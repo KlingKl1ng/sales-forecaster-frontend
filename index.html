@@ -126,18 +126,32 @@
                 formData.append('file', file);
 
                 try {
-                    // IMPORTANT: IF YOU DEPLOY TO RENDER, CHANGE THIS URL
-                    // Example: https://sales-forecaster-xyz.onrender.com/predict
-                    const response = await fetch('https://sales-forecaster-backend.onrender.com/predict', {
+                    // IMPORTANT: Set this to your RENDER URL in production
+                    const response = await fetch('http://127.0.0.1:8000/predict', {
                         method: 'POST',
                         body: formData,
+                        headers: {
+                            'X-API-Key': 'F0recastS3cr3tKey123' 
+                        }
                     });
                     const data = await response.json();
-                    if (!response.ok) throw new Error(data.detail || "Failed to process file.");
+                    
+                    if (!response.ok) {
+                        // Pass the specific backend message directly
+                        throw new Error(data.detail || "Failed to process file.");
+                    }
                     setResultData(data);
                 } catch (err) {
                     console.error("Upload Error:", err);
-                    setError(err.message + " (Check Connection)");
+                    
+                    // Logic: If the error is our specific validation message, show it cleanly.
+                    // Otherwise, append the generic "Check Connection" advice.
+                    if (err.message === "The uploaded file does not satisfy the requirements above") {
+                        setError(err.message);
+                    } else {
+                        setError(err.message + " (Check Connection)");
+                    }
+                    
                     setResultData(null);
                 } finally {
                     setIsLoading(false);
@@ -188,8 +202,8 @@
                                     <h2 className="text-lg font-semibold flex items-center gap-2"><IconActivity /> 2. Forecast Results</h2>
                                     {resultData && <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded border border-purple-200">Winner: {resultData.model_name}</span>}
                                 </div>
-                                {!resultData && !isLoading && <div className="h-96 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-100 rounded-xl"><p>Uploadddddd a fileeeee andddddddddd clickkkkkk Runnnnnnn.</p></div>}
-                                {isLoading && <div className="h-96 flex flex-col items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mb-4"></div><p className="text-slate-500 animate-pulse">Running Analytics And Choosing Best Model...</p></div>}
+                                {!resultData && !isLoading && <div className="h-96 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-100 rounded-xl"><p>Upload a file and click Run.</p></div>}
+                                {isLoading && <div className="h-96 flex flex-col items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mb-4"></div><p className="text-slate-500 animate-pulse">Running SES, DES, TES Models...</p></div>}
                                 {resultData && (
                                     <div className="h-[400px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
