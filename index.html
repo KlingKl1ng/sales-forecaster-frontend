@@ -127,8 +127,8 @@
 
                 try {
                     // IMPORTANT: IF YOU DEPLOY TO RENDER, CHANGE THIS URL
-                    // Example: https://sales-forecaster-xyz.onrender.com/predict
-                    const response = await fetch('http://127.0.0.1:8000/predict', {
+                    // URL for Render: https://sales-forecaster-backend.onrender.com/predict
+                    const response = await fetch('https://sales-forecaster-backend.onrender.com/predict', {
                         method: 'POST',
                         body: formData,
                         // headers: { 'X-API-Key': 'F0recastS3cr3tKey123' } // Uncomment if using API Key
