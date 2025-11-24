@@ -8,7 +8,7 @@
     <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. Google Fonts (Inter for a modern look) -->
+    <!-- 2. Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- 3. React & Libraries -->
@@ -18,11 +18,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/1.8.5/Recharts.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Custom Styles for Gradients and Fonts -->
     <style>
         body { font-family: 'Inter', sans-serif; }
         
-        /* The Perartis Gold Gradient for Buttons */
         .btn-gold {
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             color: white;
@@ -38,7 +36,6 @@
             cursor: not-allowed;
         }
 
-        /* Soft Card Styling */
         .glass-card {
             background: white;
             border: 1px solid #f1f5f9;
@@ -51,7 +48,6 @@
 
     <div id="root" class="flex-grow"></div>
 
-    <!-- Elegant Footer -->
     <footer class="bg-white border-t border-slate-100 py-6 mt-12">
         <div class="max-w-6xl mx-auto px-6 flex justify-between items-center">
             <div class="text-xs text-slate-400 font-medium">
@@ -85,7 +81,6 @@
             return null;
         };
 
-        // --- CUSTOM TOOLTIP ---
         const CustomTooltip = ({ active, payload, label }) => {
             if (active && payload && payload.length) {
                 const isFuture = label && label.includes("(fc)");
@@ -108,12 +103,12 @@
             return null;
         };
 
-        // --- MODERN ICONS ---
-        const IconUpload = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-amber-500 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>;
+        // --- ICONS ---
+        const IconUpload = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-amber-500 mb-3 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>;
         const IconFile = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
         const IconSettings = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>;
         const IconActivity = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>;
-        const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-emerald-500 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+        const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-emerald-500 mb-3 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
         const IconAlert = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 
         const App = () => {
@@ -124,7 +119,6 @@
             const [error, setError] = useState(null);
             const [isDragging, setIsDragging] = useState(false);
 
-            // --- Handlers (Same as before) ---
             const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
             const handleDragLeave = () => { setIsDragging(false); };
             const handleDrop = (e) => { e.preventDefault(); setIsDragging(false); if (e.dataTransfer.files[0]) validateAndSetFile(e.dataTransfer.files[0]); };
@@ -172,24 +166,21 @@
             return (
                 <div className="max-w-7xl mx-auto w-full">
                     
-                    {/* --- HEADER WITH LOGO --- */}
+                    {/* --- HEADER --- */}
                     <header className="bg-white shadow-sm border-b border-slate-100 py-4 px-6 md:px-8 mb-10 rounded-b-2xl mx-4 md:mx-0">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             
-                            {/* Logo Section */}
                             <div className="flex items-center gap-4">
                                 <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                    {/* MAKE SURE YOUR FILE IS NAMED EXACTLY THIS */}
                                     <img src="./fulllogo_transparent.png" alt="Perartis Logo" className="h-12 md:h-14 object-contain" />
                                 </div>
                                 <div className="hidden md:block h-10 w-px bg-slate-200 mx-2"></div>
                                 <div className="flex flex-col justify-center">
                                     <h1 className="text-xl font-bold text-slate-800 tracking-tight">Sales Forecaster</h1>
-                                    <p className="text-xs font-semibold text-amber-500 tracking-wide uppercase">OPTIMIZING TODAY, GROWING TOMORROW</p>
+                                    <p className="text-xs font-semibold text-amber-600 tracking-wide uppercase">OPTIMIZING TODAY, GROWING TOMORROW</p>
                                 </div>
                             </div>
 
-                            {/* Status Badge */}
                             <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-100 shadow-sm">
                                 <span className="relative flex h-2.5 w-2.5">
                                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -203,7 +194,7 @@
                     {/* --- MAIN CONTENT --- */}
                     <div className="px-4 md:px-0 grid lg:grid-cols-12 gap-8">
                         
-                        {/* LEFT SIDEBAR (Controls) */}
+                        {/* LEFT SIDEBAR */}
                         <div className="lg:col-span-4 space-y-6">
                             
                             {/* CARD 1: UPLOAD */}
@@ -217,7 +208,7 @@
                                 </div>
                                 
                                 <div 
-                                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer group
+                                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer group flex flex-col items-center justify-center
                                         ${isDragging ? 'border-amber-500 bg-amber-50' : 'border-slate-200 hover:border-amber-300 hover:bg-slate-50'}
                                         ${file ? 'bg-emerald-50 border-emerald-200' : ''}
                                     `}
@@ -226,17 +217,19 @@
                                     <input id="fileInput" type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileSelect} />
                                     
                                     {file ? (
-                                        <div className="animate-in fade-in zoom-in duration-300">
+                                        <div className="animate-in fade-in zoom-in duration-300 flex flex-col items-center">
+                                            {/* Centered Icon */}
                                             <IconCheck />
-                                            <p className="font-bold text-slate-700 break-all line-clamp-1">{file.name}</p>
+                                            <p className="font-bold text-slate-700 break-all line-clamp-1 text-center">{file.name}</p>
                                             <p className="text-xs text-slate-400 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
                                             <button onClick={clearFile} className="text-xs font-bold text-red-500 hover:text-red-700 mt-3 py-1 px-3 bg-white rounded border border-red-100 shadow-sm">Change File</button>
                                         </div>
                                     ) : (
-                                        <div className="group-hover:translate-y-[-2px] transition-transform">
+                                        <div className="group-hover:translate-y-[-2px] transition-transform flex flex-col items-center">
+                                            {/* Centered Icon */}
                                             <IconUpload />
-                                            <p className="font-medium text-slate-600">Click to upload Excel</p>
-                                            <p className="text-xs text-slate-400 mt-2">.xlsx or .xls files</p>
+                                            <p className="font-medium text-slate-600 text-center">Click to upload Excel</p>
+                                            <p className="text-xs text-slate-400 mt-2 text-center">.xlsx or .xls files</p>
                                         </div>
                                     )}
                                 </div>
@@ -281,11 +274,11 @@
                                     >
                                         <option value="auto">✨ Automatic (AI Best Fit)</option>
                                         <option disabled>──────────</option>
-                                        <option value="ses">1️⃣ SES</option>
-                                        <option value="des">2️⃣ DES</option>
-                                        <option value="tes">3️⃣ TES</option>
-                                        <option value="prophet">4️⃣ PRO</option>
-                                        <option value="arima">5️⃣ ARI</option>
+                                        <option value="ses">Simple Exponential Smoothing</option>
+                                        <option value="des">Double Exponential Smoothing</option>
+                                        <option value="tes">Triple Exponential Smoothing</option>
+                                        <option value="prophet">Facebook Prophet</option>
+                                        <option value="arima">ARIMA</option>
                                     </select>
                                     <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -331,8 +324,9 @@
                                 <div className="flex-grow bg-slate-50 rounded-2xl border border-slate-100 p-4 flex flex-col justify-center relative">
                                     {!resultData && !isLoading && (
                                         <div className="text-center opacity-40">
-                                            <img src="./grayscale_transparent.png" className="h-16 mx-auto mb-4 opacity-50 grayscale" />
-                                            <p className="text-slate-500 font-medium">Ready for analysis</p>
+                                            {/* REMOVED THE PLACEHOLDER IMAGE HERE */}
+                                            <p className="text-slate-500 font-medium text-lg">Ready for analysis</p>
+                                            <p className="text-slate-400 text-sm mt-2">Upload data and select a model to begin</p>
                                         </div>
                                     )}
 
