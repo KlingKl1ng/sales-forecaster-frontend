@@ -209,19 +209,18 @@
 
                             {/* STEP 2: CHOOSE MODEL */}
                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><IconSettings /> 2. Choose Model</h2>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Forecasting Method</label>
+                                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><IconSettings /> 2. Choose Method</h2>
                                 <select 
                                     value={modelType} 
                                     onChange={(e) => setModelType(e.target.value)}
                                     className="w-full p-3 border border-slate-300 rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                 >
-                                    <option value="auto">✨ Automatic Running (Best Fit)</option>
-                                    <option value="ses">SES</option>
-                                    <option value="des">DES</option>
-                                    <option value="tes">TES</option>
-                                    <option value="prophet">PRO</option>
-                                    <option value="arima">ARI</option>
+                                    <option value="auto">✨ Auto Run</option>
+                                    <option value="ses">1️⃣ SES</option>
+                                    <option value="des">2️⃣ DES</option>
+                                    <option value="tes">3️⃣ TES</option>
+                                    <option value="prophet">4️⃣ PRO</option>
+                                    <option value="arima">5️⃣ ARI</option>
                                 </select>
                                 
                                 <button 
