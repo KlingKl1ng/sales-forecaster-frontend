@@ -21,9 +21,14 @@
     <!-- 5. Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans p-4 md:p-8">
+<body class="bg-slate-50 text-slate-900 font-sans p-4 md:p-8 flex flex-col min-h-screen">
 
-    <div id="root"></div>
+    <div id="root" class="flex-grow"></div>
+
+    <!-- Version Footer -->
+    <footer class="text-right text-xs text-slate-400 mt-8 mr-4">
+        Version 1.0
+    </footer>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
@@ -126,10 +131,21 @@
                 formData.append('file', file);
 
                 try {
-                    // IMPORTANT: IF YOU DEPLOY TO RENDER, CHANGE THIS URL
-                    // URL for Render: https://sales-forecaster-backend.onrender.com/predict
-                    // URL for Local Test: http://127.0.0.1:8000/predict
-                    const response = await fetch('http://127.0.0.1:8000/predict', {
+                    // --- SMART URL SWITCHER ---
+                    // 1. Define your two backends
+                    const LOCAL_API = 'http://127.0.0.1:8000/predict';
+                    const PROD_API = 'https://sales-forecaster-backend.onrender.com/predict';
+                    
+                    // 2. Check where the frontend is currently running
+                    const isLocal = window.location.hostname === 'localhost' || 
+                                    window.location.hostname === '127.0.0.1' || 
+                                    window.location.protocol === 'file:';
+
+                    const apiUrl = isLocal ? LOCAL_API : PROD_API;
+                    
+                    console.log("Using Backend:", apiUrl);
+
+                    const response = await fetch(apiUrl, {
                         method: 'POST',
                         body: formData,
                         // headers: { 'X-API-Key': 'F0recastS3cr3tKey123' } // Uncomment if using API Key
@@ -143,7 +159,6 @@
                 } catch (err) {
                     console.error("Upload Error:", err);
                     
-                    // LOGIC: Only show "Check Connection" if it's NOT our specific validation error
                     if (err.message === "The uploaded file does not satisfy the requirements above") {
                         setError(err.message);
                     } else {
@@ -163,7 +178,10 @@
                             <IconActivity />
                             Sales Forecaster
                         </h1>
-                        <p className="text-sm text-slate-400 font-medium mb-2">Copyright by Operatis</p>
+                        {/* Added Subtitle */}
+                        <p className="text-sm font-medium text-blue-600 mb-1">A machine-learning based forecasting tool</p>
+                        <p className="text-xs text-slate-400 font-medium mb-2">Copyright by Operatis</p>
+                        
                         <div className="mt-4 inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-xs font-medium border border-green-200">
                             <IconInfo />
                             Ready to Forecast
