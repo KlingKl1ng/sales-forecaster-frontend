@@ -27,7 +27,7 @@
 
     <!-- Version Footer -->
     <footer class="text-right text-xs text-slate-400 mt-8 mr-4">
-        Version 1.0
+        Version 2.0
     </footer>
 
     <script type="text/babel">
@@ -35,7 +35,7 @@
         const Recharts = window.Recharts || {};
         const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart, ComposedChart } = Recharts;
 
-        // --- 1. CUSTOM FORECAST DOT (Green) ---
+        // --- ICONS & DOTS (Unchanged) ---
         const CustomForecastDot = (props) => {
             const { cx, cy, payload } = props;
             if (payload && payload.name && payload.name.includes("(fc)")) {
@@ -44,7 +44,6 @@
             return null;
         };
 
-        // --- 2. CUSTOM FITTED DOT (Purple) ---
         const CustomFittedDot = (props) => {
             const { cx, cy, payload } = props;
             if (payload && payload.forecast !== undefined && !payload.name.includes("(fc)")) {
@@ -53,7 +52,6 @@
             return null;
         };
 
-        // --- CUSTOM TOOLTIP ---
         const CustomTooltip = ({ active, payload, label }) => {
             if (active && payload && payload.length) {
                 const isFuture = label && label.includes("(fc)");
@@ -77,9 +75,9 @@
             return null;
         };
 
-        // --- ICONS ---
         const IconUpload = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-10 w-10 text-slate-400 mx-auto mb-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>;
         const IconFile = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 h-5 w-5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>;
+        const IconSettings = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 h-5 w-5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
         const IconActivity = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 h-8 w-8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>;
         const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-10 w-10 text-green-500 mx-auto mb-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
         const IconX = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>;
@@ -87,6 +85,7 @@
 
         const App = () => {
             const [file, setFile] = useState(null);
+            const [modelType, setModelType] = useState("auto"); // NEW: State for dropdown
             const [isLoading, setIsLoading] = useState(false);
             const [resultData, setResultData] = useState(null);
             const [error, setError] = useState(null);
@@ -127,28 +126,24 @@
                 if (!file) return;
                 setIsLoading(true);
                 setError(null);
+                
                 const formData = new FormData();
                 formData.append('file', file);
+                formData.append('model_type', modelType); // NEW: Send model choice
 
                 try {
                     // --- SMART URL SWITCHER ---
-                    // 1. Define your two backends
                     const LOCAL_API = 'http://127.0.0.1:8000/predict';
                     const PROD_API = 'https://sales-forecaster-backend.onrender.com/predict';
-                    
-                    // 2. Check where the frontend is currently running
                     const isLocal = window.location.hostname === 'localhost' || 
                                     window.location.hostname === '127.0.0.1' || 
                                     window.location.protocol === 'file:';
-
                     const apiUrl = isLocal ? LOCAL_API : PROD_API;
-                    
                     console.log("Using Backend:", apiUrl);
 
                     const response = await fetch(apiUrl, {
                         method: 'POST',
                         body: formData,
-                        // headers: { 'X-API-Key': 'F0recastS3cr3tKey123' } // Uncomment if using API Key
                     });
                     const data = await response.json();
                     
@@ -158,13 +153,11 @@
                     setResultData(data);
                 } catch (err) {
                     console.error("Upload Error:", err);
-                    
                     if (err.message === "The uploaded file does not satisfy the requirements above") {
                         setError(err.message);
                     } else {
                         setError(err.message + " (Check Connection)");
                     }
-                    
                     setResultData(null);
                 } finally {
                     setIsLoading(false);
@@ -178,7 +171,6 @@
                             <IconActivity />
                             Sales Forecaster
                         </h1>
-                        {/* Added Subtitle */}
                         <p className="text-sm font-medium text-blue-600 mb-1">A machine-learning based forecasting tool</p>
                         <p className="text-xs text-slate-400 font-medium mb-2">Copyright by Operatis</p>
                         
@@ -189,7 +181,11 @@
                     </header>
 
                     <div className="grid md:grid-cols-3 gap-6">
+                        
+                        {/* LEFT COLUMN */}
                         <div className="md:col-span-1 space-y-4">
+                            
+                            {/* STEP 1: UPLOAD */}
                             <div className={`bg-white rounded-xl shadow-sm border transition-colors p-6 ${error ? 'border-red-200' : 'border-slate-200'}`}>
                                 <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><IconFile /> 1. Upload Data</h2>
                                 <div 
@@ -209,17 +205,49 @@
                                 </div>
                                 {error && <div className="mt-4 p-4 bg-red-50 border border-red-100 text-red-700 text-sm rounded-lg flex items-start gap-3"><IconX /><div><p className="font-semibold">Upload Failed</p><p className="text-red-600 mt-1">{error}</p></div></div>}
                                 {!error && <div className="mt-4 p-3 bg-blue-50 text-blue-700 text-xs rounded-lg border border-blue-100"><strong>Required Columns:</strong><br/>1. Period (Date)<br/>2. Sales_quantity (Number)</div>}
-                                <button onClick={handleProcess} disabled={!file || isLoading || error} className={`w-full mt-6 py-3 px-4 rounded-lg font-medium text-white flex items-center justify-center gap-2 transition-all ${!file || isLoading || error ? 'bg-slate-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg'}`}>{isLoading ? 'Processing...' : 'Run Forecast'}</button>
                             </div>
+
+                            {/* STEP 2: CHOOSE MODEL */}
+                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><IconSettings /> 2. Choose Model</h2>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Forecasting Method</label>
+                                <select 
+                                    value={modelType} 
+                                    onChange={(e) => setModelType(e.target.value)}
+                                    className="w-full p-3 border border-slate-300 rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                >
+                                    <option value="auto">✨ Automatic Running (Best Fit)</option>
+                                    <option value="ses">SES</option>
+                                    <option value="des">DES</option>
+                                    <option value="tes">TES</option>
+                                    <option value="prophet">PRO</option>
+                                    <option value="arima">ARI</option>
+                                </select>
+                                
+                                <button 
+                                    onClick={handleProcess} 
+                                    disabled={!file || isLoading || error} 
+                                    className={`w-full mt-6 py-3 px-4 rounded-lg font-medium text-white flex items-center justify-center gap-2 transition-all ${!file || isLoading || error ? 'bg-slate-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg'}`}
+                                >
+                                    {isLoading ? 'Processing...' : 'Run Forecast'}
+                                </button>
+                            </div>
+
                         </div>
+
+                        {/* RIGHT COLUMN */}
                         <div className="md:col-span-2">
                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 h-full min-h-[500px]">
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-lg font-semibold flex items-center gap-2"><IconActivity /> 2. Forecast Results</h2>
-                                    {resultData && <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded border border-purple-200">Winner: {resultData.model_name}</span>}
+                                    <h2 className="text-lg font-semibold flex items-center gap-2"><IconActivity /> 3. Forecast Results</h2>
+                                    {resultData && (
+                                        <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded border border-purple-200">
+                                            {resultData.mode === 'auto' ? `Winner: ${resultData.model_name}` : `Model: ${resultData.model_name}`}
+                                        </span>
+                                    )}
                                 </div>
-                                {!resultData && !isLoading && <div className="h-96 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-100 rounded-xl"><p>Upload a file and click Run.</p></div>}
-                                {isLoading && <div className="h-96 flex flex-col items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mb-4"></div><p className="text-slate-500 animate-pulse">Running Analytics and Testing Models...</p></div>}
+                                {!resultData && !isLoading && <div className="h-96 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-100 rounded-xl"><p>Upload a file, choose a model, and click Run.</p></div>}
+                                {isLoading && <div className="h-96 flex flex-col items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mb-4"></div><p className="text-slate-500 animate-pulse">Running Forecasting Algorithms...</p></div>}
                                 {resultData && (
                                     <div className="h-[400px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
@@ -234,10 +262,8 @@
                                                 <Tooltip content={<CustomTooltip />} />
                                                 <Legend verticalAlign="top" height={36}/>
                                                 
-                                                {/* 1. Actual (Area) */}
                                                 <Area type="monotone" dataKey="actual" name="Actual Sales" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorActual)" />
                                                 
-                                                {/* 2. Fitted (Purple - Dashed) */}
                                                 <Line 
                                                     connectNulls={true}
                                                     type="monotone" 
@@ -249,7 +275,6 @@
                                                     dot={<CustomFittedDot />} 
                                                 />
                                                 
-                                                {/* 3. Forecast (Green - Dotted - Green Dots) */}
                                                 <Line 
                                                     type="monotone" 
                                                     dataKey="forecast" 
