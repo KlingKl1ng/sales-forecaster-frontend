@@ -39,7 +39,6 @@
         
         body { font-family: 'Inter', sans-serif; background: #f8fafc; height: 100vh; width: 100vw; overflow: hidden; margin: 0; }
         
-        /* Enable scrolling for content that overflows */
         .scroller {
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
@@ -68,6 +67,10 @@
         // --- ICONS ---
         const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>;
         const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
+        
+        // --- NEW FULLSCREEN ICONS ---
+        const MaximizeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>;
+        const MinimizeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>;
 
         const MetricTile = ({ label, value, subValue, type }) => {
             const colorClass = type === 'pos' ? 'text-emerald-600' : type === 'neg' ? 'text-rose-600' : 'text-slate-700';
@@ -88,7 +91,11 @@
             const [result, setResult] = useState(null);
             const [isLoading, setIsLoading] = useState(false);
             const [error, setError] = useState(null);
-            const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+            
+            // --- NEW: Full Screen State ---
+            const [isFullScreen, setIsFullScreen] = useState(false);
+            
             const fileInputRef = useRef(null);
 
             const handleRun = async () => {
@@ -98,6 +105,8 @@
                 setResult(null);
                 
                 if (window.innerWidth < 768) setIsSidebarOpen(false);
+                // Exit full screen if running new model just in case (optional)
+                setIsFullScreen(false);
 
                 const formData = new FormData();
                 formData.append('file', file);
@@ -153,7 +162,7 @@
                 <div className="flex flex-col h-full bg-slate-50 overflow-hidden relative w-full">
                     
                     {/* --- HEADER --- */}
-                    <header className="relative h-14 md:h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-30">
+                    <header className={`relative h-14 md:h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-30 ${isFullScreen ? 'hidden' : 'flex'}`}>
                         <div className="flex items-center gap-3 md:gap-4 z-10">
                             <button 
                                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -173,27 +182,21 @@
                         </div>
 
                         <div className="text-[10px] md:text-xs font-mono text-slate-400 z-10">
-                            v3.8_FLEX_SCROLL
+                            v4.0_FULLSCREEN
                         </div>
                     </header>
 
                     {/* --- MAIN LAYOUT --- */}
                     <div className="flex flex-grow overflow-hidden min-h-0 relative w-full">
                         
-                        {/* Mobile Overlay */}
-                        {isSidebarOpen && (
-                            <div 
-                                className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity"
-                                onClick={() => setIsSidebarOpen(false)}
-                            ></div>
-                        )}
-
-                        {/* Sidebar */}
+                        {/* --- SIDEBAR --- */}
                         <aside className={`
+                            ${isFullScreen ? 'hidden' : ''}
                             fixed md:relative inset-y-0 left-0 z-50
                             w-72 md:w-64 bg-white border-r border-slate-200 
                             flex flex-col h-full shadow-2xl md:shadow-none
                             transform transition-transform duration-300 ease-in-out
+                            ${!isSidebarOpen && 'md:translate-x-0'} 
                             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                         `}>
                             <div className="md:hidden h-14 border-b border-slate-100 flex items-center justify-between px-4 shrink-0">
@@ -220,7 +223,6 @@
                                     </div>
                                     {error && <div className="text-xxs text-red-600 mt-1 font-medium">{error}</div>}
                                 </div>
-
                                 <div className="bg-slate-50 border border-slate-200 rounded p-3">
                                     <h3 className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">Template requirements:</h3>
                                     <p className="text-xxs text-slate-500 mb-1">Table must have two columns:</p>
@@ -229,7 +231,6 @@
                                         <li>Sales_quantity (Number)</li>
                                     </ul>
                                 </div>
-
                                 <div>
                                     <h3 className="text-xxs font-bold text-slate-400 uppercase tracking-widest mb-2">Algorithm</h3>
                                     <select 
@@ -244,7 +245,6 @@
                                         <option value="prophet">Prophet (Complex)</option>
                                     </select>
                                 </div>
-
                                 <button 
                                     onClick={handleRun}
                                     disabled={!file || isLoading}
@@ -265,11 +265,8 @@
                             </div>
                         </aside>
                         
-                        {/* --- CONTENT AREA --- 
-                            Updated: 'overflow-y-auto' enables scrolling for the whole right panel. 
-                            'h-full' ensures it takes up the full space initially.
-                        */}
-                        <main className="flex-grow flex flex-col bg-slate-50 relative min-w-0 transition-all w-full h-full overflow-y-auto scroller">
+                        {/* --- CONTENT AREA (Main Window) --- */}
+                        <main className={`flex-grow flex flex-col bg-slate-50 relative min-w-0 transition-all w-full h-full overflow-y-auto scroller ${isFullScreen ? 'hidden' : 'flex'}`}>
                             
                             {/* KPI Bar */}
                             <div className="h-14 md:h-16 bg-white border-b border-slate-200 flex items-center shrink-0 shadow-sm overflow-x-auto snap-x no-scrollbar sticky top-0 z-20">
@@ -283,13 +280,25 @@
                                 </div>
                             </div>
 
-                            {/* Chart Container 
-                                Updated: 'min-h-[350px]' forces the chart to stay large. 
-                                Since 'main' has overflow-y-auto, this will push the content down and create a scrollbar on short screens (Landscape).
+                            {/* Standard Chart Container (Hidden if Full Screen is active to avoid duplicates, or we can just swap styles) */}
+                            {/* Actually, we can reuse the same container structure logic. 
+                                Below is the logic: If isFullScreen is FALSE, we render this layout. 
+                                If TRUE, we render the FULL SCREEN container overlay.
                             */}
                             <div className="p-2 md:p-4 relative flex flex-col w-full min-h-[350px] flex-grow" style={{ touchAction: 'pan-y' }}>
                                 <div className="flex-1 w-full bg-white border border-slate-200 rounded shadow-sm p-2 md:p-4 relative h-full overflow-hidden group">
                                     
+                                    {/* Full Screen Toggle Button (Standard View) */}
+                                    {result && (
+                                        <button 
+                                            onClick={() => setIsFullScreen(true)}
+                                            className="absolute top-2 right-2 z-10 p-2 bg-white/90 border border-slate-200 shadow-sm rounded-md text-slate-500 hover:text-brand-gold hover:border-brand-gold transition-colors"
+                                            title="Full Screen"
+                                        >
+                                            <MaximizeIcon />
+                                        </button>
+                                    )}
+
                                     {!result && !isLoading && (
                                         <div className="h-full flex flex-col items-center justify-center text-slate-300">
                                             <div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 border-dashed rounded flex items-center justify-center mb-2">
@@ -357,6 +366,63 @@
                                 </div>
                             </div>
                         </main>
+
+                        {/* --- FULL SCREEN OVERLAY MODE --- 
+                            This renders ONLY when isFullScreen is TRUE.
+                            It sits on top of everything else (z-50) and takes up 100vw/100vh.
+                        */}
+                        {isFullScreen && result && (
+                            <div className="fixed inset-0 z-50 bg-white p-2 md:p-6 w-screen h-screen flex flex-col">
+                                <button 
+                                    onClick={() => setIsFullScreen(false)}
+                                    className="absolute top-4 right-4 z-50 p-3 bg-slate-100 rounded-full shadow-md text-slate-600 hover:bg-slate-200 hover:text-red-600 transition-colors"
+                                >
+                                    <MinimizeIcon />
+                                </button>
+
+                                <div className="flex-1 w-full h-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <ComposedChart data={[...result.history, ...result.forecast]} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontWeight: 500}} dy={10} minTickGap={30} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontFamily: 'monospace'}} />
+                                            
+                                            <Tooltip 
+                                                contentStyle={{ backgroundColor: '#fff', borderColor: '#e2e8f0', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', fontSize: '14px', borderRadius: '8px' }}
+                                                itemStyle={{ padding: 4 }}
+                                            />
+                                            <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '12px', fontWeight: 600}}/>
+                                            
+                                            <Area type="monotone" dataKey="actual" name="Historical" stroke="#334155" fill="#f1f5f9" strokeWidth={3} isAnimationActive={false} />
+                                            
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="fitted" 
+                                                name="Fit" 
+                                                stroke="#94a3b8" 
+                                                strokeDasharray="3 3" 
+                                                strokeWidth={2} 
+                                                dot={false} 
+                                                connectNulls={false}
+                                                isAnimationActive={false}
+                                            />
+                                            
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="forecast" 
+                                                name="Forecast" 
+                                                stroke="#f59e0b" 
+                                                strokeWidth={4} 
+                                                strokeDasharray="5 5" 
+                                                dot={{r: 5, fill: '#fff', stroke: '#f59e0b', strokeWidth: 3}} 
+                                                connectNulls={false}
+                                                isAnimationActive={false}
+                                            />
+                                        </ComposedChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
