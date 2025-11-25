@@ -27,7 +27,7 @@
 
     <!-- Version Footer -->
     <footer class="text-right text-xs text-slate-400 mt-8 mr-4">
-        Version 2.0
+        Version 2.1 (Live Debug)
     </footer>
 
     <script type="text/babel">
@@ -85,7 +85,7 @@
 
         const App = () => {
             const [file, setFile] = useState(null);
-            const [modelType, setModelType] = useState("auto"); // NEW: State for dropdown
+            const [modelType, setModelType] = useState("auto");
             const [isLoading, setIsLoading] = useState(false);
             const [resultData, setResultData] = useState(null);
             const [error, setError] = useState(null);
@@ -129,17 +129,21 @@
                 
                 const formData = new FormData();
                 formData.append('file', file);
-                formData.append('model_type', modelType); // NEW: Send model choice
+                formData.append('model_type', modelType);
 
                 try {
                     // --- SMART URL SWITCHER ---
                     const LOCAL_API = 'http://127.0.0.1:8000/predict';
                     const PROD_API = 'https://sales-forecaster-backend.onrender.com/predict';
+                    
                     const isLocal = window.location.hostname === 'localhost' || 
                                     window.location.hostname === '127.0.0.1' || 
                                     window.location.protocol === 'file:';
+
                     const apiUrl = isLocal ? LOCAL_API : PROD_API;
-                    console.log("Using Backend:", apiUrl);
+                    
+                    // Log for debugging (Check browser console F12)
+                    console.log("Connecting to Backend:", apiUrl);
 
                     const response = await fetch(apiUrl, {
                         method: 'POST',
@@ -171,9 +175,7 @@
                             <IconActivity />
                             Sales Forecaster
                         </h1>
-                        <p className="text-sm font-medium text-blue-600 mb-1">A machine-learning based forecasting tool</p>
-                        <p className="text-xs text-slate-400 font-medium mb-2">Copyright by Operatis</p>
-                        
+                        <p className="text-sm text-slate-400 font-medium mb-2">Copyright by Operatis</p>
                         <div className="mt-4 inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-xs font-medium border border-green-200">
                             <IconInfo />
                             Ready to Forecast
@@ -217,11 +219,11 @@
                                     className="w-full p-3 border border-slate-300 rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                 >
                                     <option value="auto">✨ Automatic Running (Best Fit)</option>
-                                    <option value="ses">SES</option>
-                                    <option value="des">DES</option>
-                                    <option value="tes">TES</option>
-                                    <option value="prophet">PRO</option>
-                                    <option value="arima">ARI</option>
+                                    <option value="ses">Simple Exp. Smoothing (SES)</option>
+                                    <option value="des">Double Exp. Smoothing (DES)</option>
+                                    <option value="tes">Triple Exp. Smoothing (TES)</option>
+                                    <option value="prophet">Prophet (Facebook)</option>
+                                    <option value="arima">ARIMA</option>
                                 </select>
                                 
                                 <button 
