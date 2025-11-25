@@ -39,8 +39,8 @@
         
         body { font-family: 'Inter', sans-serif; background: #f8fafc; height: 100vh; width: 100vw; overflow: hidden; margin: 0; }
         
-        /* Smooth scrolling for the sidebar */
-        .sidebar-scroll {
+        /* Smooth scrolling for sidebar & main content */
+        .scroller {
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
         }
@@ -173,7 +173,7 @@
                         </div>
 
                         <div className="text-[10px] md:text-xs font-mono text-slate-400 z-10">
-                            v3.3_LAYOUT
+                            v3.4_FIXED_SCROLL
                         </div>
                     </header>
 
@@ -205,7 +205,7 @@
                             </div>
 
                             {/* SCROLLABLE CONTENT AREA (Inputs Only) */}
-                            <div className="flex-1 overflow-y-auto sidebar-scroll p-4 space-y-6">
+                            <div className="flex-1 overflow-y-auto scroller p-4 space-y-6">
                                 
                                 {/* 1. Data Source */}
                                 <div>
@@ -266,7 +266,7 @@
                                 </button>
                             </div>
 
-                            {/* 5. PINNED FOOTER (Bottom Left of Site/Sidebar) */}
+                            {/* 5. PINNED FOOTER (Fixed Bottom) */}
                             <div className="p-4 border-t border-slate-100 bg-white flex-shrink-0">
                                 <p className="text-xxs font-bold text-slate-400 leading-relaxed">
                                     OPERARTIS ANALYTICS<br/>
@@ -275,8 +275,11 @@
                             </div>
                         </aside>
                         
-                        {/* --- CONTENT AREA --- */}
-                        <main className="flex-grow flex flex-col bg-slate-50 relative min-w-0 transition-all w-full">
+                        {/* --- CONTENT AREA (Main Window) --- 
+                            Updated: Added 'overflow-y-auto' and 'scroller' to allow scrolling of the main content 
+                            when in landscape mode or small screens.
+                        */}
+                        <main className="flex-grow flex flex-col bg-slate-50 relative min-w-0 transition-all w-full overflow-y-auto scroller">
                             
                             {/* KPI Bar */}
                             <div className="h-14 md:h-16 bg-white border-b border-slate-200 flex items-center shrink-0 shadow-sm overflow-x-auto snap-x no-scrollbar">
@@ -290,9 +293,12 @@
                                 </div>
                             </div>
 
-                            {/* Chart Container */}
-                            <div className="flex-1 p-2 md:p-4 relative flex flex-col min-h-0 w-full">
-                                <div className="flex-1 w-full bg-white border border-slate-200 rounded shadow-sm p-2 md:p-4 relative min-h-0">
+                            {/* Chart Container 
+                                Updated: Added 'min-h-[350px]' to force a scrollbar on short landscape screens.
+                                Added 'touch-action: pan-y' to ensure touch scrolling works over the chart area.
+                            */}
+                            <div className="flex-1 p-2 md:p-4 relative flex flex-col w-full shrink-0 min-h-[350px] lg:min-h-0" style={{ touchAction: 'pan-y' }}>
+                                <div className="flex-1 w-full bg-white border border-slate-200 rounded shadow-sm p-2 md:p-4 relative h-full">
                                     {!result && !isLoading && (
                                         <div className="h-full flex flex-col items-center justify-center text-slate-300">
                                             <div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 border-dashed rounded flex items-center justify-center mb-2">
