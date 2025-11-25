@@ -173,7 +173,7 @@
                         </div>
 
                         <div className="text-[10px] md:text-xs font-mono text-slate-400 z-10">
-                            v3.4_FIXED_SCROLL
+                            v3.5_LOADING_FX
                         </div>
                     </header>
 
@@ -275,10 +275,7 @@
                             </div>
                         </aside>
                         
-                        {/* --- CONTENT AREA (Main Window) --- 
-                            Updated: Added 'overflow-y-auto' and 'scroller' to allow scrolling of the main content 
-                            when in landscape mode or small screens.
-                        */}
+                        {/* --- CONTENT AREA (Main Window) --- */}
                         <main className="flex-grow flex flex-col bg-slate-50 relative min-w-0 transition-all w-full overflow-y-auto scroller">
                             
                             {/* KPI Bar */}
@@ -293,12 +290,11 @@
                                 </div>
                             </div>
 
-                            {/* Chart Container 
-                                Updated: Added 'min-h-[350px]' to force a scrollbar on short landscape screens.
-                                Added 'touch-action: pan-y' to ensure touch scrolling works over the chart area.
-                            */}
+                            {/* Chart Container */}
                             <div className="flex-1 p-2 md:p-4 relative flex flex-col w-full shrink-0 min-h-[350px] lg:min-h-0" style={{ touchAction: 'pan-y' }}>
-                                <div className="flex-1 w-full bg-white border border-slate-200 rounded shadow-sm p-2 md:p-4 relative h-full">
+                                <div className="flex-1 w-full bg-white border border-slate-200 rounded shadow-sm p-2 md:p-4 relative h-full overflow-hidden">
+                                    
+                                    {/* --- 1. EMPTY STATE --- */}
                                     {!result && !isLoading && (
                                         <div className="h-full flex flex-col items-center justify-center text-slate-300">
                                             <div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 border-dashed rounded flex items-center justify-center mb-2">
@@ -308,6 +304,22 @@
                                         </div>
                                     )}
 
+                                    {/* --- 2. LOADING STATE (NEW) --- */}
+                                    {isLoading && (
+                                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
+                                            <div className="mb-4">
+                                                <svg className="animate-spin h-8 w-8 md:h-10 md:w-10 text-brand-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            </div>
+                                            <p className="text-xs md:text-sm font-bold text-brand-gold animate-pulse tracking-widest uppercase text-center px-4">
+                                                Running Forecasting Algorithm...
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* --- 3. CHART STATE --- */}
                                     {result && (
                                         <ResponsiveContainer width="100%" height="100%">
                                             <ComposedChart data={[...result.history, ...result.forecast]} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
