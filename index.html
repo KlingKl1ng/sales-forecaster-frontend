@@ -190,11 +190,13 @@
                     {/* --- MAIN LAYOUT --- */}
                     <div className="flex flex-grow overflow-hidden min-h-0 relative w-full">
                         
-                        {/* --- SIDEBAR --- */}
+                        {/* --- SIDEBAR --- 
+                            Updated: Changed w-72/md:w-64 to 'w-80' (320px) to allow text to fit on one line.
+                        */}
                         <aside className={`
                             ${isFullScreen ? 'hidden' : ''}
                             fixed md:relative inset-y-0 left-0 z-50
-                            w-72 md:w-64 bg-white border-r border-slate-200 
+                            w-80 bg-white border-r border-slate-200 
                             flex flex-col h-full shadow-2xl md:shadow-none
                             transform transition-transform duration-300 ease-in-out
                             ${!isSidebarOpen && 'md:translate-x-0'} 
@@ -225,7 +227,7 @@
                                     {error && <div className="text-xxs text-red-600 mt-1 font-medium">{error}</div>}
                                 </div>
                                 <div className="bg-slate-50 border border-slate-200 rounded p-3">
-                                    <h3 className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">Template requirements:</h3>
+                                    <h3 className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2 whitespace-nowrap">Template requirements:</h3>
                                     <p className="text-xxs text-slate-500 mb-1">Table must have two columns:</p>
                                     <ul className="text-xxs text-slate-600 list-disc pl-3 space-y-0.5 font-mono">
                                         <li>Period (Date)</li>
@@ -259,21 +261,25 @@
                             </div>
 
                             <div className="p-4 border-t border-slate-100 bg-white flex-shrink-0">
-                                <p className="text-xxs font-bold text-slate-400 leading-relaxed">
+                                <p className="text-xxs font-bold text-slate-400 leading-relaxed whitespace-nowrap">
                                     OPERARTIS ANALYTICS<br/>
                                     Optimizing Today, Growing Tomorrow.
                                 </p>
                             </div>
                         </aside>
+
+                        {/* Mobile Overlay */}
+                        {isSidebarOpen && (
+                            <div 
+                                className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity"
+                                onClick={() => setIsSidebarOpen(false)}
+                            ></div>
+                        )}
                         
-                        {/* --- CONTENT AREA (Main Window) --- 
-                            Updated logic: The KPI Bar is NO LONGER sticky. 
-                            It is just a normal flex item. When you scroll down the 'main', 
-                            the KPI bar will scroll up and out of view.
-                        */}
+                        {/* --- CONTENT AREA (Main Window) --- */}
                         <main className={`flex-grow flex flex-col bg-slate-50 relative min-w-0 transition-all w-full h-full overflow-y-auto scroller ${isFullScreen ? 'hidden' : 'flex'}`}>
                             
-                            {/* KPI Bar - REMOVED 'sticky top-0' */}
+                            {/* KPI Bar */}
                             <div className="h-14 md:h-16 bg-white border-b border-slate-200 flex items-center shrink-0 shadow-sm overflow-x-auto snap-x no-scrollbar relative z-20">
                                 <MetricTile label="Current Vol" value={metrics.current} />
                                 <MetricTile label="Current Fit" value={metrics.fit} />
@@ -285,9 +291,7 @@
                                 </div>
                             </div>
 
-                            {/* Chart Container 
-                                Updated: Increased min-h to 400px to ensure scrollability on small screens.
-                            */}
+                            {/* Chart Container */}
                             <div className="p-2 md:p-4 relative flex flex-col w-full min-h-[400px] flex-grow" style={{ touchAction: 'pan-y' }}>
                                 <div className="flex-1 w-full bg-white border border-slate-200 rounded shadow-sm p-2 md:p-4 relative h-full overflow-hidden group">
                                     
