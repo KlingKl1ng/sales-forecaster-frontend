@@ -3,297 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Forecaster</title>
+    <title>Operartis | Analyst Terminal</title>
     
-    <!-- 1. Styles -->
+    <link rel="icon" type="image/png" href="./icononly_transparent_nobuffer.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#f59e0b', 
+                            dark: '#b45309',
+                            gray: '#f8fafc',
+                            border: '#e2e8f0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    },
+                    fontSize: {
+                        xxs: '0.65rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; height: 100vh; overflow: hidden; margin: 0; }
+        
+        .input-dense { padding-top: 0.35rem; padding-bottom: 0.35rem; font-size: 0.875rem; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+    </style>
     
-    <!-- 2. React 17 (Stable) -->
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
-    
-    <!-- 3. Helper for Charts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-    
-    <!-- 4. Recharts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/1.8.5/Recharts.min.js"></script>
-    
-    <!-- 5. Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans p-4 md:p-8 flex flex-col min-h-screen">
+<body>
 
-    <div id="root" class="flex-grow"></div>
-
-    <!-- Version Footer -->
-    <footer class="text-right text-xs text-slate-400 mt-8 mr-4">
-        Version 2.0
-    </footer>
+    <div id="root" class="h-full flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
-        const Recharts = window.Recharts || {};
-        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart, ComposedChart } = Recharts;
+        const { useState, useEffect, useRef } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart } = window.Recharts;
 
-        // --- ICONS & DOTS (Unchanged) ---
-        const CustomForecastDot = (props) => {
-            const { cx, cy, payload } = props;
-            if (payload && payload.name && payload.name.includes("(fc)")) {
-                return <circle cx={cx} cy={cy} r={3} stroke="#10b981" strokeWidth={2} fill="white" />;
-            }
-            return null;
-        };
+        // --- COMPONENTS ---
 
-        const CustomFittedDot = (props) => {
-            const { cx, cy, payload } = props;
-            if (payload && payload.forecast !== undefined && !payload.name.includes("(fc)")) {
-                 return <circle cx={cx} cy={cy} r={3} stroke="#8b5cf6" strokeWidth={2} fill="white" />;
-            }
-            return null;
-        };
-
-        const CustomTooltip = ({ active, payload, label }) => {
-            if (active && payload && payload.length) {
-                const isFuture = label && label.includes("(fc)");
-                return (
-                    <div className="bg-white p-3 border border-slate-200 shadow-lg rounded-lg text-sm opacity-95">
-                        <p className="font-bold mb-2 text-slate-700">{label}</p>
-                        {payload.map((entry, index) => {
-                            if (entry.name === "Forecast" && !isFuture) return null;
-                            
-                            return (
-                                <p key={index} style={{ color: entry.color }} className="flex items-center gap-2 mb-1 last:mb-0">
-                                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></span>
-                                    <span className="font-medium">{entry.name}:</span> 
-                                    <span>{entry.value}</span>
-                                </p>
-                            );
-                        })}
+        const MetricTile = ({ label, value, subValue, type }) => {
+            const colorClass = type === 'pos' ? 'text-emerald-600' : type === 'neg' ? 'text-rose-600' : 'text-slate-700';
+            return (
+                <div className="flex flex-col justify-center px-6 border-r border-brand-border bg-white h-full min-w-[140px]">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-0.5">{label}</span>
+                    <div className="flex items-baseline gap-2">
+                        <span className={`text-lg font-bold font-mono ${colorClass}`}>{value}</span>
+                        {subValue && <span className="text-xs font-medium text-slate-400">{subValue}</span>}
                     </div>
-                );
-            }
-            return null;
+                </div>
+            );
         };
-
-        const IconUpload = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-10 w-10 text-slate-400 mx-auto mb-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>;
-        const IconFile = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 h-5 w-5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>;
-        const IconSettings = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 h-5 w-5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
-        const IconActivity = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 h-8 w-8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>;
-        const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-10 w-10 text-green-500 mx-auto mb-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
-        const IconX = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>;
-        const IconInfo = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>;
 
         const App = () => {
             const [file, setFile] = useState(null);
-            const [modelType, setModelType] = useState("auto"); // NEW: State for dropdown
+            const [modelType, setModelType] = useState("auto");
+            const [result, setResult] = useState(null);
             const [isLoading, setIsLoading] = useState(false);
-            const [resultData, setResultData] = useState(null);
             const [error, setError] = useState(null);
-            const [isDragging, setIsDragging] = useState(false);
+            const fileInputRef = useRef(null);
 
-            const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
-            const handleDragLeave = () => { setIsDragging(false); };
-            const handleDrop = (e) => {
-                e.preventDefault();
-                setIsDragging(false);
-                if (e.dataTransfer.files && e.dataTransfer.files[0]) validateAndSetFile(e.dataTransfer.files[0]);
-            };
-            const handleFileSelect = (e) => {
-                if (e.target.files && e.target.files[0]) validateAndSetFile(e.target.files[0]);
-            };
-
-            const validateAndSetFile = (uploadedFile) => {
-                setError(null);
-                setResultData(null);
-                const validExtensions = /\.(xlsx|xls)$/i;
-                if (!uploadedFile.name.match(validExtensions)) {
-                    setError("Invalid file type. Please upload an Excel file (.xlsx or .xls).");
-                    return;
-                }
-                setFile(uploadedFile);
-            };
-
-            const clearFile = (e) => {
-                if (e) e.stopPropagation();
-                setFile(null);
-                setResultData(null);
-                setError(null);
-                const fileInput = document.getElementById('fileInput');
-                if (fileInput) fileInput.value = '';
-            };
-
-            const handleProcess = async () => {
+            const handleRun = async () => {
                 if (!file) return;
                 setIsLoading(true);
                 setError(null);
-                
+                setResult(null);
+
                 const formData = new FormData();
                 formData.append('file', file);
-                formData.append('model_type', modelType); // NEW: Send model choice
+                formData.append('model_type', modelType);
+
+                // --- SMART API SWITCHER ---
+                // 1. Define your endpoints
+                const LOCAL_API = 'http://127.0.0.1:8000/predict';
+                const PROD_API = 'https://sales-forecaster-backend.onrender.com/predict';
+                
+                // 2. Check where the browser is running
+                const isLocal = window.location.hostname === 'localhost' || 
+                                window.location.hostname === '127.0.0.1' || 
+                                window.location.protocol === 'file:';
+                                
+                // 3. Select the correct URL
+                const API_URL = isLocal ? LOCAL_API : PROD_API;
+                
+                console.log("Environment detected:", isLocal ? "Local Development" : "Production");
+                console.log("Using Backend:", API_URL);
 
                 try {
-                    // --- SMART URL SWITCHER ---
-                    const LOCAL_API = 'http://127.0.0.1:8000/predict';
-                    const PROD_API = 'https://sales-forecaster-backend.onrender.com/predict';
-                    const isLocal = window.location.hostname === 'localhost' || 
-                                    window.location.hostname === '127.0.0.1' || 
-                                    window.location.protocol === 'file:';
-                    const apiUrl = isLocal ? LOCAL_API : PROD_API;
-                    console.log("Using Backend:", apiUrl);
-
-                    const response = await fetch(apiUrl, {
+                    const response = await fetch(API_URL, {
                         method: 'POST',
-                        body: formData,
+                        body: formData
                     });
                     const data = await response.json();
-                    
-                    if (!response.ok) {
-                        throw new Error(data.detail || "Failed to process file.");
-                    }
-                    setResultData(data);
+                    if (!response.ok) throw new Error(data.detail || "Error");
+                    setResult(data);
                 } catch (err) {
-                    console.error("Upload Error:", err);
-                    if (err.message === "The uploaded file does not satisfy the requirements above") {
-                        setError(err.message);
-                    } else {
-                        setError(err.message + " (Check Connection)");
-                    }
-                    setResultData(null);
+                    setError(err.message === "Failed to fetch" ? "Cannot reach Backend. Check console for URL." : err.message);
                 } finally {
                     setIsLoading(false);
                 }
             };
 
+            const getMetrics = () => {
+                if (!result) return { current: '-', fit: '-', nextFc: '-', growth: '-', model: '-' };
+                
+                const history = result.history;
+                const forecast = result.forecast;
+                const lastHistoryItem = history[history.length - 1];
+                const lastActual = lastHistoryItem.actual;
+                const lastFit = lastHistoryItem.fitted !== null ? lastHistoryItem.fitted : '-';
+                const firstForecastItem = forecast.length > 0 ? forecast[0] : null;
+                const nextForecastVal = firstForecastItem ? firstForecastItem.forecast : 0;
+                const growthVal = ((nextForecastVal - lastActual) / lastActual) * 100;
+                
+                return {
+                    current: lastActual.toLocaleString(),
+                    fit: typeof lastFit === 'number' ? lastFit.toLocaleString() : lastFit,
+                    nextFc: nextForecastVal.toLocaleString(),
+                    growth: (growthVal > 0 ? '+' : '') + growthVal.toFixed(1) + '%',
+                    growthType: growthVal >= 0 ? 'pos' : 'neg',
+                    model: result.model_name
+                };
+            };
+            
+            const metrics = getMetrics();
+
             return (
-                <div className="max-w-6xl mx-auto">
-                    <header className="mb-10 text-center">
-                        <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-1 flex items-center justify-center gap-3">
-                            <IconActivity />
-                            Sales Forecaster
-                        </h1>
-                        <p className="text-sm font-medium text-blue-600 mb-1">A machine-learning based forecasting tool</p>
-                        <p className="text-xs text-slate-400 font-medium mb-2">Copyright by Operatis</p>
-                        
-                        <div className="mt-4 inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-xs font-medium border border-green-200">
-                            <IconInfo />
-                            Ready to Forecast
+                <div className="flex flex-col h-full bg-slate-50 overflow-hidden">
+                    
+                    {/* --- HEADER --- */}
+                    <header className="relative h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 shadow-sm z-20">
+                        {/* Left: Logo */}
+                        <div className="flex items-center gap-4 z-10">
+                            <img src="./icononly_transparent_nobuffer.png" className="h-10 w-10 object-contain" onError={(e) => e.target.style.display='none'} />
+                            <h1 className="font-bold text-slate-800 tracking-tight text-lg">PERARTIS <span className="text-brand-gold font-normal">TERMINAL</span></h1>
+                        </div>
+
+                        {/* Center: Title */}
+                        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <span className="text-sm font-bold text-slate-600 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded hidden md:block">
+                                Machine-Learning Forecaster
+                            </span>
+                        </div>
+
+                        {/* Right: Version */}
+                        <div className="text-xs font-mono text-slate-400 z-10">
+                            v3.0.0_PROD
                         </div>
                     </header>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    {/* --- MAIN WORKSPACE --- */}
+                    <div className="flex flex-grow overflow-hidden min-h-0">
                         
-                        {/* LEFT COLUMN */}
-                        <div className="md:col-span-1 space-y-4">
-                            
-                            {/* STEP 1: UPLOAD */}
-                            <div className={`bg-white rounded-xl shadow-sm border transition-colors p-6 ${error ? 'border-red-200' : 'border-slate-200'}`}>
-                                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><IconFile /> 1. Upload Data</h2>
-                                <div 
-                                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer relative ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'} ${file ? 'bg-green-50 border-green-400' : ''} ${error ? 'bg-red-50 border-red-300' : ''}`}
-                                    onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={() => document.getElementById('fileInput').click()}
-                                >
-                                    <input id="fileInput" type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileSelect} />
-                                    {file ? (
-                                        <div className="animate-in fade-in zoom-in duration-300"><IconCheck /><p className="font-medium text-slate-700 break-all">{file.name}</p><button onClick={clearFile} className="text-xs text-red-500 underline mt-2 hover:text-red-700 z-10 relative">Remove</button></div>
-                                    ) : (
-                                        <React.Fragment>
-                                            <IconUpload />
-                                            <p className="font-medium text-slate-700">Click to upload</p>
-                                            <p className="text-sm text-slate-500 mt-1">.xlsx or .xls only</p>
-                                        </React.Fragment>
-                                    )}
-                                </div>
-                                {error && <div className="mt-4 p-4 bg-red-50 border border-red-100 text-red-700 text-sm rounded-lg flex items-start gap-3"><IconX /><div><p className="font-semibold">Upload Failed</p><p className="text-red-600 mt-1">{error}</p></div></div>}
-                                {!error && <div className="mt-4 p-3 bg-blue-50 text-blue-700 text-xs rounded-lg border border-blue-100"><strong>Required Columns:</strong><br/>1. Period (Date)<br/>2. Sales_quantity (Number)</div>}
-                            </div>
-
-                            {/* STEP 2: CHOOSE MODEL */}
-                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><IconSettings /> 2. Choose Model</h2>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Forecasting Method</label>
-                                <select 
-                                    value={modelType} 
-                                    onChange={(e) => setModelType(e.target.value)}
-                                    className="w-full p-3 border border-slate-300 rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                                >
-                                    <option value="auto">✨ Automatic Running (Best Fit)</option>
-                                    <option value="ses">SES</option>
-                                    <option value="des">DES</option>
-                                    <option value="tes">TES</option>
-                                    <option value="prophet">PRO</option>
-                                </select>
+                        {/* LEFT PANEL */}
+                        <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 z-10 overflow-y-auto">
+                            <div className="p-4 space-y-6">
                                 
+                                {/* Section 1: Data Source */}
+                                <div>
+                                    <h3 className="text-xxs font-bold text-slate-400 uppercase tracking-widest mb-2">Source Data</h3>
+                                    <div 
+                                        onClick={() => fileInputRef.current.click()}
+                                        className={`border border-dashed rounded px-3 py-4 text-center cursor-pointer hover:bg-slate-50 transition-colors ${file ? 'border-brand-gold bg-amber-50/20' : 'border-slate-300'}`}
+                                    >
+                                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={(e) => setFile(e.target.files[0])} />
+                                        {file ? (
+                                            <div className="text-left">
+                                                <div className="text-xs font-bold text-slate-700 truncate">{file.name}</div>
+                                                <div className="text-xxs text-emerald-600 font-medium">LOCKED & READY</div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-xs text-slate-500 font-medium">+ Import .XLSX</div>
+                                        )}
+                                    </div>
+                                    {error && <div className="text-xxs text-red-600 mt-1 font-medium">{error}</div>}
+                                </div>
+
+                                {/* Instruction Box */}
+                                <div className="bg-slate-50 border border-slate-200 rounded p-3">
+                                    <h3 className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">Template requirements:</h3>
+                                    <p className="text-xxs text-slate-500 mb-1">Table must have two columns:</p>
+                                    <ul className="text-xxs text-slate-600 list-disc pl-3 space-y-0.5 font-mono">
+                                        <li>Period (Date)</li>
+                                        <li>Sales_quantity (Number)</li>
+                                    </ul>
+                                </div>
+
+                                {/* Section 2: Algorithm */}
+                                <div>
+                                    <h3 className="text-xxs font-bold text-slate-400 uppercase tracking-widest mb-2">Algorithm</h3>
+                                    <select 
+                                        value={modelType}
+                                        onChange={(e) => setModelType(e.target.value)}
+                                        className="w-full text-xs border border-slate-300 rounded bg-white p-2 focus:border-brand-gold outline-none shadow-sm"
+                                    >
+                                        <option value="auto">Auto-Select (Best Fit)</option>
+                                        <option value="ses">SES (Simple)</option>
+                                        <option value="des">DES (Trend)</option>
+                                        <option value="tes">TES (Seasonal)</option>
+                                        <option value="prophet">Prophet (Complex)</option>
+                                    </select>
+                                </div>
+
+                                {/* Section 3: Execute */}
                                 <button 
-                                    onClick={handleProcess} 
-                                    disabled={!file || isLoading || error} 
-                                    className={`w-full mt-6 py-3 px-4 rounded-lg font-medium text-white flex items-center justify-center gap-2 transition-all ${!file || isLoading || error ? 'bg-slate-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg'}`}
+                                    onClick={handleRun}
+                                    disabled={!file || isLoading}
+                                    className={`w-full py-3 rounded text-xs font-bold uppercase tracking-wide transition-all
+                                        ${!file || isLoading 
+                                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed' 
+                                            : 'bg-brand-gold hover:bg-yellow-500 text-white shadow-sm border border-yellow-600'}`}
                                 >
-                                    {isLoading ? 'Processing...' : 'Run Forecast'}
+                                    {isLoading ? 'Running...' : 'Execute Forecast'}
                                 </button>
                             </div>
 
-                        </div>
+                            <div className="mt-auto p-4 border-t border-slate-100 bg-slate-50">
+                                <p className="text-xxs font-bold text-slate-400 leading-relaxed">
+                                    OPERARTIS ANALYTICS<br/>
+                                    Optimizing Today, Growing Tomorrow.
+                                </p>
+                            </div>
+                        </aside>
 
-                        {/* RIGHT COLUMN */}
-                        <div className="md:col-span-2">
-                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 h-full min-h-[500px]">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-lg font-semibold flex items-center gap-2"><IconActivity /> 3. Forecast Results</h2>
-                                    {resultData && (
-                                        <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded border border-purple-200">
-                                            {resultData.mode === 'auto' ? `Winner: ${resultData.model_name}` : `Model: ${resultData.model_name}`}
-                                        </span>
-                                    )}
+                        {/* RIGHT PANEL */}
+                        <main className="flex-grow flex flex-col bg-slate-50 relative min-w-0">
+                            
+                            {/* KPI Bar */}
+                            <div className="h-16 bg-white border-b border-slate-200 flex items-center shrink-0 shadow-sm overflow-x-auto">
+                                <MetricTile label="Current Vol" value={metrics.current} />
+                                <MetricTile label="Current Fit" value={metrics.fit} />
+                                <MetricTile label="Next Forecast" value={metrics.nextFc} />
+                                <MetricTile label="Growth Delta" value={metrics.growth} type={metrics.growthType} />
+                                <div className="flex flex-col justify-center px-6 h-full ml-auto min-w-[140px] border-l border-slate-100 bg-slate-50/50">
+                                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-0.5">Active Model</span>
+                                    <span className="text-xs font-bold text-brand-dark bg-amber-100 px-2 py-0.5 rounded w-fit">{metrics.model}</span>
                                 </div>
-                                {!resultData && !isLoading && <div className="h-96 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-100 rounded-xl"><p>Upload a file, choose a model, and click Run.</p></div>}
-                                {isLoading && <div className="h-96 flex flex-col items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mb-4"></div><p className="text-slate-500 animate-pulse">Running Forecasting Algorithms...</p></div>}
-                                {resultData && (
-                                    <div className="h-[400px] w-full">
+                            </div>
+
+                            {/* Chart Container */}
+                            <div className="flex-1 p-4 relative flex flex-col min-h-0">
+                                <div className="flex-1 w-full bg-white border border-slate-200 rounded shadow-sm p-4 relative min-h-0">
+                                    {!result && !isLoading && (
+                                        <div className="h-full flex flex-col items-center justify-center text-slate-300">
+                                            <div className="w-16 h-16 border-2 border-slate-200 border-dashed rounded flex items-center justify-center mb-2">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg>
+                                            </div>
+                                            <span className="text-xs font-medium uppercase tracking-widest">No Data Loaded</span>
+                                        </div>
+                                    )}
+
+                                    {result && (
                                         <ResponsiveContainer width="100%" height="100%">
-                                            <ComposedChart data={[...resultData.history, ...resultData.forecast]} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                                                <defs>
-                                                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/></linearGradient>
-                                                </defs>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                                            <ComposedChart data={[...result.history, ...result.forecast]} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11, fontWeight: 500}} dy={10} />
+                                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11, fontFamily: 'monospace'}} />
                                                 
-                                                <Tooltip content={<CustomTooltip />} />
-                                                <Legend verticalAlign="top" height={36}/>
+                                                <Tooltip 
+                                                    contentStyle={{ backgroundColor: '#fff', borderColor: '#e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontSize: '12px' }}
+                                                    itemStyle={{ padding: 0 }}
+                                                />
+                                                <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '11px', fontWeight: 600}}/>
                                                 
-                                                <Area type="monotone" dataKey="actual" name="Actual Sales" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorActual)" />
+                                                <Area type="monotone" dataKey="actual" name="Historical" stroke="#334155" fill="#f1f5f9" strokeWidth={2} isAnimationActive={false} />
                                                 
                                                 <Line 
-                                                    connectNulls={true}
                                                     type="monotone" 
                                                     dataKey="fitted" 
-                                                    name="Model Fit" 
-                                                    stroke="#8b5cf6" 
-                                                    strokeWidth={3} 
-                                                    strokeDasharray="10 10" 
-                                                    dot={<CustomFittedDot />} 
+                                                    name="Fit" 
+                                                    stroke="#94a3b8" 
+                                                    strokeDasharray="3 3" 
+                                                    strokeWidth={1} 
+                                                    dot={false} 
+                                                    connectNulls={false}
+                                                    isAnimationActive={false}
                                                 />
                                                 
                                                 <Line 
                                                     type="monotone" 
                                                     dataKey="forecast" 
                                                     name="Forecast" 
-                                                    stroke="#10b981" 
+                                                    stroke="#f59e0b" 
                                                     strokeWidth={3} 
-                                                    strokeDasharray="4 4" 
-                                                    dot={<CustomForecastDot />} 
+                                                    strokeDasharray="5 5" 
+                                                    dot={{r: 4, fill: '#fff', stroke: '#f59e0b', strokeWidth: 2}} 
+                                                    connectNulls={false}
+                                                    isAnimationActive={false}
                                                 />
                                             </ComposedChart>
                                         </ResponsiveContainer>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        </main>
                     </div>
                 </div>
             );
         };
-        
+
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
