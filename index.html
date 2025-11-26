@@ -229,7 +229,8 @@
                 tooltipBorder: isDark ? "#334155" : "#e2e8f0",
                 actualStroke: isDark ? "#94a3b8" : "#334155",
                 actualFill: isDark ? "#1e293b" : "#f1f5f9",
-                fitStroke: isDark ? "#64748b" : "#94a3b8"
+                fitStroke: isDark ? "#64748b" : "#94a3b8",
+                forecastFill: isDark ? "rgba(245, 158, 11, 0.1)" : "#FEF3C7" // Light: Amber-100, Dark: Transparent Gold
             };
 
             return (
@@ -434,11 +435,12 @@
                                                     isAnimationActive={false}
                                                 />
                                                 
-                                                <Line 
+                                                <Area 
                                                     type="monotone" 
                                                     dataKey="forecast" 
                                                     name="Forecast" 
                                                     stroke="#f59e0b" 
+                                                    fill={chartColors.forecastFill}
                                                     strokeWidth={3} 
                                                     strokeDasharray="5 5" 
                                                     dot={{r: 4, fill: isDark ? '#1e293b' : '#fff', stroke: '#f59e0b', strokeWidth: 2}} 
@@ -489,11 +491,12 @@
                                                 isAnimationActive={false}
                                             />
                                             
-                                            <Line 
+                                            <Area 
                                                 type="monotone" 
                                                 dataKey="forecast" 
                                                 name="Forecast" 
                                                 stroke="#f59e0b" 
+                                                fill={chartColors.forecastFill}
                                                 strokeWidth={4} 
                                                 strokeDasharray="5 5" 
                                                 dot={{r: 5, fill: isDark ? '#1e293b' : '#fff', stroke: '#f59e0b', strokeWidth: 3}} 
