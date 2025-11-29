@@ -290,12 +290,15 @@
                 if (!file || validationError) return; 
                 setIsValidating(true);
                 setError(null);
+                setResult(null); // Clear previous chart before validation run
+                
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('model_type', validationModelType);
                 formData.append('validation_method', validationMethod);
                 formData.append('train_horizon', trainHorizon);
                 formData.append('test_horizon', testHorizon);
+
                 try {
                     const response = await fetch(`${BASE_URL}/validate`, {
                         method: 'POST',
@@ -303,6 +306,7 @@
                     });
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.detail || "Validation Error");
+                    
                     setValidationResult(data);
                     setModelType(data.winner_code || data.winner.split(' ')[0].toLowerCase()); 
                     setResult(data); 
@@ -418,7 +422,7 @@
                                 {theme === 'system' && <SystemIcon />}
                             </button>
                             <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">
-                                v5.10_FINAL
+                                v5.11_RUN
                             </div>
                         </div>
                     </header>
@@ -678,7 +682,7 @@
                                         </button>
                                     )}
 
-                                    {!result && !isLoading && (
+                                    {!result && !isLoading && !isValidating && (
                                         <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 transition-colors">
                                             <div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded flex items-center justify-center mb-2 transition-colors">
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg>
@@ -687,7 +691,7 @@
                                         </div>
                                     )}
 
-                                    {isLoading && (
+                                    {(isLoading || isValidating) && (
                                         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm transition-colors">
                                             <div className="mb-4">
                                                 <svg className="animate-spin h-8 w-8 md:h-10 md:w-10 text-brand-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -696,7 +700,7 @@
                                                 </svg>
                                             </div>
                                             <p className="text-xs md:text-sm font-bold text-brand-gold animate-pulse tracking-widest uppercase text-center px-4">
-                                                Running Forecasting Algorithm...
+                                                {isValidating ? 'Running Validation Algorithm...' : 'Running Forecasting Algorithm...'}
                                             </p>
                                         </div>
                                     )}
@@ -734,9 +738,9 @@
                                                     name="Forecast" 
                                                     stroke="#f59e0b" 
                                                     fill={chartColors.forecastFill}
-                                                    strokeWidth={4} 
+                                                    strokeWidth={3} 
                                                     strokeDasharray="5 5" 
-                                                    dot={{r: 5, fill: isDark ? '#1e293b' : '#fff', stroke: '#f59e0b', strokeWidth: 3}} 
+                                                    dot={{r: 4, fill: isDark ? '#1e293b' : '#fff', stroke: '#f59e0b', strokeWidth: 2}} 
                                                     connectNulls={false}
                                                     isAnimationActive={false}
                                                 />
