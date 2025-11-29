@@ -87,6 +87,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/1.8.5/Recharts.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- ADDED: SheetJS for Client-Side Excel Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -126,7 +128,9 @@
             const [forecastSteps, setForecastSteps] = useState(6);
             
             // Validation State
+            const [dataLength, setDataLength] = useState(0); 
             const [validationModelType, setValidationModelType] = useState("auto");
+            const [validationMethod, setValidationMethod] = useState("simple"); // 'simple' or 'walk_forward'
             const [trainHorizon, setTrainHorizon] = useState(24);
             const [testHorizon, setTestHorizon] = useState(6);
             const [validationResult, setValidationResult] = useState(null);
@@ -197,6 +201,64 @@
                 else setTheme('light');
             };
 
+            const handleFileChange = (e) => {
+                const selectedFile = e.target.files[0];
+                if (!selectedFile) return;
+
+                setFile(selectedFile);
+                setError(null);
+                setResult(null);
+                setValidationResult(null);
+
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const data = new Uint8Array(evt.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const json = XLSX.utils.sheet_to_json(worksheet);
+                        
+                        const totalRows = json.length;
+                        setDataLength(totalRows);
+
+                        const defaultTest = 6;
+                        const defaultTrain = totalRows > defaultTest ? totalRows - defaultTest : totalRows - 1;
+                        
+                        setTrainHorizon(defaultTrain > 0 ? defaultTrain : 1);
+                        setTestHorizon(totalRows > defaultTrain ? totalRows - defaultTrain : 1);
+
+                    } catch (err) {
+                        console.error("Error parsing excel for length:", err);
+                        setDataLength(0);
+                    }
+                };
+                reader.readAsArrayBuffer(selectedFile);
+            };
+
+            const handleTrainHorizonChange = (e) => {
+                const valStr = e.target.value;
+                if (valStr === '') {
+                    setTrainHorizon('');
+                    if (dataLength > 0) setTestHorizon(dataLength);
+                    return;
+                }
+
+                let val = parseInt(valStr);
+                if (isNaN(val)) return;
+                
+                const maxTrain = dataLength > 0 ? dataLength - 1 : 1000; 
+                
+                if (val > maxTrain) val = maxTrain;
+                if (val < 1) val = 1;
+                
+                setTrainHorizon(val);
+                
+                if (dataLength > 0) {
+                    setTestHorizon(dataLength - val);
+                }
+            };
+
             const handleValidation = async () => {
                 if (!file) return;
                 setIsValidating(true);
@@ -206,6 +268,7 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('model_type', validationModelType);
+                formData.append('validation_method', validationMethod);
                 formData.append('train_horizon', trainHorizon);
                 formData.append('test_horizon', testHorizon);
 
@@ -218,7 +281,6 @@
                     if (!response.ok) throw new Error(data.detail || "Validation Error");
                     
                     setValidationResult(data);
-                    // Automatically set the Forecast Running model to the winner
                     setModelType(data.winner);
                 } catch (err) {
                     setError(err.message === "Failed to fetch" ? "Cannot reach Backend." : err.message);
@@ -319,7 +381,7 @@
                                 {theme === 'system' && <SystemIcon />}
                             </button>
                             <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">
-                                v5.0_VAL
+                                v5.2_AUTOVAL
                             </div>
                         </div>
                     </header>
@@ -352,11 +414,14 @@
                                         className={`border border-dashed rounded px-3 py-4 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors 
                                             ${file ? 'border-brand-gold bg-amber-50/20 dark:bg-amber-900/10' : 'border-slate-300 dark:border-slate-700'}`}
                                     >
-                                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={(e) => setFile(e.target.files[0])} />
+                                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
                                         {file ? (
                                             <div className="text-left">
                                                 <div className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">{file.name}</div>
-                                                <div className="text-xxs text-emerald-600 dark:text-emerald-400 font-medium">LOCKED & READY</div>
+                                                <div className="flex justify-between items-center">
+                                                    <div className="text-xxs text-emerald-600 dark:text-emerald-400 font-medium">LOCKED & READY</div>
+                                                    {dataLength > 0 && <div className="text-xxs font-mono text-slate-400 dark:text-slate-500">[{dataLength} rows]</div>}
+                                                </div>
                                             </div>
                                         ) : (
                                             <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">+ Import .XLSX</div>
@@ -372,14 +437,33 @@
                                         <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
                                     </h3>
                                     <div className="space-y-3">
+                                        
+                                        {/* Method Toggle */}
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Validation Method</label>
+                                            <select 
+                                                value={validationMethod}
+                                                onChange={(e) => setValidationMethod(e.target.value)}
+                                                className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1"
+                                            >
+                                                <option value="simple">Simple Split (Fast)</option>
+                                                <option value="walk_forward">Walk-Forward (Robust)</option>
+                                            </select>
+                                        </div>
+
                                         <div className="flex gap-2">
                                             <div className="flex-1">
-                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Train Horizon</label>
+                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
+                                                    {validationMethod === 'walk_forward' ? 'Min. Train Size' : 'Train Horizon'}
+                                                </label>
                                                 <input 
                                                     type="number" 
                                                     value={trainHorizon}
-                                                    onChange={(e) => setTrainHorizon(Number(e.target.value))}
-                                                    className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1"
+                                                    onChange={handleTrainHorizonChange}
+                                                    max={dataLength > 0 ? dataLength - 1 : undefined}
+                                                    min="1"
+                                                    disabled={!file}
+                                                    className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50"
                                                 />
                                             </div>
                                             <div className="flex-1">
@@ -387,8 +471,8 @@
                                                 <input 
                                                     type="number" 
                                                     value={testHorizon}
-                                                    onChange={(e) => setTestHorizon(Number(e.target.value))}
-                                                    className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1"
+                                                    readOnly
+                                                    className="w-full text-xs border border-slate-200 dark:border-slate-800 rounded bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-500 p-2 outline-none shadow-none mt-1 cursor-not-allowed"
                                                 />
                                             </div>
                                         </div>
@@ -414,14 +498,16 @@
                                                     ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' 
                                                     : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}
                                         >
-                                            {isValidating ? 'Validating...' : 'Run Data Validation'}
+                                            {isValidating ? 'Running Validation...' : (validationMethod === 'walk_forward' ? 'Run Auto-Validation' : 'Run Split Validation')}
                                         </button>
                                         
                                         {validationResult && (
                                             <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-2 rounded text-center animate-fade-in">
                                                 <div className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Winner Identified</div>
                                                 <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 mt-1">{validationResult.winner.toUpperCase()}</div>
-                                                <div className="text-[10px] text-emerald-600 dark:text-emerald-400">MSE: {validationResult.best_mse.toFixed(2)}</div>
+                                                <div className="text-[10px] text-emerald-600 dark:text-emerald-400">
+                                                    {validationMethod === 'walk_forward' ? 'Avg MSE' : 'MSE'}: {validationResult.best_mse.toFixed(2)}
+                                                </div>
                                             </div>
                                         )}
                                     </div>
