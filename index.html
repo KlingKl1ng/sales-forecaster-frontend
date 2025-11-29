@@ -418,7 +418,7 @@
                                 {theme === 'system' && <SystemIcon />}
                             </button>
                             <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">
-                                v5.9_FINAL_US
+                                v5.10_FINAL
                             </div>
                         </div>
                     </header>
@@ -466,6 +466,16 @@
                                         )}
                                     </div>
                                     {error && <div className="text-xxs text-red-600 dark:text-red-400 mt-1 font-medium">{error}</div>}
+                                </div>
+
+                                {/* ADDED: Template Requirements Note */}
+                                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded p-3 transition-colors">
+                                    <h3 className="text-xxs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 whitespace-nowrap">Template requirements:</h3>
+                                    <p className="text-xxs text-slate-500 dark:text-slate-400 mb-1">Data must have two columns:</p>
+                                    <ul className="text-xxs text-slate-600 dark:text-slate-300 list-disc pl-3 space-y-0.5 font-mono">
+                                        <li>Period (Date)</li>
+                                        <li>Actual (Number)</li>
+                                    </ul>
                                 </div>
 
                                 {/* 2. Data Validation Group */}
@@ -547,8 +557,6 @@
                                         >
                                             {isValidating ? 'Running Validation...' : (validationMethod === 'walk_forward' ? 'Run Auto-Validation' : 'Run Split Validation')}
                                         </button>
-                                        
-                                        {/* --- Notification Box Removed --- */}
                                     </div>
                                 </div>
 
