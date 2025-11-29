@@ -103,6 +103,7 @@
         const App = () => {
             const [file, setFile] = useState(null);
             const [modelType, setModelType] = useState("auto");
+            const [forecastSteps, setForecastSteps] = useState(6); // Default 6 periods
             const [result, setResult] = useState(null);
             const [isLoading, setIsLoading] = useState(false);
             const [error, setError] = useState(null);
@@ -175,6 +176,7 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('model_type', modelType);
+                formData.append('forecast_steps', forecastSteps); // Pass the step count
 
                 const LOCAL_API = 'http://127.0.0.1:8000/predict';
                 const PROD_API = 'https://sales-forecaster-backend.onrender.com/predict';
@@ -328,6 +330,22 @@
                                         <option value="prophet">Prophet (Complex)</option>
                                     </select>
                                 </div>
+
+                                <div>
+                                    <h3 className="text-xxs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Forecast Horizon</h3>
+                                    <select 
+                                        value={forecastSteps}
+                                        onChange={(e) => setForecastSteps(Number(e.target.value))}
+                                        className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm transition-colors"
+                                    >
+                                        <option value={1}>1 Period</option>
+                                        <option value={3}>3 Periods</option>
+                                        <option value={6}>6 Periods</option>
+                                        <option value={12}>12 Periods</option>
+                                    </select>
+                                    <p className="text-xxs text-slate-400 dark:text-slate-500 mt-1 italic">Hint: Larger horizon leads to less precise forecast</p>
+                                </div>
+
                                 <button 
                                     onClick={handleRun}
                                     disabled={!file || isLoading}
