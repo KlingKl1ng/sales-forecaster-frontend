@@ -108,9 +108,17 @@
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>;
         const RefreshIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>;
 
-        const MetricTile = ({ label, value, subValue, type, isDark, highlight }) => {
+        // UPDATED: MetricTile with variant support for grouping colors
+        const MetricTile = ({ label, value, subValue, type, isDark, variant = 'default' }) => {
             const colorClass = type === 'pos' ? 'text-emerald-600 dark:text-emerald-400' : type === 'neg' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-200';
-            const bgClass = highlight ? 'bg-amber-50 dark:bg-amber-900/10' : 'bg-white dark:bg-slate-900';
+            
+            let bgClass = 'bg-white dark:bg-slate-900';
+            if (variant === 'validation') {
+                bgClass = 'bg-amber-50 dark:bg-amber-900/10';
+            } else if (variant === 'forecast') {
+                bgClass = 'bg-slate-100 dark:bg-slate-800'; // Distinct color for forecast group
+            }
+
             return (
                 <div className={`flex flex-col justify-center items-center px-4 md:px-6 border-r border-brand-border dark:border-slate-700 ${bgClass} h-full min-w-[120px] md:min-w-[140px] snap-start transition-colors duration-300`}>
                     <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 whitespace-nowrap text-center">{label}</span>
@@ -146,6 +154,7 @@
             const [validationError, setValidationError] = useState(null);
 
             const [result, setResult] = useState(null);
+            const [lastForecastResult, setLastForecastResult] = useState(null); // Separate state for Forecast KPI
             const [isLoading, setIsLoading] = useState(false);
             const [error, setError] = useState(null);
             const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -221,6 +230,7 @@
                 setFile(selectedFile);
                 setError(null);
                 setResult(null);
+                setLastForecastResult(null); // Clear forecast on new file
                 setValidationResult(null);
                 const reader = new FileReader();
                 reader.onload = (evt) => {
@@ -277,6 +287,7 @@
                 setTestHorizon(6);
                 setValidationResult(null);
                 setResult(null);
+                setLastForecastResult(null); // Reset forecast KPI state
                 setError(null);
                 setValidationError(null);
                 setIsValidating(false);
@@ -290,7 +301,7 @@
                 if (!file || validationError) return; 
                 setIsValidating(true);
                 setError(null);
-                setResult(null); // Clear previous chart before validation run
+                setResult(null); 
                 
                 const formData = new FormData();
                 formData.append('file', file);
@@ -336,6 +347,7 @@
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.detail || "Error");
                     setResult(data);
+                    setLastForecastResult(data); // Save specifically for KPI display
                 } catch (err) {
                     setError(err.message === "Failed to fetch" ? "Cannot reach Backend." : err.message);
                 } finally {
@@ -354,6 +366,16 @@
                     const runs = (dataLength - test) - train + 1;
                     return runs > 0 ? runs : '0';
                 }
+            };
+
+            // NEW: Format Validation Model Name specifically for display
+            const formatValidationModelName = (name) => {
+                if (!name) return '-';
+                if (name.includes("SES")) return "SES";
+                if (name.includes("DES")) return "DES";
+                if (name.includes("TES")) return "TES";
+                if (name.includes("Prophet")) return "PROPHET";
+                return name.toUpperCase();
             };
 
             const getMetrics = () => {
@@ -422,7 +444,7 @@
                                 {theme === 'system' && <SystemIcon />}
                             </button>
                             <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">
-                                v5.11_RUN
+                                v5.15_COLORS
                             </div>
                         </div>
                     </header>
@@ -649,22 +671,34 @@
                                 <MetricTile label="Current Fit" value={metrics.fit} isDark={isDark} />
                                 <MetricTile label="Next Forecast" value={metrics.nextFc} isDark={isDark} />
                                 <MetricTile label="Growth Delta" value={metrics.growth} type={metrics.growthType} isDark={isDark} />
-                                <MetricTile label="Validation Runs" value={valRuns} isDark={isDark} />
+                                <MetricTile label="Validation Runs" value={valRuns} isDark={isDark} variant="validation" />
                                 
+                                {/* Updated Validation Model Tile: Synced with Forecast Group */}
+                                <div className={`flex flex-col justify-center px-4 md:px-6 h-full min-w-[120px] md:min-w-[140px] border-r border-brand-border dark:border-slate-700 bg-amber-50 dark:bg-amber-900/10 snap-start transition-colors items-center`}>
+                                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Validation Model</span>
+                                    <span className="text-[10px] md:text-xs font-bold text-brand-dark dark:text-brand-gold bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded w-fit truncate max-w-[100px] block transition-colors">
+                                        {validationResult ? formatValidationModelName(validationResult.winner) : '-'}
+                                    </span>
+                                </div>
+
                                 <MetricTile 
                                     label="Validation (Avg.) MSE" 
                                     value={validationResult ? fmtNumber(validationResult.best_mse, 2, 2) : '-'} 
                                     isDark={isDark} 
+                                    variant="validation"
                                 />
                                 <MetricTile 
                                     label="Forecast MSE" 
                                     value={metrics.forecastMse} 
                                     isDark={isDark} 
+                                    variant="forecast"
                                 />
 
-                                <div className="flex flex-col justify-center px-4 md:px-6 h-full ml-auto min-w-[120px] md:min-w-[140px] border-l border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 snap-start transition-colors items-center">
-                                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Model</span>
-                                    <span className="text-[10px] md:text-xs font-bold text-brand-dark dark:text-brand-gold bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded w-fit truncate max-w-[100px] block transition-colors">{metrics.model}</span>
+                                <div className={`flex flex-col justify-center px-4 md:px-6 h-full ml-auto min-w-[120px] md:min-w-[140px] border-l border-brand-border dark:border-slate-700 bg-slate-100 dark:bg-slate-800 snap-start transition-colors items-center`}>
+                                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Forecast Model</span>
+                                    <span className="text-[10px] md:text-xs font-bold text-brand-dark dark:text-brand-gold bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded w-fit truncate max-w-[100px] block transition-colors">
+                                        {lastForecastResult ? lastForecastResult.model_name : '-'}
+                                    </span>
                                 </div>
                             </div>
 
@@ -738,9 +772,9 @@
                                                     name="Forecast" 
                                                     stroke="#f59e0b" 
                                                     fill={chartColors.forecastFill}
-                                                    strokeWidth={3} 
+                                                    strokeWidth={4} 
                                                     strokeDasharray="5 5" 
-                                                    dot={{r: 4, fill: isDark ? '#1e293b' : '#fff', stroke: '#f59e0b', strokeWidth: 2}} 
+                                                    dot={{r: 5, fill: isDark ? '#1e293b' : '#fff', stroke: '#f59e0b', strokeWidth: 3}} 
                                                     connectNulls={false}
                                                     isAnimationActive={false}
                                                 />
