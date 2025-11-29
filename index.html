@@ -61,6 +61,25 @@
         /* Dark mode scrollbar overrides */
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .dark body { background: #0f172a; }
+
+        /* --- MOBILE LANDSCAPE OPTIMIZATION --- */
+        /* Forces the body to scroll naturally on mobile landscape to trigger address bar hiding */
+        @media screen and (orientation: landscape) and (max-height: 600px) {
+            body {
+                height: auto !important;
+                overflow-y: auto !important;
+                position: static !important;
+            }
+            .mobile-landscape-root {
+                height: auto !important;
+                overflow: visible !important;
+                min-height: 100vh;
+            }
+            .mobile-landscape-main {
+                height: auto !important;
+                overflow: visible !important;
+            }
+        }
     </style>
     
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
@@ -236,7 +255,7 @@
             };
 
             return (
-                <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300">
+                <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
                     
                     {/* --- HEADER --- */}
                     <header className={`relative h-14 md:h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-30 transition-colors duration-300 ${isFullScreen ? 'hidden' : 'flex'}`}>
@@ -265,13 +284,13 @@
                                 {theme === 'system' && <SystemIcon />}
                             </button>
                             <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">
-                                v4.3_SYSTEM
+                                v4.4_MOBILE
                             </div>
                         </div>
                     </header>
 
                     {/* --- MAIN LAYOUT --- */}
-                    <div className="flex flex-grow overflow-hidden min-h-0 relative w-full">
+                    <div className="flex flex-grow overflow-hidden min-h-0 relative w-full mobile-landscape-root">
                         
                         {/* --- SIDEBAR --- */}
                         <aside className={`
@@ -375,7 +394,7 @@
                         )}
                         
                         {/* --- CONTENT AREA (Main Window) --- */}
-                        <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative min-w-0 transition-all w-full h-full overflow-y-auto scroller ${isFullScreen ? 'hidden' : 'flex'}`}>
+                        <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative min-w-0 transition-all w-full h-full overflow-y-auto scroller ${isFullScreen ? 'hidden' : 'flex'} mobile-landscape-main`}>
                             
                             {/* KPI Bar */}
                             <div className="h-14 md:h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center shrink-0 shadow-sm overflow-x-auto snap-x no-scrollbar relative z-20 transition-colors">
