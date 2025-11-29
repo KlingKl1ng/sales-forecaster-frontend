@@ -130,11 +130,12 @@
             // Validation State
             const [dataLength, setDataLength] = useState(0); 
             const [validationModelType, setValidationModelType] = useState("auto");
-            const [validationMethod, setValidationMethod] = useState("simple"); // 'simple' or 'walk_forward'
+            const [validationMethod, setValidationMethod] = useState("simple"); 
             const [trainHorizon, setTrainHorizon] = useState(24);
             const [testHorizon, setTestHorizon] = useState(6);
             const [validationResult, setValidationResult] = useState(null);
             const [isValidating, setIsValidating] = useState(false);
+            const [validationError, setValidationError] = useState(null); // To store horizon errors
 
             const [result, setResult] = useState(null);
             const [isLoading, setIsLoading] = useState(false);
@@ -195,6 +196,20 @@
                 };
             }, [theme]);
 
+            // NEW: Validation Effect to check Sum Limits
+            useEffect(() => {
+                if (dataLength > 0) {
+                    const totalRequested = (parseInt(trainHorizon) || 0) + (parseInt(testHorizon) || 0);
+                    if (totalRequested > dataLength) {
+                        setValidationError(`Error: Train (${trainHorizon}) + Test (${testHorizon}) > Total Rows (${dataLength})`);
+                    } else {
+                        setValidationError(null);
+                    }
+                } else {
+                    setValidationError(null);
+                }
+            }, [trainHorizon, testHorizon, dataLength]);
+
             const cycleTheme = () => {
                 if (theme === 'light') setTheme('dark');
                 else if (theme === 'dark') setTheme('system');
@@ -222,11 +237,12 @@
                         const totalRows = json.length;
                         setDataLength(totalRows);
 
+                        // Set intelligent defaults, but allow user to change them later
                         const defaultTest = 6;
                         const defaultTrain = totalRows > defaultTest ? totalRows - defaultTest : totalRows - 1;
                         
                         setTrainHorizon(defaultTrain > 0 ? defaultTrain : 1);
-                        setTestHorizon(totalRows > defaultTrain ? totalRows - defaultTrain : 1);
+                        setTestHorizon(totalRows > defaultTrain ? defaultTest : 1); // Set default, don't lock
 
                     } catch (err) {
                         console.error("Error parsing excel for length:", err);
@@ -236,31 +252,32 @@
                 reader.readAsArrayBuffer(selectedFile);
             };
 
+            // Handle Train Horizon Input Change (Independent)
             const handleTrainHorizonChange = (e) => {
                 const valStr = e.target.value;
                 if (valStr === '') {
                     setTrainHorizon('');
-                    if (dataLength > 0) setTestHorizon(dataLength);
                     return;
                 }
-
                 let val = parseInt(valStr);
                 if (isNaN(val)) return;
-                
-                const maxTrain = dataLength > 0 ? dataLength - 1 : 1000; 
-                
-                if (val > maxTrain) val = maxTrain;
-                if (val < 1) val = 1;
-                
                 setTrainHorizon(val);
-                
-                if (dataLength > 0) {
-                    setTestHorizon(dataLength - val);
+            };
+
+            // NEW: Handle Test Horizon Input Change (Independent)
+            const handleTestHorizonChange = (e) => {
+                const valStr = e.target.value;
+                if (valStr === '') {
+                    setTestHorizon('');
+                    return;
                 }
+                let val = parseInt(valStr);
+                if (isNaN(val)) return;
+                setTestHorizon(val);
             };
 
             const handleValidation = async () => {
-                if (!file) return;
+                if (!file || validationError) return; // Prevent run if error
                 setIsValidating(true);
                 setError(null);
                 setValidationResult(null);
@@ -282,6 +299,7 @@
                     
                     setValidationResult(data);
                     setModelType(data.winner);
+                    setResult(data); // RENDER THE CHART WITH VALIDATION DATA
                 } catch (err) {
                     setError(err.message === "Failed to fetch" ? "Cannot reach Backend." : err.message);
                 } finally {
@@ -381,7 +399,7 @@
                                 {theme === 'system' && <SystemIcon />}
                             </button>
                             <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">
-                                v5.2_AUTOVAL
+                                v5.3_VALFIX
                             </div>
                         </div>
                     </header>
@@ -460,10 +478,9 @@
                                                     type="number" 
                                                     value={trainHorizon}
                                                     onChange={handleTrainHorizonChange}
-                                                    max={dataLength > 0 ? dataLength - 1 : undefined}
                                                     min="1"
                                                     disabled={!file}
-                                                    className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50"
+                                                    className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`}
                                                 />
                                             </div>
                                             <div className="flex-1">
@@ -471,11 +488,21 @@
                                                 <input 
                                                     type="number" 
                                                     value={testHorizon}
-                                                    readOnly
-                                                    className="w-full text-xs border border-slate-200 dark:border-slate-800 rounded bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-500 p-2 outline-none shadow-none mt-1 cursor-not-allowed"
+                                                    onChange={handleTestHorizonChange}
+                                                    min="1"
+                                                    disabled={!file}
+                                                    className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`}
                                                 />
                                             </div>
                                         </div>
+                                        
+                                        {/* Error Message for Invalid Horizons */}
+                                        {validationError && (
+                                            <div className="text-xxs text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800">
+                                                {validationError}
+                                            </div>
+                                        )}
+
                                         <div>
                                             <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Validation Model</label>
                                             <select 
@@ -492,9 +519,9 @@
                                         </div>
                                         <button 
                                             onClick={handleValidation}
-                                            disabled={!file || isValidating}
+                                            disabled={!file || isValidating || !!validationError}
                                             className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm
-                                                ${!file || isValidating 
+                                                ${!file || isValidating || validationError
                                                     ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' 
                                                     : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}
                                         >
