@@ -311,7 +311,7 @@
                                     <p className="text-xxs text-slate-500 dark:text-slate-400 mb-1">Table must have two columns:</p>
                                     <ul className="text-xxs text-slate-600 dark:text-slate-300 list-disc pl-3 space-y-0.5 font-mono">
                                         <li>Period (Date)</li>
-                                        <li>Sales_quantity (Number)</li>
+                                        <li>Actual (Number)</li>
                                     </ul>
                                 </div>
                                 <div>
@@ -421,7 +421,7 @@
                                                 />
                                                 <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '10px', fontWeight: 600, color: chartColors.text}}/>
                                                 
-                                                <Area type="monotone" dataKey="actual" name="Historical" stroke={chartColors.actualStroke} fill={chartColors.actualFill} strokeWidth={2} isAnimationActive={false} />
+                                                <Area type="monotone" dataKey="actual" name="Actual" stroke={chartColors.actualStroke} fill={chartColors.actualFill} strokeWidth={2} isAnimationActive={false} />
                                                 
                                                 <Line 
                                                     type="monotone" 
@@ -477,7 +477,7 @@
                                             />
                                             <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '12px', fontWeight: 600, color: chartColors.text}}/>
                                             
-                                            <Area type="monotone" dataKey="actual" name="Historical" stroke={chartColors.actualStroke} fill={chartColors.actualFill} strokeWidth={3} isAnimationActive={false} />
+                                            <Area type="monotone" dataKey="actual" name="Actual" stroke={chartColors.actualStroke} fill={chartColors.actualFill} strokeWidth={3} isAnimationActive={false} />
                                             
                                             <Line 
                                                 type="monotone" 
