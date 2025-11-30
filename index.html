@@ -54,6 +54,7 @@
             scrollbar-width: thin;
         }
         
+        /* Reverted Scrollbar Styling to Standard Gray */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -218,6 +219,11 @@
                 }
             }, [trainHorizon, testHorizon, dataLength]);
 
+            // Link Forecast Steps to Test Horizon
+            useEffect(() => {
+                setForecastSteps(testHorizon);
+            }, [testHorizon]);
+
             const cycleTheme = () => {
                 if (theme === 'light') setTheme('dark');
                 else if (theme === 'dark') setTheme('system');
@@ -278,7 +284,7 @@
 
             const handleReset = () => {
                 setFile(null);
-                setModelType("auto");
+                setModelType("ses");
                 setForecastSteps(6);
                 setDataLength(0);
                 setValidationModelType("auto");
@@ -444,7 +450,7 @@
                                 {theme === 'system' && <SystemIcon />}
                             </button>
                             <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">
-                                v5.15_COLORS
+                                v5.19_CONTINUOUS
                             </div>
                         </div>
                     </header>
@@ -477,7 +483,7 @@
                                     </h3>
                                     <div 
                                         onClick={() => fileInputRef.current.click()}
-                                        className={`border border-dashed rounded px-3 py-4 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex flex-col items-center justify-center gap-1
+                                        className={`border border-dashed rounded px-3 py-8 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex flex-col items-center justify-center gap-1
                                             ${file ? 'border-brand-gold bg-amber-50/20 dark:bg-amber-900/10' : 'border-slate-300 dark:border-slate-700'}`}
                                     >
                                         <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
@@ -492,16 +498,6 @@
                                         )}
                                     </div>
                                     {error && <div className="text-xxs text-red-600 dark:text-red-400 mt-1 font-medium">{error}</div>}
-                                </div>
-
-                                {/* ADDED: Template Requirements Note */}
-                                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded p-3 transition-colors">
-                                    <h3 className="text-xxs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 whitespace-nowrap">Template requirements:</h3>
-                                    <p className="text-xxs text-slate-500 dark:text-slate-400 mb-1">Data must have two columns:</p>
-                                    <ul className="text-xxs text-slate-600 dark:text-slate-300 list-disc pl-3 space-y-0.5 font-mono">
-                                        <li>Period (Date)</li>
-                                        <li>Actual (Number)</li>
-                                    </ul>
                                 </div>
 
                                 {/* 2. Data Validation Group */}
@@ -594,40 +590,36 @@
                                     </h3>
                                     <div className="space-y-3">
                                         <div>
-                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Forecast Model</label>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Forecast Model (Locked)</label>
                                             <select 
                                                 value={modelType}
-                                                onChange={(e) => setModelType(e.target.value)}
-                                                className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1"
+                                                disabled={true} // LOCKED
+                                                className="w-full text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-2 outline-none shadow-none mt-1 cursor-not-allowed"
                                             >
-                                                <option value="auto">Auto-Select (Best Fit)</option>
                                                 <option value="ses">SES (Level)</option>
                                                 <option value="des">DES (Trend)</option>
                                                 <option value="tes">TES (Seasonal)</option>
                                                 <option value="prophet">Prophet (Complex)</option>
+                                                {/* Removed "auto" option */}
                                             </select>
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Forecast Horizon</label>
-                                            <select 
-                                                value={forecastSteps}
-                                                onChange={(e) => setForecastSteps(Number(e.target.value))}
-                                                className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1"
-                                            >
-                                                <option value={1}>1 Period</option>
-                                                <option value={3}>3 Periods</option>
-                                                <option value={6}>6 Periods</option>
-                                                <option value={12}>12 Periods</option>
-                                            </select>
-                                            <p className="text-xxs text-slate-400 dark:text-slate-500 mt-1 italic">Hint: Larger horizon leads to less precise forecast</p>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Forecast Horizon (Locked)</label>
+                                            <input 
+                                                type="text"
+                                                value={forecastSteps + " Periods"}
+                                                disabled={true} // LOCKED
+                                                className="w-full text-xs border border-slate-200 dark:border-slate-800 rounded bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-2 outline-none shadow-none mt-1 cursor-not-allowed"
+                                            />
+                                            <p className="text-xxs text-slate-400 dark:text-slate-500 mt-1 italic">Determined by Data Validation</p>
                                         </div>
 
                                         <button 
                                             onClick={handleRun}
-                                            disabled={!file || isLoading}
+                                            disabled={!file || isLoading || !validationResult} // Only enabled after validation
                                             className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm
-                                                ${!file || isLoading 
+                                                ${!file || isLoading || !validationResult
                                                     ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' 
                                                     : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}
                                         >
@@ -671,33 +663,20 @@
                                 <MetricTile label="Current Fit" value={metrics.fit} isDark={isDark} />
                                 <MetricTile label="Next Forecast" value={metrics.nextFc} isDark={isDark} />
                                 <MetricTile label="Growth Delta" value={metrics.growth} type={metrics.growthType} isDark={isDark} />
-                                <MetricTile label="Validation Runs" value={valRuns} isDark={isDark} variant="validation" />
+                                <MetricTile label="Validation Runs" value={valRuns} isDark={isDark} />
                                 
-                                {/* Updated Validation Model Tile: Synced with Forecast Group */}
-                                <div className={`flex flex-col justify-center px-4 md:px-6 h-full min-w-[120px] md:min-w-[140px] border-r border-brand-border dark:border-slate-700 bg-amber-50 dark:bg-amber-900/10 snap-start transition-colors items-center`}>
-                                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Validation Model</span>
-                                    <span className="text-[10px] md:text-xs font-bold text-brand-dark dark:text-brand-gold bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded w-fit truncate max-w-[100px] block transition-colors">
-                                        {validationResult ? formatValidationModelName(validationResult.winner) : '-'}
-                                    </span>
-                                </div>
-
                                 <MetricTile 
                                     label="Validation (Avg.) MSE" 
                                     value={validationResult ? fmtNumber(validationResult.best_mse, 2, 2) : '-'} 
                                     isDark={isDark} 
-                                    variant="validation"
-                                />
-                                <MetricTile 
-                                    label="Forecast MSE" 
-                                    value={metrics.forecastMse} 
-                                    isDark={isDark} 
-                                    variant="forecast"
+                                    highlight={!!validationResult}
                                 />
 
-                                <div className={`flex flex-col justify-center px-4 md:px-6 h-full ml-auto min-w-[120px] md:min-w-[140px] border-l border-brand-border dark:border-slate-700 bg-slate-100 dark:bg-slate-800 snap-start transition-colors items-center`}>
-                                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Forecast Model</span>
+                                {/* Unified Validation Model Tile at the End */}
+                                <div className={`flex flex-col justify-center px-4 md:px-6 h-full min-w-[120px] md:min-w-[140px] border-l border-brand-border dark:border-slate-700 bg-white dark:bg-slate-900 snap-start transition-colors items-center`}>
+                                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Validation Model</span>
                                     <span className="text-[10px] md:text-xs font-bold text-brand-dark dark:text-brand-gold bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded w-fit truncate max-w-[100px] block transition-colors">
-                                        {lastForecastResult ? lastForecastResult.model_name : '-'}
+                                        {validationResult ? formatValidationModelName(validationResult.winner) : '-'}
                                     </span>
                                 </div>
                             </div>
