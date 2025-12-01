@@ -88,7 +88,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/1.8.5/Recharts.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- ADDED: SheetJS for Client-Side Excel Parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -413,6 +412,11 @@
             
             const metrics = getMetrics();
             const valRuns = calculateValidationRuns();
+            
+            // LOGIC TO DETERMINE VIEW MODE
+            // If the result has a 'mode' property, it comes from /predict (Forecast Mode)
+            // If the result has 'winner_code' etc, it comes from /validate (Validation Mode)
+            const isForecastRun = result && result.mode ? true : false;
 
             const chartColors = {
                 grid: isDark ? "#334155" : "#e2e8f0",
@@ -739,26 +743,33 @@
                                                 />
                                                 <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '10px', fontWeight: 600, color: chartColors.text}}/>
                                                 
-                                                {/* REPLACED: Single Actual Area with Split Actuals */}
+                                                {/* CONDITIONAL RENDERING FOR CHART AREAS */}
+                                                
+                                                {/* 1. Actual / Train Line (Grey) */}
+                                                {/* In Forecast mode, we rename "Actual (Train)" to "Actual" but keep the Grey color */}
                                                 <Area 
                                                     type="monotone" 
                                                     dataKey="actual_train" 
-                                                    name="Actual (Train)" 
+                                                    name={isForecastRun ? "Actual" : "Actual (Train)"} 
                                                     stroke={chartColors.actualTrainStroke} 
                                                     fill={chartColors.actualTrainFill} 
                                                     strokeWidth={2} 
                                                     isAnimationActive={false} 
                                                 />
                                                 
-                                                <Area 
-                                                    type="monotone" 
-                                                    dataKey="actual_test" 
-                                                    name="Actual (Test)" 
-                                                    stroke={chartColors.actualTestStroke} 
-                                                    fill={chartColors.actualTestFill} 
-                                                    strokeWidth={2} 
-                                                    isAnimationActive={false} 
-                                                />
+                                                {/* 2. Test Line (Green) */}
+                                                {/* Only shown in Validation Mode */}
+                                                {!isForecastRun && (
+                                                    <Area 
+                                                        type="monotone" 
+                                                        dataKey="actual_test" 
+                                                        name="Actual (Test)" 
+                                                        stroke={chartColors.actualTestStroke} 
+                                                        fill={chartColors.actualTestFill} 
+                                                        strokeWidth={2} 
+                                                        isAnimationActive={false} 
+                                                    />
+                                                )}
                                                 
                                                 <Line 
                                                     type="monotone" 
@@ -814,26 +825,29 @@
                                             />
                                             <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '12px', fontWeight: 600, color: chartColors.text}}/>
                                             
-                                            {/* REPLACED: Single Actual Area with Split Actuals */}
+                                            {/* CONDITIONAL RENDERING FOR CHART AREAS (Fullscreen) */}
+                                            
                                             <Area 
                                                 type="monotone" 
                                                 dataKey="actual_train" 
-                                                name="Actual (Train)" 
+                                                name={isForecastRun ? "Actual" : "Actual (Train)"} 
                                                 stroke={chartColors.actualTrainStroke} 
                                                 fill={chartColors.actualTrainFill} 
                                                 strokeWidth={3} 
                                                 isAnimationActive={false} 
                                             />
                                             
-                                            <Area 
-                                                type="monotone" 
-                                                dataKey="actual_test" 
-                                                name="Actual (Test)" 
-                                                stroke={chartColors.actualTestStroke} 
-                                                fill={chartColors.actualTestFill} 
-                                                strokeWidth={3} 
-                                                isAnimationActive={false} 
-                                            />
+                                            {!isForecastRun && (
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="actual_test" 
+                                                    name="Actual (Test)" 
+                                                    stroke={chartColors.actualTestStroke} 
+                                                    fill={chartColors.actualTestFill} 
+                                                    strokeWidth={3} 
+                                                    isAnimationActive={false} 
+                                                />
+                                            )}
                                             
                                             <Line 
                                                 type="monotone" 
