@@ -389,7 +389,12 @@
                 const history = result.history;
                 const forecast = result.forecast;
                 const lastHistoryItem = history[history.length - 1];
-                const lastActual = lastHistoryItem.actual;
+                
+                // UPDATED: Support for split Actuals
+                const lastActual = lastHistoryItem.actual_train !== undefined 
+                    ? lastHistoryItem.actual_train 
+                    : lastHistoryItem.actual;
+                    
                 const lastFit = lastHistoryItem.fitted !== null ? lastHistoryItem.fitted : '-';
                 const firstForecastItem = forecast.length > 0 ? forecast[0] : null;
                 const nextForecastVal = firstForecastItem ? firstForecastItem.forecast : 0;
@@ -414,8 +419,11 @@
                 text: isDark ? "#94a3b8" : "#64748b",
                 tooltipBg: isDark ? "#1e293b" : "#fff",
                 tooltipBorder: isDark ? "#334155" : "#e2e8f0",
-                actualStroke: isDark ? "#94a3b8" : "#334155",
-                actualFill: isDark ? "#1e293b" : "#f1f5f9",
+                // Split Actual Colors
+                actualTrainStroke: isDark ? "#94a3b8" : "#64748b", // Grey/Slate
+                actualTrainFill: isDark ? "#1e293b" : "#f1f5f9",
+                actualTestStroke: "#10b981", // Green/Emerald
+                actualTestFill: "rgba(16, 185, 129, 0.1)",
                 fitStroke: isDark ? "#64748b" : "#94a3b8",
                 forecastFill: isDark ? "rgba(245, 158, 11, 0.1)" : "#FEF3C7"
             };
@@ -450,7 +458,7 @@
                                 {theme === 'system' && <SystemIcon />}
                             </button>
                             <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">
-                                v5.19_CONTINUOUS
+                                v5.20_SPLIT_ACTUALS
                             </div>
                         </div>
                     </header>
@@ -731,7 +739,26 @@
                                                 />
                                                 <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '10px', fontWeight: 600, color: chartColors.text}}/>
                                                 
-                                                <Area type="monotone" dataKey="actual" name="Actual" stroke={chartColors.actualStroke} fill={chartColors.actualFill} strokeWidth={2} isAnimationActive={false} />
+                                                {/* REPLACED: Single Actual Area with Split Actuals */}
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="actual_train" 
+                                                    name="Actual (Train)" 
+                                                    stroke={chartColors.actualTrainStroke} 
+                                                    fill={chartColors.actualTrainFill} 
+                                                    strokeWidth={2} 
+                                                    isAnimationActive={false} 
+                                                />
+                                                
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="actual_test" 
+                                                    name="Actual (Test)" 
+                                                    stroke={chartColors.actualTestStroke} 
+                                                    fill={chartColors.actualTestFill} 
+                                                    strokeWidth={2} 
+                                                    isAnimationActive={false} 
+                                                />
                                                 
                                                 <Line 
                                                     type="monotone" 
@@ -787,7 +814,26 @@
                                             />
                                             <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '12px', fontWeight: 600, color: chartColors.text}}/>
                                             
-                                            <Area type="monotone" dataKey="actual" name="Actual" stroke={chartColors.actualStroke} fill={chartColors.actualFill} strokeWidth={3} isAnimationActive={false} />
+                                            {/* REPLACED: Single Actual Area with Split Actuals */}
+                                            <Area 
+                                                type="monotone" 
+                                                dataKey="actual_train" 
+                                                name="Actual (Train)" 
+                                                stroke={chartColors.actualTrainStroke} 
+                                                fill={chartColors.actualTrainFill} 
+                                                strokeWidth={3} 
+                                                isAnimationActive={false} 
+                                            />
+                                            
+                                            <Area 
+                                                type="monotone" 
+                                                dataKey="actual_test" 
+                                                name="Actual (Test)" 
+                                                stroke={chartColors.actualTestStroke} 
+                                                fill={chartColors.actualTestFill} 
+                                                strokeWidth={3} 
+                                                isAnimationActive={false} 
+                                            />
                                             
                                             <Line 
                                                 type="monotone" 
