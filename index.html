@@ -6,11 +6,6 @@
     <title>Operartis | Machine-Learning Forecaster</title>
     
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
-
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -53,37 +48,16 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
         
         body { font-family: 'Inter', sans-serif; height: 100vh; width: 100vw; overflow: hidden; margin: 0; }
-        
-        .scroller {
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-        }
-        
-        /* Reverted Scrollbar Styling to Standard Gray */
+        .scroller { -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
         ::-webkit-scrollbar-track { background: transparent; }
-
-        /* Dark mode scrollbar overrides */
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .dark body { background: #0f172a; }
-
-        /* --- MOBILE LANDSCAPE OPTIMIZATION --- */
         @media screen and (orientation: landscape) and (max-height: 600px) {
-            body {
-                height: auto !important;
-                overflow-y: auto !important;
-                position: static !important;
-            }
-            .mobile-landscape-root {
-                height: auto !important;
-                overflow: visible !important;
-                min-height: 100vh;
-            }
-            .mobile-landscape-main {
-                height: auto !important;
-                overflow: visible !important;
-            }
+            body { height: auto !important; overflow-y: auto !important; position: static !important; }
+            .mobile-landscape-root { height: auto !important; overflow: visible !important; min-height: 100vh; }
+            .mobile-landscape-main { height: auto !important; overflow: visible !important; }
         }
     </style>
     
@@ -112,10 +86,9 @@
         const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>;
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>;
         const RefreshIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>;
-        
-        // --- NEW: Split View Icons ---
         const SplitIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="4" x2="20" y1="12" y2="12"/></svg>;
         const SingleViewIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>;
+        const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
 
         const MetricTile = ({ label, value, subValue, type, isDark, variant = 'default' }) => {
             const colorClass = type === 'pos' ? 'text-emerald-600 dark:text-emerald-400' : type === 'neg' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-200';
@@ -140,28 +113,18 @@
             return num.toLocaleString('en-US', { minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
         };
 
-        // --- REUSABLE CHART COMPONENT (Used for Split View) ---
         const ChartWidget = ({ data, isDark, isForecastRun, title, uniqueId }) => {
             if (!data) return null;
             
-            // Re-define colors locally to ensure consistency
             const chartColors = {
                 grid: isDark ? "#334155" : "#e2e8f0",
                 text: isDark ? "#94a3b8" : "#64748b",
                 tooltipBg: isDark ? "#1e293b" : "#fff",
                 tooltipBorder: isDark ? "#334155" : "#e2e8f0",
-                
-                // Actual (Train): Dark Grey/Silver
                 actualTrainStroke: isDark ? "#cbd5e1" : "#475569", 
                 actualTrainGradientStart: isDark ? "#475569" : "#64748b",
-                
-                // Actual (Test): Emerald
                 actualTestStroke: "#10b981", 
-                
-                // Fit: Subtle
                 fitStroke: isDark ? "#64748b" : "#94a3b8",
-                
-                // Forecast: Brand Gold
                 forecastStroke: "#f59e0b",
             };
 
@@ -197,63 +160,13 @@
                             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: chartColors.text, fontSize: 10, fontFamily: 'monospace'}} dy={10} minTickGap={30} />
                             <YAxis axisLine={false} tickLine={false} tick={{fill: chartColors.text, fontSize: 10, fontFamily: 'monospace'}} />
                             
-                            <Tooltip 
-                                contentStyle={{ backgroundColor: chartColors.tooltipBg, borderColor: chartColors.tooltipBorder, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontSize: '12px', color: chartColors.text, fontFamily: 'monospace' }}
-                                itemStyle={{ padding: 0 }}
-                            />
+                            <Tooltip contentStyle={{ backgroundColor: chartColors.tooltipBg, borderColor: chartColors.tooltipBorder, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontSize: '12px', color: chartColors.text, fontFamily: 'monospace' }} itemStyle={{ padding: 0 }} />
                             <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '10px', fontWeight: 600, color: chartColors.text, fontFamily: 'sans-serif', textTransform: 'uppercase'}}/>
                             
-                            {/* 1. Actual / Train Line (Grey) */}
-                            <Area 
-                                type="monotone" 
-                                dataKey="actual_train" 
-                                name={isForecastRun ? "Actual" : "Actual (Train)"} 
-                                stroke={chartColors.actualTrainStroke} 
-                                fill={`url(#${gradientTrainId})`} 
-                                strokeWidth={2} 
-                                isAnimationActive={false} 
-                            />
-                            
-                            {/* 2. Test Line (Green) - Only in Validation Mode */}
-                            {!isForecastRun && (
-                                <Area 
-                                    type="monotone" 
-                                    dataKey="actual_test" 
-                                    name="Actual (Test)" 
-                                    stroke={chartColors.actualTestStroke} 
-                                    fill={`url(#${gradientTestId})`}
-                                    strokeWidth={2} 
-                                    isAnimationActive={false} 
-                                />
-                            )}
-                            
-                            {/* 3. Fit Line - Subtle */}
-                            <Line 
-                                type="monotone" 
-                                dataKey="fitted" 
-                                name="Fit" 
-                                stroke={chartColors.fitStroke} 
-                                strokeDasharray="2 2" 
-                                strokeWidth={1.5} 
-                                dot={false} 
-                                connectNulls={false}
-                                isAnimationActive={false}
-                                strokeOpacity={0.7}
-                            />
-                            
-                            {/* 4. Forecast - Bold Gold */}
-                            <Area 
-                                type="monotone" 
-                                dataKey="forecast" 
-                                name="Forecast" 
-                                stroke={chartColors.forecastStroke} 
-                                fill={`url(#${gradientForecastId})`}
-                                strokeWidth={2.5} 
-                                strokeDasharray="4 4" 
-                                dot={{r: 4, fill: isDark ? '#1e293b' : '#fff', stroke: chartColors.forecastStroke, strokeWidth: 2}} 
-                                connectNulls={false}
-                                isAnimationActive={false}
-                            />
+                            <Area type="monotone" dataKey="actual_train" name={isForecastRun ? "Actual" : "Actual (Train)"} stroke={chartColors.actualTrainStroke} fill={`url(#${gradientTrainId})`} strokeWidth={2} isAnimationActive={false} />
+                            {!isForecastRun && ( <Area type="monotone" dataKey="actual_test" name="Actual (Test)" stroke={chartColors.actualTestStroke} fill={`url(#${gradientTestId})`} strokeWidth={2} isAnimationActive={false} /> )}
+                            <Line type="monotone" dataKey="fitted" name="Fit" stroke={chartColors.fitStroke} strokeDasharray="2 2" strokeWidth={1.5} dot={false} connectNulls={false} isAnimationActive={false} strokeOpacity={0.7} />
+                            <Area type="monotone" dataKey="forecast" name="Forecast" stroke={chartColors.forecastStroke} fill={`url(#${gradientForecastId})`} strokeWidth={2.5} strokeDasharray="4 4" dot={{r: 4, fill: isDark ? '#1e293b' : '#fff', stroke: chartColors.forecastStroke, strokeWidth: 2}} connectNulls={false} isAnimationActive={false} />
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
@@ -262,29 +175,24 @@
 
         const App = () => {
             const [file, setFile] = useState(null);
-            
             const [modelType, setModelType] = useState("auto");
             const [forecastSteps, setForecastSteps] = useState(6);
-            
             const [dataLength, setDataLength] = useState(0); 
             const [validationModelType, setValidationModelType] = useState("auto");
             const [validationMethod, setValidationMethod] = useState("simple"); 
             const [trainHorizon, setTrainHorizon] = useState(24);
             const [testHorizon, setTestHorizon] = useState(6);
             
-            // RESULT STATES
             const [validationResult, setValidationResult] = useState(null);
-            const [forecastResult, setForecastResult] = useState(null); // Stores the final forecast
+            const [forecastResult, setForecastResult] = useState(null);
             
             const [isValidating, setIsValidating] = useState(false);
             const [validationError, setValidationError] = useState(null);
-
             const [isLoading, setIsLoading] = useState(false);
+            const [isExporting, setIsExporting] = useState(false);
             const [error, setError] = useState(null);
             const [isSidebarOpen, setIsSidebarOpen] = useState(false);
             const [isFullScreen, setIsFullScreen] = useState(false);
-            
-            // VIEW MODE STATE
             const [isSplitView, setIsSplitView] = useState(false);
             
             const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
@@ -293,9 +201,7 @@
             const fileInputRef = useRef(null);
             const LOCAL_API = 'http://127.0.0.1:8000';
             const PROD_API = 'https://sales-forecaster-backend.onrender.com';
-            const isLocal = window.location.hostname === 'localhost' || 
-                            window.location.hostname === '127.0.0.1' || 
-                            window.location.protocol === 'file:';
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
             const BASE_URL = isLocal ? LOCAL_API : PROD_API;
 
             useEffect(() => {
@@ -306,30 +212,15 @@
                     else if (theme === 'light') effectiveDark = false;
                     else effectiveDark = systemPrefersDark;
                     setIsDark(effectiveDark);
-                    if (effectiveDark) {
-                        document.documentElement.classList.add('dark');
-                    } else {
-                        document.documentElement.classList.remove('dark');
-                    }
+                    if (effectiveDark) { document.documentElement.classList.add('dark'); } 
+                    else { document.documentElement.classList.remove('dark'); }
                     localStorage.setItem('theme', theme);
                 };
                 applyTheme();
                 const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                const handleSystemChange = () => {
-                    if (theme === 'system') applyTheme();
-                };
-                if (mediaQuery.addEventListener) {
-                    mediaQuery.addEventListener('change', handleSystemChange);
-                } else {
-                    mediaQuery.addListener(handleSystemChange);
-                }
-                return () => {
-                    if (mediaQuery.removeEventListener) {
-                        mediaQuery.removeEventListener('change', handleSystemChange);
-                    } else {
-                        mediaQuery.removeListener(handleSystemChange);
-                    }
-                };
+                const handleSystemChange = () => { if (theme === 'system') applyTheme(); };
+                mediaQuery.addEventListener('change', handleSystemChange);
+                return () => mediaQuery.removeEventListener('change', handleSystemChange);
             }, [theme]);
 
             useEffect(() => {
@@ -337,17 +228,11 @@
                     const totalRequested = (parseInt(trainHorizon) || 0) + (parseInt(testHorizon) || 0);
                     if (totalRequested > dataLength) {
                         setValidationError(`Error: Train (${trainHorizon}) + Test (${testHorizon}) > Total Rows (${dataLength})`);
-                    } else {
-                        setValidationError(null);
-                    }
-                } else {
-                    setValidationError(null);
-                }
+                    } else { setValidationError(null); }
+                } else { setValidationError(null); }
             }, [trainHorizon, testHorizon, dataLength]);
 
-            useEffect(() => {
-                setForecastSteps(testHorizon);
-            }, [testHorizon]);
+            useEffect(() => { setForecastSteps(testHorizon); }, [testHorizon]);
 
             const cycleTheme = () => {
                 if (theme === 'light') setTheme('dark');
@@ -371,16 +256,12 @@
                         const firstSheetName = workbook.SheetNames[0];
                         const worksheet = workbook.Sheets[firstSheetName];
                         const json = XLSX.utils.sheet_to_json(worksheet);
-                        const totalRows = json.length;
-                        setDataLength(totalRows);
+                        setDataLength(json.length);
                         const defaultTest = 6;
-                        const defaultTrain = totalRows > defaultTest ? totalRows - defaultTest : totalRows - 1;
+                        const defaultTrain = json.length > defaultTest ? json.length - defaultTest : json.length - 1;
                         setTrainHorizon(defaultTrain > 0 ? defaultTrain : 1);
-                        setTestHorizon(totalRows > defaultTrain ? defaultTest : 1); 
-                    } catch (err) {
-                        console.error("Error parsing excel for length:", err);
-                        setDataLength(0);
-                    }
+                        setTestHorizon(json.length > defaultTrain ? defaultTest : 1); 
+                    } catch (err) { setDataLength(0); }
                 };
                 reader.readAsArrayBuffer(selectedFile);
             };
@@ -416,6 +297,7 @@
                 setValidationError(null);
                 setIsValidating(false);
                 setIsLoading(false);
+                setIsExporting(false);
                 setIsSplitView(false);
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
@@ -425,11 +307,8 @@
                 setIsValidating(true);
                 setError(null);
                 setValidationResult(null); 
-                // Don't clear forecastResult to allow user to compare if they want, 
-                // though typically validation changes would imply a new forecast is needed.
-                // For now we keep it to allow Split View to function if data exists.
+                // FIX: Clear Forecast result to ensure "Validation View" is shown immediately
                 setForecastResult(null); 
-                
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('model_type', validationModelType);
@@ -441,14 +320,11 @@
                     const response = await fetch(`${BASE_URL}/validate`, { method: 'POST', body: formData });
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.detail || "Validation Error");
-                    
                     setValidationResult(data);
                     setModelType(data.winner_code || data.winner.split(' ')[0].toLowerCase()); 
                 } catch (err) {
                     setError(err.message === "Failed to fetch" ? "Cannot reach Backend." : err.message);
-                } finally {
-                    setIsValidating(false);
-                }
+                } finally { setIsValidating(false); }
             };
 
             const handleRun = async () => {
@@ -468,9 +344,30 @@
                     setForecastResult(data);
                 } catch (err) {
                     setError(err.message === "Failed to fetch" ? "Cannot reach Backend." : err.message);
-                } finally {
-                    setIsLoading(false);
-                }
+                } finally { setIsLoading(false); }
+            };
+
+            const handleExport = async () => {
+                if (!file || !modelType) return;
+                setIsExporting(true); setError(null);
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('model_type', modelType);
+                formData.append('train_horizon', trainHorizon);
+                formData.append('test_horizon', testHorizon);
+                formData.append('forecast_steps', forecastSteps);
+                try {
+                    const response = await fetch(`${BASE_URL}/export`, { method: 'POST', body: formData });
+                    if (!response.ok) { const errData = await response.json(); throw new Error(errData.detail || "Export Failed"); }
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Operartis_Forecast_${modelType.toUpperCase()}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } catch (err) { setError(err.message); } finally { setIsExporting(false); }
             };
 
             const calculateValidationRuns = () => {
@@ -494,21 +391,20 @@
                 return name.toUpperCase();
             };
 
-            // Which data to show in KPIs? (Prefer Forecast, then Validation)
             const activeResult = forecastResult || validationResult;
+            const canSplit = !!(validationResult && forecastResult);
+            const isSplitActive = isSplitView && canSplit;
 
             const getMetrics = () => {
                 if (!activeResult) return { current: '-', fit: '-', nextFc: '-', growth: '-', model: '-', forecastMse: '-' };
                 const history = activeResult.history;
                 const forecast = activeResult.forecast;
                 const lastHistoryItem = history[history.length - 1];
-                
                 const lastActual = lastHistoryItem.actual_train !== undefined ? lastHistoryItem.actual_train : lastHistoryItem.actual;
                 const lastFit = lastHistoryItem.fitted !== null ? lastHistoryItem.fitted : '-';
                 const firstForecastItem = forecast.length > 0 ? forecast[0] : null;
                 const nextForecastVal = firstForecastItem ? firstForecastItem.forecast : 0;
                 const growthVal = ((nextForecastVal - lastActual) / lastActual) * 100;
-                
                 return {
                     current: fmtNumber(lastActual),
                     fit: typeof lastFit === 'number' ? fmtNumber(lastFit) : lastFit,
@@ -523,15 +419,8 @@
             const metrics = getMetrics();
             const valRuns = calculateValidationRuns();
 
-            // Determines if we can actually split (Need both results)
-            const canSplit = !!(validationResult && forecastResult);
-            // Effective view mode
-            const isSplitActive = isSplitView && canSplit;
-
             return (
                 <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
-                    
-                    {/* --- HEADER --- */}
                     <header className={`relative h-14 md:h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-30 transition-colors duration-300 ${isFullScreen ? 'hidden' : 'flex'}`}>
                         <div className="flex items-center gap-3 md:gap-4 z-10">
                             <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-1 -ml-1 text-slate-500 hover:text-brand-gold focus:outline-none dark:text-slate-400"><MenuIcon /></button>
@@ -543,43 +432,24 @@
                         </div>
                         <div className="flex items-center gap-4 z-10">
                             <button onClick={cycleTheme} className="text-slate-400 hover:text-brand-gold dark:text-slate-500 dark:hover:text-yellow-400 transition-colors flex items-center gap-2">
-                                {theme === 'light' && <SunIcon />}
-                                {theme === 'dark' && <MoonIcon />}
-                                {theme === 'system' && <SystemIcon />}
+                                {theme === 'light' && <SunIcon />} {theme === 'dark' && <MoonIcon />} {theme === 'system' && <SystemIcon />}
                             </button>
-                            <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">v5.30_SPLIT_VIEW</div>
+                            <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">v5.60_FIXED</div>
                         </div>
                     </header>
 
-                    {/* --- MAIN LAYOUT --- */}
                     <div className="flex flex-grow overflow-hidden min-h-0 relative w-full mobile-landscape-root">
-                        
-                        {/* --- SIDEBAR --- */}
                         <aside className={`${isFullScreen ? 'hidden' : ''} fixed md:relative inset-y-0 left-0 z-50 w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out ${!isSidebarOpen && 'md:translate-x-0'} ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-                            <div className="md:hidden h-14 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 shrink-0">
-                                <span className="font-bold text-slate-700 dark:text-slate-200">Configuration</span>
-                                <button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 hover:text-red-500"><XIcon /></button>
-                            </div>
-
+                            <div className="md:hidden h-14 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 shrink-0"><span className="font-bold text-slate-700 dark:text-slate-200">Configuration</span><button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 hover:text-red-500"><XIcon /></button></div>
                             <div className="flex-1 overflow-y-auto scroller p-4 space-y-6">
-                                
-                                {/* 1. Source Data */}
                                 <div>
                                     <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">Source Data<span className="h-px flex-1 bg-brand-gold"></span></h3>
                                     <div onClick={() => fileInputRef.current.click()} className={`border border-dashed rounded px-3 py-8 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex flex-col items-center justify-center gap-1 ${file ? 'border-brand-gold bg-amber-50/20 dark:bg-amber-900/10' : 'border-slate-300 dark:border-slate-700'}`}>
                                         <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
-                                        {file ? (
-                                            <>
-                                                <div className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate w-full text-center">{file.name}</div>
-                                                <div className="text-xxs text-emerald-600 dark:text-emerald-400 font-medium">LOCKED & READY</div>
-                                                {dataLength > 0 && <div className="text-xxs font-mono text-slate-400 dark:text-slate-500">[{dataLength} Periods]</div>}
-                                            </>
-                                        ) : <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">+ Import .XLSX</div>}
+                                        {file ? (<><div className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate w-full text-center">{file.name}</div><div className="text-xxs text-emerald-600 dark:text-emerald-400 font-medium">LOCKED & READY</div>{dataLength > 0 && <div className="text-xxs font-mono text-slate-400 dark:text-slate-500">[{dataLength} Periods]</div>}</>) : <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">+ Import .XLSX</div>}
                                     </div>
                                     {error && <div className="text-xxs text-red-600 dark:text-red-400 mt-1 font-medium">{error}</div>}
                                 </div>
-
-                                {/* 2. Data Validation */}
                                 <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
                                     <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">Data Validation<span className="h-px flex-1 bg-brand-gold"></span></h3>
                                     <div className="space-y-3">
@@ -591,14 +461,8 @@
                                             </select>
                                         </div>
                                         <div className="flex gap-2">
-                                            <div className="flex-1">
-                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">{validationMethod === 'walk_forward' ? 'Min. Train Size' : 'Train Horizon'}</label>
-                                                <input type="number" value={trainHorizon} onChange={handleTrainHorizonChange} min="1" disabled={!file} className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`} />
-                                            </div>
-                                            <div className="flex-1">
-                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Test Horizon</label>
-                                                <input type="number" value={testHorizon} onChange={handleTestHorizonChange} min="1" disabled={!file} className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`} />
-                                            </div>
+                                            <div className="flex-1"><label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">{validationMethod === 'walk_forward' ? 'Min. Train Size' : 'Train Horizon'}</label><input type="number" value={trainHorizon} onChange={handleTrainHorizonChange} min="1" disabled={!file} className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`} /></div>
+                                            <div className="flex-1"><label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Test Horizon</label><input type="number" value={testHorizon} onChange={handleTestHorizonChange} min="1" disabled={!file} className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`} /></div>
                                         </div>
                                         {validationError && <div className="text-xxs text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800">{validationError}</div>}
                                         <div>
@@ -611,51 +475,38 @@
                                                 <option value="prophet">Prophet (Complex)</option>
                                             </select>
                                         </div>
-                                        <button onClick={handleValidation} disabled={!file || isValidating || !!validationError} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm ${!file || isValidating || validationError ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}>
-                                            {isValidating ? 'Running Validation...' : (validationMethod === 'walk_forward' ? 'Run Auto-Validation' : 'Run Split Validation')}
-                                        </button>
+                                        <button onClick={handleValidation} disabled={!file || isValidating || !!validationError} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm ${!file || isValidating || validationError ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}>{isValidating ? 'Running Validation...' : (validationMethod === 'walk_forward' ? 'Run Auto-Validation' : 'Run Split Validation')}</button>
                                     </div>
                                 </div>
-
-                                {/* 3. Forecast Running */}
                                 <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
                                     <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">Forecast Running<span className="h-px flex-1 bg-brand-gold"></span></h3>
                                     <div className="space-y-3">
                                         <div>
                                             <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Forecast Model (Locked)</label>
-                                            <select value={modelType} disabled={true} className="w-full text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-2 outline-none shadow-none mt-1 cursor-not-allowed">
-                                                <option value="ses">SES (Level)</option>
-                                                <option value="des">DES (Trend)</option>
-                                                <option value="tes">TES (Seasonal)</option>
-                                                <option value="prophet">Prophet (Complex)</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Forecast Horizon (Locked)</label>
-                                            <input type="text" value={forecastSteps + " Periods"} disabled={true} className="w-full text-xs border border-slate-200 dark:border-slate-800 rounded bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-2 outline-none shadow-none mt-1 cursor-not-allowed" />
+                                            <select value={modelType} disabled={true} className="w-full text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 outline-none shadow-none mt-1 cursor-not-allowed"><option value="ses">SES (Level)</option><option value="des">DES (Trend)</option><option value="tes">TES (Seasonal)</option><option value="prophet">Prophet (Complex)</option></select>
                                             <p className="text-xxs text-slate-400 dark:text-slate-500 mt-1 italic">Determined by Data Validation</p>
                                         </div>
-                                        <button onClick={handleRun} disabled={!file || isLoading || !validationResult} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm ${!file || isLoading || !validationResult ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}>
-                                            {isLoading ? 'Running...' : 'Execute Forecast'}
-                                        </button>
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Forecast Horizon</label>
+                                            {/* CHANGED: Editable input field for Forecast Horizon */}
+                                            <input 
+                                                type="number" 
+                                                value={forecastSteps} 
+                                                onChange={(e) => setForecastSteps(parseInt(e.target.value) || '')}
+                                                min="1"
+                                                className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1" 
+                                            />
+                                        </div>
+                                        <button onClick={handleRun} disabled={!file || isLoading || !validationResult} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm ${!file || isLoading || !validationResult ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}>{isLoading ? 'Running...' : 'Execute Forecast'}</button>
+                                        <button onClick={handleExport} disabled={!file || isExporting || !forecastResult} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isExporting || !forecastResult ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}>{isExporting ? 'Generating Report...' : <><DownloadIcon /> Export Report (.xlsx)</>}</button>
                                     </div>
                                 </div>
-                                <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-4">
-                                    <button onClick={handleReset} className="w-full py-2 text-xs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2">
-                                        <RefreshIcon /> Reset Application
-                                    </button>
-                                </div>
+                                <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-4"><button onClick={handleReset} className="w-full py-2 text-xs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2"><RefreshIcon /> Reset Application</button></div>
                             </div>
-                            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex-shrink-0 transition-colors">
-                                <p className="text-xxs font-bold text-slate-400 dark:text-slate-500 leading-relaxed whitespace-nowrap">OPERARTIS ANALYTICS<br/>Optimizing Today, Growing Tomorrow.</p>
-                            </div>
+                            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex-shrink-0 transition-colors"><p className="text-xxs font-bold text-slate-400 dark:text-slate-500 leading-relaxed whitespace-nowrap">OPERARTIS ANALYTICS<br/>Optimizing Today, Growing Tomorrow.</p></div>
                         </aside>
                         {isSidebarOpen && <div className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity" onClick={() => setIsSidebarOpen(false)}></div>}
-                        
-                        {/* --- CONTENT AREA (Main Window) --- */}
                         <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative min-w-0 transition-all w-full h-full overflow-y-auto scroller ${isFullScreen ? 'hidden' : 'flex'} mobile-landscape-main`}>
-                            
-                            {/* KPI Bar */}
                             <div className="h-14 md:h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center shrink-0 shadow-sm overflow-x-auto snap-x no-scrollbar relative z-20 transition-colors">
                                 <MetricTile label="Current Vol" value={metrics.current} isDark={isDark} />
                                 <MetricTile label="Current Fit" value={metrics.fit} isDark={isDark} />
@@ -663,154 +514,23 @@
                                 <MetricTile label="Growth Delta" value={metrics.growth} type={metrics.growthType} isDark={isDark} />
                                 <MetricTile label="Validation Runs" value={valRuns} isDark={isDark} />
                                 <MetricTile label="Validation (Avg.) MSE" value={validationResult ? fmtNumber(validationResult.best_mse, 2, 2) : '-'} isDark={isDark} highlight={!!validationResult} />
-                                <div className={`flex flex-col justify-center px-4 md:px-6 h-full min-w-[120px] md:min-w-[140px] border-l border-brand-border dark:border-slate-700 bg-white dark:bg-slate-900 snap-start transition-colors items-center`}>
-                                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Validation Model</span>
-                                    <span className="text-[10px] md:text-xs font-bold text-brand-dark dark:text-brand-gold bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded w-fit truncate max-w-[100px] block transition-colors">
-                                        {validationResult ? formatValidationModelName(validationResult.winner) : '-'}
-                                    </span>
-                                </div>
+                                <div className={`flex flex-col justify-center px-4 md:px-6 h-full min-w-[120px] md:min-w-[140px] border-l border-brand-border dark:border-slate-700 bg-white dark:bg-slate-900 snap-start transition-colors items-center`}><span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Validation Model</span><span className="text-[10px] md:text-xs font-bold text-brand-dark dark:text-brand-gold bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded w-fit truncate max-w-[100px] block transition-colors">{validationResult ? formatValidationModelName(validationResult.winner) : '-'}</span></div>
                             </div>
-
-                            {/* Chart Container */}
                             <div className="p-2 md:p-4 relative flex flex-col w-full min-h-[400px] flex-grow" style={{ touchAction: 'pan-y' }}>
                                 <div className="flex-1 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm p-2 md:p-4 relative h-full overflow-hidden group transition-colors flex flex-col">
-                                    
-                                    {/* Toolbar (Split / Fullscreen) */}
-                                    {activeResult && (
-                                        <div className="absolute top-2 right-2 z-10 flex gap-2">
-                                            {/* Only show Split toggle if we have BOTH results */}
-                                            {canSplit && (
-                                                <button 
-                                                    onClick={() => setIsSplitView(!isSplitView)}
-                                                    className={`p-2 border shadow-sm rounded-md transition-colors ${isSplitView ? 'text-brand-gold border-brand-gold bg-amber-50 dark:bg-amber-900/20' : 'bg-white/90 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-brand-gold'}`}
-                                                    title={isSplitView ? "Single View" : "Split View"}
-                                                >
-                                                    {isSplitView ? <SingleViewIcon /> : <SplitIcon />}
-                                                </button>
-                                            )}
-                                            <button 
-                                                onClick={() => setIsFullScreen(true)}
-                                                className="p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-sm rounded-md text-slate-500 dark:text-slate-400 hover:text-brand-gold hover:border-brand-gold dark:hover:text-brand-gold transition-colors"
-                                            >
-                                                <MaximizeIcon />
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {/* Loading / Empty States */}
-                                    {!activeResult && !isLoading && !isValidating && (
-                                        <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 transition-colors">
-                                            <div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded flex items-center justify-center mb-2 transition-colors">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg>
-                                            </div>
-                                            <span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-center">No Data Loaded<br/>(Use Menu to Upload)</span>
-                                        </div>
-                                    )}
-
-                                    {(isLoading || isValidating) && (
-                                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm transition-colors">
-                                            <div className="mb-4">
-                                                <svg className="animate-spin h-8 w-8 md:h-10 md:w-10 text-brand-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                            </div>
-                                            <p className="text-xs md:text-sm font-bold text-brand-gold animate-pulse tracking-widest uppercase text-center px-4">
-                                                {isValidating ? 'Running Validation Algorithm...' : 'Running Forecasting Algorithm...'}
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {/* --- MAIN CHART RENDERING LOGIC --- */}
-                                    
-                                    {/* 1. SPLIT VIEW MODE (Top: Validation, Bottom: Forecast) */}
-                                    {isSplitActive && (
-                                        <div className="flex flex-col h-full gap-2">
-                                            {/* Top Pane: Validation */}
-                                            <div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative">
-                                                <ChartWidget 
-                                                    data={validationResult} 
-                                                    isDark={isDark} 
-                                                    isForecastRun={false} 
-                                                    title="Validation / Backtest" 
-                                                    uniqueId="split_val"
-                                                />
-                                            </div>
-                                            {/* Bottom Pane: Forecast */}
-                                            <div className="flex-1 relative">
-                                                <ChartWidget 
-                                                    data={forecastResult} 
-                                                    isDark={isDark} 
-                                                    isForecastRun={true} 
-                                                    title="Forecast / Future" 
-                                                    uniqueId="split_fc"
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* 2. SINGLE VIEW MODE (Show whichever is active, Forecast takes precedence) */}
-                                    {!isSplitActive && activeResult && (
-                                        <ChartWidget 
-                                            data={activeResult} 
-                                            isDark={isDark} 
-                                            isForecastRun={!!(activeResult.mode)} // Use mode prop to detect forecast
-                                            uniqueId="single_main"
-                                        />
-                                    )}
+                                    {activeResult && (<div className="absolute top-2 right-2 z-10 flex gap-2">{canSplit && (<button onClick={() => setIsSplitView(!isSplitView)} className={`p-2 border shadow-sm rounded-md transition-colors ${isSplitView ? 'text-brand-gold border-brand-gold bg-amber-50 dark:bg-amber-900/20' : 'bg-white/90 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-brand-gold'}`} title={isSplitView ? "Single View" : "Split View"}>{isSplitView ? <SingleViewIcon /> : <SplitIcon />}</button>)}<button onClick={() => setIsFullScreen(true)} className="p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-sm rounded-md text-slate-500 dark:text-slate-400 hover:text-brand-gold hover:border-brand-gold dark:hover:text-brand-gold transition-colors"><MaximizeIcon /></button></div>)}
+                                    {!activeResult && !isLoading && !isValidating && (<div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 transition-colors"><div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded flex items-center justify-center mb-2 transition-colors"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg></div><span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-center">No Data Loaded<br/>(Use Menu to Upload)</span></div>)}
+                                    {(isLoading || isValidating) && (<div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm transition-colors"><div className="mb-4"><svg className="animate-spin h-8 w-8 md:h-10 md:w-10 text-brand-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><p className="text-xs md:text-sm font-bold text-brand-gold animate-pulse tracking-widest uppercase text-center px-4">{isValidating ? 'Running Validation Algorithm...' : 'Running Forecasting Algorithm...'}</p></div>)}
+                                    {isSplitActive && (<div className="flex flex-col h-full gap-2"><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={validationResult} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="split_val" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="split_fc" /></div></div>)}
+                                    {!isSplitActive && activeResult && (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="single_main" />)}
                                 </div>
                             </div>
                         </main>
-
-                        {/* --- FULL SCREEN OVERLAY MODE --- */}
-                        {isFullScreen && activeResult && (
-                            <div className="fixed inset-0 z-50 bg-white dark:bg-slate-900 p-2 md:p-6 w-screen h-screen flex flex-col transition-colors">
-                                <button 
-                                    onClick={() => setIsFullScreen(false)}
-                                    className="absolute top-4 right-4 z-50 p-3 bg-slate-100 dark:bg-slate-800 rounded-full shadow-md text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-red-600 transition-colors"
-                                >
-                                    <MinimizeIcon />
-                                </button>
-
-                                <div className="flex-1 w-full h-full flex flex-col gap-4">
-                                     {/* Full Screen Split Logic */}
-                                     {isSplitActive ? (
-                                        <>
-                                            <div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative">
-                                                <ChartWidget 
-                                                    data={validationResult} 
-                                                    isDark={isDark} 
-                                                    isForecastRun={false} 
-                                                    title="Validation / Backtest"
-                                                    uniqueId="fs_val"
-                                                />
-                                            </div>
-                                            <div className="flex-1 relative">
-                                                <ChartWidget 
-                                                    data={forecastResult} 
-                                                    isDark={isDark} 
-                                                    isForecastRun={true} 
-                                                    title="Forecast / Future"
-                                                    uniqueId="fs_fc"
-                                                />
-                                            </div>
-                                        </>
-                                     ) : (
-                                        <ChartWidget 
-                                            data={activeResult} 
-                                            isDark={isDark} 
-                                            isForecastRun={!!(activeResult.mode)}
-                                            uniqueId="fs_single"
-                                        />
-                                     )}
-                                </div>
-                            </div>
-                        )}
+                        {isFullScreen && activeResult && (<div className="fixed inset-0 z-50 bg-white dark:bg-slate-900 p-2 md:p-6 w-screen h-screen flex flex-col transition-colors"><button onClick={() => setIsFullScreen(false)} className="absolute top-4 right-4 z-50 p-3 bg-slate-100 dark:bg-slate-800 rounded-full shadow-md text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-red-600 transition-colors"><MinimizeIcon /></button><div className="flex-1 w-full h-full flex flex-col gap-4">{isSplitActive ? (<><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={validationResult} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="fs_val" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="fs_fc" /></div></>) : (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="fs_single" />)}</div></div>)}
                     </div>
                 </div>
             );
         };
-
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
