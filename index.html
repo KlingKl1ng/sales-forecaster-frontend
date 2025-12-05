@@ -113,9 +113,16 @@
             return num.toLocaleString('en-US', { minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
         };
 
-        const ChartWidget = ({ data, isDark, isForecastRun, title, uniqueId }) => {
+        const ChartWidget = ({ data, isDark, isForecastRun, title, uniqueId, syncId }) => {
             if (!data) return null;
             
+            let chartData = [];
+            if (Array.isArray(data)) {
+                chartData = data; 
+            } else {
+                chartData = [...data.history, ...data.forecast];
+            }
+
             const chartColors = {
                 grid: isDark ? "#334155" : "#e2e8f0",
                 text: isDark ? "#94a3b8" : "#64748b",
@@ -140,7 +147,7 @@
                         </div>
                     )}
                     <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart data={[...data.history, ...data.forecast]} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                        <ComposedChart data={chartData} syncId={syncId} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                             <defs>
                                 <linearGradient id={gradientTrainId} x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor={chartColors.actualTrainGradientStart} stopOpacity={0.3}/>
@@ -347,7 +354,6 @@
                 } finally { setIsLoading(false); }
             };
 
-            // --- FIXED EXPORT HANDLER ---
             const handleExport = async () => {
                 if (!file || !modelType) return;
                 setIsExporting(true); setError(null);
@@ -358,24 +364,16 @@
                 formData.append('train_horizon', trainHorizon);
                 formData.append('test_horizon', testHorizon);
                 formData.append('forecast_steps', forecastSteps);
-
                 try {
                     const response = await fetch(`${BASE_URL}/export`, { method: 'POST', body: formData });
-                    
-                    if (!response.ok) { 
-                        const errData = await response.json(); 
-                        throw new Error(errData.detail || "Export Failed"); 
-                    }
-                    
+                    if (!response.ok) { const errData = await response.json(); throw new Error(errData.detail || "Export Failed"); }
                     const blob = await response.blob();
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
                     
-                    // --- CORRECT FILENAME LOGIC ---
-                    // Attempt to get filename from backend Content-Disposition header
-                    let fileName = `Operartis_Forecast_${modelType.toUpperCase()}.xlsx`; // Fallback
-                    
+                    // --- UPDATED FILENAME LOGIC ---
+                    let fileName = `Operartis_Forecast_${modelType.toUpperCase()}.xlsx`;
                     const contentDisposition = response.headers.get('Content-Disposition');
                     if (contentDisposition) {
                         const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
@@ -383,20 +381,25 @@
                             fileName = fileNameMatch[1];
                         }
                     } else if (file && file.name) {
-                         // Client-side fallback: matches desired format
+                         // Fallback using Timestamp
                          const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-                         fileName = `Operartis_Forecast_${nameWithoutExt}_${modelType.toUpperCase()}.xlsx`;
+                         // Simple JS timestamp: YYYYMMDD_HHMMSS
+                         const now = new Date();
+                         const timestamp = now.getFullYear() +
+                             String(now.getMonth() + 1).padStart(2, '0') +
+                             String(now.getDate()).padStart(2, '0') + "_" +
+                             String(now.getHours()).padStart(2, '0') +
+                             String(now.getMinutes()).padStart(2, '0') +
+                             String(now.getSeconds()).padStart(2, '0');
+                         
+                         fileName = `Operartis_Forecast_${nameWithoutExt}_${timestamp}.xlsx`;
                     }
                     
                     a.download = fileName;
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
-                } catch (err) { 
-                    setError(err.message); 
-                } finally { 
-                    setIsExporting(false); 
-                }
+                } catch (err) { setError(err.message); } finally { setIsExporting(false); }
             };
 
             const calculateValidationRuns = () => {
@@ -423,6 +426,31 @@
             const activeResult = forecastResult || validationResult;
             const canSplit = !!(validationResult && forecastResult);
             const isSplitActive = isSplitView && canSplit;
+
+            // --- ALIGN DATA FOR SPLIT VIEW ---
+            const getAlignedValidationData = () => {
+                if (!validationResult || !forecastResult) return null;
+                
+                const valMap = new Map();
+                [...validationResult.history, ...validationResult.forecast].forEach(item => {
+                    const key = item.name.replace(" (val)", "").replace(" (fc)", "");
+                    valMap.set(key, item);
+                });
+
+                const masterTimeline = [...forecastResult.history, ...forecastResult.forecast];
+                return masterTimeline.map(masterItem => {
+                    const key = masterItem.name.replace(" (val)", "").replace(" (fc)", "");
+                    const valItem = valMap.get(key);
+                    
+                    if (valItem) {
+                        return { ...valItem, name: masterItem.name };
+                    } else {
+                        return { name: masterItem.name };
+                    }
+                });
+            };
+
+            const splitViewValidationData = isSplitActive ? getAlignedValidationData() : null;
 
             const getMetrics = () => {
                 if (!activeResult) return { current: '-', fit: '-', nextFc: '-', growth: '-', model: '-', forecastMse: '-' };
@@ -463,7 +491,7 @@
                             <button onClick={cycleTheme} className="text-slate-400 hover:text-brand-gold dark:text-slate-500 dark:hover:text-yellow-400 transition-colors flex items-center gap-2">
                                 {theme === 'light' && <SunIcon />} {theme === 'dark' && <MoonIcon />} {theme === 'system' && <SystemIcon />}
                             </button>
-                            <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">v6.30_FINAL_FIX</div>
+                            <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">v6.60_TIMESTAMP</div>
                         </div>
                     </header>
 
@@ -549,12 +577,12 @@
                                     {activeResult && (<div className="absolute top-2 right-2 z-10 flex gap-2">{canSplit && (<button onClick={() => setIsSplitView(!isSplitView)} className={`p-2 border shadow-sm rounded-md transition-colors ${isSplitView ? 'text-brand-gold border-brand-gold bg-amber-50 dark:bg-amber-900/20' : 'bg-white/90 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-brand-gold'}`} title={isSplitView ? "Single View" : "Split View"}>{isSplitView ? <SingleViewIcon /> : <SplitIcon />}</button>)}<button onClick={() => setIsFullScreen(true)} className="p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-sm rounded-md text-slate-500 dark:text-slate-400 hover:text-brand-gold hover:border-brand-gold dark:hover:text-brand-gold transition-colors"><MaximizeIcon /></button></div>)}
                                     {!activeResult && !isLoading && !isValidating && (<div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 transition-colors"><div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded flex items-center justify-center mb-2 transition-colors"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg></div><span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-center">No Data Loaded<br/>(Use Menu to Upload)</span></div>)}
                                     {(isLoading || isValidating) && (<div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm transition-colors"><div className="mb-4"><svg className="animate-spin h-8 w-8 md:h-10 md:w-10 text-brand-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><p className="text-xs md:text-sm font-bold text-brand-gold animate-pulse tracking-widest uppercase text-center px-4">{isValidating ? 'Running Validation Algorithm...' : 'Running Forecasting Algorithm...'}</p></div>)}
-                                    {isSplitActive && (<div className="flex flex-col h-full gap-2"><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={validationResult} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="split_val" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="split_fc" /></div></div>)}
+                                    {isSplitActive && (<div className="flex flex-col h-full gap-2"><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="split_val" syncId="splitView" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="split_fc" syncId="splitView" /></div></div>)}
                                     {!isSplitActive && activeResult && (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="single_main" />)}
                                 </div>
                             </div>
                         </main>
-                        {isFullScreen && activeResult && (<div className="fixed inset-0 z-50 bg-white dark:bg-slate-900 p-2 md:p-6 w-screen h-screen flex flex-col transition-colors"><button onClick={() => setIsFullScreen(false)} className="absolute top-4 right-4 z-50 p-3 bg-slate-100 dark:bg-slate-800 rounded-full shadow-md text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-red-600 transition-colors"><MinimizeIcon /></button><div className="flex-1 w-full h-full flex flex-col gap-4">{isSplitActive ? (<><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={validationResult} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="fs_val" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="fs_fc" /></div></>) : (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="fs_single" />)}</div></div>)}
+                        {isFullScreen && activeResult && (<div className="fixed inset-0 z-50 bg-white dark:bg-slate-900 p-2 md:p-6 w-screen h-screen flex flex-col transition-colors"><button onClick={() => setIsFullScreen(false)} className="absolute top-4 right-4 z-50 p-3 bg-slate-100 dark:bg-slate-800 rounded-full shadow-md text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-red-600 transition-colors"><MinimizeIcon /></button><div className="flex-1 w-full h-full flex flex-col gap-4">{isSplitActive ? (<><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="fs_val" syncId="fs_split" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="fs_fc" syncId="fs_split" /></div></>) : (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="fs_single" />)}</div></div>)}
                     </div>
                 </div>
             );
