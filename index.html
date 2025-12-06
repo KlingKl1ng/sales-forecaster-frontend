@@ -392,7 +392,7 @@ fetch(url, options)
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
                                              {/* Endpoint URL */}
                                              <div className="flex flex-col">
-                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2 mb-2">
+                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2 h-5 mb-2">
                                                     Base Endpoint URL
                                                 </label>
                                                 <div className="h-12 flex items-center gap-2 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded p-3 text-xs font-mono text-emerald-600 dark:text-emerald-400 w-full">
@@ -405,7 +405,7 @@ fetch(url, options)
 
                                              {/* Auth Method */}
                                              <div className="flex flex-col">
-                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center mb-2">Authentication Header</label>
+                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center h-5 mb-2">Authentication Header</label>
                                                 <div className="h-12 flex items-center p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded text-xs text-slate-600 dark:text-slate-300 w-full">
                                                     <span className="mr-2">Header:</span> 
                                                     <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-brand-dark dark:text-brand-gold font-bold">X-API-Key</code>
@@ -484,7 +484,7 @@ fetch(url, options)
                                         <li>Our quantitative-driven approach allows clients to make data-backed decisions, reduce operational costs, minimize waste, shorten lead times and improve overall efficiency.</li>
                                     </ul>
                                 </div>
-                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col justify-center">
+                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col">
                                     <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">Our Vision & Philosophy</h3>
                                     <p className="text-xs italic mb-4">
                                         We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.
@@ -901,7 +901,7 @@ fetch(url, options)
                                     {activeResult && (<div className="absolute top-2 right-2 z-10 flex gap-2">{canSplit && (<button onClick={() => setIsSplitView(!isSplitView)} className={`p-2 border shadow-sm rounded-md transition-colors ${isSplitView ? 'text-brand-gold border-brand-gold bg-amber-50 dark:bg-amber-900/20' : 'bg-white/90 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-brand-gold'}`} title={isSplitView ? "Single View" : "Split View"}>{isSplitView ? <SingleViewIcon /> : <SplitIcon />}</button>)}<button onClick={() => setIsFullScreen(true)} className="p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-sm rounded-md text-slate-500 dark:text-slate-400 hover:text-brand-gold hover:border-brand-gold dark:hover:text-brand-gold transition-colors"><MaximizeIcon /></button></div>)}
                                     {!activeResult && !isLoading && !isValidating && (<div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 transition-colors"><div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded flex items-center justify-center mb-2 transition-colors"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg></div><span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-center">No Data Loaded<br/>(Use Menu to Upload)</span></div>)}
                                     {(isLoading || isValidating) && (<div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm transition-colors"><div className="mb-4"><svg className="animate-spin h-8 w-8 md:h-10 md:w-10 text-brand-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><p className="text-xs md:text-sm font-bold text-brand-gold animate-pulse tracking-widest uppercase text-center px-4">{isValidating ? 'Running Validation Algorithm...' : 'Running Forecasting Algorithm...'}</p></div>)}
-                                    {isSplitActive && (<div className="flex flex-col h-full gap-2"><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="split_val" syncId="splitView" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="split_fc" syncId="splitView" /></div></div>)}
+                                    {isSplitActive && (<div className="flex flex-col h-full gap-2"><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="split_val" syncId="splitView" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="fs_fc" syncId="fs_split" /></div></div>)}
                                     {!isSplitActive && activeResult && (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="single_main" />)}
                                 </div>
                             </div>
