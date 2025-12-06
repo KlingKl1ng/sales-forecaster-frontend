@@ -296,6 +296,164 @@ fetch(url, options)
   .then(json => console.log(json))
   .catch(err => console.error('error:' + err));`;
 
+            // --- CONTENT COMPONENTS ---
+            const ThemeContent = () => (
+                <div className="space-y-6 animate-fade-in">
+                    <div>
+                        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Interface Appearance</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button onClick={() => setTheme('light')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'light' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                <div className="p-3 bg-white rounded-full shadow-sm"><SunIcon /></div>
+                                <span className="text-sm font-bold">Light Mode</span>
+                            </button>
+                            <button onClick={() => setTheme('dark')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'dark' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                <div className="p-3 bg-slate-800 text-white rounded-full shadow-sm"><MoonIcon /></div>
+                                <span className="text-sm font-bold">Dark Mode</span>
+                            </button>
+                            <button onClick={() => setTheme('system')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'system' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                <div className="p-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full shadow-sm"><SystemIcon /></div>
+                                <span className="text-sm font-bold">System Default</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const ApiContent = () => (
+                <div className="animate-fade-in flex flex-col h-full overflow-hidden">
+                    {/* Credentials Info - Fixed Top */}
+                    <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-6 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 shrink-0">
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-white dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-700 text-brand-gold shadow-sm">
+                                <LockIcon />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">API Credentials</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md leading-relaxed">
+                                    To access the forecasting engine programmatically, you need a secure API Key. 
+                                    Please contact the system administrator to request your unique credentials.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="shrink-0 flex flex-col items-center justify-center gap-1">
+                            <div className="text-xs font-bold text-slate-400 uppercase">Status</div>
+                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 min-h-0 flex flex-col gap-6 overflow-y-auto scroller pr-2">
+                        {/* Top Row: Config Details */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 shrink-0">
+                             {/* Endpoint URL */}
+                             <div className="flex flex-col">
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2 h-5 mb-2">
+                                    Base Endpoint URL
+                                </label>
+                                <div className="h-12 flex items-center gap-2 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded p-3 text-xs font-mono text-emerald-600 dark:text-emerald-400 w-full">
+                                    <span className="truncate flex-1">{endpoint}</span>
+                                    <button onClick={() => copyToClipboard(endpoint, 'url')} className="ml-auto text-slate-400 hover:text-brand-gold shrink-0" title="Copy URL">
+                                        {copied === 'url' ? <span className="text-xs font-bold text-green-500">Copied</span> : <CopyIcon />}
+                                    </button>
+                                </div>
+                             </div>
+
+                             {/* Auth Method */}
+                             <div className="flex flex-col">
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center h-5 mb-2">Authentication Header</label>
+                                <div className="h-12 flex items-center p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded text-xs text-slate-600 dark:text-slate-300 w-full">
+                                    <span className="mr-2">Header:</span> 
+                                    <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-brand-dark dark:text-brand-gold font-bold">X-API-Key</code>
+                                </div>
+                             </div>
+                        </div>
+
+                        {/* Bottom Row: Code Snippets (Full Width) */}
+                        <div className="flex flex-col flex-1 min-h-[300px] border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-950 shadow-inner">
+                            <div className="bg-slate-100 dark:bg-slate-900 px-4 py-2 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+                                <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Integration Examples</h3>
+                                <div className="flex gap-2">
+                                    <button onClick={() => copyToClipboard(pythonExample, 'py')} className="text-[10px] font-bold uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold transition-colors flex items-center gap-1 min-w-[70px] justify-center">
+                                        {copied === 'py' ? <><CheckIcon /> <span className="text-emerald-500">Copied</span></> : "Python"}
+                                    </button>
+                                    <button onClick={() => copyToClipboard(curlExample, 'curl')} className="text-[10px] font-bold uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold transition-colors flex items-center gap-1 min-w-[70px] justify-center">
+                                        {copied === 'curl' ? <><CheckIcon /> <span className="text-emerald-500">Copied</span></> : "cURL"}
+                                    </button>
+                                    <button onClick={() => copyToClipboard(nodeExample, 'js')} className="text-[10px] font-bold uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold transition-colors flex items-center gap-1 min-w-[70px] justify-center">
+                                        {copied === 'js' ? <><CheckIcon /> <span className="text-emerald-500">Copied</span></> : "Node.js"}
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex-1 p-4 overflow-auto text-[10px] md:text-xs font-mono text-slate-300 leading-relaxed relative group">
+                                <div className="space-y-6">
+                                    <div>
+                                        <div className="text-slate-500 mb-1"># Python (Requests)</div>
+                                        <pre>{pythonExample}</pre>
+                                    </div>
+                                    <div className="border-t border-slate-800 pt-4">
+                                        <div className="text-slate-500 mb-1"># cURL</div>
+                                        <pre>{curlExample}</pre>
+                                    </div>
+                                    <div className="border-t border-slate-800 pt-4">
+                                        <div className="text-slate-500 mb-1"># Node.js / JavaScript</div>
+                                        <pre>{nodeExample}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer Text */}
+                        <div className="text-center pb-2 shrink-0">
+                            <p className="text-xs text-slate-400 dark:text-slate-500">
+                                Need custom rate limits or support? <span className="underline cursor-pointer hover:text-brand-gold">Contact the development team.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const AboutContent = () => (
+                <div className="animate-fade-in space-y-8 max-w-3xl mx-auto">
+                    <div className="text-center space-y-2 mb-8">
+                        <div className="inline-block p-4 bg-brand-gold/10 rounded-full mb-2">
+                            <img src="./icononly_transparent_quadratic.png" className="w-12 h-12 object-contain mx-auto" onError={(e) => e.target.style.display='none'} />
+                        </div>
+                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">About Operartis</h2>
+                        <p className="text-sm text-brand-gold font-medium uppercase tracking-widest">Optimising today, Growing tomorrow.</p>
+                    </div>
+
+                    <div className="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed space-y-6">
+                        <p>
+                            Founded in 2025, Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations. We combine deep expertise in supply chain, logistics, production, warehousing and manufacturing processes with advanced quantitative-optimization and simulation methods to deliver meaningful, measurable improvements.
+                        </p>
+                        <p>
+                            At Operartis, we understand that having data in an Enterprise Resource Planning (ERP) system is only the first step. True operational excellence requires turning that data into actionable planning, forecasting and scheduling insights. That’s why we focus on building, developing, and continuously improving a tailored Advanced Planning and Scheduling System (APS) — helping our clients leverage their data not just for record-keeping, but for real operational advantage.
+                        </p>
+
+                        <div className="grid md:grid-cols-2 gap-6 my-8">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800">
+                                <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">What We Do</h3>
+                                <ul className="space-y-3 text-xs list-disc pl-4 marker:text-brand-gold">
+                                    <li>We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.</li>
+                                    <li>We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.</li>
+                                    <li>We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.</li>
+                                    <li>Our quantitative-driven approach allows clients to make data-backed decisions, reduce operational costs, minimize waste, shorten lead times and improve overall efficiency.</li>
+                                </ul>
+                            </div>
+                            <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col"> 
+                                <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">Our Vision & Philosophy</h3>
+                                <ul className="space-y-3 text-xs list-disc pl-4 marker:text-brand-gold">
+                                    <li>We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.</li>
+                                    <li>We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.</li>
+                                    <li>By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 modal-backdrop transition-opacity" onClick={onClose}></div>
@@ -342,166 +500,9 @@ fetch(url, options)
 
                             {/* Content Area */}
                             <div className="flex-1 overflow-y-auto scroller p-6 md:p-8 relative bg-white dark:bg-slate-900">
-                                {activeTab === 'theme' && (
-                                    <div className="space-y-6 animate-fade-in">
-                                        <div>
-                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Interface Appearance</h3>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <button onClick={() => setTheme('light')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'light' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
-                                                    <div className="p-3 bg-white rounded-full shadow-sm"><SunIcon /></div>
-                                                    <span className="text-sm font-bold">Light Mode</span>
-                                                </button>
-                                                <button onClick={() => setTheme('dark')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'dark' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
-                                                    <div className="p-3 bg-slate-800 text-white rounded-full shadow-sm"><MoonIcon /></div>
-                                                    <span className="text-sm font-bold">Dark Mode</span>
-                                                </button>
-                                                <button onClick={() => setTheme('system')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'system' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
-                                                    <div className="p-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full shadow-sm"><SystemIcon /></div>
-                                                    <span className="text-sm font-bold">System Default</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'api' && (
-                                    <div className="animate-fade-in space-y-6">
-                                        {/* Credentials Info */}
-                                        <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                                            <div className="flex items-start gap-4">
-                                                <div className="p-3 bg-white dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-700 text-brand-gold shadow-sm">
-                                                    <LockIcon />
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">API Credentials</h4>
-                                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md leading-relaxed">
-                                                        To access the forecasting engine programmatically, you need a secure API Key. 
-                                                        Please contact the system administrator to request your unique credentials.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="shrink-0 hidden md:flex flex-col items-center justify-center gap-1">
-                                                <div className="text-xs font-bold text-slate-400 uppercase">Status</div>
-                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Config Details */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                                             {/* Endpoint URL */}
-                                             <div className="flex flex-col">
-                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2 h-5 mb-2">
-                                                    Base Endpoint URL
-                                                </label>
-                                                <div className="h-12 flex items-center gap-2 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded p-3 text-xs font-mono text-emerald-600 dark:text-emerald-400 w-full">
-                                                    <span className="truncate flex-1">{endpoint}</span>
-                                                    <button onClick={() => copyToClipboard(endpoint, 'url')} className="ml-auto text-slate-400 hover:text-brand-gold shrink-0" title="Copy URL">
-                                                        {copied === 'url' ? <span className="text-xs font-bold text-green-500">Copied</span> : <CopyIcon />}
-                                                    </button>
-                                                </div>
-                                             </div>
-
-                                             {/* Auth Method */}
-                                             <div className="flex flex-col">
-                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center h-5 mb-2">Authentication Header</label>
-                                                <div className="h-12 flex items-center p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded text-xs text-slate-600 dark:text-slate-300 w-full">
-                                                    <span className="mr-2">Header:</span> 
-                                                    <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-brand-dark dark:text-brand-gold font-bold">X-API-Key</code>
-                                                </div>
-                                             </div>
-                                        </div>
-
-                                        {/* Code Snippets */}
-                                        <div className="flex flex-col min-h-[300px] border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-950 shadow-inner">
-                                            <div className="bg-slate-100 dark:bg-slate-900 px-4 py-2 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
-                                                <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Integration Examples</h3>
-                                                <div className="flex gap-2">
-                                                    <button onClick={() => copyToClipboard(pythonExample, 'py')} className="text-[10px] font-bold uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold transition-colors flex items-center gap-1 min-w-[70px] justify-center">
-                                                        {copied === 'py' ? <><CheckIcon /> <span className="text-emerald-500">Copied</span></> : "Python"}
-                                                    </button>
-                                                    <button onClick={() => copyToClipboard(curlExample, 'curl')} className="text-[10px] font-bold uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold transition-colors flex items-center gap-1 min-w-[70px] justify-center">
-                                                        {copied === 'curl' ? <><CheckIcon /> <span className="text-emerald-500">Copied</span></> : "cURL"}
-                                                    </button>
-                                                    <button onClick={() => copyToClipboard(nodeExample, 'js')} className="text-[10px] font-bold uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold transition-colors flex items-center gap-1 min-w-[70px] justify-center">
-                                                        {copied === 'js' ? <><CheckIcon /> <span className="text-emerald-500">Copied</span></> : "Node.js"}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 p-4 overflow-auto text-[10px] md:text-xs font-mono text-slate-300 leading-relaxed relative group">
-                                                <div className="space-y-6">
-                                                    <div>
-                                                        <div className="text-slate-500 mb-1"># Python (Requests)</div>
-                                                        <pre>{pythonExample}</pre>
-                                                    </div>
-                                                    <div className="border-t border-slate-800 pt-4">
-                                                        <div className="text-slate-500 mb-1"># cURL</div>
-                                                        <pre>{curlExample}</pre>
-                                                    </div>
-                                                    <div className="border-t border-slate-800 pt-4">
-                                                        <div className="text-slate-500 mb-1"># Node.js / JavaScript</div>
-                                                        <pre>{nodeExample}</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Footer Text */}
-                        <div className="text-center pb-2">
-                            <p className="text-xs text-slate-400 dark:text-slate-500">
-                                Need custom rate limits or support? <span className="underline cursor-pointer hover:text-brand-gold">Contact the development team.</span>
-                            </p>
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'about' && (
-                    <div className="animate-fade-in space-y-8 max-w-3xl mx-auto">
-                        <div className="text-center space-y-2 mb-8">
-                            <div className="inline-block p-4 bg-brand-gold/10 rounded-full mb-2">
-                                <img src="./icononly_transparent_quadratic.png" className="w-12 h-12 object-contain mx-auto" onError={(e) => e.target.style.display='none'} />
-                            </div>
-                            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">About Operartis</h2>
-                            <p className="text-sm text-brand-gold font-medium uppercase tracking-widest">Optimising today, Growing tomorrow.</p>
-                        </div>
-
-                        <div className="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed space-y-6">
-                            <p>
-                                Founded in 2025, Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations. We combine deep expertise in supply chain, logistics, production, warehousing and manufacturing processes with advanced quantitative-optimization and simulation methods to deliver meaningful, measurable improvements.
-                            </p>
-                            <p>
-                                At Operartis, we understand that having data in an Enterprise Resource Planning (ERP) system is only the first step. True operational excellence requires turning that data into actionable planning, forecasting and scheduling insights. That’s why we focus on building, developing, and continuously improving a tailored Advanced Planning and Scheduling System (APS) — helping our clients leverage their data not just for record-keeping, but for real operational advantage.
-                            </p>
-
-                            <div className="grid md:grid-cols-2 gap-6 my-8">
-                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800">
-                                    <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">What We Do</h3>
-                                    <ul className="space-y-3 text-xs list-disc pl-4 marker:text-brand-gold">
-                                        <li>We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.</li>
-                                        <li>We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.</li>
-                                        <li>We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.</li>
-                                        <li>Our quantitative-driven approach allows clients to make data-backed decisions, reduce operational costs, minimize waste, shorten lead times and improve overall efficiency.</li>
-                                    </ul>
-                                </div>
-                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col">
-                                    <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">Our Vision & Philosophy</h3>
-                                    <p className="text-xs italic mb-4">
-                                        We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.
-                                    </p>
-                                    <p className="text-xs">
-                                        We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.
-                                    </p>
-                                    <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                                        <p className="text-xs font-medium">
-                                            By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                                {activeTab === 'theme' && <ThemeContent />}
+                                {activeTab === 'api' && <ApiContent />}
+                                {activeTab === 'about' && <AboutContent />}
                             </div>
                         </div>
                     </div>
@@ -901,7 +902,7 @@ fetch(url, options)
                                     {activeResult && (<div className="absolute top-2 right-2 z-10 flex gap-2">{canSplit && (<button onClick={() => setIsSplitView(!isSplitView)} className={`p-2 border shadow-sm rounded-md transition-colors ${isSplitView ? 'text-brand-gold border-brand-gold bg-amber-50 dark:bg-amber-900/20' : 'bg-white/90 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-brand-gold'}`} title={isSplitView ? "Single View" : "Split View"}>{isSplitView ? <SingleViewIcon /> : <SplitIcon />}</button>)}<button onClick={() => setIsFullScreen(true)} className="p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-sm rounded-md text-slate-500 dark:text-slate-400 hover:text-brand-gold hover:border-brand-gold dark:hover:text-brand-gold transition-colors"><MaximizeIcon /></button></div>)}
                                     {!activeResult && !isLoading && !isValidating && (<div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 transition-colors"><div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded flex items-center justify-center mb-2 transition-colors"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg></div><span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-center">No Data Loaded<br/>(Use Menu to Upload)</span></div>)}
                                     {(isLoading || isValidating) && (<div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm transition-colors"><div className="mb-4"><svg className="animate-spin h-8 w-8 md:h-10 md:w-10 text-brand-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><p className="text-xs md:text-sm font-bold text-brand-gold animate-pulse tracking-widest uppercase text-center px-4">{isValidating ? 'Running Validation Algorithm...' : 'Running Forecasting Algorithm...'}</p></div>)}
-                                    {isSplitActive && (<div className="flex flex-col h-full gap-2"><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="split_val" syncId="splitView" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="fs_fc" syncId="fs_split" /></div></div>)}
+                                    {isSplitActive && (<div className="flex flex-col h-full gap-2"><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="split_val" syncId="splitView" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="fs_fc" syncId="splitView" /></div></div>)}
                                     {!isSplitActive && activeResult && (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="single_main" />)}
                                 </div>
                             </div>
