@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operartis APS | Terminal</title>
+    
+    <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#f59e0b', 
+                            dark: '#b45309',
+                            obsidian: '#0f172a',
+                            slate: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)",
+                        'grid-pattern-light': "linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        /* Subtle Grid Animation */
+        .bg-grid {
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        /* Reveal Animation Base Classes */
+        .reveal-base {
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-hidden {
+            opacity: 0;
+            transform: translateY(40px);
+            filter: blur(8px);
+        }
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+    </style>
+    
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-100 transition-colors duration-500">
+
+    <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- ICONS ---
+        const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
+        const ActivityIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>;
+        const BoxIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>;
+        const TruckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>;
+        const BarChartIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>;
+        const SunIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>;
+        const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>;
+        const ArrowRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
+        const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
+        const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
+        const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
+
+
+        // --- CONFIGURATION ---
+        const MODULES = [
+            {
+                id: 'forecaster',
+                name: 'ML Forecaster',
+                desc: 'Time-series prediction engine using SES, DES, TES, and Prophet models. Supports multi-horizon validation.',
+                icon: <ActivityIcon />,
+                status: 'live',
+                version: 'v7.5_PRO',
+                href: './forecaster.html' // Assumes you renamed index.html
+            },
+            {
+                id: 'inventory',
+                name: 'Inventory Optimizer',
+                desc: 'Dynamic safety stock calculation, reorder point analysis, and EOQ optimization.',
+                icon: <BoxIcon />,
+                status: 'dev',
+                version: 'v0.1_ALPHA',
+                href: '#'
+            },
+            {
+                id: 'abc',
+                name: 'ABC-XYZ Analysis',
+                desc: 'Classification matrix for inventory segmentation based on value and volatility.',
+                icon: <BarChartIcon />,
+                status: 'planned',
+                version: 'CONCEPT',
+                href: '#'
+            },
+            {
+                id: 'logistics',
+                name: 'Logistics Control',
+                desc: 'Route optimization, carrier management, and lead-time tracking.',
+                icon: <TruckIcon />,
+                status: 'planned',
+                version: 'CONCEPT',
+                href: '#'
+            }
+        ];
+
+        // --- COMPONENTS ---
+
+        // Reveal Animation Component
+        const Reveal = ({ children, className = "", delay = 0, threshold = 0.1 }) => {
+            const [isVisible, setIsVisible] = useState(false);
+            const ref = useRef(null);
+
+            useEffect(() => {
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) {
+                        setIsVisible(true);
+                        observer.disconnect();
+                    }
+                }, { threshold, rootMargin: "0px 0px -50px 0px" });
+                
+                if (ref.current) observer.observe(ref.current);
+                return () => {
+                    if (ref.current) observer.unobserve(ref.current);
+                };
+            }, [threshold]);
+
+            return (
+                <div 
+                    ref={ref} 
+                    className={`reveal-base ${isVisible ? 'reveal-visible' : 'reveal-hidden'} ${className}`}
+                    style={{ transitionDelay: `${delay}ms` }}
+                >
+                    {children}
+                </div>
+            );
+        };
+
+        const ModuleCard = ({ module }) => {
+            const isLive = module.status === 'live';
+            const isDev = module.status === 'dev';
+            
+            return (
+                <div 
+                    onClick={() => isLive ? window.location.href = module.href : null}
+                    className={`
+                        relative group overflow-hidden rounded-xl border p-6 flex flex-col justify-between transition-all duration-300 h-full
+                        ${isLive 
+                            ? 'bg-white/80 dark:bg-brand-slate/40 border-slate-200 dark:border-slate-800 hover:border-brand-gold hover:shadow-lg cursor-pointer' 
+                            : 'bg-slate-100/50 dark:bg-brand-slate/20 border-slate-100 dark:border-slate-800/50 opacity-80 grayscale-[0.5] cursor-not-allowed'
+                        }
+                    `}
+                >
+                    {/* Background Glow Effect on Hover (Only Live) */}
+                    {isLive && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/0 via-brand-gold/0 to-brand-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    )}
+
+                    <div>
+                        <div className="flex justify-between items-start mb-4">
+                            <div className={`
+                                p-3 rounded-lg border
+                                ${isLive ? 'bg-brand-gold/10 text-brand-gold border-brand-gold/20' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 border-slate-300 dark:border-slate-700'}
+                            `}>
+                                {module.icon}
+                            </div>
+                            <div className={`
+                                text-[10px] font-mono uppercase font-bold px-2 py-1 rounded
+                                ${isLive ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 
+                                  isDev ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' :
+                                  'bg-slate-200 dark:bg-slate-800 text-slate-400'}
+                            `}>
+                                {module.status === 'live' ? 'Online' : module.status === 'dev' ? 'In Dev' : 'Planned'}
+                            </div>
+                        </div>
+                        
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 group-hover:text-brand-gold transition-colors">{module.name}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed h-12 overflow-hidden">{module.desc}</p>
+                    </div>
+
+                    <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-700 pt-4">
+                        <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{module.version}</span>
+                        {isLive && (
+                            <button className="text-xs font-bold text-brand-gold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                Launch <ArrowRightIcon />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const AboutSection = () => (
+            <div className="mt-16 border-t border-slate-200 dark:border-slate-800 pt-10 pb-16">
+                <Reveal>
+                    <div className="flex items-center gap-3 mb-8">
+                        <span className="w-8 h-1 bg-brand-gold rounded-full"></span>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">About Operartis</h2>
+                    </div>
+                </Reveal>
+                
+                <div className="grid md:grid-cols-2 gap-12 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                    <div className="space-y-8">
+                        <Reveal delay={100}>
+                            <div>
+                                <p className="mb-4 text-slate-800 dark:text-slate-300 font-medium">
+                                    Founded in 2025, Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations.
+                                </p>
+                                <p>
+                                    We combine deep expertise in supply chain, logistics, production, warehousing and manufacturing processes with advanced quantitative-optimization and simulation methods to deliver meaningful, measurable improvements.
+                                </p>
+                                <p className="mt-4">
+                                    At Operartis, we understand that having data in an Enterprise Resource Planning (ERP) system is only the first step. True operational excellence requires turning that data into actionable planning, forecasting and scheduling insights. That’s why we focus on building, developing, and continuously improving a tailored Advanced Planning and Scheduling System (APS) — helping our clients leverage their data not just for record-keeping, but for real operational advantage.
+                                </p>
+                            </div>
+                        </Reveal>
+                        
+                        <Reveal delay={200}>
+                            <div>
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
+                                    What We Do
+                                </h3>
+                                <div className="space-y-4">
+                                    <p className="leading-relaxed">
+                                        We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.
+                                    </p>
+                                    <p className="leading-relaxed">
+                                        We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.
+                                    </p>
+                                    <p className="leading-relaxed">
+                                        We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.
+                                    </p>
+                                    <p className="leading-relaxed">
+                                        Our quantitative-driven approach allows clients to make data-backed decisions, reduce operational costs, minimize waste, shorten lead times and improve overall efficiency.
+                                    </p>
+                                </div>
+                            </div>
+                        </Reveal>
+                    </div>
+
+                    <div className="space-y-8">
+                        <Reveal delay={300}>
+                            <div>
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
+                                    Vision & Philosophy
+                                </h3>
+                                <div className="bg-slate-100 dark:bg-slate-900/50 p-6 rounded-lg border border-slate-200 dark:border-slate-800 mb-6 text-center shadow-inner">
+                                    <p className="text-brand-gold font-bold italic text-lg tracking-wide">“Optimising today, Growing tomorrow.”</p>
+                                </div>
+                                <p className="mb-4">
+                                    We aim to democratize operational and supply-chain optimization. We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.
+                                </p>
+                                <p className="mb-4">
+                                    We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.
+                                </p>
+                                <p>
+                                    By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness.
+                                </p>
+                            </div>
+                        </Reveal>
+
+                        <div>
+                            <Reveal delay={400}>
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
+                                    Why Choose Operartis
+                                </h3>
+                            </Reveal>
+                            <div className="space-y-3">
+                                {[
+                                    { title: "Specialization & Expertise", text: "We are not a generalist IT or consulting firm. Our core competence lies in operations, supply-chain optimization, and APS/ERP integration." },
+                                    { title: "Quantitative & Data-Driven", text: "Our approaches rely on simulation, modeling and data analytics — not guesswork. This ensures improvements are measurable and repeatable." },
+                                    { title: "Tailored & Pragmatic Solutions", text: "We design APS systems that reflect your real-world constraints. What we build fits your operations — not the other way around." },
+                                    { title: "Affordability & Value", text: "We strive to provide our services at reasonable price levels, making high-quality optimization accessible to a broad range of enterprises." },
+                                    { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." }
+                                ].map((item, i) => (
+                                    <Reveal key={i} delay={450 + (i * 100)}>
+                                        <div className="bg-white/50 dark:bg-white/5 p-3 rounded border border-slate-100 dark:border-slate-800/50 hover:border-brand-gold/30 transition-colors">
+                                            <strong className="text-brand-dark dark:text-brand-gold block text-xs uppercase tracking-wider mb-1">{item.title}</strong> 
+                                            {item.text}
+                                        </div>
+                                    </Reveal>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <Reveal delay={800}>
+                    <div className="mt-16 pt-10 border-t border-dashed border-slate-200 dark:border-slate-800 text-center">
+                        <p className="text-slate-800 dark:text-slate-200 font-medium max-w-3xl mx-auto text-base">
+                            We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis. 
+                        </p>
+                        <p className="text-brand-gold font-bold uppercase tracking-widest mt-4 text-xs">Let’s optimize today — so you can grow stronger tomorrow.</p>
+                    </div>
+                </Reveal>
+            </div>
+        );
+
+        const App = () => {
+            // Theme Logic
+            const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+            
+            // Clock Logic
+            const [time, setTime] = useState(new Date());
+
+            useEffect(() => {
+                const root = window.document.documentElement;
+                if (theme === 'dark') {
+                    root.classList.add('dark');
+                } else {
+                    root.classList.remove('dark');
+                }
+                localStorage.setItem('theme', theme);
+            }, [theme]);
+
+            useEffect(() => {
+                const timer = setInterval(() => setTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+            return (
+                <div className="h-full flex flex-col relative">
+                    {/* Background Grid */}
+                    <div className="absolute inset-0 pointer-events-none z-0">
+                        <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-grid-pattern opacity-[0.03]' : 'bg-grid-pattern-light opacity-[0.4]'}`}></div>
+                        <div className="absolute inset-0 bg-grid"></div>
+                    </div>
+
+                    {/* Navigation Bar */}
+                    <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel flex items-center justify-between px-6 z-10 shrink-0">
+                        <div className="flex items-center gap-4">
+                            {/* Corrected Logo Implementation */}
+                            <img src="./icononly_transparent_nobuffer.png" className="h-10 w-10 object-contain" onError={(e) => e.target.style.display='none'} />
+                            
+                            <div className="flex flex-col">
+                                <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS <span className="text-brand-gold font-normal">APS</span></span>
+                                <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase">System Terminal</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-6">
+                            {/* System Status Ticker */}
+                            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-300 font-bold">SYSTEM OPERATIONAL</span>
+                            </div>
+
+                            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
+                            
+                            {/* Time */}
+                            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
+                                <ClockIcon />
+                                <span>{time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+
+                            {/* Theme Toggle */}
+                            <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+                                {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+                            </button>
+                            
+                            {/* Profile Placeholder */}
+                            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shadow-md cursor-pointer">
+                                <UserIcon />
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Main Content */}
+                    <main className="flex-1 overflow-y-auto z-10 p-6 md:p-12 max-w-7xl mx-auto w-full flex flex-col">
+                        
+                        {/* Hero Section */}
+                        <Reveal>
+                            <div className="mb-12">
+                                <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+                                    Optimizing Today, <br/>
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark">Growing Tomorrow.</span>
+                                </h1>
+                                <p className="text-slate-500 dark:text-slate-400 max-w-xl text-sm md:text-base leading-relaxed mt-4">
+                                    Welcome to the Operartis Advanced Planning & Scheduling hub. 
+                                    Centralized control for demand forecasting, inventory optimization, and logistics management.
+                                </p>
+                            </div>
+                        </Reveal>
+
+                        {/* Modules Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10">
+                            {MODULES.map((mod, i) => (
+                                <Reveal key={mod.id} delay={i * 100}>
+                                    <ModuleCard module={mod} />
+                                </Reveal>
+                            ))}
+                            
+                            {/* Add Module Placeholder */}
+                            <Reveal delay={MODULES.length * 100}>
+                                <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-800 p-6 flex flex-col items-center justify-center text-center opacity-50 hover:opacity-100 transition-opacity cursor-pointer group hover:border-brand-gold hover:text-brand-gold h-full">
+                                    <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-900 mb-3 group-hover:bg-brand-gold/10 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    </div>
+                                    <span className="text-xs font-bold uppercase tracking-wider">Connect Module</span>
+                                </div>
+                            </Reveal>
+                        </div>
+
+                        {/* About Us Section */}
+                        <AboutSection />
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="py-4 px-6 border-t border-slate-200 dark:border-slate-800 text-center md:text-left z-10 shrink-0 bg-white/30 dark:bg-brand-obsidian/30 glass-panel">
+                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+                            <p className="text-[10px] text-slate-400">© 2025 Operartis Analytics. All rights reserved.</p>
+                            <div className="flex items-center gap-4 text-[10px] text-slate-500 font-mono">
+                                <span>v1.0.0 Terminal</span>
+                                <span className="text-brand-gold">•</span>
+                                <span>Latency: 24ms</span>
+                                <span className="text-brand-gold">•</span>
+                                <span>Data: Encrypted</span>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
