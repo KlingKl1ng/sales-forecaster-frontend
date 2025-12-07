@@ -49,7 +49,7 @@
             -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
         }
 
-        /* Modern Scrollbar */
+        /* Modern Scrollbar for Main Page */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -62,6 +62,21 @@
         }
         .dark ::-webkit-scrollbar-thumb {
             background: #334155;
+        }
+
+        /* Custom Scrollbar for Module Cards (Thinner) */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 2px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
         }
 
         /* Reveal Animation Base Classes */
@@ -216,10 +231,17 @@
                         </div>
                         
                         <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 group-hover:text-brand-gold transition-colors">{module.name}</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed h-12 overflow-hidden">{module.desc}</p>
+                    </div>
+                    
+                    {/* SCROLLABLE DESCRIPTION AREA - Click events allowed here if needed, but pointer-events-auto usually needed if inside pointer-events-none parent. 
+                        However, the parent 'content' wrapper has pointer-events-none. We need to re-enable pointer events for scrolling. */}
+                    <div className="pointer-events-auto h-24 overflow-y-auto pr-2 custom-scrollbar mb-2">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                            {module.desc}
+                        </p>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-700 pt-4 pointer-events-none">
+                    <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-700 pt-4 pointer-events-none">
                         <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{module.version}</span>
                         {isLive && (
                             <span className="text-xs font-bold text-brand-gold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
@@ -322,7 +344,7 @@
                                     Vision & Philosophy
                                 </h3>
                                 <div className="bg-slate-100 dark:bg-slate-900/50 p-6 rounded-lg border border-slate-200 dark:border-slate-800 mb-6 text-center shadow-inner">
-                                    <p className="text-brand-gold font-bold italic text-lg tracking-wide">“Optimising today, Growing tomorrow.”</p>
+                                    <p className="text-brand-gold font-bold italic text-lg tracking-wide">“Optimizing today, Growing tomorrow.”</p>
                                 </div>
                                 <p className="mb-4">
                                     We aim to democratize operational and supply-chain optimization. We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.
@@ -407,8 +429,10 @@
                     {/* Navigation Bar */}
                     <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel flex items-center justify-between px-6 z-10 shrink-0">
                         <div className="flex items-center gap-4">
-                            {/* Corrected Logo Implementation */}
-                            <img src="./icononly_transparent_nobuffer.png" className="h-10 w-10 object-contain" onError={(e) => e.target.style.display='none'} />
+                            {/* Corrected Logo Implementation with Hyperlink */}
+                            <a href="https://operartis.vercel.app/terminal.html" className="hover:opacity-80 transition-opacity">
+                                <img src="./icononly_transparent_nobuffer.png" className="h-10 w-10 object-contain" onError={(e) => e.target.style.display='none'} />
+                            </a>
                             
                             <div className="flex flex-col">
                                 <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS <span className="text-brand-gold font-normal">APS</span></span>

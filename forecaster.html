@@ -474,7 +474,7 @@ fetch(url, options)
                                                 <img src="./icononly_transparent_quadratic.png" className="w-12 h-12 object-contain mx-auto" onError={(e) => e.target.style.display='none'} />
                                             </div>
                                             <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">About Operartis</h2>
-                                            <p className="text-sm text-brand-gold font-medium uppercase tracking-widest">Optimising today, Growing tomorrow.</p>
+                                            <p className="text-sm text-brand-gold font-medium uppercase tracking-widest">Optimizing today, Growing tomorrow.</p>
                                         </div>
 
                                         <div className="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed space-y-6">
@@ -486,22 +486,24 @@ fetch(url, options)
                                             </p>
 
                                             <div className="grid md:grid-cols-2 gap-6 my-8">
-                                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800">
+                                                {/* What We Do Box */}
+                                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col h-full">
                                                     <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">What We Do</h3>
-                                                    <ul className="space-y-3 text-xs list-disc pl-4 marker:text-brand-gold">
-                                                        <li>We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.</li>
-                                                        <li>We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.</li>
-                                                        <li>We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.</li>
-                                                        <li>Our quantitative-driven approach allows clients to make data-backed decisions, reduce operational costs, minimize waste, shorten lead times and improve overall efficiency.</li>
-                                                    </ul>
+                                                    <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                                                        <p className="leading-relaxed">We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.</p>
+                                                        <p className="leading-relaxed">We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.</p>
+                                                        <p className="leading-relaxed">We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.</p>
+                                                    </div>
                                                 </div>
-                                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col"> 
+
+                                                {/* Vision Box */}
+                                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col h-full"> 
                                                     <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">Our Vision & Philosophy</h3>
-                                                    <ul className="space-y-3 text-xs list-disc pl-4 marker:text-brand-gold text-slate-600 dark:text-slate-300">
-                                                        <li>We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.</li>
-                                                        <li>We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.</li>
-                                                        <li>By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness.</li>
-                                                    </ul>
+                                                    <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                                                        <p className="leading-relaxed">We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.</p>
+                                                        <p className="leading-relaxed">We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.</p>
+                                                        <p className="leading-relaxed">By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness.</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -804,7 +806,9 @@ fetch(url, options)
                     <header className={`relative h-14 md:h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-30 transition-colors duration-300 ${isFullScreen ? 'hidden' : 'flex'}`}>
                         <div className="flex items-center gap-3 md:gap-4 z-10">
                             <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-1 -ml-1 text-slate-500 hover:text-brand-gold focus:outline-none dark:text-slate-400"><MenuIcon /></button>
-                            <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain" onError={(e) => e.target.style.display='none'} />
+                            <a href="https://operartis.vercel.app/terminal.html">
+                                <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer hover:opacity-80 transition-opacity" onError={(e) => e.target.style.display='none'} />
+                            </a>
                             <h1 className="font-bold text-slate-800 dark:text-slate-100 tracking-tight text-base md:text-lg transition-colors">OPERARTIS <span className="text-brand-gold font-normal hidden sm:inline">TERMINAL</span></h1>
                         </div>
                         <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden md:block">
