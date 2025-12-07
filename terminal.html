@@ -119,6 +119,7 @@
         const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
         const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
         const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
+        const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>;
 
 
         // --- CONFIGURATION ---
@@ -139,7 +140,7 @@
                 icon: <BarChartIcon />,
                 status: 'live',
                 version: 'v1.0_PRO',
-                href: './abcxyz.html'
+                href: './abc_xyz.html'
             },
             {
                 id: 'inventory',
@@ -395,20 +396,32 @@
         );
 
         const App = () => {
-            // Theme Logic
-            const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+            // Theme Logic: Updated to cycle Light -> Dark -> System
+            const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
             
             // Clock Logic
             const [time, setTime] = useState(new Date());
 
             useEffect(() => {
-                const root = window.document.documentElement;
-                if (theme === 'dark') {
-                    root.classList.add('dark');
-                } else {
-                    root.classList.remove('dark');
-                }
-                localStorage.setItem('theme', theme);
+                const applyTheme = () => {
+                    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    let effectiveDark = false;
+                    if (theme === 'dark') effectiveDark = true;
+                    else if (theme === 'light') effectiveDark = false;
+                    else effectiveDark = systemPrefersDark;
+                    
+                    if (effectiveDark) { document.documentElement.classList.add('dark'); } 
+                    else { document.documentElement.classList.remove('dark'); }
+                    localStorage.setItem('theme', theme);
+                };
+                
+                applyTheme();
+                
+                // System listener
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                const handleSystemChange = () => { if (theme === 'system') applyTheme(); };
+                mediaQuery.addEventListener('change', handleSystemChange);
+                return () => mediaQuery.removeEventListener('change', handleSystemChange);
             }, [theme]);
 
             useEffect(() => {
@@ -416,7 +429,11 @@
                 return () => clearInterval(timer);
             }, []);
 
-            const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+            const toggleTheme = () => {
+                if (theme === 'light') setTheme('dark');
+                else if (theme === 'dark') setTheme('system');
+                else setTheme('light');
+            };
 
             return (
                 <div className="h-full flex flex-col relative">
@@ -457,7 +474,7 @@
 
                             {/* Theme Toggle */}
                             <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
-                                {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+                                {theme === 'dark' ? <SunIcon /> : theme === 'light' ? <MoonIcon /> : <SystemIcon />}
                             </button>
                             
                             {/* Profile Placeholder */}
