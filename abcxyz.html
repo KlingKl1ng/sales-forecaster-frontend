@@ -48,7 +48,7 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
         
         body { font-family: 'Inter', sans-serif; height: 100vh; width: 100vw; overflow: hidden; margin: 0; }
         .scroller { -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
@@ -122,6 +122,7 @@
         const PaletteIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>;
         const InfoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>;
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>;
+        const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
 
         // --- UTILS ---
         const calculateStats = (numbers) => {
@@ -387,6 +388,7 @@
             const [headers, setHeaders] = useState([]);
             const [isMappingOpen, setIsMappingOpen] = useState(false);
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+            const [time, setTime] = useState(new Date());
             
             // Configuration State
             const [abcThresholds, setAbcThresholds] = useState({ a: 80, b: 95 }); // A: 0-80, B: 80-95, C: >95
@@ -401,6 +403,12 @@
             const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, list
             const [searchTerm, setSearchTerm] = useState('');
             const fileInputRef = useRef(null);
+
+            // Clock Effect
+            useEffect(() => {
+                const timer = setInterval(() => setTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
 
             // Theme Effect
             useEffect(() => {
@@ -552,7 +560,7 @@
                                 <a href="https://operartis.vercel.app/terminal.html" className="hover:opacity-80 transition-opacity">
                                     <img src="./icononly_transparent_quadratic.png" className="h-8 w-8" onError={(e) => e.target.style.display='none'} />
                                 </a>
-                                <span className="font-bold text-lg tracking-tight">OPERARTIS <span className="text-brand-gold">ABC-XYZ</span></span>
+                                <span className="font-bold text-lg tracking-tight">OPERARTIS <span className="text-brand-gold">TERMINAL</span></span>
                             </div>
                         </div>
 
@@ -675,26 +683,11 @@
 
                     {/* MAIN CONTENT */}
                     <main className="flex-1 flex flex-col overflow-hidden relative">
-                        {analysisData.length === 0 ? (
-                            <div className="flex-1 flex flex-col items-center justify-center p-8 opacity-60">
-                                <div className="absolute top-4 right-6">
-                                    <button onClick={() => setIsSettingsOpen(true)} className="text-slate-400 hover:text-brand-gold dark:text-slate-500 dark:hover:text-yellow-400 transition-colors flex items-center gap-2">
-                                        <SettingsIcon />
-                                    </button>
-                                </div>
-                                <div className="p-6 bg-white dark:bg-slate-900 rounded-full mb-6 shadow-sm border border-slate-100 dark:border-slate-800">
-                                    <GridIcon />
-                                </div>
-                                <h2 className="text-2xl font-bold mb-2">Ready to Analyze</h2>
-                                <p className="text-slate-500 max-w-md text-center">
-                                    Upload your inventory Excel file to generate the ABC-XYZ matrix, identify critical items, and optimize your supply chain policies.
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                {/* Header Tabs */}
-                                <div className="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm shrink-0">
-                                    <div className="flex gap-4">
+                        {/* Header Tabs - Always Visible */}
+                        <div className="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm shrink-0 relative">
+                            <div className="flex gap-4">
+                                {analysisData.length > 0 && (
+                                    <>
                                         <button 
                                             onClick={() => setActiveTab('dashboard')}
                                             className={`px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-2 ${activeTab === 'dashboard' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
@@ -707,19 +700,50 @@
                                         >
                                             <ListIcon /> Item List ({analysisData.length})
                                         </button>
-                                    </div>
-                                    <div className="flex items-center gap-4">
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Centered Title */}
+                            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest drop-shadow-sm hidden md:block">
+                                ABC-XYZ ANALYSIS
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                {analysisData.length > 0 && (
+                                    <>
                                         <div className="text-right hidden md:block">
                                             <div className="text-xs font-bold text-slate-400 uppercase">Total Inventory Value</div>
                                             <div className="font-mono font-bold text-slate-800 dark:text-slate-200">{fmtCurrency(summary.totalValue)}</div>
                                         </div>
                                         <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
-                                        <button onClick={() => setIsSettingsOpen(true)} className="text-slate-400 hover:text-brand-gold dark:text-slate-500 dark:hover:text-yellow-400 transition-colors flex items-center gap-2">
-                                            <SettingsIcon />
-                                        </button>
-                                    </div>
+                                    </>
+                                )}
+                                
+                                {/* Clock - Always Visible */}
+                                <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
+                                    <ClockIcon />
+                                    <span>{time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                 </div>
 
+                                <button onClick={() => setIsSettingsOpen(true)} className="text-slate-400 hover:text-brand-gold dark:text-slate-500 dark:hover:text-yellow-400 transition-colors flex items-center gap-2">
+                                    <SettingsIcon />
+                                </button>
+                            </div>
+                        </div>
+
+                        {analysisData.length === 0 ? (
+                            <div className="flex-1 flex flex-col items-center justify-center p-8 opacity-60">
+                                <div className="p-6 bg-white dark:bg-slate-900 rounded-full mb-6 shadow-sm border border-slate-100 dark:border-slate-800">
+                                    <GridIcon />
+                                </div>
+                                <h2 className="text-2xl font-bold mb-2">Ready to Analyze</h2>
+                                <p className="text-slate-500 max-w-md text-center">
+                                    Upload your inventory Excel file to generate the ABC-XYZ matrix, identify critical items, and optimize your supply chain policies.
+                                </p>
+                            </div>
+                        ) : (
+                            <>
                                 {/* Dashboard View */}
                                 {activeTab === 'dashboard' && (
                                     <div className="flex-1 overflow-y-auto p-8 scroller">
