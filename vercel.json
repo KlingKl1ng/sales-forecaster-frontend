@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/terminal.html"
+    },
+    {
+      "source": "/forecaster",
+      "destination": "/forecaster.html"
+    }
+  ],
+  "cleanUrls": true
+}

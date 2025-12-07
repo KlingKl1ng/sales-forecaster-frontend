@@ -115,7 +115,7 @@
                 icon: <ActivityIcon />,
                 status: 'live',
                 version: 'v7.5_PRO',
-                href: './forecaster.html' // Assumes you renamed index.html
+                href: './forecaster.html' // Assumes you have forecaster.html in the same folder
             },
             {
                 id: 'inventory',
@@ -178,27 +178,26 @@
             );
         };
 
+        // FIXED MODULE CARD: Uses <a> tag for navigation if LIVE
         const ModuleCard = ({ module }) => {
             const isLive = module.status === 'live';
             const isDev = module.status === 'dev';
             
-            return (
-                <div 
-                    onClick={() => isLive ? window.location.href = module.href : null}
-                    className={`
-                        relative group overflow-hidden rounded-xl border p-6 flex flex-col justify-between transition-all duration-300 h-full
-                        ${isLive 
-                            ? 'bg-white/80 dark:bg-brand-slate/40 border-slate-200 dark:border-slate-800 hover:border-brand-gold hover:shadow-lg cursor-pointer' 
-                            : 'bg-slate-100/50 dark:bg-brand-slate/20 border-slate-100 dark:border-slate-800/50 opacity-80 grayscale-[0.5] cursor-not-allowed'
-                        }
-                    `}
-                >
+            // Common Classes
+            const baseClasses = "relative group overflow-hidden rounded-xl border p-6 flex flex-col justify-between transition-all duration-300 h-full text-left";
+            
+            // Background & Interaction Classes
+            const liveClasses = "bg-white/80 dark:bg-brand-slate/40 border-slate-200 dark:border-slate-800 hover:border-brand-gold hover:shadow-lg cursor-pointer";
+            const disabledClasses = "bg-slate-100/50 dark:bg-brand-slate/20 border-slate-100 dark:border-slate-800/50 opacity-80 grayscale-[0.5] cursor-not-allowed pointer-events-none";
+
+            const content = (
+                <>
                     {/* Background Glow Effect on Hover (Only Live) */}
                     {isLive && (
-                        <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/0 via-brand-gold/0 to-brand-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/0 via-brand-gold/0 to-brand-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                     )}
 
-                    <div>
+                    <div className="pointer-events-none">
                         <div className="flex justify-between items-start mb-4">
                             <div className={`
                                 p-3 rounded-lg border
@@ -220,14 +219,29 @@
                         <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed h-12 overflow-hidden">{module.desc}</p>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-700 pt-4">
+                    <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-700 pt-4 pointer-events-none">
                         <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{module.version}</span>
                         {isLive && (
-                            <button className="text-xs font-bold text-brand-gold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            <span className="text-xs font-bold text-brand-gold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                                 Launch <ArrowRightIcon />
-                            </button>
+                            </span>
                         )}
                     </div>
+                </>
+            );
+
+            // Conditional Rendering: Anchor for Live, Div for Disabled
+            if (isLive) {
+                return (
+                    <a href={module.href} className={`${baseClasses} ${liveClasses}`}>
+                        {content}
+                    </a>
+                );
+            }
+
+            return (
+                <div className={`${baseClasses} ${disabledClasses}`}>
+                    {content}
                 </div>
             );
         };
@@ -242,9 +256,15 @@
                 </Reveal>
                 
                 <div className="grid md:grid-cols-2 gap-12 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                    <div className="space-y-8">
+                    
+                    {/* LEFT COLUMN: WHO WE ARE (TOP) + LOGO (MIDDLE) + WHAT WE DO (BOTTOM) */}
+                    <div className="flex flex-col h-full justify-between gap-12">
+                        {/* Block 1: Intro */}
                         <Reveal delay={100}>
                             <div>
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
+                                    Who We Are
+                                </h3>
                                 <p className="mb-4 text-slate-800 dark:text-slate-300 font-medium">
                                     Founded in 2025, Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations.
                                 </p>
@@ -256,7 +276,20 @@
                                 </p>
                             </div>
                         </Reveal>
-                        
+
+                        {/* NEW: Logo Filler - INCREASED SIZE */}
+                        <Reveal delay={150}>
+                            <div className="w-full flex justify-center py-8 opacity-90">
+                                <img 
+                                    src="./fulllogo_transparent_nobuffer.png" 
+                                    alt="Operartis Logo" 
+                                    className="w-full max-w-[500px] object-contain" 
+                                    onError={(e) => e.target.style.display='none'}
+                                />
+                            </div>
+                        </Reveal>
+
+                        {/* Block 2: What We Do */}
                         <Reveal delay={200}>
                             <div>
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
@@ -280,8 +313,10 @@
                         </Reveal>
                     </div>
 
-                    <div className="space-y-8">
-                        <Reveal delay={300}>
+                    {/* RIGHT COLUMN: VISION (TOP) + WHY CHOOSE (BOTTOM) */}
+                    <div className="flex flex-col h-full justify-between gap-12">
+                         {/* Block 3: Vision */}
+                         <Reveal delay={300}>
                             <div>
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
                                     Vision & Philosophy
@@ -301,29 +336,28 @@
                             </div>
                         </Reveal>
 
-                        <div>
-                            <Reveal delay={400}>
+                        {/* Block 4: Why Choose - UPDATED TO REMOVE BOX STYLING */}
+                        <Reveal delay={400}>
+                            <div>
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
                                     Why Choose Operartis
                                 </h3>
-                            </Reveal>
-                            <div className="space-y-3">
-                                {[
-                                    { title: "Specialization & Expertise", text: "We are not a generalist IT or consulting firm. Our core competence lies in operations, supply-chain optimization, and APS/ERP integration." },
-                                    { title: "Quantitative & Data-Driven", text: "Our approaches rely on simulation, modeling and data analytics — not guesswork. This ensures improvements are measurable and repeatable." },
-                                    { title: "Tailored & Pragmatic Solutions", text: "We design APS systems that reflect your real-world constraints. What we build fits your operations — not the other way around." },
-                                    { title: "Affordability & Value", text: "We strive to provide our services at reasonable price levels, making high-quality optimization accessible to a broad range of enterprises." },
-                                    { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." }
-                                ].map((item, i) => (
-                                    <Reveal key={i} delay={450 + (i * 100)}>
-                                        <div className="bg-white/50 dark:bg-white/5 p-3 rounded border border-slate-100 dark:border-slate-800/50 hover:border-brand-gold/30 transition-colors">
-                                            <strong className="text-brand-dark dark:text-brand-gold block text-xs uppercase tracking-wider mb-1">{item.title}</strong> 
-                                            {item.text}
+                                <div className="space-y-6">
+                                    {[
+                                        { title: "Specialization & Expertise", text: "We are not a generalist IT or consulting firm. Our core competence lies in operations, supply-chain optimization, and APS/ERP integration." },
+                                        { title: "Quantitative & Data-Driven", text: "Our approaches rely on simulation, modeling and data analytics — not guesswork. This ensures improvements are measurable and repeatable." },
+                                        { title: "Tailored & Pragmatic Solutions", text: "We design APS systems that reflect your real-world constraints. What we build fits your operations — not the other way around." },
+                                        { title: "Affordability & Value", text: "We strive to provide our services at reasonable price levels, making high-quality optimization accessible to a broad range of enterprises." },
+                                        { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." }
+                                    ].map((item, i) => (
+                                        <div key={i}>
+                                            <strong className="text-brand-dark block text-xs uppercase tracking-wider mb-1">{item.title}</strong> 
+                                            <p className="leading-relaxed">{item.text}</p>
                                         </div>
-                                    </Reveal>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        </Reveal>
                     </div>
                 </div>
                 
