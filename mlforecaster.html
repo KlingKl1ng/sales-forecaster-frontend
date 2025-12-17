@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Operartis | Advanced-ML Forecaster</title>
+    <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { brand: { gold: '#f59e0b', dark: '#b45309', gray: '#f8fafc', border: '#e2e8f0' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['Roboto Mono', 'monospace'] },
+                    fontSize: { xxs: '0.65rem' },
+                    animation: { 'fade-in': 'fadeIn 0.2s ease-out', 'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .scroller {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        .dark body {
+            background: #0f172a;
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
+
+        .scenario-input {
+            background: transparent;
+            border: 1px solid transparent;
+            width: 100%;
+            text-align: right;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .scenario-input:hover {
+            border-color: #cbd5e1;
+        }
+
+        .dark .scenario-input:hover {
+            border-color: #475569;
+        }
+
+        .scenario-input:focus {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            outline: none;
+        }
+
+        .table-row-hover:hover td {
+            background-color: #f8fafc;
+        }
+
+        .dark .table-row-hover:hover td {
+            background-color: #1e293b;
+        }
+    </style>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+    <script crossorigin
+        src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.12/Recharts.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+</head>
+
+<body>
+    <div id="root" class="h-full w-full flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo } = React;
+        const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart, ReferenceLine } = window.Recharts;
+        const API_URL = 'http://127.0.0.1:8000';
+
+        // --- ICONS ---
+        const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg>;
+        const UploadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>;
+        const PlayIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3" /></svg>;
+        const TrashIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>;
+        const SunIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>;
+        const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>;
+        const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>;
+        const PaletteIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></svg>;
+        const InfoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>;
+        const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>;
+        const CheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>;
+        const CopyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>;
+        const CodeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>;
+        const LockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
+        const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
+        const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
+        const MonitorIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>;
+        const SidebarCloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>;
+        const SidebarOpenIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>;
+        const SearchIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>;
+        const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
+        const LayoutIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>;
+        const ClipboardCheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="m9 14 2 2 4-4"></path></svg>;
+        const ActivityIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>;
+
+        // --- UTILS ---
+        const exportToCSV = (data, filename) => {
+            if (!data || !data.length) return;
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+            XLSX.writeFile(wb, filename + ".csv");
+        };
+
+        // --- SUB-COMPONENTS ---
+
+        const ForecastingLoader = () => (
+            <div className="h-full flex flex-col items-center justify-center gap-6 animate-fade-in">
+                <div className="relative">
+                    <div className="absolute inset-0 bg-brand-gold/20 blur-xl rounded-full animate-pulse"></div>
+                    <svg className="animate-spin text-brand-gold relative z-10" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                    <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">Running Analytics Algorithms</h3>
+                    <div className="flex gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const KPICards = ({ results }) => {
+            const stats = useMemo(() => {
+                if (!results || !results.length) return null;
+                const totalVol = results.reduce((acc, r) => acc + r.forecast_data.reduce((sum, d) => sum + (d.future_forecast || 0), 0), 0);
+                const avgR2 = results.reduce((acc, r) => acc + (r.r2_score || 0), 0) / results.length;
+                const lowConf = results.filter(r => (r.r2_score || 0) < 0.6).length;
+                return { totalVol, avgR2, lowConf };
+            }, [results]);
+
+            if (!stats) return null;
+
+            return (
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="text-xs text-slate-500 uppercase font-bold">Total Forecast Volume</div>
+                        <div className="text-2xl font-black text-slate-800 dark:text-white mt-1">{Math.round(stats.totalVol).toLocaleString()}</div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="text-xs text-slate-500 uppercase font-bold">Avg Model Health (R²)</div>
+                        <div className={`text-2xl font-black mt-1 ${stats.avgR2 > 0.7 ? 'text-emerald-500' : stats.avgR2 > 0.4 ? 'text-amber-500' : 'text-rose-500'}`}>
+                            {(stats.avgR2 * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="text-xs text-slate-500 uppercase font-bold">Critical Alerts (Low R²)</div>
+                        <div className="text-2xl font-black text-rose-500 mt-1">{stats.lowConf} <span className="text-xs text-slate-400 font-normal">SKUs</span></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DetailKPITopBar = ({ data, results, currentSku, handleSkuSelect, cycleSku }) => {
+            if (!data) return null;
+            const [searchError, setSearchError] = useState(false);
+            const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+            const history = data.forecast_data ? data.forecast_data.filter(d => d.actual_history !== undefined) : [];
+            const future = data.forecast_data ? data.forecast_data.filter(d => d.future_forecast !== undefined) : [];
+
+            const currentVol = history.length > 0 ? history[history.length - 1].actual_history : 0;
+            const nextForecast = future.length > 0 ? future[0].future_forecast : 0;
+
+            return (
+                <div className="flex gap-4 mb-4 overflow-x-auto pb-2">
+                    {/* SKU Selector (Position 1) */}
+                    <div className="flex-none min-w-[160px] bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-2">
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">SKU Name</div>
+                        <div className="flex items-center gap-2 w-full justify-center">
+                            <button onClick={() => cycleSku(-1)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-brand-gold transition-colors flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg></button>
+                            <select value={currentSku || ''} onChange={(e) => handleSkuSelect(e.target.value)} className="bg-transparent text-sm font-black text-slate-800 dark:text-white w-auto outline-none text-center cursor-pointer appearance-none">
+                                {results && results.map(r => <option key={r.sku} value={r.sku}>{r.sku}</option>)}
+                            </select>
+                            <button onClick={() => cycleSku(1)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-brand-gold transition-colors flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg></button>
+                        </div>
+                    </div>
+
+                    {/* Compare Switch (Position 2) */}
+                    {/* Search Box (Position 2) */}
+                    <div className="flex-none min-w-[176px] bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px]">
+                        <div className="relative group w-full h-full flex items-center justify-center">
+                            <input
+                                type="text"
+                                placeholder={searchError ? "SKU Not Found" : "Search SKU..."}
+                                className={`absolute inset-0 w-full h-full bg-white dark:bg-slate-900 text-sm font-bold placeholder:text-slate-400 transition-opacity duration-200 outline-none text-center z-10 ${isSearchFocused ? 'opacity-100' : 'opacity-0'} ${searchError ? 'text-rose-500 placeholder:text-rose-400' : 'text-slate-700 dark:text-slate-200'}`}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        const match = results.find(r => r.sku.toLowerCase().includes(e.target.value.toLowerCase()));
+                                        if (match) {
+                                            handleSkuSelect(match.sku);
+                                            setSearchError(false);
+                                            e.target.value = ''; // clear input on success for better UX
+                                            e.target.blur(); // Remove focus to show icon again
+                                        } else {
+                                            setSearchError(true);
+                                        }
+                                    }
+                                }}
+                                onChange={() => setSearchError(false)}
+                                onClick={() => setSearchError(false)}
+                                onFocus={() => setIsSearchFocused(true)}
+                                onBlur={() => setIsSearchFocused(false)}
+                            />
+                            {!isSearchFocused && (
+                                <div className={`flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none ${searchError ? 'text-rose-500' : 'text-slate-500'}`}>
+                                    <SearchIcon />
+                                    <span className="text-[10px] font-bold uppercase mt-1">{searchError ? "Invalid SKU" : "Search"}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">Current Vol</div>
+                        <div className="text-lg font-black text-slate-800 dark:text-white leading-none">{Math.round(currentVol).toLocaleString()}</div>
+                    </div>
+                    <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">Next Forecast</div>
+                        <div className="text-lg font-black text-brand-gold leading-none">{Math.round(nextForecast).toLocaleString()}</div>
+                    </div>
+                    <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">Avg. MSE</div>
+                        <div className="text-lg font-black text-slate-600 dark:text-slate-300 leading-none">{Math.round(data.mse_validation || 0).toLocaleString()}</div>
+                    </div>
+                    <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">R² Score</div>
+                        <div className={`text-lg font-black leading-none ${data.r2_score > 0.7 ? 'text-emerald-500' : data.r2_score > 0.4 ? 'text-amber-500' : 'text-rose-500'}`}>
+                            {(data.r2_score || 0).toFixed(3)}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const BacktestChart = ({ data, syncId, isDark }) => {
+            if (!data) return null;
+            const chartData = data.validation_data || [];
+            const forecastData = data.forecast_data || [];
+            const mainColor = isDark ? '#ffffff' : '#000000';
+
+            const alignedData = useMemo(() => {
+                if (!forecastData.length || !chartData.length) return chartData;
+                const valMap = new Map(chartData.map(item => [item.date, item]));
+                return forecastData.map(item => {
+                    const date = item.date;
+                    return valMap.get(date) || { date };
+                });
+            }, [chartData, forecastData]);
+
+            return (
+                <div className="flex-1 min-h-0 relative">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={alignedData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }} syncId={syncId}>
+                            <defs>
+                                <linearGradient id="bt_train" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={mainColor} stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor={mainColor} stopOpacity={0} />
+                                </linearGradient>
+                                <linearGradient id="bt_test" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#a78bfa" stopOpacity={0} />
+                                </linearGradient>
+                                <linearGradient id="bt_pred" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#334155" opacity={0.1} />
+                            <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} minTickGap={30} />
+                            <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                            <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', border: isDark ? '1px solid #334155' : '1px solid #e2e8f0', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '12px', fontFamily: 'monospace' }} />
+                            <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
+
+                            <Area type="monotone" dataKey="actual_train" stroke={mainColor} fill="url(#bt_train)" strokeWidth={2} name="Actual (Train)" connectNulls />
+                            <Line type="monotone" dataKey="baseline_fit" stroke="#64748b" strokeWidth={1} dot={false} strokeDasharray="3 3" name="Baseline Fit" connectNulls />
+
+                            <Area type="monotone" dataKey="actual_test" stroke="#a78bfa" fill="url(#bt_test)" strokeWidth={2} name="Actual (Test)" connectNulls />
+                            <Area type="monotone" dataKey="val_forecast" stroke="#10b981" fill="url(#bt_pred)" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Synthesis Prediction" connectNulls />
+                        </ComposedChart>
+                    </ResponsiveContainer>
+                </div>
+            );
+        };
+
+        const ForecastChart = ({ data, scenarioResults, syncId, isDark }) => {
+            if (!data) return null;
+            const history = data.forecast_data ? data.forecast_data.filter(d => d.actual_history !== undefined) : [];
+            const future = data.forecast_data ? data.forecast_data.filter(d => d.future_forecast !== undefined) : [];
+            const mainColor = isDark ? '#ffffff' : '#000000';
+
+            const chartData = [
+                ...history,
+                ...future.map((d, i) => {
+                    const scenVal = (scenarioResults && scenarioResults[i]) ? scenarioResults[i].scenario_forecast : d.future_forecast;
+                    return {
+                        date: d.date,
+                        future_forecast: d.future_forecast,
+                        scenario_forecast: scenVal,
+                    };
+                })
+            ];
+
+            return (
+                <div className="flex-1 min-h-0 relative">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }} syncId={syncId}>
+                            <defs>
+                                <linearGradient id="fc_hist" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={mainColor} stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor={mainColor} stopOpacity={0} />
+                                </linearGradient>
+                                <linearGradient id="fc_syn" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                </linearGradient>
+                                <linearGradient id="fc_scen" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#334155" opacity={0.1} />
+                            <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} minTickGap={30} />
+                            <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                            <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', border: isDark ? '1px solid #334155' : '1px solid #e2e8f0', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '12px', fontFamily: 'monospace' }} />
+                            <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
+
+                            <Area type="monotone" dataKey="actual_history" stroke={mainColor} fill="url(#fc_hist)" strokeWidth={2} name="Full History" connectNulls />
+                            <Line type="monotone" dataKey="final_fit" stroke="#64748b" strokeWidth={1} dot={false} strokeDasharray="3 3" name="Final Fit" connectNulls />
+                            <Area type="monotone" dataKey="future_forecast" stroke="#10b981" fill="url(#fc_syn)" strokeWidth={2.5} strokeDasharray="5 5" dot={false} name="Synthesis Forecast" connectNulls />
+                            <Area type="monotone" dataKey="scenario_forecast" stroke="#f59e0b" fill="url(#fc_scen)" strokeWidth={3} strokeDasharray="5 5" dot={{ r: 4 }} name="Scenario" connectNulls />
+                        </ComposedChart>
+                    </ResponsiveContainer>
+                </div>
+            );
+        };
+
+        const DriverImportance = ({ data, isDark }) => {
+            if (!data || !data.importance) return null;
+            return (
+                <div className="h-full min-h-0 relative">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={Object.entries(data.importance).map(([k, v]) => ({ name: k, value: v })).sort((a, b) => b.value - a.value)} layout="vertical">
+                            <defs>
+                                <linearGradient id="driverGradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={1} />
+                                    <stop offset="100%" stopColor="#10b981" stopOpacity={1} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#334155" opacity={0.1} />
+                            <XAxis type="number" hide />
+                            <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#94a3b8' }} width={80} />
+                            <Tooltip
+                                cursor={{ fill: 'transparent' }}
+                                content={({ active, payload, label }) => {
+                                    if (active && payload && payload.length) {
+                                        return (
+                                            <div style={{
+                                                backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                                                border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+                                                padding: '8px',
+                                                borderRadius: '4px',
+                                                fontFamily: 'monospace'
+                                            }}>
+                                                <p style={{
+                                                    fontSize: '12px',
+                                                    fontWeight: 'bold',
+                                                    background: 'linear-gradient(to right, #f59e0b, #10b981)',
+                                                    WebkitBackgroundClip: 'text',
+                                                    WebkitTextFillColor: 'transparent',
+                                                    marginBottom: '4px'
+                                                }}>
+                                                    {label}
+                                                </p>
+                                                <p style={{ fontSize: '12px', color: isDark ? '#f8fafc' : '#0f172a' }}>
+                                                    Importance: {Number(payload[0].value).toFixed(2)}
+                                                </p>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                }}
+                            />
+                            <Bar dataKey="value" fill="url(#driverGradient)" radius={[0, 4, 4, 0]} barSize={16} name="Importance" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            );
+        };
+
+        const ScenarioPlanner = ({ data, scenarioData, setScenarioData, runScenario, isSimulating, jobId }) => {
+            if (!data) return null;
+            const drivers = data.driver_cols || [];
+
+            const updateDriver = (idx, driver, val) => {
+                const newData = scenarioData.map((row, i) =>
+                    i === idx ? { ...row, [driver]: parseFloat(val) } : row
+                );
+                setScenarioData(newData);
+            };
+
+            const applyBulkChange = (driver, percent) => {
+                const factor = 1 + (percent / 100);
+                const newData = scenarioData.map(row => ({
+                    ...row,
+                    [driver]: parseFloat((row[driver] * factor).toFixed(2))
+                }));
+                setScenarioData(newData);
+            };
+
+            return (
+                <div className="flex flex-col h-full">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">Scenario Planner</h3>
+                        <div className="flex gap-2">
+                            <button onClick={() => exportToCSV(scenarioData, `scenario_${data.sku}`)} className="text-xs text-slate-400 hover:text-brand-gold flex items-center gap-1">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg> Export
+                            </button>
+                            <button
+                                onClick={runScenario}
+                                disabled={!jobId || isSimulating}
+                                className={`text-xs px-3 py-1 rounded font-bold transition-colors ${!jobId || isSimulating ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
+                            >
+                                {isSimulating ? 'Simulating...' : 'Simulate'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-2 mb-2 overflow-x-auto pb-2 border-b border-slate-100 dark:border-slate-800">
+                        {drivers.map(d => (
+                            <div key={d} className="flex flex-col min-w-[100px] bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                                <span className="text-[10px] text-slate-500 font-bold truncate mb-1">{d}</span>
+                                <div className="flex gap-1">
+                                    <button onClick={() => applyBulkChange(d, -10)} className="text-[10px] px-1 bg-white dark:bg-slate-700 border rounded hover:border-brand-gold">-10%</button>
+                                    <button onClick={() => applyBulkChange(d, 10)} className="text-[10px] px-1 bg-white dark:bg-slate-700 border rounded hover:border-brand-gold">+10%</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="flex-1 overflow-auto scroller">
+                        <table className="w-full text-xs text-left">
+                            <thead className="text-slate-400 sticky top-0 bg-white dark:bg-slate-900">
+                                <tr><th className="py-2">Date</th>{drivers.map(d => <th key={d} className="py-2 text-right">{d}</th>)}</tr>
+                            </thead>
+                            <tbody className="text-slate-600 dark:text-slate-300">
+                                {scenarioData.map((row, i) => (
+                                    <tr key={i} className="border-b border-slate-100 dark:border-slate-800">
+                                        <td className="py-2 font-mono">{row.date}</td>
+                                        {drivers.map(d => (
+                                            <td key={d}><input type="number" className="scenario-input" value={row[d]} onChange={(e) => updateDriver(i, d, e.target.value)} /></td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        const BatchOverview = ({ results, onSelectSku }) => {
+            if (!results || results.length === 0) return null;
+            return (
+                <div className="flex flex-col h-full">
+                    <KPICards results={results} />
+
+                    <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col min-h-0">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Batch Forecast Overview</h3>
+                            <button onClick={() => exportToCSV(results.map(r => ({ sku: r.sku, r2: r.r2_score, mse: r.mse_validation })), 'batch_summary')} className="text-xs text-brand-gold font-bold">Download Summary</button>
+                        </div>
+                        <div className="flex-1 overflow-auto scroller p-0">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 sticky top-0 font-semibold shadow-sm z-10">
+                                    <tr>
+                                        <th className="p-4">SKU</th>
+                                        <th className="p-4">Status</th>
+                                        <th className="p-4">Best TS Model</th>
+                                        <th className="p-4">Best Causal Model</th>
+                                        <th className="p-4 text-right">Validation MSE</th>
+                                        <th className="p-4 text-right">R² Score</th>
+                                        <th className="p-4 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                    {results.map((res) => {
+                                        let statusColor = 'bg-emerald-500';
+                                        if (res.r2_score < 0.4) statusColor = 'bg-rose-500';
+                                        else if (res.r2_score < 0.7) statusColor = 'bg-amber-500';
+
+                                        return (
+                                            <tr key={res.sku} className="table-row-hover transition-colors cursor-pointer" onClick={() => onSelectSku(res.sku)}>
+                                                <td className="p-4 font-bold text-slate-900 dark:text-slate-100">{res.sku}</td>
+                                                <td className="p-4"><div className={`w-3 h-3 rounded-full ${statusColor} shadow-sm`}></div></td>
+                                                <td className="p-4 text-slate-600 dark:text-slate-400 uppercase text-xs font-bold">{res.best_ts_model}</td>
+                                                <td className="p-4 text-slate-600 dark:text-slate-400 uppercase text-xs font-bold">{res.best_causal_model}</td>
+                                                <td className="p-4 text-right font-mono text-slate-600 dark:text-slate-300">{res.mse_validation?.toLocaleString()}</td>
+                                                <td className="p-4 text-right font-mono text-slate-600 dark:text-slate-300">{res.r2_score?.toFixed(3)}</td>
+                                                <td className="p-4 text-center">
+                                                    <button className="text-xs bg-brand-gold/10 text-brand-gold px-3 py-1 rounded font-bold hover:bg-brand-gold hover:text-white transition-colors">View</button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const MappingModal = ({ headers, isOpen, onClose, onConfirm }) => {
+            const [sku, setSku] = useState('');
+            const [date, setDate] = useState('');
+            const [val, setVal] = useState('');
+            const [drivers, setDrivers] = useState([]);
+
+            useEffect(() => {
+                if (isOpen && headers.length) {
+                    setSku(headers.find(h => /sku|id/i.test(h)) || headers[0]);
+                    setDate(headers.find(h => /date|time/i.test(h)) || headers[1]);
+                    setVal(headers.find(h => /sales|qty/i.test(h)) || '');
+                    setDrivers([]);
+                }
+            }, [isOpen, headers]);
+
+            const toggleDriver = (c) => {
+                if ([sku, date, val].includes(c)) return;
+                if (drivers.includes(c)) setDrivers(drivers.filter(x => x !== c)); else setDrivers([...drivers, c]);
+            };
+
+            const selectAllDrivers = () => {
+                const available = headers.filter(h => ![sku, date, val].includes(h));
+                setDrivers(available);
+            };
+
+            const unselectAllDrivers = () => {
+                setDrivers([]);
+            };
+
+            const handleConfirm = () => {
+                onConfirm(sku, date, val, drivers, 0);
+            };
+
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-lg border border-slate-200 dark:border-slate-700 flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-slate-200 dark:border-slate-800"><h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Choose Columns</h2></div>
+                        <div className="p-6 overflow-y-auto space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="text-xs font-bold uppercase text-slate-500">ID</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={sku} onChange={e => setSku(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                                <div><label className="text-xs font-bold uppercase text-slate-500">Date</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={date} onChange={e => setDate(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                            </div>
+                            <div><label className="text-xs font-bold uppercase text-slate-500">Target Value</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={val} onChange={e => setVal(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-xs font-bold uppercase text-slate-500">Causal Drivers</label>
+                                    <div className="flex gap-2">
+                                        <button onClick={unselectAllDrivers} className="text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase">Unselect All</button>
+                                        <button onClick={selectAllDrivers} className="text-[10px] font-bold text-brand-gold hover:text-brand-dark uppercase">Select All</button>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 border p-2 rounded bg-slate-50 dark:bg-slate-800 max-h-40 overflow-y-auto">{headers.map(h => <button key={h} onClick={() => toggleDriver(h)} className={`text-xs px-2 py-1 rounded truncate text-left ${drivers.includes(h) ? 'bg-brand-gold text-white' : 'bg-white dark:bg-slate-800 text-slate-500'} ${[sku, date, val].includes(h) ? 'opacity-30' : ''}`} disabled={[sku, date, val].includes(h)}>{h}</button>)}</div>
+                            </div>
+                        </div>
+                        <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-3"><button onClick={onClose} className="text-sm text-slate-500">Cancel</button><button onClick={handleConfirm} disabled={!sku || !date || !val} className="px-4 py-2 bg-brand-gold text-white text-sm font-bold rounded">Confirm</button></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const SettingsModal = ({ isOpen, onClose, baseUrl, theme, setTheme }) => {
+            const [copied, setCopied] = useState(null);
+            const [activeTab, setActiveTab] = useState("theme");
+            const endpoint = `${baseUrl}/api/v1/forecast`;
+
+            useEffect(() => {
+                if (isOpen) {
+                    setActiveTab("theme");
+                    setCopied(null);
+                }
+            }, [isOpen]);
+
+            if (!isOpen) return null;
+
+            const copyToClipboard = (text, type) => {
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.top = "0";
+                    textArea.style.left = "0";
+                    textArea.style.position = "fixed";
+                    textArea.style.opacity = "0";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    if (successful) {
+                        setCopied(type);
+                        setTimeout(() => setCopied(null), 2000);
+                    }
+                } catch (err) { console.error("Copy error", err); }
+            };
+
+            return (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 modal-backdrop transition-opacity" onClick={onClose}></div>
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-xl shadow-2xl relative flex flex-col overflow-hidden animate-slide-up border border-slate-200 dark:border-slate-700">
+                        {/* Header */}
+                        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/50 shrink-0">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-brand-gold/10 rounded-lg text-brand-gold">
+                                    <SettingsIcon />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Settings</h2>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">Configure application preferences.</p>
+                                </div>
+                            </div>
+                            <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
+                                <XIcon />
+                            </button>
+                        </div>
+
+                        {/* Body Layout */}
+                        <div className="flex flex-1 overflow-hidden">
+                            {/* Sidebar Nav */}
+                            <div className="w-1/4 md:w-64 border-r border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 p-4 flex flex-col gap-2 overflow-y-auto">
+                                <button
+                                    onClick={() => setActiveTab("theme")}
+                                    className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'theme' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                >
+                                    <PaletteIcon /> Theme Mode
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("about")}
+                                    className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'about' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                >
+                                    <InfoIcon /> About Us
+                                </button>
+                            </div>
+
+                            {/* Content Area */}
+                            <div className="flex-1 overflow-y-auto scroller p-6 md:p-8 relative bg-white dark:bg-slate-900">
+                                {activeTab === 'theme' && (
+                                    <div className="space-y-6 animate-fade-in">
+                                        <div>
+                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Interface Appearance</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <button onClick={() => setTheme('light')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'light' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                    <div className="p-3 bg-white rounded-full shadow-sm"><SunIcon /></div>
+                                                    <span className="text-sm font-bold">Light Mode</span>
+                                                </button>
+                                                <button onClick={() => setTheme('dark')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'dark' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                    <div className="p-3 bg-slate-800 text-white rounded-full shadow-sm"><MoonIcon /></div>
+                                                    <span className="text-sm font-bold">Dark Mode</span>
+                                                </button>
+                                                <button onClick={() => setTheme('system')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'system' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                    <div className="p-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full shadow-sm"><SystemIcon /></div>
+                                                    <span className="text-sm font-bold">System Default</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'about' && (
+                                    <div className="animate-fade-in space-y-8 max-w-3xl mx-auto">
+                                        <div className="text-center space-y-2 mb-8">
+                                            <div className="inline-block p-4 bg-brand-gold/10 rounded-full mb-2">
+                                                <img src="./icononly_transparent_quadratic.png" className="w-12 h-12 object-contain mx-auto" onError={(e) => e.target.style.display = 'none'} />
+                                            </div>
+                                            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">About Operartis</h2>
+                                            <p className="text-sm text-brand-gold font-medium uppercase tracking-widest">Optimizing today, Growing tomorrow.</p>
+                                        </div>
+
+                                        <div className="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed space-y-6">
+                                            <p>
+                                                Founded in 2025, Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations. We combine deep expertise in supply chain, logistics, production, warehousing and manufacturing processes with advanced quantitative-optimization and simulation methods to deliver meaningful, measurable improvements.
+                                            </p>
+                                            <p>
+                                                At Operartis, we understand that having data in an Enterprise Resource Planning (ERP) system is only the first step. True operational excellence requires turning that data into actionable planning, forecasting and scheduling insights. That’s why we focus on building, developing, and continuously improving a tailored Advanced Planning and Scheduling System (APS) — helping our clients leverage their data not just for record-keeping, but for real operational advantage.
+                                            </p>
+
+                                            <div className="grid md:grid-cols-2 gap-6 my-8">
+                                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col">
+                                                    <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">What We Do</h3>
+                                                    <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                                                        <p className="leading-relaxed">We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.</p>
+                                                        <p className="leading-relaxed">We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.</p>
+                                                        <p className="leading-relaxed">We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col">
+                                                    <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">Our Vision & Philosophy</h3>
+                                                    <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                                                        <p className="leading-relaxed">We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.</p>
+                                                        <p className="leading-relaxed">We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.</p>
+                                                        <p className="leading-relaxed">By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const MainApp = () => {
+            const [activeTab, setActiveTab] = useState('validation');
+            const [viewMode, setViewMode] = useState('overview');
+            const [sidebarTab, setSidebarTab] = useState('import');
+            const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
+            const [isDark, setIsDark] = useState(false);
+
+            const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+            const [time, setTime] = useState(new Date());
+
+            const [file, setFile] = useState(null);
+            const [headers, setHeaders] = useState([]);
+            const [mapping, setMapping] = useState(null);
+            const [mappingOpen, setMappingOpen] = useState(false);
+            const [status, setStatus] = useState('idle');
+            const [results, setResults] = useState([]);
+            const [currentSku, setCurrentSku] = useState(null);
+            const [jobId, setJobId] = useState(null);
+            const [sidebarOpen, setSidebarOpen] = useState(true);
+
+            // Settings
+            const [valMethod, setValMethod] = useState('simple');
+            const [trainHorizon, setTrainHorizon] = useState(24);
+            const [testHorizon, setTestHorizon] = useState(6);
+            const [forecastHorizon, setForecastHorizon] = useState(12);
+
+            // Scenario
+            const [scenarioData, setScenarioData] = useState([]);
+            const [scenarioResults, setScenarioResults] = useState(null);
+            const [isSimulating, setIsSimulating] = useState(false);
+
+            const selectedResult = useMemo(() => {
+                if (!results || results.length === 0 || !currentSku) return null;
+                return results.find(r => r.sku === currentSku);
+            }, [results, currentSku]);
+
+            // Theme Management
+            useEffect(() => {
+                const root = window.document.documentElement;
+                root.classList.remove('light', 'dark');
+
+                if (theme === 'system') {
+                    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    root.classList.add(systemTheme);
+                    setIsDark(systemTheme === 'dark');
+                } else {
+                    root.classList.add(theme);
+                    setIsDark(theme === 'dark');
+                }
+                localStorage.setItem('theme', theme);
+            }, [theme]);
+
+            // Clock Effect
+            useEffect(() => {
+                const timer = setInterval(() => setTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            useEffect(() => {
+                setForecastHorizon(testHorizon);
+            }, [testHorizon]);
+
+            useEffect(() => {
+                if (selectedResult && selectedResult.scenario_base) {
+                    setScenarioData(selectedResult.scenario_base);
+                    setScenarioResults(null);
+                }
+            }, [selectedResult]);
+
+            const runScenario = async () => {
+                if (!jobId || !currentSku) return;
+                setIsSimulating(true);
+                try {
+                    const res = await fetch(`${API_URL}/synthesis/scenario`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ job_id: jobId, sku: currentSku, modifications: scenarioData })
+                    });
+                    const resData = await res.json();
+                    if (resData.scenario_results) setScenarioResults(resData.scenario_results);
+                } catch (e) { console.error(e); }
+                setIsSimulating(false);
+            };
+
+            const handleFileUpload = (e) => {
+                const f = e.target.files[0];
+                if (!f) return;
+                setFile(f);
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    const wb = XLSX.read(evt.target.result, { type: 'binary' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                    if (data.length) {
+                        setHeaders(data[0]);
+                        setMappingOpen(true);
+                    }
+                };
+                reader.readAsBinaryString(f);
+                e.target.value = null;
+            };
+
+            const runSynthesis = () => {
+                if (!file || !mapping) return;
+                setStatus('running');
+                setResults([]);
+
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('sku_col', mapping.sku);
+                fd.append('date_col', mapping.date);
+                fd.append('value_col', mapping.value);
+                fd.append('driver_cols', mapping.drivers.join(','));
+                fd.append('validation_method', valMethod);
+                fd.append('train_horizon', Math.max(1, trainHorizon));
+                fd.append('test_horizon', Math.max(1, testHorizon));
+                fd.append('forecast_steps', Math.max(1, forecastHorizon));
+                fd.append('model_type', 'tes');
+
+                fetch(`${API_URL}/synthesis/init`, { method: 'POST', body: fd })
+                    .then(res => res.json())
+                    .then(data => { if (data.job_id) setJobId(data.job_id); })
+                    .catch(e => setStatus('failed'));
+            };
+
+            const resetApp = () => {
+                setFile(null);
+                setMapping(null);
+                setResults([]);
+                setStatus('idle');
+                setCurrentSku(null);
+                setJobId(null);
+                setScenarioResults(null);
+                setScenarioData([]);
+                setTrainHorizon(24);
+                setTestHorizon(6);
+                setForecastHorizon(12);
+                setSidebarTab('import');
+            };
+
+            useEffect(() => {
+                if (!jobId || status === 'completed') return;
+                const interval = setInterval(async () => {
+                    try {
+                        const res = await fetch(`${API_URL}/status/${jobId}`);
+                        const data = await res.json();
+                        if (data.status === 'completed') {
+                            const resArr = data.result.results || [];
+                            setResults(resArr);
+                            if (resArr.length > 0 && !currentSku) {
+                                setCurrentSku(resArr[0].sku);
+                            }
+                            setStatus('completed');
+                            setSidebarTab('batch');
+                            clearInterval(interval);
+                        } else if (data.status === 'failed') {
+                            setStatus('failed');
+                            clearInterval(interval);
+                        }
+                    } catch (e) { console.error(e); }
+                }, 2000);
+                return () => clearInterval(interval);
+            }, [jobId, status]);
+
+            const handleSkuSelect = (sku) => {
+                setCurrentSku(sku);
+                if (sidebarTab === 'batch' || sidebarTab === 'import') {
+                    setSidebarTab('all_in_one');
+                }
+            };
+
+            const cycleSku = (dir) => {
+                if (!results.length) return;
+                const idx = results.findIndex(r => r.sku === currentSku);
+                const nextIdx = (idx + dir + results.length) % results.length;
+                setCurrentSku(results[nextIdx].sku);
+            };
+
+            // Sidebar Section Component
+            const SidebarSection = ({ id, label, children }) => {
+                const isActive = sidebarTab === id;
+                return (
+                    <div className="mb-4">
+                        <div
+                            className={`cursor-pointer p-3 rounded-lg border transition-all duration-300 mb-2 flex items-center justify-center ${isActive ? 'border-brand-gold bg-white dark:bg-slate-800 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50'}`}
+                            onClick={() => {
+                                setSidebarTab(id);
+                                if (id === 'validation') { setActiveTab('validation'); }
+                                if (id === 'forecast') { setActiveTab('forecast'); }
+                                if (id === 'batch') setViewMode('overview');
+                                else setViewMode('detail');
+                            }}
+                        >
+                            <h3 className={`text-xxs font-bold uppercase tracking-wider transition-colors text-center ${isActive ? 'text-brand-gold' : 'text-slate-500 dark:text-slate-400 dark:group-hover:text-slate-200'}`}>
+                                {label}
+                            </h3>
+                        </div>
+                        <div className={`px-2 transition-opacity duration-200 opacity-100`}>
+                            {children}
+                        </div>
+                    </div>
+                );
+            };
+
+            const ThemeToggle = () => (
+                <div className="flex justify-center gap-2 mb-3">
+                    <button onClick={() => setTheme('light')} className={`p-1.5 rounded-lg ${theme === 'light' ? 'bg-slate-200 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="Light Mode">
+                        <SunIcon />
+                    </button>
+                    <button onClick={() => setTheme('dark')} className={`p-1.5 rounded-lg ${theme === 'dark' ? 'bg-slate-800 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="Dark Mode">
+                        <MoonIcon />
+                    </button>
+                    <button onClick={() => setTheme('system')} className={`p-1.5 rounded-lg ${theme === 'system' ? 'bg-slate-200 dark:bg-slate-800 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="System Default">
+                        <MonitorIcon />
+                    </button>
+                </div>
+            );
+
+
+            const renderDetailContent = () => {
+                if (!selectedResult) return <div className="h-full flex items-center justify-center text-slate-400">Select a valid SKU</div>;
+
+                if (sidebarTab === 'all_in_one') {
+                    return (
+                        <div className="flex flex-col h-full">
+                            <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} />
+                            <div className="flex h-full gap-4 min-h-0 flex-1">
+                                <div className="flex flex-col w-1/2 gap-4 h-full">
+                                    <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col min-h-0">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Backtesting</h3>
+                                        <BacktestChart data={selectedResult} syncId="syncedCharts" isDark={isDark} />
+                                    </div>
+                                    <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col min-h-0">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Forecast</h3>
+                                        <ForecastChart data={selectedResult} scenarioResults={scenarioResults} syncId="syncedCharts" isDark={isDark} />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col w-1/2 gap-4 h-full">
+                                    <div className="h-1/3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col min-h-0">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Driver Impact</h3>
+                                        <DriverImportance data={selectedResult} isDark={isDark} />
+                                    </div>
+                                    <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col min-h-0">
+                                        <ScenarioPlanner
+                                            data={selectedResult}
+                                            scenarioData={scenarioData}
+                                            setScenarioData={setScenarioData}
+                                            runScenario={runScenario}
+                                            isSimulating={isSimulating}
+                                            jobId={jobId}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                } else {
+                    if (activeTab === 'validation') {
+                        return (
+                            <div className="flex flex-col h-full gap-4">
+                                <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} />
+                                <div className="flex-1 flex flex-col gap-6 min-h-0">
+                                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex-1 min-h-0 flex flex-col">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Backtesting (Historical Validation)</h3>
+                                        <BacktestChart data={selectedResult} isDark={isDark} />
+                                    </div>
+                                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 h-1/3 min-h-[200px] flex flex-col">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Driver Impact (Importance)</h3>
+                                        <DriverImportance data={selectedResult} isDark={isDark} />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    } else {
+                        return (
+                            <div className="flex flex-col h-full gap-4">
+                                <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} />
+                                <div className="flex h-full gap-6 min-h-0 flex-1">
+                                    <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Total Synthesis Forecast</h3>
+                                        <ForecastChart data={selectedResult} scenarioResults={scenarioResults} isDark={isDark} />
+                                    </div>
+                                    <div className="w-1/3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col">
+                                        <ScenarioPlanner
+                                            data={selectedResult}
+                                            scenarioData={scenarioData}
+                                            setScenarioData={setScenarioData}
+                                            runScenario={runScenario}
+                                            isSimulating={isSimulating}
+                                            jobId={jobId}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }
+                }
+            };
+
+            return (
+                <div className="flex h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
+                    <aside className={`bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-xl z-20 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-16'} relative`}>
+                        <div className={`h-16 flex items-center border-b border-slate-200 dark:border-slate-800 flex-shrink-0 transition-all ${sidebarOpen ? 'px-4 gap-3 justify-center' : 'justify-center'}`}>
+                            {/* Logo */}
+                            <a href="https://operartis.vercel.app/terminal.html" className="flex-shrink-0">
+                                <img
+                                    src="./icononly_transparent_nobuffer.png"
+                                    alt="Operartis Logo"
+                                    className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.style.display = 'none';
+                                    }}
+                                />
+                            </a>
+
+                            {/* Title */}
+                            {sidebarOpen && <span className="font-bold text-lg animate-fade-in truncate">OPERARTIS</span>}
+                        </div>
+
+                        {sidebarOpen && (
+                            <div className="flex-1 flex flex-col overflow-hidden animate-fade-in">
+                                <div className="flex-1 overflow-y-auto px-2 py-4">
+
+
+                                    <div className="flex items-center gap-2 mb-2 mt-2 px-1"><h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">Data Import</h3><div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div></div>
+                                    <div className="px-1">
+                                        <div className="space-y-4">
+                                            <div onClick={() => document.getElementById('upl').click()} className={`border-2 border-dashed rounded-xl p-4 mx-4 text-center cursor-pointer transition-all hover:scale-[1.02] ${file ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'border-slate-300 dark:border-slate-700 hover:border-brand-gold'}`}>
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <UploadIcon />
+                                                    <p className="text-xs font-bold text-slate-600 dark:text-slate-300 truncate w-full">{file ? file.name : "Upload Data"}</p>
+                                                    {file && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-full">Data Uploaded Successfully</span>}
+                                                </div>
+                                            </div>
+                                            <input id="upl" type="file" hidden onChange={handleFileUpload} />
+
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 mb-2 mt-6 px-1"><h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">Configuration</h3><div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div></div>
+                                    <div className="px-1">
+                                        <div className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                                            <div><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">Validation Method</label><select className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200" value={valMethod} onChange={e => setValMethod(e.target.value)}><option value="simple">Simple Split</option><option value="rolling_window">Rolling Window</option><option value="walk_forward">Walk-Forward</option></select></div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="flex flex-col"><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end">Train Horizon</label><input type="number" min="1" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={trainHorizon} onChange={e => setTrainHorizon(Math.max(1, parseInt(e.target.value) || 1))} /></div>
+                                                <div className="flex flex-col"><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end">Test Horizon</label><input type="number" min="1" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={testHorizon} onChange={e => setTestHorizon(Math.max(1, parseInt(e.target.value) || 1))} /></div>
+                                            </div>
+                                            <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                                                <div><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">Forecast Horizon</label><input type="number" min="1" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={forecastHorizon} onChange={e => setForecastHorizon(Math.max(1, parseInt(e.target.value) || 1))} /></div>
+                                            </div>
+                                            <button onClick={runSynthesis} disabled={status === 'running' || !mapping} className="w-full py-3 mt-2 bg-brand-gold text-white text-xs font-bold rounded-lg shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                {status === 'running' ? 'Processing...' : 'Execute Forecast'}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 mb-2 mt-6 px-1"><h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">Forecasting Results</h3><div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div></div>
+
+                                    <SidebarSection id="batch" label="Batch Overview">
+                                    </SidebarSection>
+
+                                    <SidebarSection id="all_in_one" label="All-In-One View">
+                                    </SidebarSection>
+
+                                    <SidebarSection id="validation" label="Data Validation">
+                                    </SidebarSection>
+
+                                    <SidebarSection id="forecast" label="Forecast Running">
+                                    </SidebarSection>
+
+
+                                    <button onClick={resetApp} className="w-full py-2 mt-2 flex items-center justify-center gap-2 text-xxs font-bold text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded transition-colors">
+                                        <TrashIcon /> Reset All
+                                    </button>
+                                </div>
+
+                                <div className="relative p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                                    <div className="text-center">
+                                        <div className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Operartis Analytics</div>
+                                        <div className="text-[10px] text-amber-600 dark:text-amber-500 italic mt-1 font-medium">Optimizing Today, Growing Tomorrow</div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setSidebarOpen(false)}
+                                        className="absolute right-0 top-0 bottom-0 w-8 flex items-center justify-center text-slate-400 hover:text-brand-gold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                        title="Collapse Sidebar"
+                                    >
+                                        <SidebarCloseIcon />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {!sidebarOpen && (
+                            <div className="flex flex-col items-center mt-4 gap-4 flex-1">
+                                <button className="bg-white dark:bg-slate-800 text-slate-400 hover:text-brand-gold border border-slate-200 dark:border-slate-700 rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors" title="Import" onClick={() => { setSidebarOpen(true); setSidebarTab('import'); }}><UploadIcon /></button>
+                                <button className="bg-white dark:bg-slate-800 text-slate-400 hover:text-brand-gold border border-slate-200 dark:border-slate-700 rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors" title="Run" onClick={() => { if (status !== 'running' && mapping) runSynthesis(); }}><PlayIcon /></button>
+                                <div className="w-8 h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
+                                <button className={`bg-white dark:bg-slate-800 border rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors ${sidebarTab === 'batch' ? 'text-brand-gold border-brand-gold' : 'text-slate-400 hover:text-brand-gold border-slate-200 dark:border-slate-700'}`} title="Batch Overview" onClick={() => { setSidebarTab('batch'); setViewMode('overview'); }}><GridIcon /></button>
+                                <button className={`bg-white dark:bg-slate-800 border rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors ${sidebarTab === 'all_in_one' ? 'text-brand-gold border-brand-gold' : 'text-slate-400 hover:text-brand-gold border-slate-200 dark:border-slate-700'}`} title="All-In-One View" onClick={() => { setSidebarTab('all_in_one'); setViewMode('detail'); }}><LayoutIcon /></button>
+                                <button className={`bg-white dark:bg-slate-800 border rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors ${sidebarTab === 'validation' ? 'text-brand-gold border-brand-gold' : 'text-slate-400 hover:text-brand-gold border-slate-200 dark:border-slate-700'}`} title="Data Validation" onClick={() => { setSidebarTab('validation'); setActiveTab('validation'); setViewMode('detail'); }}><ClipboardCheckIcon /></button>
+                                <button className={`bg-white dark:bg-slate-800 border rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors ${sidebarTab === 'forecast' ? 'text-brand-gold border-brand-gold' : 'text-slate-400 hover:text-brand-gold border-slate-200 dark:border-slate-700'}`} title="Forecast Running" onClick={() => { setSidebarTab('forecast'); setActiveTab('forecast'); setViewMode('detail'); }}><ActivityIcon /></button>
+                            </div>
+                        )}
+                        {!sidebarOpen && (
+                            <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-center relative">
+                                <button
+                                    onClick={() => setSidebarOpen(true)}
+                                    className="bg-white dark:bg-slate-800 text-slate-400 hover:text-brand-gold border border-slate-200 dark:border-slate-700 rounded-full p-1 shadow-md z-30 flex items-center justify-center transition-colors"
+                                    title="Expand Sidebar"
+                                >
+                                    <SidebarOpenIcon />
+                                </button>
+                            </div>
+                        )}
+                    </aside>
+
+                    <main className="flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-slate-950">
+                        {/* Header */}
+                        <div className="h-16 flex justify-between items-center px-6 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex-none z-10">
+                            <div></div> {/* Spacer to balance flex */}
+                            <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest pl-20">
+                                ADVANCED-ML FORECASTER
+                            </h2>
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-400 dark:text-slate-500 hidden md:flex">
+                                    <ClockIcon />
+                                    <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                                </div>
+                                <button onClick={() => setIsSettingsOpen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-brand-gold transition-colors">
+                                    <div className="group-hover:rotate-90 transition-transform duration-500">
+                                        <SettingsIcon />
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 overflow-hidden relative p-6">
+                            {results.length === 0 && status !== 'running' ? (
+                                <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-4">
+                                    <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300">
+                                        <UploadIcon />
+                                    </div>
+                                    <p className="font-medium">Ready to Forecast</p>
+                                    <p className="text-xs opacity-60 max-w-xs text-center">Upload your dataset in the sidebar to begin the forecast process.</p>
+                                </div>
+                            ) : (
+                                status === 'running' ? (
+                                    <ForecastingLoader />
+                                ) : (
+                                    sidebarTab === 'batch' ? (
+                                        <BatchOverview results={results} onSelectSku={handleSkuSelect} />
+                                    ) : (
+                                        renderDetailContent()
+                                    )
+                                )
+                            )}
+                        </div>
+                    </main>
+
+                    <MappingModal headers={headers} isOpen={mappingOpen} onClose={() => setMappingOpen(false)} onConfirm={(sku, d, v, dr, count) => { setMapping({ sku, date: d, value: v, drivers: dr }); setMappingOpen(false); }} />
+                    <SettingsModal
+                        isOpen={isSettingsOpen}
+                        onClose={() => setIsSettingsOpen(false)}
+                        baseUrl={API_URL}
+                        theme={theme}
+                        setTheme={setTheme}
+                    />
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MainApp />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
