@@ -781,7 +781,18 @@
             const [time, setTime] = useState(new Date());
 
             // API URL State
-            const [apiUrl, setApiUrl] = useState(() => localStorage.getItem('api_url') || API_ENDPOINTS.LOCAL);
+            // Corrected logic
+            const [apiUrl, setApiUrl] = useState(() => {
+                // 1. Check if the user manually saved a URL preference previously
+                const saved = localStorage.getItem('api_url');
+                if (saved) return saved;
+
+                // 2. Automatically detect environment
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+                // 3. Return the correct endpoint
+                return isLocal ? API_ENDPOINTS.LOCAL : API_ENDPOINTS.PROD;
+            });
 
             useEffect(() => {
                 localStorage.setItem('api_url', apiUrl);
