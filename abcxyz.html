@@ -440,6 +440,7 @@
             // UI State
             const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, list
             const [searchTerm, setSearchTerm] = useState('');
+            const [filterClass, setFilterClass] = useState(null);
             const fileInputRef = useRef(null);
 
             // Clock Effect
@@ -772,11 +773,13 @@
                                     className={`h-full border-b-2 px-2 text-xs md:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'list' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                                 >
                                     <ListIcon /> <span className="hidden sm:inline">Item List</span>
-                                    {analysisData.length > 0 && <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-full ml-1">{analysisData.length}</span>}
+                                    {analysisData.length > 0 && <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-full ml-1">
+                                        {filterClass ? (matrix[filterClass]?.count || 0) : analysisData.length}
+                                    </span>}
                                 </button>
 
                                 {/* Search SKU Input (Moved here) */}
-                                <div className="h-8 border-l border-slate-200 dark:border-slate-800 ml-2 pl-4 flex items-center shrink-0">
+                                <div className="h-8 border-l border-slate-200 dark:border-slate-800 ml-2 pl-4 flex items-center shrink-0 gap-2">
                                     <input
                                         type="text"
                                         placeholder="Search SKU..."
@@ -784,6 +787,12 @@
                                         onChange={e => { setSearchTerm(e.target.value); if (activeTab !== 'list') setActiveTab('list'); }}
                                         className="bg-slate-100 dark:bg-slate-800 border-none rounded-md px-3 py-1.5 text-xs w-48 md:w-64 focus:ring-1 focus:ring-brand-gold outline-none transition-all placeholder-slate-400"
                                     />
+                                    {filterClass && (
+                                        <div className="flex items-center gap-1 bg-brand-gold/10 text-brand-gold px-2 py-1 rounded text-[10px] font-bold uppercase cursor-pointer hover:bg-rose-50 hover:text-rose-500 transition-colors" onClick={() => setFilterClass(null)}>
+                                            <span>Class: {filterClass}</span>
+                                            <XIcon />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -826,13 +835,30 @@
                                                         ['X', 'Y', 'Z'].map(col => {
                                                             const key = `${row}${col}`;
                                                             const data = matrix[key] || { count: 0, pctValue: 0, pctCount: 0 };
-                                                            let bgClass = '';
-                                                            if (row === 'A') bgClass = col === 'X' ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-200 dark:border-emerald-800' : col === 'Y' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-900' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-900';
-                                                            else if (row === 'B') bgClass = 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700';
-                                                            else bgClass = col === 'Z' ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900' : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700';
+
+                                                            // Gradient Logic for Matrix Cards
+                                                            // A=Emerald, B=Blue, C=Slate
+                                                            // X=Emerald, Y=Amber, Z=Rose
+                                                            let bgClass = 'bg-white dark:bg-slate-800'; // Default
+
+                                                            if (key === 'AX') bgClass = 'bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/40 dark:to-emerald-800/40 border-emerald-200 dark:border-emerald-700';
+                                                            else if (key === 'AY') bgClass = 'bg-gradient-to-br from-emerald-50 to-amber-100 dark:from-emerald-900/20 dark:to-amber-900/20 border-emerald-100 dark:border-emerald-800';
+                                                            else if (key === 'AZ') bgClass = 'bg-gradient-to-br from-emerald-50 to-rose-100 dark:from-emerald-900/10 dark:to-rose-900/20 border-rose-100 dark:border-rose-900';
+
+                                                            else if (key === 'BX') bgClass = 'bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900/30 dark:to-emerald-900/20 border-blue-200 dark:border-blue-800';
+                                                            else if (key === 'BY') bgClass = 'bg-gradient-to-br from-blue-50 to-amber-100 dark:from-blue-900/20 dark:to-amber-900/20 border-blue-100 dark:border-blue-800';
+                                                            else if (key === 'BZ') bgClass = 'bg-gradient-to-br from-blue-50 to-rose-100 dark:from-blue-900/20 dark:to-rose-900/20 border-rose-100 dark:border-rose-900';
+
+                                                            else if (key === 'CX') bgClass = 'bg-gradient-to-br from-slate-200 to-emerald-100 dark:from-slate-800 dark:to-emerald-900/20 border-slate-300 dark:border-slate-700';
+                                                            else if (key === 'CY') bgClass = 'bg-gradient-to-br from-slate-200 to-amber-100 dark:from-slate-800 dark:to-amber-900/20 border-slate-300 dark:border-slate-700';
+                                                            else if (key === 'CZ') bgClass = 'bg-gradient-to-br from-slate-200 to-rose-100 dark:from-slate-800 dark:to-rose-900/20 border-slate-300 dark:border-slate-700';
 
                                                             return (
-                                                                <div key={key} className={`rounded-lg border p-2 md:p-4 flex flex-col justify-between relative overflow-hidden transition-all hover:scale-[1.02] hover:shadow-md ${bgClass}`}>
+                                                                <div
+                                                                    key={key}
+                                                                    onClick={() => { setFilterClass(key); setActiveTab('list'); }}
+                                                                    className={`rounded-lg border p-2 md:p-4 flex flex-col justify-between relative overflow-hidden transition-all hover:scale-[1.02] hover:shadow-md cursor-pointer ${bgClass}`}
+                                                                >
                                                                     <div className="absolute top-1 right-1 md:top-2 md:right-2 text-xl md:text-2xl font-black pointer-events-none flex">
                                                                         <span className={row === 'A' ? 'text-emerald-500' : row === 'B' ? 'text-blue-500' : 'text-slate-600 dark:text-slate-400'}>{row}</span>
                                                                         <span className={col === 'X' ? 'text-emerald-500' : col === 'Y' ? 'text-brand-gold' : 'text-rose-500'}>{col}</span>
@@ -932,7 +958,11 @@
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-950">
                                                     {analysisData
-                                                        .filter(item => item.sku.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+                                                        .filter(item => {
+                                                            const matchSearch = item.sku.toString().toLowerCase().includes(searchTerm.toLowerCase());
+                                                            const matchFilter = filterClass ? item.class === filterClass : true;
+                                                            return matchSearch && matchFilter;
+                                                        })
                                                         .slice(0, 100) // Render limit for performance
                                                         .map((item, idx) => (
                                                             <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
