@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Operartis | Machine-Learning Forecaster</title>
-    
+
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -15,7 +17,7 @@
                 extend: {
                     colors: {
                         brand: {
-                            gold: '#f59e0b', 
+                            gold: '#f59e0b',
                             dark: '#b45309',
                             gray: '#f8fafc',
                             border: '#e2e8f0'
@@ -29,7 +31,7 @@
                         xxs: '0.65rem',
                     },
                     screens: {
-                        'landscape': {'raw': '(orientation: landscape)'},
+                        'landscape': { 'raw': '(orientation: landscape)' },
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.2s ease-out',
@@ -51,33 +53,82 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
-        
-        body { font-family: 'Inter', sans-serif; height: 100vh; width: 100vw; overflow: hidden; margin: 0; }
-        .scroller { -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
-        .dark body { background: #0f172a; }
-        @media screen and (orientation: landscape) and (max-height: 600px) {
-            body { height: auto !important; overflow-y: auto !important; position: static !important; }
-            .mobile-landscape-root { height: auto !important; overflow: visible !important; min-height: 100vh; }
-            .mobile-landscape-main { height: auto !important; overflow: visible !important; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            margin: 0;
         }
-        pre { white-space: pre-wrap; word-wrap: break-word; }
-        
+
+        .scroller {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        .dark body {
+            background: #0f172a;
+        }
+
+        @media screen and (orientation: landscape) and (max-height: 600px) {
+            body {
+                height: auto !important;
+                overflow-y: auto !important;
+                position: static !important;
+            }
+
+            .mobile-landscape-root {
+                height: auto !important;
+                overflow: visible !important;
+                min-height: 100vh;
+            }
+
+            .mobile-landscape-main {
+                height: auto !important;
+                overflow: visible !important;
+            }
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
         /* Modal Backdrop Blur */
-        .modal-backdrop { backdrop-filter: blur(4px); }
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
     </style>
-    
+
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+    <script crossorigin
+        src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/1.8.5/Recharts.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
+
 <body>
 
     <div id="root" class="h-full w-full flex flex-col"></div>
@@ -87,25 +138,25 @@
         const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart } = window.Recharts;
 
         // --- ICONS ---
-        const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>;
-        const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
-        const MaximizeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>;
-        const MinimizeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>;
-        const SunIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
-        const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>;
-        const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>;
-        const RefreshIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>;
-        const SplitIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="4" x2="20" y1="12" y2="12"/></svg>;
-        const SingleViewIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>;
-        const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
-        const CodeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>;
-        const CopyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>;
-        const LockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
-        const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-        const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
-        const PaletteIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>;
-        const InfoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>;
-        const CheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+        const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg>;
+        const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>;
+        const MaximizeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3" /><path d="M21 8V5a2 2 0 0 0-2-2h-3" /><path d="M3 16v3a2 2 0 0 0 2 2h3" /><path d="M16 21h3a2 2 0 0 0 2-2v-3" /></svg>;
+        const MinimizeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3" /><path d="M21 8h-3a2 2 0 0 1-2-2V3" /><path d="M3 16h3a2 2 0 0 1 2 2v3" /><path d="M16 21v-3a2 2 0 0 1 2-2h3" /></svg>;
+        const SunIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></svg>;
+        const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>;
+        const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
+        const RefreshIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 21h5v-5" /></svg>;
+        const SplitIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" /><line x1="4" x2="20" y1="12" y2="12" /></svg>;
+        const SingleViewIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" /></svg>;
+        const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>;
+        const CodeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>;
+        const CopyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>;
+        const LockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
+        const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>;
+        const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>;
+        const PaletteIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></svg>;
+        const InfoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>;
+        const CheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>;
         const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
 
         const MetricTile = ({ label, value, subValue, type, isDark, variant = 'default', highlight }) => {
@@ -113,7 +164,7 @@
             let bgClass = 'bg-white dark:bg-slate-900';
             if (variant === 'validation') bgClass = 'bg-amber-50 dark:bg-amber-900/10';
             else if (variant === 'forecast') bgClass = 'bg-slate-100 dark:bg-slate-800';
-            
+
             // Highlight override
             if (highlight) bgClass = 'bg-amber-50 dark:bg-amber-900/20';
 
@@ -131,14 +182,14 @@
         const fmtNumber = (val, minFrac = 0, maxFrac = 0) => {
             if (val === null || val === undefined || val === '-') return '-';
             const num = Number(val);
-            if (isNaN(num)) return val; 
+            if (isNaN(num)) return val;
             return num.toLocaleString('en-US', { minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
         };
 
         // ChartWidget wrapped in React.memo to prevent re-renders when parent (Clock) updates
         const ChartWidget = React.memo(({ data, isDark, isForecastRun, title, uniqueId, syncId }) => {
             if (!data) return null;
-            
+
             // Memoize data processing to ensure stable references
             const chartData = useMemo(() => {
                 if (Array.isArray(data)) return data;
@@ -150,9 +201,9 @@
                 text: isDark ? "#94a3b8" : "#64748b",
                 tooltipBg: isDark ? "#1e293b" : "#fff",
                 tooltipBorder: isDark ? "#334155" : "#e2e8f0",
-                actualTrainStroke: isDark ? "#cbd5e1" : "#475569", 
+                actualTrainStroke: isDark ? "#cbd5e1" : "#475569",
                 actualTrainGradientStart: isDark ? "#475569" : "#64748b",
-                actualTestStroke: "#10b981", 
+                actualTestStroke: "#10b981",
                 fitStroke: isDark ? "#64748b" : "#94a3b8",
                 forecastStroke: "#f59e0b",
             };
@@ -172,30 +223,30 @@
                         <ComposedChart data={chartData} syncId={syncId} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                             <defs>
                                 <linearGradient id={gradientTrainId} x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor={chartColors.actualTrainGradientStart} stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor={chartColors.actualTrainGradientStart} stopOpacity={0}/>
+                                    <stop offset="5%" stopColor={chartColors.actualTrainGradientStart} stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor={chartColors.actualTrainGradientStart} stopOpacity={0} />
                                 </linearGradient>
                                 <linearGradient id={gradientTestId} x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor={chartColors.actualTestStroke} stopOpacity={0.4}/>
-                                    <stop offset="95%" stopColor={chartColors.actualTestStroke} stopOpacity={0}/>
+                                    <stop offset="5%" stopColor={chartColors.actualTestStroke} stopOpacity={0.4} />
+                                    <stop offset="95%" stopColor={chartColors.actualTestStroke} stopOpacity={0} />
                                 </linearGradient>
                                 <linearGradient id={gradientForecastId} x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor={chartColors.forecastStroke} stopOpacity={0.4}/>
-                                    <stop offset="95%" stopColor={chartColors.forecastStroke} stopOpacity={0}/>
+                                    <stop offset="5%" stopColor={chartColors.forecastStroke} stopOpacity={0.4} />
+                                    <stop offset="95%" stopColor={chartColors.forecastStroke} stopOpacity={0} />
                                 </linearGradient>
                             </defs>
 
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartColors.grid} />
-                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: chartColors.text, fontSize: 10, fontFamily: 'monospace'}} dy={10} minTickGap={30} />
-                            <YAxis axisLine={false} tickLine={false} tick={{fill: chartColors.text, fontSize: 10, fontFamily: 'monospace'}} />
-                            
+                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: chartColors.text, fontSize: 10, fontFamily: 'monospace' }} dy={10} minTickGap={30} />
+                            <YAxis axisLine={false} tickLine={false} tick={{ fill: chartColors.text, fontSize: 10, fontFamily: 'monospace' }} />
+
                             <Tooltip contentStyle={{ backgroundColor: chartColors.tooltipBg, borderColor: chartColors.tooltipBorder, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontSize: '12px', color: chartColors.text, fontFamily: 'monospace' }} itemStyle={{ padding: 0 }} />
-                            <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{fontSize: '10px', fontWeight: 600, color: chartColors.text, fontFamily: 'sans-serif', textTransform: 'uppercase'}}/>
-                            
+                            <Legend verticalAlign="top" height={36} iconType="rect" wrapperStyle={{ fontSize: '10px', fontWeight: 600, color: chartColors.text, fontFamily: 'sans-serif', textTransform: 'uppercase' }} />
+
                             <Area type="monotone" dataKey="actual_train" name={isForecastRun ? "Actual" : "Actual (Train)"} stroke={chartColors.actualTrainStroke} fill={`url(#${gradientTrainId})`} strokeWidth={2} isAnimationActive={false} />
-                            {!isForecastRun && ( <Area type="monotone" dataKey="actual_test" name="Actual (Test)" stroke={chartColors.actualTestStroke} fill={`url(#${gradientTestId})`} strokeWidth={2} isAnimationActive={false} /> )}
+                            {!isForecastRun && (<Area type="monotone" dataKey="actual_test" name="Actual (Test)" stroke={chartColors.actualTestStroke} fill={`url(#${gradientTestId})`} strokeWidth={2} isAnimationActive={false} />)}
                             <Line type="monotone" dataKey="fitted" name="Fit" stroke={chartColors.fitStroke} strokeDasharray="2 2" strokeWidth={1.5} dot={false} connectNulls={false} isAnimationActive={false} strokeOpacity={0.7} />
-                            <Area type="monotone" dataKey="forecast" name="Forecast" stroke={chartColors.forecastStroke} fill={`url(#${gradientForecastId})`} strokeWidth={2.5} strokeDasharray="4 4" dot={{r: 4, fill: isDark ? '#1e293b' : '#fff', stroke: chartColors.forecastStroke, strokeWidth: 2}} connectNulls={false} isAnimationActive={false} />
+                            <Area type="monotone" dataKey="forecast" name="Forecast" stroke={chartColors.forecastStroke} fill={`url(#${gradientForecastId})`} strokeWidth={2.5} strokeDasharray="4 4" dot={{ r: 4, fill: isDark ? '#1e293b' : '#fff', stroke: chartColors.forecastStroke, strokeWidth: 2 }} connectNulls={false} isAnimationActive={false} />
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
@@ -208,7 +259,7 @@
             const endpoint = `${baseUrl}/api/v1/forecast`;
 
             useEffect(() => {
-                if(isOpen) {
+                if (isOpen) {
                     setActiveTab("theme");
                     setCopied(null);
                 }
@@ -229,7 +280,7 @@
                     textArea.select();
                     const successful = document.execCommand('copy');
                     document.body.removeChild(textArea);
-                    if(successful) {
+                    if (successful) {
                         setCopied(type);
                         setTimeout(() => setCopied(null), 2000);
                     }
@@ -327,24 +378,24 @@ fetch(url, options)
                                 <XIcon />
                             </button>
                         </div>
-                        
+
                         {/* Body Layout */}
                         <div className="flex flex-1 overflow-hidden">
                             {/* Sidebar Nav */}
                             <div className="w-1/4 md:w-64 border-r border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 p-4 flex flex-col gap-2 overflow-y-auto">
-                                <button 
+                                <button
                                     onClick={() => setActiveTab("theme")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'theme' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
                                     <PaletteIcon /> Theme Mode
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setActiveTab("api")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'api' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
                                     <CodeIcon /> API Configuration
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setActiveTab("about")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'about' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
@@ -387,7 +438,7 @@ fetch(url, options)
                                                 <div>
                                                     <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">API Credentials</h4>
                                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md leading-relaxed">
-                                                        To access the forecasting engine programmatically, you need a secure API Key. 
+                                                        To access the forecasting engine programmatically, you need a secure API Key.
                                                         Please contact the system administrator to request your unique credentials.
                                                     </p>
                                                 </div>
@@ -402,8 +453,8 @@ fetch(url, options)
 
                                         {/* Config Details */}
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                                             {/* Endpoint URL */}
-                                             <div className="flex flex-col">
+                                            {/* Endpoint URL */}
+                                            <div className="flex flex-col">
                                                 <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2 h-5 mb-2">
                                                     Base Endpoint URL
                                                 </label>
@@ -413,16 +464,16 @@ fetch(url, options)
                                                         {copied === 'url' ? <span className="text-xs font-bold text-green-500">Copied</span> : <CopyIcon />}
                                                     </button>
                                                 </div>
-                                             </div>
+                                            </div>
 
-                                             {/* Auth Method */}
-                                             <div className="flex flex-col">
+                                            {/* Auth Method */}
+                                            <div className="flex flex-col">
                                                 <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center h-5 mb-2">Authentication Header</label>
                                                 <div className="h-12 flex items-center p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded text-xs text-slate-600 dark:text-slate-300 w-full">
-                                                    <span className="mr-2">Header:</span> 
+                                                    <span className="mr-2">Header:</span>
                                                     <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-brand-dark dark:text-brand-gold font-bold">X-API-Key</code>
                                                 </div>
-                                             </div>
+                                            </div>
                                         </div>
 
                                         {/* Code Snippets */}
@@ -472,7 +523,7 @@ fetch(url, options)
                                     <div className="animate-fade-in space-y-8 max-w-3xl mx-auto">
                                         <div className="text-center space-y-2 mb-8">
                                             <div className="inline-block p-4 bg-brand-gold/10 rounded-full mb-2">
-                                                <img src="./icononly_transparent_quadratic.png" className="w-12 h-12 object-contain mx-auto" onError={(e) => e.target.style.display='none'} />
+                                                <img src="./icononly_transparent_quadratic.png" className="w-12 h-12 object-contain mx-auto" onError={(e) => e.target.style.display = 'none'} />
                                             </div>
                                             <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">About Operartis</h2>
                                             <p className="text-sm text-brand-gold font-medium uppercase tracking-widest">Optimizing today, Growing tomorrow.</p>
@@ -495,7 +546,7 @@ fetch(url, options)
                                                         <p className="leading-relaxed">We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.</p>
                                                     </div>
                                                 </div>
-                                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col"> 
+                                                <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-800 flex flex-col">
                                                     <h3 className="text-sm font-bold text-brand-dark dark:text-brand-gold uppercase tracking-wider mb-3">Our Vision & Philosophy</h3>
                                                     <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
                                                         <p className="leading-relaxed">We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.</p>
@@ -518,15 +569,15 @@ fetch(url, options)
             const [file, setFile] = useState(null);
             const [modelType, setModelType] = useState("auto");
             const [forecastSteps, setForecastSteps] = useState(6);
-            const [dataLength, setDataLength] = useState(0); 
+            const [dataLength, setDataLength] = useState(0);
             const [validationModelType, setValidationModelType] = useState("auto");
-            const [validationMethod, setValidationMethod] = useState("simple"); 
+            const [validationMethod, setValidationMethod] = useState("simple");
             const [trainHorizon, setTrainHorizon] = useState(24);
             const [testHorizon, setTestHorizon] = useState(6);
-            
+
             const [validationResult, setValidationResult] = useState(null);
             const [forecastResult, setForecastResult] = useState(null);
-            
+
             const [isValidating, setIsValidating] = useState(false);
             const [validationError, setValidationError] = useState(null);
             const [isLoading, setIsLoading] = useState(false);
@@ -536,11 +587,11 @@ fetch(url, options)
             const [isFullScreen, setIsFullScreen] = useState(false);
             const [isSplitView, setIsSplitView] = useState(false);
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-            
+
             const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
             const [isDark, setIsDark] = useState(false);
             const [time, setTime] = useState(new Date());
-            
+
             const fileInputRef = useRef(null);
             const LOCAL_API = 'http://127.0.0.1:8000';
             const PROD_API = 'https://sales-forecaster-backend.onrender.com';
@@ -555,7 +606,7 @@ fetch(url, options)
                     else if (theme === 'light') effectiveDark = false;
                     else effectiveDark = systemPrefersDark;
                     setIsDark(effectiveDark);
-                    if (effectiveDark) { document.documentElement.classList.add('dark'); } 
+                    if (effectiveDark) { document.documentElement.classList.add('dark'); }
                     else { document.documentElement.classList.remove('dark'); }
                     localStorage.setItem('theme', theme);
                 };
@@ -601,7 +652,7 @@ fetch(url, options)
                 reader.onload = (evt) => {
                     try {
                         const data = new Uint8Array(evt.target.result);
-                        const workbook = XLSX.read(data, {type: 'array'});
+                        const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheetName = workbook.SheetNames[0];
                         const worksheet = workbook.Sheets[firstSheetName];
                         const json = XLSX.utils.sheet_to_json(worksheet);
@@ -609,7 +660,7 @@ fetch(url, options)
                         const defaultTest = 6;
                         const defaultTrain = json.length > defaultTest ? json.length - defaultTest : json.length - 1;
                         setTrainHorizon(defaultTrain > 0 ? defaultTrain : 1);
-                        setTestHorizon(json.length > defaultTrain ? defaultTest : 1); 
+                        setTestHorizon(json.length > defaultTrain ? defaultTest : 1);
                     } catch (err) { setDataLength(0); }
                 };
                 reader.readAsArrayBuffer(selectedFile);
@@ -652,10 +703,10 @@ fetch(url, options)
             };
 
             const handleValidation = async () => {
-                if (!file || validationError) return; 
+                if (!file || validationError) return;
                 setIsValidating(true);
                 setError(null);
-                setValidationResult(null); 
+                setValidationResult(null);
                 setForecastResult(null);
                 const formData = new FormData();
                 formData.append('file', file);
@@ -669,7 +720,7 @@ fetch(url, options)
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.detail || "Validation Error");
                     setValidationResult(data);
-                    setModelType(data.winner_code || data.winner.split(' ')[0].toLowerCase()); 
+                    setModelType(data.winner_code || data.winner.split(' ')[0].toLowerCase());
                 } catch (err) {
                     setError(err.message === "Failed to fetch" ? "Cannot reach Backend." : err.message);
                 } finally { setIsValidating(false); }
@@ -712,7 +763,7 @@ fetch(url, options)
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    
+
                     let fileName = `Operartis_Forecast_${modelType.toUpperCase()}.xlsx`;
                     const contentDisposition = response.headers.get('Content-Disposition');
                     if (contentDisposition) {
@@ -721,17 +772,17 @@ fetch(url, options)
                             fileName = fileNameMatch[1];
                         }
                     } else if (file && file.name) {
-                         const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-                         const now = new Date();
-                         const timestamp = now.getFullYear() +
-                             String(now.getMonth() + 1).padStart(2, '0') +
-                             String(now.getDate()).padStart(2, '0') + "_" +
-                             String(now.getHours()).padStart(2, '0') +
-                             String(now.getMinutes()).padStart(2, '0') +
-                             String(now.getSeconds()).padStart(2, '0');
-                         fileName = `Operartis_Forecast_${nameWithoutExt}_${timestamp}.xlsx`;
+                        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+                        const now = new Date();
+                        const timestamp = now.getFullYear() +
+                            String(now.getMonth() + 1).padStart(2, '0') +
+                            String(now.getDate()).padStart(2, '0') + "_" +
+                            String(now.getHours()).padStart(2, '0') +
+                            String(now.getMinutes()).padStart(2, '0') +
+                            String(now.getSeconds()).padStart(2, '0');
+                        fileName = `Operartis_Forecast_${nameWithoutExt}_${timestamp}.xlsx`;
                     }
-                    
+
                     a.download = fileName;
                     document.body.appendChild(a);
                     a.click();
@@ -806,115 +857,136 @@ fetch(url, options)
                     forecastMse: activeResult.forecast_mse ? fmtNumber(activeResult.forecast_mse, 2, 2) : '0.00'
                 };
             };
-            
+
             const metrics = getMetrics();
             const valRuns = calculateValidationRuns();
 
             return (
-                <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
-                    <header className={`relative h-14 md:h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-30 transition-colors duration-300 ${isFullScreen ? 'hidden' : 'flex'}`}>
-                        <div className="flex items-center gap-3 md:gap-4 z-10">
-                            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-1 -ml-1 text-slate-500 hover:text-brand-gold focus:outline-none dark:text-slate-400"><MenuIcon /></button>
-                            <a href="https://operartis.vercel.app/terminal.html">
-                                <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer hover:opacity-80 transition-opacity" onError={(e) => e.target.style.display='none'} />
-                            </a>
-                            <h1 className="font-bold text-slate-800 dark:text-slate-100 tracking-tight text-base md:text-lg transition-colors">OPERARTIS <span className="text-brand-gold font-normal hidden sm:inline">TERMINAL</span></h1>
-                        </div>
-                        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest drop-shadow-sm hidden md:block">
-                            MACHINE-LEARNING FORECASTER
-                        </div>
-                        <div className="flex items-center gap-4 z-10">
-                            {/* Clock - Always Visible */}
-                            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
-                                <ClockIcon />
-                                <span>{time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                            </div>
-                            <button onClick={() => setIsSettingsOpen(true)} className="text-slate-400 hover:text-brand-gold dark:text-slate-500 dark:hover:text-yellow-400 transition-colors flex items-center gap-2">
-                                <SettingsIcon />
-                            </button>
-                            <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">v7.5_PRO</div>
-                        </div>
-                    </header>
+                <div className="flex h-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
 
-                    <div className="flex flex-grow overflow-hidden min-h-0 relative w-full mobile-landscape-root">
-                        <aside className={`${isFullScreen ? 'hidden' : ''} fixed md:relative inset-y-0 left-0 z-50 w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out ${!isSidebarOpen && 'md:translate-x-0'} ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-                            <div className="md:hidden h-14 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 shrink-0"><span className="font-bold text-slate-700 dark:text-slate-200">Configuration</span><button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 hover:text-red-500"><XIcon /></button></div>
-                            <div className="flex-1 overflow-y-auto scroller p-4 relative flex flex-col">
-                                <div className="space-y-6">
-                                    <div>
-                                        <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">Source Data<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                        <div onClick={() => fileInputRef.current.click()} className={`border border-dashed rounded px-3 py-8 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex flex-col items-center justify-center gap-1 ${file ? 'border-brand-gold bg-amber-50/20 dark:bg-amber-900/10' : 'border-slate-300 dark:border-slate-700'}`}>
-                                            <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
-                                            {file ? (<><div className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate w-full text-center">{file.name}</div><div className="text-xxs text-emerald-600 dark:text-emerald-400 font-medium">LOCKED & READY</div>{dataLength > 0 && <div className="text-xxs font-mono text-slate-400 dark:text-slate-500">[{dataLength} Periods]</div>}</>) : <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">+ Import .XLSX</div>}
-                                        </div>
-                                        {error && <div className="text-xxs text-red-600 dark:text-red-400 mt-1 font-medium">{error}</div>}
-                                    </div>
-                                    <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                        <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">Data Validation<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                        <div className="space-y-3">
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Validation Method</label>
-                                                <select value={validationMethod} onChange={(e) => setValidationMethod(e.target.value)} className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1">
-                                                    <option value="simple">Simple Split (Fast)</option>
-                                                    <option value="walk_forward">Walk-Forward (Robust)</option>
-                                                </select>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <div className="flex-1"><label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">{validationMethod === 'walk_forward' ? 'Min. Train Size' : 'Train Horizon'}</label><input type="number" value={trainHorizon} onChange={handleTrainHorizonChange} min="1" disabled={!file} className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`} /></div>
-                                                <div className="flex-1"><label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Test Horizon</label><input type="number" value={testHorizon} onChange={handleTestHorizonChange} min="1" disabled={!file} className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`} /></div>
-                                            </div>
-                                            {validationError && <div className="text-xxs text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800">{validationError}</div>}
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Validation Model</label>
-                                                <select value={validationModelType} onChange={(e) => setValidationModelType(e.target.value)} className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1">
-                                                    <option value="auto">Auto-Select (All)</option>
-                                                    <option value="ses">SES (Level)</option>
-                                                    <option value="des">DES (Trend)</option>
-                                                    <option value="tes">TES (Seasonal)</option>
-                                                    <option value="prophet">Prophet (Complex)</option>
-                                                </select>
-                                            </div>
-                                            <button onClick={handleValidation} disabled={!file || isValidating || !!validationError} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm ${!file || isValidating || validationError ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}>{isValidating ? 'Running Validation...' : (validationMethod === 'walk_forward' ? 'Run Auto-Validation' : 'Run Split Validation')}</button>
-                                        </div>
-                                    </div>
-                                    <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                        <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">Forecast Running<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                        <div className="space-y-3">
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase">Forecast Model (Locked)</label>
-                                                <select value={modelType} disabled={true} className="w-full text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-400 p-2 outline-none shadow-none mt-1 cursor-not-allowed"><option value="ses">SES (Level)</option><option value="des">DES (Trend)</option><option value="tes">TES (Seasonal)</option><option value="prophet">Prophet (Complex)</option></select>
-                                                <p className="text-xxs text-slate-400 dark:text-slate-500 mt-1 italic">Determined by Data Validation</p>
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase">Forecast Horizon</label>
-                                                <input 
-                                                    type="number" 
-                                                    value={forecastSteps} 
-                                                    onChange={(e) => setForecastSteps(parseInt(e.target.value) || '')}
-                                                    min="1"
-                                                    className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1" 
-                                                />
-                                            </div>
-                                            <button onClick={handleRun} disabled={!file || isLoading || !validationResult} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm ${!file || isLoading || !validationResult ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}>{isLoading ? 'Running...' : 'Execute Forecast'}</button>
-                                            <button onClick={handleExport} disabled={!file || isExporting || !forecastResult} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isExporting || !forecastResult ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}>{isExporting ? 'Generating Report...' : <><DownloadIcon /> Export Report (.xlsx)</>}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mt-auto pt-6">
-                                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                                        <button onClick={handleReset} className="w-full py-2 text-xs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2"><RefreshIcon /> Reset Application</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex-shrink-0 transition-colors flex items-center justify-center text-center">
+                    {/* SIDEBAR COLUMN */}
+                    <aside className={`
+                        ${isFullScreen ? 'hidden' : 'flex'} 
+                        fixed md:relative inset-y-0 left-0 z-50 w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out 
+                        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+                    `}>
+                        {/* Sidebar Header */}
+                        <div className="h-14 md:h-16 flex items-center justify-center px-4 md:px-6 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 transition-colors gap-3 relative">
+                            <a href="https://operartis.vercel.app/terminal.html" className="shrink-0">
+                                <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer hover:opacity-80 transition-opacity" onError={(e) => e.target.style.display = 'none'} />
+                            </a>
+                            <h1 className="font-bold text-slate-800 dark:text-slate-100 tracking-tight text-base md:text-lg transition-colors whitespace-nowrap">
+                                OPERARTIS
+                            </h1>
+                            <button onClick={() => setIsSidebarOpen(false)} className="md:hidden absolute right-4 text-slate-400 hover:text-red-500"><XIcon /></button>
+                        </div>
+
+                        {/* Sidebar Content */}
+                        <div className="flex-1 overflow-y-auto scroller p-4 relative flex flex-col">
+                            <div className="space-y-6">
                                 <div>
-                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">Operartis Analytics</p>
-                                    <p className="text-[10px] text-brand-gold mt-1 font-medium italic">Optimizing Today, Growing Tomorrow</p>
+                                    <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">Source Data<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                    <div onClick={() => fileInputRef.current.click()} className={`border border-dashed rounded px-3 py-8 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex flex-col items-center justify-center gap-1 ${file ? 'border-brand-gold bg-amber-50/20 dark:bg-amber-900/10' : 'border-slate-300 dark:border-slate-700'}`}>
+                                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
+                                        {file ? (<><div className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate w-full text-center">{file.name}</div><div className="text-xxs text-emerald-600 dark:text-emerald-400 font-medium">LOCKED & READY</div>{dataLength > 0 && <div className="text-xxs font-mono text-slate-400 dark:text-slate-500">[{dataLength} Periods]</div>}</>) : <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">+ Import .XLSX</div>}
+                                    </div>
+                                    {error && <div className="text-xxs text-red-600 dark:text-red-400 mt-1 font-medium">{error}</div>}
+                                </div>
+                                <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                                    <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">Data Validation<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Validation Method</label>
+                                            <select value={validationMethod} onChange={(e) => setValidationMethod(e.target.value)} className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1">
+                                                <option value="simple">Simple Split (Fast)</option>
+                                                <option value="walk_forward">Walk-Forward (Robust)</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <div className="flex-1"><label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">{validationMethod === 'walk_forward' ? 'Min. Train Size' : 'Train Horizon'}</label><input type="number" value={trainHorizon} onChange={handleTrainHorizonChange} min="1" disabled={!file} className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`} /></div>
+                                            <div className="flex-1"><label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Test Horizon</label><input type="number" value={testHorizon} onChange={handleTestHorizonChange} min="1" disabled={!file} className={`w-full text-xs border rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1 disabled:opacity-50 ${validationError ? 'border-red-500 dark:border-red-500' : 'border-slate-300 dark:border-slate-700'}`} /></div>
+                                        </div>
+                                        {validationError && <div className="text-xxs text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800">{validationError}</div>}
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Validation Model</label>
+                                            <select value={validationModelType} onChange={(e) => setValidationModelType(e.target.value)} className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1">
+                                                <option value="auto">Auto-Select (All)</option>
+                                                <option value="ses">SES (Level)</option>
+                                                <option value="des">DES (Trend)</option>
+                                                <option value="tes">TES (Seasonal)</option>
+                                                <option value="prophet">Prophet (Complex)</option>
+                                            </select>
+                                        </div>
+                                        <button onClick={handleValidation} disabled={!file || isValidating || !!validationError} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm ${!file || isValidating || validationError ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}>{isValidating ? 'Running Validation...' : (validationMethod === 'walk_forward' ? 'Run Auto-Validation' : 'Run Split Validation')}</button>
+                                    </div>
+                                </div>
+                                <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                                    <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">Forecast Running<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase">Forecast Model (Locked)</label>
+                                            <select value={modelType} disabled={true} className="w-full text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-400 p-2 outline-none shadow-none mt-1 cursor-not-allowed"><option value="ses">SES (Level)</option><option value="des">DES (Trend)</option><option value="tes">TES (Seasonal)</option><option value="prophet">Prophet (Complex)</option></select>
+                                            <p className="text-xxs text-slate-400 dark:text-slate-500 mt-1 italic">Determined by Data Validation</p>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase">Forecast Horizon</label>
+                                            <input
+                                                type="number"
+                                                value={forecastSteps}
+                                                onChange={(e) => setForecastSteps(parseInt(e.target.value) || '')}
+                                                min="1"
+                                                className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-2 focus:border-brand-gold outline-none shadow-sm mt-1"
+                                            />
+                                        </div>
+                                        <button onClick={handleRun} disabled={!file || isLoading || !validationResult} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm ${!file || isLoading || !validationResult ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-gold border border-brand-gold'}`}>{isLoading ? 'Running...' : 'Execute Forecast'}</button>
+                                        <button onClick={handleExport} disabled={!file || isExporting || !forecastResult} className={`w-full py-2 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isExporting || !forecastResult ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}>{isExporting ? 'Generating Report...' : <><DownloadIcon /> Export Report (.xlsx)</>}</button>
+                                    </div>
                                 </div>
                             </div>
-                        </aside>
-                        {isSidebarOpen && <div className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity" onClick={() => setIsSidebarOpen(false)}></div>}
-                        <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative min-w-0 transition-all w-full h-full overflow-y-auto scroller ${isFullScreen ? 'hidden' : 'flex'} mobile-landscape-main`}>
+                            <div className="mt-auto pt-6">
+                                <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                                    <button onClick={handleReset} className="w-full py-2 text-xs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2"><RefreshIcon /> Reset Application</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Sidebar Footer */}
+                        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex-shrink-0 transition-colors flex items-center justify-center text-center">
+                            <div>
+                                <p className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">Operartis Analytics</p>
+                                <p className="text-[10px] text-brand-gold mt-1 font-medium italic">Optimizing Today, Growing Tomorrow</p>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* MAIN CONTENT COLUMN */}
+                    <div className="flex flex-col flex-grow min-w-0 transition-all relative">
+                        {/* Main Header */}
+                        <header className={`h-14 md:h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-20 transition-colors ${isFullScreen ? 'hidden' : 'flex'} relative`}>
+                            <div className="flex items-center gap-3 md:gap-4 z-10 w-28">
+                                <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-1 -ml-1 text-slate-500 hover:text-brand-gold focus:outline-none dark:text-slate-400"><MenuIcon /></button>
+                            </div>
+
+                            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest drop-shadow-sm text-center w-full pointer-events-none">
+                                <span className="hidden md:inline">MACHINE-LEARNING FORECASTER</span>
+                                <span className="md:hidden">ML FORECASTER</span>
+                            </div>
+
+                            <div className="flex items-center gap-4 z-10 justify-end w-28">
+                                <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
+                                    <ClockIcon />
+                                    <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                                <button onClick={() => setIsSettingsOpen(true)} className="text-slate-400 hover:text-brand-gold dark:text-slate-500 dark:hover:text-yellow-400 transition-colors flex items-center gap-2">
+                                    <SettingsIcon />
+                                </button>
+                                <div className="text-[10px] md:text-xs font-mono text-slate-400 dark:text-slate-600 hidden sm:block">v7.5_PRO</div>
+                            </div>
+                        </header>
+
+                        {/* Main Body */}
+                        <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full h-full overflow-y-auto scroller mobile-landscape-main ${isFullScreen ? 'hidden' : 'flex'}`}>
+                            {/* Scrollable Header (Metrics) */}
                             <div className="h-14 md:h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center shrink-0 shadow-sm overflow-x-auto snap-x no-scrollbar relative z-20 transition-colors">
                                 <MetricTile label="Current Vol" value={metrics.current} isDark={isDark} />
                                 <MetricTile label="Current Fit" value={metrics.fit} isDark={isDark} />
@@ -924,25 +996,33 @@ fetch(url, options)
                                 <MetricTile label="Validation (Avg.) MSE" value={validationResult ? fmtNumber(validationResult.best_mse, 2, 2) : '-'} isDark={isDark} highlight={!!validationResult} />
                                 <div className={`flex flex-col justify-center px-4 md:px-6 h-full min-w-[120px] md:min-w-[140px] border-l border-brand-border dark:border-slate-700 bg-white dark:bg-slate-900 snap-start transition-colors items-center`}><span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 text-center">Validation Model</span><span className="text-[10px] md:text-xs font-bold text-brand-dark dark:text-brand-gold bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded w-fit truncate max-w-[100px] block transition-colors">{validationResult ? formatValidationModelName(validationResult.winner) : '-'}</span></div>
                             </div>
+
+                            {/* Chart Area */}
                             <div className="p-2 md:p-4 relative flex flex-col w-full min-h-[400px] flex-grow" style={{ touchAction: 'pan-y' }}>
                                 <div className="flex-1 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm p-2 md:p-4 relative h-full overflow-hidden group transition-colors flex flex-col">
                                     {activeResult && (<div className="absolute top-2 right-2 z-10 flex gap-2">{canSplit && (<button onClick={() => setIsSplitView(!isSplitView)} className={`p-2 border shadow-sm rounded-md transition-colors ${isSplitView ? 'text-brand-gold border-brand-gold bg-amber-50 dark:bg-amber-900/20' : 'bg-white/90 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-brand-gold'}`} title={isSplitView ? "Single View" : "Split View"}>{isSplitView ? <SingleViewIcon /> : <SplitIcon />}</button>)}<button onClick={() => setIsFullScreen(true)} className="p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-sm rounded-md text-slate-500 dark:text-slate-400 hover:text-brand-gold hover:border-brand-gold dark:hover:text-brand-gold transition-colors"><MaximizeIcon /></button></div>)}
-                                    {!activeResult && !isLoading && !isValidating && (<div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 transition-colors"><div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded flex items-center justify-center mb-2 transition-colors"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg></div><span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-center">No Data Loaded<br/>(Use Menu to Upload)</span></div>)}
+                                    {!activeResult && !isLoading && !isValidating && (<div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 transition-colors"><div className="w-12 h-12 md:w-16 md:h-16 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded flex items-center justify-center mb-2 transition-colors"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20" /></svg></div><span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-center">No Data Loaded<br />(Use Menu to Upload)</span></div>)}
                                     {(isLoading || isValidating) && (<div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm transition-colors"><div className="mb-4"><svg className="animate-spin h-8 w-8 md:h-10 md:w-10 text-brand-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><p className="text-xs md:text-sm font-bold text-brand-gold animate-pulse tracking-widest uppercase text-center px-4">{isValidating ? 'Running Validation Algorithm...' : 'Running Forecasting Algorithm...'}</p></div>)}
                                     {isSplitActive && (<div className="flex flex-col h-full gap-2"><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="split_val" syncId="splitView" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="split_fc" syncId="splitView" /></div></div>)}
                                     {!isSplitActive && activeResult && (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="single_main" />)}
                                 </div>
                             </div>
                         </main>
-                        {isFullScreen && activeResult && (<div className="fixed inset-0 z-50 bg-white dark:bg-slate-900 p-2 md:p-6 w-screen h-screen flex flex-col transition-colors"><button onClick={() => setIsFullScreen(false)} className="absolute top-4 right-4 z-50 p-3 bg-slate-100 dark:bg-slate-800 rounded-full shadow-md text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-red-600 transition-colors"><MinimizeIcon /></button><div className="flex-1 w-full h-full flex flex-col gap-4">{isSplitActive ? (<><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="fs_val" syncId="fs_split" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="fs_fc" syncId="fs_split" /></div></>) : (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="fs_single" />)}</div></div>)}
-                        
-                        {/* Settings Modal */}
-                        <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} />
                     </div>
+
+                    {/* Mobile Overlay */}
+                    {isSidebarOpen && <div className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity" onClick={() => setIsSidebarOpen(false)}></div>}
+
+                    {/* Full Screen Overlay */}
+                    {isFullScreen && activeResult && (<div className="fixed inset-0 z-50 bg-white dark:bg-slate-900 p-2 md:p-6 w-screen h-screen flex flex-col transition-colors"><button onClick={() => setIsFullScreen(false)} className="absolute top-4 right-4 z-50 p-3 bg-slate-100 dark:bg-slate-800 rounded-full shadow-md text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-red-600 transition-colors"><MinimizeIcon /></button><div className="flex-1 w-full h-full flex flex-col gap-4">{isSplitActive ? (<><div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative"><ChartWidget data={splitViewValidationData} isDark={isDark} isForecastRun={false} title="Validation / Backtest" uniqueId="fs_val" syncId="fs_split" /></div><div className="flex-1 relative"><ChartWidget data={forecastResult} isDark={isDark} isForecastRun={true} title="Forecast / Future" uniqueId="fs_fc" syncId="fs_split" /></div></>) : (<ChartWidget data={activeResult} isDark={isDark} isForecastRun={!!(activeResult.mode)} uniqueId="fs_single" />)}</div></div>)}
+
+                    {/* Settings Modal */}
+                    <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} />
                 </div>
             );
         };
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
+
 </html>
