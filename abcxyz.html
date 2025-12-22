@@ -134,6 +134,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
 </head>
 
@@ -553,127 +554,183 @@
                 setIsSidebarOpen(false);
             };
 
-            const handleExport = () => {
+            const handleExport = async () => {
                 if (analysisData.length === 0) return;
+                if (typeof ExcelJS === 'undefined') {
+                    console.error('ExcelJS not loaded');
+                    alert('Export library not loaded. Please refresh the page.');
+                    return;
+                }
 
-                const ws = XLSX.utils.aoa_to_sheet([]);
-                const wb = XLSX.utils.book_new();
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet("Analysis Report");
 
-                // --- STYLES ---
-                const titleStyle = { font: { name: "Arial", sz: 24, bold: true, color: { rgb: "E38800" } }, alignment: { horizontal: "left" } };
-                const subtitleStyle = { font: { name: "Arial", sz: 12, italic: true, color: { rgb: "E38800" } } };
-                const headerStyle = { fill: { fgColor: { rgb: "FFFFFF" } }, font: { name: "Arial", sz: 10, bold: true }, border: { top: { style: "thick" }, bottom: { style: "thick" }, left: { style: "thick" }, right: { style: "thick" } } };
-                const labelStyle = { fill: { fgColor: { rgb: "EFEFEF" } }, font: { name: "Arial", sz: 10, bold: true }, border: { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } } };
-                const valueStyle = { font: { name: "Arial", sz: 10 }, border: { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } } };
-                const tableHeaderStyle = { fill: { fgColor: { rgb: "101f3a" } }, font: { name: "Arial", sz: 11, bold: true, color: { rgb: "FFFFFF" } }, alignment: { horizontal: "center" } };
+                // --- 1. LOGO & BRANDING ---
+                try {
+                    const response = await fetch("./icononly_transparent_nobuffer.png");
+                    const blob = await response.blob();
+                    const buffer = await blob.arrayBuffer();
+                    const logoId = workbook.addImage({ buffer, extension: "png" });
 
-                // --- CONTENT ---
-                // 1. Logo & Title Area (Logo Placeholder)
-                XLSX.utils.sheet_add_aoa(ws, [
-                    ["OPERARTIS ANALYTICS REPORT"],
-                    ["Optimizing Today, Growing Tomorrow."]
-                ], { origin: "C2" });
+                    worksheet.addImage(logoId, {
+                        tl: { col: 1.2, row: 0 },
+                        ext: { width: 60, height: 60 }
+                    });
+                } catch (e) {
+                    console.error("Logo fetch failed. Ensure you are running on a local server (http://) not file:// protocol.", e);
+                    alert("Logo could not be loaded. Please ensure you are running this page via a web server (http://localhost), not directly as a file.");
+                }
 
-                // 2. Metadata Box
-                const metaStartRow = 5;
-                XLSX.utils.sheet_add_aoa(ws, [
-                    ["Report By:", "Operartis Analytics", "", "Report Date:", new Date().toLocaleString()],
-                    ["Report For:", "ABC-XYZ Analysis", "", "Total SKUs:", summary.totalSkus],
-                    ["Version:", "1.0", "", "Total Value:", fmtCurrency(summary.totalValue)]
-                ], { origin: `B${metaStartRow}` });
+                // Title Area
+                worksheet.mergeCells("C1:I2");
+                const titleCell = worksheet.getCell("C1");
+                titleCell.value = "OPERARTIS ANALYTICS REPORT";
+                titleCell.font = { name: "Arial", size: 24, bold: true, color: { argb: "FFE38800" } };
+                titleCell.alignment = { vertical: "middle", horizontal: "left" };
 
-                // 3. Matrix Summary
+                worksheet.mergeCells("C3:I3");
+                const subTitleCell = worksheet.getCell("C3");
+                subTitleCell.value = "Optimizing Today, Growing Tomorrow.";
+                subTitleCell.font = { name: "Arial", size: 12, italic: true, color: { argb: "FFE38800" } };
+
+                // --- 2. METADATA BOX ---
+                // Start Row 5
+                const metaLabels = ["Report By:", "Report For:", "Version:"];
+                const metaValues = ["Operartis Analytics", "ABC-XYZ Analysis", "1.0"];
+                const metaLabels2 = ["Report Date:", "Total SKUs:", "Total Value:"];
+                const metaValues2 = [new Date().toLocaleString(), summary.totalSkus, fmtCurrency(summary.totalValue)];
+
+                for (let i = 0; i < 3; i++) {
+                    const r = 5 + i;
+                    // Left Column
+                    worksheet.getCell(`B${r}`).value = metaLabels[i];
+                    worksheet.getCell(`B${r}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFEFEF' } };
+                    worksheet.getCell(`B${r}`).font = { bold: true };
+                    worksheet.getCell(`B${r}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                    worksheet.getCell(`C${r}`).value = metaValues[i];
+                    worksheet.getCell(`C${r}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                    // Right Column
+                    worksheet.getCell(`E${r}`).value = metaLabels2[i];
+                    worksheet.getCell(`E${r}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFEFEF' } };
+                    worksheet.getCell(`E${r}`).font = { bold: true };
+                    worksheet.getCell(`E${r}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                    worksheet.getCell(`F${r}`).value = metaValues2[i];
+                    worksheet.getCell(`F${r}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                }
+
+                // --- 3. MATRIX SUMMARY ---
                 const matrixStartRow = 10;
-                XLSX.utils.sheet_add_aoa(ws, [["MATRIX SUMMARY"]], { origin: `B${matrixStartRow}` });
+                const mHeader = worksheet.getCell(`B${matrixStartRow}`);
+                mHeader.value = "MATRIX SUMMARY";
+                mHeader.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } };
+                // Using merge for header appearance if desired, currently single cell title
 
-                const matrixHeader = ["", "X (Low Var)", "Y (Med Var)", "Z (High Var)"];
-                const matrixRows = [
-                    ["A (High Val)", matrix['AX']?.count || 0, matrix['AY']?.count || 0, matrix['AZ']?.count || 0],
-                    ["B (Med Val)", matrix['BX']?.count || 0, matrix['BY']?.count || 0, matrix['BZ']?.count || 0],
-                    ["C (Low Val)", matrix['CX']?.count || 0, matrix['CY']?.count || 0, matrix['CZ']?.count || 0]
+                const mHeadRow = worksheet.getRow(matrixStartRow + 1);
+                mHeadRow.values = ["", "", "X (Low Var)", "Y (Med Var)", "Z (High Var)"];
+
+                const matrixData = [
+                    ["", "A (High Val)", matrix['AX']?.count || 0, matrix['AY']?.count || 0, matrix['AZ']?.count || 0],
+                    ["", "B (Med Val)", matrix['BX']?.count || 0, matrix['BY']?.count || 0, matrix['BZ']?.count || 0],
+                    ["", "C (Low Val)", matrix['CX']?.count || 0, matrix['CY']?.count || 0, matrix['CZ']?.count || 0]
                 ];
 
-                XLSX.utils.sheet_add_aoa(ws, [matrixHeader, ...matrixRows], { origin: `B${matrixStartRow + 1}` });
-
-                // 4. Detailed Item Table
-                const tableStartRow = 17;
-                const columns = ["Class", "SKU", "Total Value", "Total Qty", "Avg Demand", "CV", "ABC", "XYZ"];
-                const tableData = analysisData.map(item => [
-                    item.class,
-                    item.sku,
-                    item.totalValue,
-                    item.totalQty,
-                    item.avgDemand,
-                    item.cv,
-                    item.abc,
-                    item.xyz
-                ]);
-
-                XLSX.utils.sheet_add_aoa(ws, [columns, ...tableData], { origin: `B${tableStartRow}` });
-
-                // --- FORMATTING APPLIED ---
-                // Apply styles to cells manually loop
-
-                // Title
-                ws["C2"].s = titleStyle;
-                ws["C3"].s = subtitleStyle;
-
-                // Metadata Box Formatting
-                for (let r = 0; r < 3; r++) {
-                    const R = metaStartRow + r;
-                    // Labels
-                    if (!ws[`B${R}`]) ws[`B${R}`] = { v: "" }; ws[`B${R}`].s = labelStyle;
-                    if (!ws[`E${R}`]) ws[`E${R}`] = { v: "" }; ws[`E${R}`].s = labelStyle;
-                    // Values
-                    if (!ws[`C${R}`]) ws[`C${R}`] = { v: "" }; ws[`C${R}`].s = valueStyle;
-                    if (!ws[`F${R}`]) ws[`F${R}`] = { v: "" }; ws[`F${R}`].s = valueStyle;
-                }
-
-                // Table Header
-                for (let c = 0; c < columns.length; c++) {
-                    const cellRef = XLSX.utils.encode_cell({ r: tableStartRow - 1, c: c + 1 }); // Col B is index 1
-                    if (!ws[cellRef]) ws[cellRef] = { v: "" };
-                    ws[cellRef].s = tableHeaderStyle;
-                }
-
-                // Table Data Border & Conditional Formats
-                tableData.forEach((row, ri) => {
-                    row.forEach((val, ci) => {
-                        const cellRef = XLSX.utils.encode_cell({ r: tableStartRow + ri, c: ci + 1 });
-                        if (!ws[cellRef]) ws[cellRef] = { v: val };
-                        ws[cellRef].s = {
-                            border: { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } },
-                            numFmt: (ci === 2) ? '"$"#,##0' : (ci === 3 || ci === 4) ? '#,##0.0' : (ci === 5) ? '0.00' : undefined
-                        };
-
-                        // Color Coding for Class Column (Index 0)
-                        if (ci === 0) {
-                            let bg = "FFFFFF";
-                            if (val.startsWith('A')) bg = (val.endsWith('X') ? "D1FAE5" : val.endsWith('Y') ? "FEF3C7" : "FFE4E6"); // Emerald-100 / Amber-100 / Rose-100
-                            else if (val.startsWith('B')) bg = (val.endsWith('X') ? "DBEAFE" : val.endsWith('Y') ? "FEF3C7" : "FFE4E6");
-                            else if (val.startsWith('C')) bg = "F1F5F9"; // Slate-100
-
-                            ws[cellRef].s.fill = { fgColor: { rgb: bg } };
-                            ws[cellRef].s.font = { bold: true };
-                        }
-                    });
+                matrixData.forEach((row, idx) => {
+                    const r = worksheet.getRow(matrixStartRow + 2 + idx);
+                    r.values = row;
                 });
 
+                // Style Matrix Header Area
+                for (let c = 3; c <= 5; c++) {
+                    const cell = worksheet.getRow(matrixStartRow + 1).getCell(c);
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF101F3A' } };
+                    cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
+                    cell.alignment = { horizontal: 'center' };
+                }
+
+                // --- 4. DETAILED TABLE ---
+                const tableStartRow = 17;
+                const tableHeader = ["", "Class", "SKU", "Total Value", "Total Qty", "Avg Demand", "CV", "ABC", "XYZ"];
+                const headerRow = worksheet.getRow(tableStartRow);
+                headerRow.values = tableHeader;
+
+                headerRow.eachCell((cell, colNumber) => {
+                    if (colNumber > 1) { // Skip empty A col
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF101F3A' } };
+                        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                        cell.alignment = { horizontal: 'center' };
+                    }
+                });
+
+                // Add Data
+                analysisData.forEach((item, index) => {
+                    const row = worksheet.getRow(tableStartRow + 1 + index);
+                    row.values = [
+                        "",
+                        item.class,
+                        item.sku,
+                        item.totalValue,
+                        item.totalQty,
+                        item.avgDemand,
+                        item.cv,
+                        item.abc,
+                        item.xyz
+                    ];
+
+                    // Formatting
+                    row.getCell(4).numFmt = '"$"#,##0'; // Value
+                    row.getCell(5).numFmt = '#,##0.0';  // Qty
+                    row.getCell(6).numFmt = '#,##0.0';  // Avg
+                    row.getCell(7).numFmt = '0.00';     // CV
+
+                    // Conditional Color for Class (Col 2)
+                    let argb = 'FFFFFFFF';
+                    const c = item.class;
+                    if (c.startsWith('A')) argb = c.endsWith('X') ? 'FFD1FAE5' : c.endsWith('Y') ? 'FFFEF3C7' : 'FFFFE4E6';
+                    else if (c.startsWith('B')) argb = c.endsWith('X') ? 'FFDBEAFE' : c.endsWith('Y') ? 'FFFEF3C7' : 'FFFFE4E6';
+                    else if (c.startsWith('C')) argb = 'FFF1F5F9';
+
+                    const classCell = row.getCell(2);
+                    classCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: argb } };
+                    classCell.font = { bold: true };
+                    classCell.alignment = { horizontal: 'center' };
+                    classCell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                    // General Borders
+                    for (let i = 3; i <= 9; i++) {
+                        row.getCell(i).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    }
+                });
+
+                // --- COPYRIGHT FOOTER ---
+                const footerRowIdx = tableStartRow + 1 + analysisData.length + 1;
+                const footerRow = worksheet.getRow(footerRowIdx);
+                footerRow.getCell(2).value = "© 2025 Operartis Analytics. All rights reserved.";
+                footerRow.getCell(2).font = { italic: true, color: { argb: 'FF888888' }, size: 9 };
+                worksheet.mergeCells(`B${footerRowIdx}:D${footerRowIdx}`);
+
                 // Column Widths
-                ws['!cols'] = [
-                    { wch: 2 },  // A (Margin)
-                    { wch: 10 }, // B (Class)
-                    { wch: 20 }, // C (SKU)
-                    { wch: 15 }, // D (Val)
-                    { wch: 15 }, // E (Qty)
-                    { wch: 15 }, // F (Avg)
-                    { wch: 10 }, // G (CV)
-                    { wch: 8 },  // H (A)
-                    { wch: 8 }   // I (X)
+                worksheet.columns = [
+                    { width: 5 }, // A margin
+                    { width: 12 }, // Class
+                    { width: 25 }, // SKU
+                    { width: 18 }, // Value
+                    { width: 15 }, // Qty
+                    { width: 15 }, // Avg
+                    { width: 10 }, // CV
+                    { width: 8 },  // A
+                    { width: 8 }   // X
                 ];
 
-                XLSX.utils.book_append_sheet(wb, ws, "Analysis Report");
-                XLSX.writeFile(wb, "Operartis_ABC_Activity_Report.xlsx");
+                // --- 5. EXPORT ---
+                const bufferOut = await workbook.xlsx.writeBuffer();
+                const blobOut = new Blob([bufferOut], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blobOut);
+                link.download = `Operartis_ABC_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+                link.click();
             };
 
             // Recalculate Classes whenever sliders or data change
