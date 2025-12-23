@@ -802,6 +802,17 @@
 
             useEffect(() => {
                 const checkConnection = async () => {
+                    // Check if we are running in a local environment
+                    const isLocalDomain = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+                    if (!isLocalDomain) {
+                        // If not local, default immediately to Cloud API and skip local check
+                        setApiUrl(API_ENDPOINTS.PROD);
+                        setConnectionStatus('cloud');
+                        console.log("Running in Cloud environment. Skipping Local API check.");
+                        return;
+                    }
+
                     setConnectionStatus('checking');
                     try {
                         // Try to connect to Local API with a short timeout
