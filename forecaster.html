@@ -137,6 +137,160 @@
         const { useState, useEffect, useRef, useMemo } = React;
         const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart, Bar, BarChart } = window.Recharts;
 
+        // --- TRANSLATIONS ---
+        const TRANSLATIONS = {
+            en: {
+                sidebar: {
+                    source_data: "Source Data",
+                    upload_label: "Upload Data",
+                    configuration: "Configuration",
+                    val_method: "Validation Method",
+                    train_h: "Train Horizon",
+                    test_h: "Test Horizon",
+                    fc_h: "Forecast Horizon",
+                    execute_btn: "Execute Forecast",
+                    processing: "Processing...",
+                    export_btn: "Export Report",
+                    reset_btn: "Reset Application",
+                    footer_title: "Operartis Analytics",
+                    footer_slogan: "Optimizing Today, Growing Tomorrow"
+                },
+                settings: {
+                    title: "Settings",
+                    subtitle: "Configure application preferences.",
+                    theme_mode: "Theme Mode",
+                    language: "Language",
+                    about_us: "About Us",
+                    interface_appearance: "Interface Appearance",
+                    light: "Light Mode",
+                    dark: "Dark Mode",
+                    system: "System Default",
+                    about_title: "About Operartis",
+                    about_slogan: "Optimizing today, Growing tomorrow.",
+                    about_text_1: "Founded in 2025, Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations. This machine-learning forecaster is a testament to our commitment to making advanced analytics accessible.",
+                    about_text_2: "We specialize in Advanced Planning and Scheduling (APS) systems, bridging the gap between raw ERP data and actionable strategic insights."
+                },
+                mapping: {
+                    title: "Map Columns",
+                    date_col: "Date Column",
+                    sku_col: "SKU Column",
+                    val_col: "Value Column",
+                    cancel: "Cancel",
+                    confirm: "Confirm Mapping"
+                },
+                header: {
+                    title: "MACHINE-LEARNING FORECASTER",
+                    local: "LOCAL",
+                    cloud: "CLOUD"
+                },
+                dashboard: {
+                    batch_overview: "Batch Overview",
+                    detailed_view: "Detailed View",
+                    total_skus: "Total SKUs",
+                    total_vol: "Total Forecast Vol",
+                    avg_mae: "Avg. Validation MAE",
+                    avg_mse: "Avg. Validation MSE",
+                    search_placeholder: "Search SKU...",
+                    no_results: "No Results Loaded",
+                    running_algo: "Running Analytics Algorithms",
+                    table_sku: "SKU",
+                    table_status: "Status",
+                    table_best_model: "Best Model",
+                    table_mae: "MAE (Val)",
+                    table_mse: "MSE (Val)",
+                    table_action: "Action",
+                    table_success: "SUCCESS",
+                    view_details: "View Details",
+                    best_model: "Best Model",
+                    val_mse: "Val. MSE"
+                },
+                charts: {
+                    act_train: "Actual (Train)",
+                    act_test: "Actual (Test)",
+                    fitted: "Fitted (Train)",
+                    val_fc: "Validation Forecast",
+                    history: "History",
+                    final_fit: "Final Fit",
+                    future_fc: "Future Forecast"
+                }
+            },
+            vi: {
+                sidebar: {
+                    source_data: "Dữ liệu nguồn",
+                    upload_label: "Tải lên dữ liệu",
+                    configuration: "Cấu hình",
+                    val_method: "Phương pháp kiểm định",
+                    train_h: "Chu kỳ huấn luyện",
+                    test_h: "Chu kỳ thử nghiệm",
+                    fc_h: "Chu kỳ dự báo",
+                    execute_btn: "Chạy dự báo",
+                    processing: "Đang xử lý...",
+                    export_btn: "Xuất báo cáo",
+                    reset_btn: "Đặt lại ứng dụng",
+                    footer_title: "Operartis Analytics",
+                    footer_slogan: "Optimizing Today, Growing Tomorrow"
+                },
+                settings: {
+                    title: "Cài đặt",
+                    subtitle: "Cấu hình tùy chọn ứng dụng.",
+                    theme_mode: "Giao diện",
+                    language: "Ngôn ngữ",
+                    about_us: "Về chúng tôi",
+                    interface_appearance: "Giao diện người dùng",
+                    light: "Chế độ sáng",
+                    dark: "Chế độ tối",
+                    system: "Mặc định hệ thống",
+                    about_title: "OPERARTIS",
+                    about_slogan: "Optimizing today, Growing tomorrow.",
+                    about_text_1: "Được thành lập vào năm 2025, OPERARTIS là một công ty tư vấn và công nghệ chuyên dụng nhằm giúp các doanh nghiệp hợp lý hóa, tối ưu hóa và chuyển đổi hoạt động của họ. Công cụ dự báo máy học này là minh chứng cho cam kết của chúng tôi trong việc làm cho các công cụ phân tích nâng cao trở nên dễ tiếp cận.",
+                    about_text_2: "Chúng tôi chuyên về các hệ thống Lập kế hoạch và Lên lịch trình nâng cao (APS), thu hẹp khoảng cách giữa dữ liệu ERP thô và thông tin chiến lược có thể được biến đổi thành hành động hỗ trợ đưa ra quyết định."
+                },
+                mapping: {
+                    title: "Chọn cột dữ liệu",
+                    date_col: "Cột ngày tháng",
+                    sku_col: "Cột mã hàng (SKU)",
+                    val_col: "Cột giá trị",
+                    cancel: "Hủy bỏ",
+                    confirm: "Xác nhận"
+                },
+                header: {
+                    title: "MACHINE-LEARNING FORECASTER",
+                    local: "LOCAL",
+                    cloud: "CLOUD"
+                },
+                dashboard: {
+                    batch_overview: "Tổng quan",
+                    detailed_view: "Chi tiết",
+                    total_skus: "Tổng SKU",
+                    total_vol: "Tổng lượng dự báo",
+                    avg_mae: "MAE trung bình (Val)",
+                    avg_mse: "MSE trung bình (Val)",
+                    search_placeholder: "Tìm kiếm SKU...",
+                    no_results: "Chưa có kết quả",
+                    running_algo: "Đang chạy thuật toán phân tích",
+                    table_sku: "Mã hàng (SKU)",
+                    table_status: "Trạng thái",
+                    table_best_model: "Mô hình tốt nhất",
+                    table_mae: "MAE (Val)",
+                    table_mse: "MSE (Val)",
+                    table_action: "Hành động",
+                    table_success: "THÀNH CÔNG",
+                    view_details: "Xem chi tiết",
+                    best_model: "Mô hình tốt nhất",
+                    val_mse: "MSE (Val)"
+                },
+                charts: {
+                    act_train: "Thực tế (Train)",
+                    act_test: "Thực tế (Test)",
+                    fitted: "Khớp (Train)",
+                    val_fc: "Dự báo thử nghiệm",
+                    history: "Lịch sử",
+                    final_fit: "Khớp cuối cùng",
+                    future_fc: "Dự báo tương lai"
+                }
+            }
+        };
+
         // --- ICONS ---
         const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg>;
         const PlayIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
@@ -186,7 +340,7 @@
             return num.toLocaleString('en-US', { minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
         };
 
-        const ForecastingLoader = () => (
+        const ForecastingLoader = ({ t }) => (
             <div className="h-full flex flex-col items-center justify-center gap-6 animate-fade-in">
                 <div className="relative">
                     <div className="absolute inset-0 bg-brand-gold/20 blur-xl rounded-full animate-pulse"></div>
@@ -196,7 +350,7 @@
                     </svg>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                    <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">Running Analytics Algorithms</h3>
+                    <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">{t('dashboard.running_algo')}</h3>
                     <div className="flex gap-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce" style={{ animationDelay: '0ms' }}></div>
                         <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -206,7 +360,7 @@
             </div>
         );
 
-        const KPICards = ({ results, activeTab, setActiveTab, currentSku, handleSkuSelect, cycleSku }) => {
+        const KPICards = ({ results, activeTab, setActiveTab, currentSku, handleSkuSelect, cycleSku, t }) => {
             const hasData = results && results.length > 0;
             const totalSeries = hasData ? results.length : '-';
             const avgMse = hasData ? results.reduce((sum, r) => sum + (r.mse_validation || 0), 0) / results.length : '-';
@@ -234,14 +388,14 @@
                 <div className="h-full flex items-center w-full">
                     {/* Tabs Embedded */}
                     <div className="flex gap-2 px-4 border-r border-white/20 dark:border-white/10 h-full items-center shrink-0 bg-white/20 dark:bg-white/5 backdrop-blur-sm">
-                        <button onClick={() => setActiveTab("overview")} className={`flex items-center justify-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all ${activeTab === 'overview' ? 'bg-brand-gold/90 text-white shadow-lg backdrop-blur-md ring-1 ring-white/20' : 'text-slate-600 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-white/10 hover:backdrop-blur-sm'}`}><LayoutDashboardIcon className="w-3 h-3" /> Batch Overview</button>
-                        <button onClick={() => setActiveTab("details")} className={`flex items-center justify-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all ${activeTab === 'details' ? 'bg-brand-gold/90 text-white shadow-lg backdrop-blur-md ring-1 ring-white/20' : 'text-slate-600 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-white/10 hover:backdrop-blur-sm'}`}><ChartLineIcon className="w-3 h-3" /> Detailed View</button>
+                        <button onClick={() => setActiveTab("overview")} className={`flex items-center justify-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all ${activeTab === 'overview' ? 'bg-brand-gold/90 text-white shadow-lg backdrop-blur-md ring-1 ring-white/20' : 'text-slate-600 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-white/10 hover:backdrop-blur-sm'}`}><LayoutDashboardIcon className="w-3 h-3" /> {t('dashboard.batch_overview')}</button>
+                        <button onClick={() => setActiveTab("details")} className={`flex items-center justify-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all ${activeTab === 'details' ? 'bg-brand-gold/90 text-white shadow-lg backdrop-blur-md ring-1 ring-white/20' : 'text-slate-600 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-white/10 hover:backdrop-blur-sm'}`}><ChartLineIcon className="w-3 h-3" /> {t('dashboard.detailed_view')}</button>
                     </div>
 
-                    <MetricTile label="Total SKUs" value={totalSeries} />
-                    <MetricTile label="Total Forecast Vol" value={fmtNumber(totalForecastVolume, 0, 0)} />
-                    <MetricTile label="Avg. Validation MAE" value={fmtNumber(avgMae, 0, 0)} />
-                    <MetricTile label="Avg. Validation MSE" value={fmtNumber(avgMse, 0, 0)} />
+                    <MetricTile label={t('dashboard.total_skus')} value={totalSeries} />
+                    <MetricTile label={t('dashboard.total_vol')} value={fmtNumber(totalForecastVolume, 0, 0)} />
+                    <MetricTile label={t('dashboard.avg_mae')} value={fmtNumber(avgMae, 0, 0)} />
+                    <MetricTile label={t('dashboard.avg_mse')} value={fmtNumber(avgMse, 0, 0)} />
 
                     {/* Search Embedded */}
                     <div className="flex items-center gap-2 pl-6 pr-4 flex-1 justify-end">
@@ -258,7 +412,7 @@
                                 onChange={(e) => setLocalSku(e.target.value)}
                                 onFocus={() => setSearchActive(true)}
                                 onBlur={() => setSearchActive(false)}
-                                placeholder="Search SKU..."
+                                placeholder={t('dashboard.search_placeholder')}
                             />
                         </form>
                     </div>
@@ -268,29 +422,29 @@
 
 
 
-        const BatchOverview = ({ results, onSelectSku }) => {
+        const BatchOverview = ({ results, onSelectSku, t }) => {
             return (
                 <div className="w-full h-full overflow-auto border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 shadow-sm">
                     <table className="w-full text-left text-xs">
                         <thead className="bg-slate-50 dark:bg-slate-950 sticky top-0 z-10">
                             <tr>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">SKU</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">Best Model</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-right">MAE (Val)</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-right">MSE (Val)</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-center">Action</th>
+                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_sku')}</th>
+                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_status')}</th>
+                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_best_model')}</th>
+                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-right">{t('dashboard.table_mae')}</th>
+                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-right">{t('dashboard.table_mse')}</th>
+                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-center">{t('dashboard.table_action')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {results.map((r, i) => (
                                 <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                     <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
-                                    <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">SUCCESS</span></td>
+                                    <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">{t('dashboard.table_success')}</span></td>
                                     <td className="p-3 text-slate-600 dark:text-slate-300 uppercase">{r.best_ts_model}</td>
                                     <td className="p-3 text-right font-mono dark:text-slate-300">{fmtNumber(r.mae_validation, 0, 0)}</td>
                                     <td className="p-3 text-right font-mono dark:text-slate-300">{fmtNumber(r.mse_validation, 0, 0)}</td>
-                                    <td className="p-3 text-center"><button onClick={() => onSelectSku(r.sku)} className="text-brand-gold hover:underline font-bold">View Details</button></td>
+                                    <td className="p-3 text-center"><button onClick={() => onSelectSku(r.sku)} className="text-brand-gold hover:underline font-bold">{t('dashboard.view_details')}</button></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -299,7 +453,7 @@
             );
         };
 
-        const BacktestChart = ({ data, syncId, isDark }) => {
+        const BacktestChart = ({ data, syncId, isDark, t }) => {
             if (!data) return null;
             return (
                 <ResponsiveContainer width="100%" height="100%">
@@ -327,16 +481,16 @@
                         <YAxis axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} />
                         <Tooltip contentStyle={{ backgroundColor: isDark ? "#0f172a" : "#fff", borderColor: isDark ? "#334155" : "#e2e8f0", fontSize: '12px', color: isDark ? '#fff' : '#000' }} />
                         <Legend verticalAlign="top" height={36} wrapperStyle={{ color: isDark ? '#cbd5e1' : '#64748b' }} />
-                        <Area type="monotone" dataKey="actual_train" name="Actual (Train)" stroke="#64748b" fill="url(#gd_bt_actual_train)" strokeWidth={2} isAnimationActive={false} />
-                        <Area type="monotone" dataKey="actual_test" name="Actual (Test)" stroke="#10b981" fill="url(#gd_bt_actual_test)" strokeWidth={2} isAnimationActive={false} />
-                        <Area type="monotone" dataKey="fitted" name="Fitted (Train)" stroke="#94a3b8" fill="url(#gd_bt_fitted)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
-                        <Area type="monotone" dataKey="val_forecast" name="Validation Forecast" stroke="#f59e0b" fill="url(#gd_bt_val_forecast)" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false} />
+                        <Area type="monotone" dataKey="actual_train" name={t('charts.act_train')} stroke="#64748b" fill="url(#gd_bt_actual_train)" strokeWidth={2} isAnimationActive={false} />
+                        <Area type="monotone" dataKey="actual_test" name={t('charts.act_test')} stroke="#10b981" fill="url(#gd_bt_actual_test)" strokeWidth={2} isAnimationActive={false} />
+                        <Area type="monotone" dataKey="fitted" name={t('charts.fitted')} stroke="#94a3b8" fill="url(#gd_bt_fitted)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
+                        <Area type="monotone" dataKey="val_forecast" name={t('charts.val_fc')} stroke="#f59e0b" fill="url(#gd_bt_val_forecast)" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false} />
                     </ComposedChart>
                 </ResponsiveContainer>
             );
         };
 
-        const ForecastChart = ({ data, syncId, isDark }) => {
+        const ForecastChart = ({ data, syncId, isDark, t }) => {
             if (!data) return null;
             // Merge history and future for visualization
             // data is array of objects
@@ -362,15 +516,15 @@
                         <YAxis axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} />
                         <Tooltip contentStyle={{ backgroundColor: isDark ? "#0f172a" : "#fff", borderColor: isDark ? "#334155" : "#e2e8f0", fontSize: '12px', color: isDark ? '#fff' : '#000' }} />
                         <Legend verticalAlign="top" height={36} wrapperStyle={{ color: isDark ? '#cbd5e1' : '#64748b' }} />
-                        <Area type="monotone" dataKey="actual_history" name="History" stroke="#64748b" fill="url(#gd_fc_history)" strokeWidth={2} isAnimationActive={false} />
-                        <Area type="monotone" dataKey="final_fit" name="Final Fit" stroke="#94a3b8" fill="url(#gd_fc_final_fit)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
-                        <Area type="monotone" dataKey="future_forecast" name="Future Forecast" stroke="#f59e0b" fill="url(#gd_fc_future)" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false} />
+                        <Area type="monotone" dataKey="actual_history" name={t('charts.history')} stroke="#64748b" fill="url(#gd_fc_history)" strokeWidth={2} isAnimationActive={false} />
+                        <Area type="monotone" dataKey="final_fit" name={t('charts.final_fit')} stroke="#94a3b8" fill="url(#gd_fc_final_fit)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
+                        <Area type="monotone" dataKey="future_forecast" name={t('charts.future_fc')} stroke="#f59e0b" fill="url(#gd_fc_future)" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false} />
                     </ComposedChart>
                 </ResponsiveContainer>
             );
         };
 
-        const MappingModal = ({ headers, isOpen, onClose, onConfirm }) => {
+        const MappingModal = ({ headers, isOpen, onClose, onConfirm, t }) => {
             const [sku, setSku] = useState('');
             const [date, setDate] = useState('');
             const [val, setVal] = useState('');
@@ -399,17 +553,17 @@
                     <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm modal-backdrop transition-opacity" onClick={onClose}></div>
                     <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-xl shadow-2xl w-full max-w-sm border border-white/20 dark:border-white/10 flex flex-col relative animate-slide-up z-10 ring-1 ring-black/5 dark:ring-white/5">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wide">Map Columns</h2>
+                            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wide">{t('mapping.title')}</h2>
                             <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><XIcon /></button>
                         </div>
                         <div className="p-4 space-y-4">
-                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Date Column</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={date} onChange={e => setDate(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
-                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">SKU Column</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={sku} onChange={e => setSku(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
-                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Value Column</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={val} onChange={e => setVal(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.date_col')}</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={date} onChange={e => setDate(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.sku_col')}</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={sku} onChange={e => setSku(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.val_col')}</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={val} onChange={e => setVal(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
                         </div>
                         <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
-                            <button onClick={onClose} className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700">Cancel</button>
-                            <button onClick={handleConfirm} disabled={!sku || !date || !val} className="px-3 py-1.5 bg-brand-gold text-white text-xs font-bold rounded hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Confirm Mapping</button>
+                            <button onClick={onClose} className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700">{t('mapping.cancel')}</button>
+                            <button onClick={handleConfirm} disabled={!sku || !date || !val} className="px-3 py-1.5 bg-brand-gold text-white text-xs font-bold rounded hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{t('mapping.confirm')}</button>
                         </div>
                     </div>
                 </div>
@@ -417,7 +571,7 @@
         };
 
 
-        const SettingsModal = ({ isOpen, onClose, theme, setTheme }) => {
+        const SettingsModal = ({ isOpen, onClose, theme, setTheme, lang, setLang, t }) => {
             const [copied, setCopied] = useState(null);
             const [activeTab, setActiveTab] = useState("theme");
 
@@ -441,8 +595,8 @@
                                     <SettingsIcon />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Settings</h2>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">Configure application preferences.</p>
+                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('settings.title')}</h2>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.subtitle')}</p>
                                 </div>
                             </div>
                             <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
@@ -458,13 +612,19 @@
                                     onClick={() => setActiveTab("theme")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'theme' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
-                                    <PaletteIcon /> Theme Mode
+                                    <PaletteIcon /> {t('settings.theme_mode')}
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("lang")}
+                                    className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'lang' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                >
+                                    <div className="w-5 h-5 flex items-center justify-center font-serif font-black text-lg leading-none">Aa</div> {t('settings.language')}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab("about")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'about' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
-                                    <InfoIcon /> About Us
+                                    <InfoIcon /> {t('settings.about_us')}
                                 </button>
                             </div>
 
@@ -473,19 +633,45 @@
                                 {activeTab === 'theme' && (
                                     <div className="space-y-6 animate-fade-in">
                                         <div>
-                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Interface Appearance</h3>
+                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{t('settings.interface_appearance')}</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <button onClick={() => setTheme('light')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'light' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-white rounded-full shadow-sm"><SunIcon /></div>
-                                                    <span className="text-sm font-bold">Light Mode</span>
+                                                    <span className="text-sm font-bold">{t('settings.light')}</span>
                                                 </button>
                                                 <button onClick={() => setTheme('dark')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'dark' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-slate-800 text-white rounded-full shadow-sm"><MoonIcon /></div>
-                                                    <span className="text-sm font-bold">Dark Mode</span>
+                                                    <span className="text-sm font-bold">{t('settings.dark')}</span>
                                                 </button>
                                                 <button onClick={() => setTheme('system')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'system' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full shadow-sm"><SystemIcon /></div>
-                                                    <span className="text-sm font-bold">System Default</span>
+                                                    <span className="text-sm font-bold">{t('settings.system')}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'lang' && (
+                                    <div className="space-y-6 animate-fade-in">
+                                        <div>
+                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{t('settings.language')}</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <button onClick={() => setLang('en')} className={`p-4 rounded-lg border-2 flex items-center gap-4 transition-all ${lang === 'en' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs ring-2 ring-white dark:ring-slate-800 shadow-sm">EN</div>
+                                                    <div className="text-left">
+                                                        <div className="font-bold">English</div>
+                                                        <div className="text-xs opacity-70">United States</div>
+                                                    </div>
+                                                    {lang === 'en' && <div className="ml-auto text-brand-gold"><CheckIcon /></div>}
+                                                </button>
+                                                <button onClick={() => setLang('vi')} className={`p-4 rounded-lg border-2 flex items-center gap-4 transition-all ${lang === 'vi' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                    <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs ring-2 ring-white dark:ring-slate-800 shadow-sm">VI</div>
+                                                    <div className="text-left">
+                                                        <div className="font-bold">Vietnamese</div>
+                                                        <div className="text-xs opacity-70">Tiếng Việt</div>
+                                                    </div>
+                                                    {lang === 'vi' && <div className="ml-auto text-brand-gold"><CheckIcon /></div>}
                                                 </button>
                                             </div>
                                         </div>
@@ -498,16 +684,16 @@
                                             <div className="inline-block p-4 bg-brand-gold/10 rounded-full mb-2">
                                                 <img src="./icononly_transparent_quadratic.png" className="w-12 h-12 object-contain mx-auto" onError={(e) => e.target.style.display = 'none'} />
                                             </div>
-                                            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">About Operartis</h2>
-                                            <p className="text-sm text-brand-gold font-medium uppercase tracking-widest">Optimizing today, Growing tomorrow.</p>
+                                            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">{t('settings.about_title')}</h2>
+                                            <p className="text-sm text-brand-gold font-medium uppercase tracking-widest">{t('settings.about_slogan')}</p>
                                         </div>
 
                                         <div className="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed space-y-6">
                                             <p>
-                                                Founded in 2025, Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations. This machine-learning forecaster is a testament to our commitment to making advanced analytics accessible.
+                                                {t('settings.about_text_1')}
                                             </p>
                                             <p>
-                                                We specialize in Advanced Planning and Scheduling (APS) systems, bridging the gap between raw ERP data and actionable strategic insights.
+                                                {t('settings.about_text_2')}
                                             </p>
                                         </div>
                                     </div>
@@ -585,6 +771,19 @@
                 applyTheme();
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
             }, [theme]);
+
+            // Language State
+            const [lang, setLang] = useState(() => localStorage.getItem('lang') || 'en');
+            useEffect(() => { localStorage.setItem('lang', lang); }, [lang]);
+
+            const t = (key) => {
+                const keys = key.split('.');
+                let val = TRANSLATIONS[lang];
+                for (const k of keys) {
+                    val = val ? val[k] : null;
+                }
+                return val || key;
+            };
 
             useEffect(() => { const t = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(t); }, []);
 
@@ -758,7 +957,7 @@
 
             return (
                 <div className="flex h-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
-                    <MappingModal headers={availableCols} isOpen={isMappingModalOpen} onClose={() => setIsMappingModalOpen(false)} onConfirm={handleMappingConfirm} />
+                    <MappingModal headers={availableCols} isOpen={isMappingModalOpen} onClose={() => setIsMappingModalOpen(false)} onConfirm={handleMappingConfirm} t={t} />
                     {/* SIDEBAR */}
                     <aside className={`${isFullScreen ? 'hidden' : 'flex'} fixed md:relative inset-y-0 left-0 z-50 w-64 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-white/20 dark:border-white/10 flex flex-col h-full shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
                         <div className="h-16 flex items-center justify-center px-4 border-b border-white/20 dark:border-white/10 shrink-0 bg-white/50 dark:bg-white/5 gap-2 relative">
@@ -772,7 +971,7 @@
                         <div className="flex-1 overflow-y-auto scroller p-3 space-y-6">
                             {/* 1. Source Data */}
                             <div>
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">Source Data<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
                                 <div className={`relative border border-dashed rounded px-3 py-6 text-center transition-colors group ${file ? (dateCol && skuCol && valCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
                                     <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
                                     <div onClick={() => !file && fileInputRef.current.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
@@ -800,7 +999,7 @@
                                         ) : (
                                             <>
                                                 <UploadIcon className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-1" />
-                                                <div className="text-xs text-slate-500 font-medium">Upload Data</div>
+                                                <div className="text-xs text-slate-500 font-medium">{t('sidebar.upload_label')}</div>
                                             </>
                                         )}
                                     </div>
@@ -809,15 +1008,15 @@
 
                             {/* 2. Configuration */}
                             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">Configuration<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
                                 <div className="space-y-3">
                                     <div>
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Validation Method</label>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.val_method')}</label>
                                         <select value={validationMethod} onChange={(e) => setValidationMethod(e.target.value)} className="w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors"><option value="simple">Simple Split (Fast)</option><option value="walk_forward">Walk-Forward (Robust)</option><option value="rolling_window">Rolling Window (Strict)</option></select>
                                     </div>
                                     <div className="flex gap-2">
                                         <div className="flex-1">
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Train Horizon</label>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.train_h')}</label>
                                             <input
                                                 type="number"
                                                 value={trainHorizon}
@@ -827,7 +1026,7 @@
                                             />
                                         </div>
                                         <div className="flex-1">
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Test Horizon</label>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.test_h')}</label>
                                             <input
                                                 type="number"
                                                 value={testHorizon}
@@ -839,7 +1038,7 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Forecast Horizon</label>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.fc_h')}</label>
                                         <input
                                             type="number"
                                             value={forecastSteps}
@@ -851,10 +1050,10 @@
                                     </div>
                                     <button onClick={handleExecute} disabled={!file || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}>
                                         {isPolling ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
-                                        {isPolling ? 'Processing...' : 'Execute Forecast'}
+                                        {isPolling ? t('sidebar.processing') : t('sidebar.execute_btn')}
                                     </button>
                                     <button onClick={handleExport} disabled={!file} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}>
-                                        <DownloadIcon /> Export Report
+                                        <DownloadIcon /> {t('sidebar.export_btn')}
                                     </button>
                                 </div>
                             </div>
@@ -862,7 +1061,7 @@
                         </div>
 
                         <div className="px-6 pb-4 pt-2 bg-transparent border-t border-white/20 dark:border-white/10">
-                            <button onClick={handleReset} className="w-full py-2 text-xxs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2 transition-all"><RefreshIcon /> Reset Application</button>
+                            <button onClick={handleReset} className="w-full py-2 text-xxs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2 transition-all"><RefreshIcon /> {t('sidebar.reset_btn')}</button>
                         </div>
 
                         {/* Sidebar Footer */}
@@ -876,10 +1075,10 @@
                     <div className="flex flex-col flex-grow min-w-0 transition-all relative">
                         <header className={`h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-b border-white/20 dark:border-white/10 flex items-center justify-between px-6 shrink-0 shadow-sm z-20 relative ${isFullScreen ? 'hidden' : 'flex'}`}>
                             <div className="flex items-center gap-4"><button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden text-slate-500"><MenuIcon /></button></div>
-                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest whitespace-nowrap">MACHINE-LEARNING FORECASTER</div>
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest whitespace-nowrap">{t('header.title')}</div>
                             <div className="flex items-center gap-4">
                                 <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
-                                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${connectionStatus === 'local' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-sky-50 text-sky-600 border-sky-200'}`}><ServerIcon /><span>{connectionStatus === 'local' ? 'LOCAL' : 'CLOUD'}</span></div>
+                                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${connectionStatus === 'local' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-sky-50 text-sky-600 border-sky-200'}`}><ServerIcon /><span>{connectionStatus === 'local' ? t('header.local') : t('header.cloud')}</span></div>
                                     <div className="w-px h-4 bg-slate-300 mx-2"></div><ClockIcon /><span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
                                 <button onClick={() => setIsSettingsOpen(true)} className="text-slate-400 hover:text-brand-gold"><SettingsIcon /></button>
@@ -889,23 +1088,23 @@
                         <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full h-full overflow-hidden ${isFullScreen ? 'hidden' : 'flex'}`}>
                             {/* KPI BAR */}
                             <div className="min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex items-center shrink-0 shadow-sm overflow-x-auto relative z-20">
-                                <KPICards results={batchResults} activeTab={activeTab} setActiveTab={setActiveTab} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} />
+                                <KPICards results={batchResults} activeTab={activeTab} setActiveTab={setActiveTab} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
                             </div>
 
                             {/* CONTENT AREA */}
                             <div className="flex-1 p-4 relative overflow-y-auto scroller">
                                 {!batchResults && (
                                     isPolling ? (
-                                        <ForecastingLoader />
+                                        <ForecastingLoader t={t} />
                                     ) : (
                                         <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600">
                                             <div className="w-16 h-16 border-2 border-dashed rounded flex items-center justify-center mb-2"><LayoutDashboardIcon /></div>
-                                            <span className="text-xs font-bold uppercase tracking-widest">No Results Loaded</span>
+                                            <span className="text-xs font-bold uppercase tracking-widest">{t('dashboard.no_results')}</span>
                                         </div>
                                     )
                                 )}
 
-                                {batchResults && activeTab === 'overview' && <BatchOverview results={batchResults} onSelectSku={handleSkuSelect} />}
+                                {batchResults && activeTab === 'overview' && <BatchOverview results={batchResults} onSelectSku={handleSkuSelect} t={t} />}
 
                                 {batchResults && activeTab === 'details' && skuData && (
                                     <div className="h-full flex flex-col gap-4">
@@ -915,11 +1114,11 @@
                                                     {/* Metrics Overlay */}
                                                     <div className="absolute top-0 right-2 z-10 flex items-center gap-4 bg-white/40 dark:bg-white/5 p-2 rounded-xl backdrop-blur-md shadow-lg border border-white/20 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5">
                                                         <div className="flex flex-col items-end">
-                                                            <span className="text-[10px] uppercase font-bold text-slate-400">Best Model</span>
+                                                            <span className="text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
                                                             <span className="text-xs font-bold text-brand-gold">{skuData.best_ts_model.toUpperCase()}</span>
                                                         </div>
                                                         <div className="flex flex-col items-end">
-                                                            <span className="text-[10px] uppercase font-bold text-slate-400">Val. MSE</span>
+                                                            <span className="text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
                                                             <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
                                                         </div>
                                                     </div>
@@ -929,10 +1128,10 @@
                                                         <span className="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight mx-1">{skuData.sku}</span>
                                                         <button onClick={() => cycleSku(1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"><ChevronRightIcon /></button>
                                                     </div>
-                                                    <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} />
+                                                    <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
                                                 </div>
                                                 <div className="flex-1 relative">
-                                                    <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} />
+                                                    <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
                                                 </div>
                                             </div>
                                         </div>
@@ -945,7 +1144,7 @@
                     {/* FULL SCREEN */}
 
 
-                    <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} />
+                    <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} t={t} />
                 </div>
             );
         };
