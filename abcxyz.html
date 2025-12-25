@@ -177,6 +177,161 @@
         const fmtCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
         const fmtNum = (val, d = 2) => new Intl.NumberFormat('en-US', { maximumFractionDigits: d }).format(val);
 
+        const TRANSLATIONS = {
+            en: {
+                sidebar: {
+                    import_title: "Data Import",
+                    upload_placeholder: "Upload Data",
+                    loaded: "Loaded",
+                    config_title: "Configuration",
+                    abc_class: "ABC Class (Pareto)",
+                    xyz_class: "XYZ Class (CV)",
+                    top: "Top",
+                    next: "Next",
+                    reset_btn: "Reset All",
+                    export_btn: "Export Report",
+                    footer_title: "Operartis Analytics",
+                    footer_slogan: "Optimizing Today, Growing Tomorrow"
+                },
+                header: {
+                    title: "ABC-XYZ ANALYSIS"
+                },
+                tabs: {
+                    dashboard: "Matrix Dashboard",
+                    list: "Item List",
+                    search_placeholder: "Search SKU...",
+                    total_val: "Total Inventory Value"
+                },
+                dashboard: {
+                    empty_title: "Ready to Analyze",
+                    empty_desc: "Upload your inventory Excel file to generate the ABC-XYZ matrix, identify critical items, and optimize your supply chain policies.",
+                    matrix_title: "Inventory Matrix",
+                    matrix_subtitle: "SKU Count & Value %",
+                    pareto_title: "Pareto Curve",
+                    pareto_xlabel: "% of SKUs",
+                    pareto_ylabel: "Cumulative Value %",
+                    pareto_caption: "Cumulative Value Distribution",
+                    legend_stable: "Stable (X)",
+                    legend_fluctuating: "Fluctuating (Y)",
+                    legend_volatile: "Volatile (Z)",
+                    sku_label: "SKUs",
+                    val_label: "Val",
+                    qty_label: "Qty"
+                },
+                list: {
+                    col_class: "Class",
+                    col_sku: "SKU",
+                    col_val: "Total Value",
+                    col_cv: "Demand Vol (CV)",
+                    col_avg: "Avg Demand",
+                    col_pattern: "Demand Pattern",
+                    showing_msg: "Showing first 100 of",
+                    items_msg: "items. Filter to see more."
+                },
+                settings: {
+                    title: "Settings",
+                    subtitle: "Configure application preferences.",
+                    theme_mode: "Theme Mode",
+                    about_us: "About Us",
+                    interface_appearance: "Interface Appearance",
+                    light: "Light Mode",
+                    dark: "Dark Mode",
+                    system: "System Default",
+                    // Keeping About Us content untranslated as per previous preference for coherence, or translating basic headers?
+                    // User wanted specific brand text EN. I will translate generic text but keep brand text EN if mixed.
+                    // For now, I will translate the headers and leave long text EN if unsure, but user said "translate from english to vietnamese".
+                    // I will provide full VI translation for generic parts.
+                    language: "Language"
+                },
+                mapping: {
+                    title: "Map Your Data Columns",
+                    subtitle: "Select which columns represent what data.",
+                    sku_col: "Item ID / SKU Column",
+                    cost_col: "Unit Cost Column",
+                    demand_cols: "Demand Data Columns (Select all that apply)",
+                    select_all: "Select All Remaining",
+                    selected_msg: "*Selected:",
+                    cols_msg: "columns. These will be summed to calculate total demand.",
+                    cancel: "Cancel",
+                    analyze: "Analyze Data"
+                }
+            },
+            vi: {
+                sidebar: {
+                    import_title: "Nhập dữ liệu",
+                    upload_placeholder: "Tải lên dữ liệu",
+                    loaded: "Đã tải",
+                    config_title: "Cấu hình",
+                    abc_class: "Phân loại ABC (Pareto)",
+                    xyz_class: "Phân loại XYZ (CV)",
+                    top: "Top",
+                    next: "Tiếp",
+                    reset_btn: "Đặt lại tất cả",
+                    export_btn: "Xuất báo cáo",
+                    footer_title: "Operartis Analytics",
+                    footer_slogan: "Optimizing Today, Growing Tomorrow"
+                },
+                header: {
+                    title: "PHÂN TÍCH ABC-XYZ"
+                },
+                tabs: {
+                    dashboard: "Bảng điều khiển",
+                    list: "Danh sách mặt hàng",
+                    search_placeholder: "Tìm kiếm SKU...",
+                    total_val: "Tổng giá trị tồn kho"
+                },
+                dashboard: {
+                    empty_title: "Sẵn sàng phân tích",
+                    empty_desc: "Tải lên tệp Excel tồn kho của bạn để tạo ma trận ABC-XYZ, xác định các mặt hàng quan trọng và tối ưu hóa chính sách chuỗi cung ứng.",
+                    matrix_title: "Ma trận tồn kho",
+                    matrix_subtitle: "Số lượng SKU & % Giá trị",
+                    pareto_title: "Đường cong Pareto",
+                    pareto_xlabel: "% số lượng SKU",
+                    pareto_ylabel: "% Giá trị tích lũy",
+                    pareto_caption: "Phân phối giá trị tích lũy",
+                    legend_stable: "Ổn định (X)",
+                    legend_fluctuating: "Biến động (Y)",
+                    legend_volatile: "Bất định (Z)",
+                    sku_label: "SKU",
+                    val_label: "Giá trị",
+                    qty_label: "SL"
+                },
+                list: {
+                    col_class: "Phân loại",
+                    col_sku: "SKU",
+                    col_val: "Tổng giá trị",
+                    col_cv: "Biến động cầu (CV)",
+                    col_avg: "Nhu cầu TB",
+                    col_pattern: "Mô hình cầu",
+                    showing_msg: "Hiển thị 100 mục đầu tiên trong",
+                    items_msg: "mục. Lọc để xem thêm."
+                },
+                settings: {
+                    title: "Cài đặt",
+                    subtitle: "Cấu hình tùy chọn ứng dụng.",
+                    theme_mode: "Giao diện",
+                    about_us: "Về chúng tôi",
+                    interface_appearance: "Giao diện người dùng",
+                    light: "Chế độ sáng",
+                    dark: "Chế độ tối",
+                    system: "Mặc định hệ thống",
+                    language: "Ngôn ngữ"
+                },
+                mapping: {
+                    title: "Ánh xạ cột dữ liệu",
+                    subtitle: "Chọn cột đại diện cho dữ liệu nào.",
+                    sku_col: "Cột Mã hàng / SKU",
+                    cost_col: "Cột Đơn giá vốn",
+                    demand_cols: "Cột Dữ liệu Nhu cầu (Chọn tất cả các cột liên quan)",
+                    select_all: "Chọn tất cả còn lại",
+                    selected_msg: "*Đã chọn:",
+                    cols_msg: "cột. Các cột này sẽ được cộng gộp để tính tổng nhu cầu.",
+                    cancel: "Hủy bỏ",
+                    analyze: "Phân tích dữ liệu"
+                }
+            }
+        };
+
         // --- COMPONENTS ---
 
         // Custom Tooltip for Pareto Chart
@@ -203,7 +358,7 @@
         };
 
         // Settings Modal Component
-        const SettingsModal = ({ isOpen, onClose, theme, setTheme }) => {
+        const SettingsModal = ({ isOpen, onClose, theme, setTheme, lang, setLang, t }) => {
             const [activeTab, setActiveTab] = useState("theme");
 
             useEffect(() => {
@@ -223,8 +378,8 @@
                                     <SettingsIcon />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Settings</h2>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">Configure application preferences.</p>
+                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('settings.title')}</h2>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.subtitle')}</p>
                                 </div>
                             </div>
                             <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
@@ -240,13 +395,20 @@
                                     onClick={() => setActiveTab("theme")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'theme' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
-                                    <PaletteIcon /> Theme Mode
+                                    <PaletteIcon /> {t('settings.theme_mode')}
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("lang")}
+                                    className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'lang' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" x2="22" y1="12" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+                                    {t('settings.language')}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab("about")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'about' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
-                                    <InfoIcon /> About Us
+                                    <InfoIcon /> {t('settings.about_us')}
                                 </button>
                             </div>
 
@@ -255,21 +417,49 @@
                                 {activeTab === 'theme' && (
                                     <div className="space-y-6 animate-fade-in">
                                         <div>
-                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Interface Appearance</h3>
+                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{t('settings.interface_appearance')}</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <button onClick={() => setTheme('light')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'light' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-white rounded-full shadow-sm"><SunIcon /></div>
-                                                    <span className="text-sm font-bold">Light Mode</span>
+                                                    <span className="text-sm font-bold">{t('settings.light')}</span>
                                                 </button>
                                                 <button onClick={() => setTheme('dark')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'dark' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-slate-800 text-white rounded-full shadow-sm"><MoonIcon /></div>
-                                                    <span className="text-sm font-bold">Dark Mode</span>
+                                                    <span className="text-sm font-bold">{t('settings.dark')}</span>
                                                 </button>
                                                 <button onClick={() => setTheme('system')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'system' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full shadow-sm"><SystemIcon /></div>
-                                                    <span className="text-sm font-bold">System Default</span>
+                                                    <span className="text-sm font-bold">{t('settings.system')}</span>
                                                 </button>
                                             </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'lang' && (
+                                    <div className="space-y-6 animate-fade-in">
+                                        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{t('settings.language')}</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <button onClick={() => setLang('en')} className={`p-4 rounded-lg border-2 flex items-center justify-between transition-all ${lang === 'en' ? 'border-brand-gold bg-brand-gold/5' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl">🇺🇸</span>
+                                                    <div className="text-left">
+                                                        <div className={`font-bold ${lang === 'en' ? 'text-brand-dark dark:text-brand-gold' : 'text-slate-700 dark:text-slate-200'}`}>English</div>
+                                                        <div className="text-xs text-slate-500">US English</div>
+                                                    </div>
+                                                </div>
+                                                {lang === 'en' && <div className="w-3 h-3 rounded-full bg-brand-gold"></div>}
+                                            </button>
+                                            <button onClick={() => setLang('vi')} className={`p-4 rounded-lg border-2 flex items-center justify-between transition-all ${lang === 'vi' ? 'border-brand-gold bg-brand-gold/5' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl">🇻🇳</span>
+                                                    <div className="text-left">
+                                                        <div className={`font-bold ${lang === 'vi' ? 'text-brand-dark dark:text-brand-gold' : 'text-slate-700 dark:text-slate-200'}`}>Tiếng Việt</div>
+                                                        <div className="text-xs text-slate-500">Vietnamese</div>
+                                                    </div>
+                                                </div>
+                                                {lang === 'vi' && <div className="w-3 h-3 rounded-full bg-brand-gold"></div>}
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -324,7 +514,7 @@
         };
 
         // Column Mapping Modal
-        const MappingModal = ({ headers, isOpen, onClose, onConfirm }) => {
+        const MappingModal = ({ headers, isOpen, onClose, onConfirm, t }) => {
             const [skuCol, setSkuCol] = useState('');
             const [costCol, setCostCol] = useState('');
             const [dataCols, setDataCols] = useState([]);
@@ -359,19 +549,19 @@
                     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-700">
                         {/* Header */}
                         <div className="p-6 border-b border-slate-200 dark:border-slate-800">
-                            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Map Your Data Columns</h2>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Select which columns represent what data.</p>
+                            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">{t('mapping.title')}</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('mapping.subtitle')}</p>
                         </div>
                         <div className="p-6 overflow-y-auto space-y-6">
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-xs font-bold uppercase text-slate-500 mb-2">Item ID / SKU Column</label>
+                                    <label className="block text-xs font-bold uppercase text-slate-500 mb-2">{t('mapping.sku_col')}</label>
                                     <select value={skuCol} onChange={e => setSkuCol(e.target.value)} className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm">
                                         {headers.map(h => <option key={h} value={h}>{h}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold uppercase text-slate-500 mb-2">Unit Cost Column</label>
+                                    <label className="block text-xs font-bold uppercase text-slate-500 mb-2">{t('mapping.cost_col')}</label>
                                     <select value={costCol} onChange={e => setCostCol(e.target.value)} className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm">
                                         {headers.map(h => <option key={h} value={h}>{h}</option>)}
                                     </select>
@@ -380,8 +570,8 @@
 
                             <div>
                                 <div className="flex justify-between items-center mb-2">
-                                    <label className="block text-xs font-bold uppercase text-slate-500">Demand Data Columns (Select all that apply)</label>
-                                    <button onClick={selectAllData} className="text-xs text-brand-gold hover:underline">Select All Remaining</button>
+                                    <label className="block text-xs font-bold uppercase text-slate-500">{t('mapping.demand_cols')}</label>
+                                    <button onClick={selectAllData} className="text-xs text-brand-gold hover:underline">{t('mapping.select_all')}</button>
                                 </div>
                                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 border p-3 rounded bg-slate-50 dark:bg-slate-800/50 dark:border-slate-700 max-h-48 overflow-y-auto">
                                     {headers.map(h => (
@@ -401,18 +591,18 @@
                                     ))}
                                 </div>
                                 <p className="text-xs text-slate-400 mt-2">
-                                    *Selected: {dataCols.length} columns. These will be summed to calculate total demand.
+                                    {t('mapping.selected_msg')} {dataCols.length} {t('mapping.cols_msg')}
                                 </p>
                             </div>
                         </div>
                         <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-end gap-3 rounded-b-xl">
-                            <button onClick={onClose} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">Cancel</button>
+                            <button onClick={onClose} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">{t('mapping.cancel')}</button>
                             <button
                                 onClick={() => onConfirm(skuCol, costCol, dataCols)}
                                 disabled={!skuCol || !costCol || dataCols.length === 0}
                                 className="px-6 py-2 bg-brand-gold hover:bg-brand-dark text-white text-sm font-bold rounded shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                Analyze Data
+                                {t('mapping.analyze')}
                             </button>
                         </div>
                     </div>
@@ -444,6 +634,22 @@
             const [searchTerm, setSearchTerm] = useState('');
             const [filterClass, setFilterClass] = useState(null);
             const fileInputRef = useRef(null);
+
+            // I18n State
+            const [lang, setLang] = useState(localStorage.getItem('lang') || 'en');
+
+            const t = (key) => {
+                const keys = key.split('.');
+                let val = TRANSLATIONS[lang];
+                for (const k of keys) {
+                    val = val ? val[k] : undefined;
+                }
+                return val || key;
+            };
+
+            useEffect(() => {
+                localStorage.setItem('lang', lang);
+            }, [lang]);
 
             // Clock Effect
             useEffect(() => {
@@ -797,7 +1003,7 @@
 
                             {/* File Upload Section */}
                             <div className="flex items-center gap-2 mb-2 mt-2 px-1">
-                                <h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">Data Import</h3>
+                                <h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">{t('sidebar.import_title')}</h3>
                                 <div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div>
                             </div>
 
@@ -810,9 +1016,9 @@
                                     <div className="flex flex-col items-center gap-2">
                                         <div className="text-slate-400">{file ? <RefreshIcon /> : <UploadIcon />}</div>
                                         <p className="text-xs font-bold text-slate-600 dark:text-slate-300 truncate w-full">
-                                            {file ? file.name : "Upload Data"}
+                                            {file ? file.name : t('sidebar.upload_placeholder')}
                                         </p>
-                                        {file && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-full">Loaded</span>}
+                                        {file && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-full">{t('sidebar.loaded')}</span>}
                                     </div>
                                 </div>
                             </div>
@@ -821,7 +1027,7 @@
                             {analysisData.length > 0 && (
                                 <div className="animate-fade-in">
                                     <div className="flex items-center gap-2 mb-2 mt-6 px-1">
-                                        <h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">Configuration</h3>
+                                        <h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">{t('sidebar.config_title')}</h3>
                                         <div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div>
                                     </div>
 
@@ -830,13 +1036,13 @@
                                         {/* ABC Settings */}
                                         <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
                                             <div className="flex justify-between items-center mb-3">
-                                                <h3 className="text-xxs font-bold text-slate-500 dark:text-slate-400 uppercase">ABC Class (Pareto)</h3>
+                                                <h3 className="text-xxs font-bold text-slate-500 dark:text-slate-400 uppercase">{t('sidebar.abc_class')}</h3>
                                             </div>
                                             <div className="space-y-4">
                                                 <div>
                                                     <div className="flex justify-between text-xxs font-bold mb-1">
                                                         <span className="text-emerald-500">A</span>
-                                                        <span className="text-slate-600 dark:text-slate-300">Top {abcThresholds.a}%</span>
+                                                        <span className="text-slate-600 dark:text-slate-300">{t('sidebar.top')} {abcThresholds.a}%</span>
                                                     </div>
                                                     <input
                                                         type="range" min="10" max="90" step="1"
@@ -848,7 +1054,7 @@
                                                 <div>
                                                     <div className="flex justify-between text-xxs font-bold mb-1">
                                                         <span className="text-blue-500">B</span>
-                                                        <span className="text-slate-600 dark:text-slate-300">Next {abcThresholds.b - abcThresholds.a}%</span>
+                                                        <span className="text-slate-600 dark:text-slate-300">{t('sidebar.next')} {abcThresholds.b - abcThresholds.a}%</span>
                                                     </div>
                                                     <input
                                                         type="range" min={abcThresholds.a + 1} max="99" step="1"
@@ -863,7 +1069,7 @@
                                         {/* XYZ Settings */}
                                         <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
                                             <div className="flex justify-between items-center mb-3">
-                                                <h3 className="text-xxs font-bold text-slate-500 dark:text-slate-400 uppercase">XYZ Class (CV)</h3>
+                                                <h3 className="text-xxs font-bold text-slate-500 dark:text-slate-400 uppercase">{t('sidebar.xyz_class')}</h3>
                                             </div>
                                             <div className="space-y-4">
                                                 <div>
@@ -905,14 +1111,14 @@
                                 onClick={handleReset}
                                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-rose-200 dark:border-rose-900 text-rose-500 dark:text-rose-400 font-bold text-xs hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all uppercase tracking-wider group"
                             >
-                                <RefreshIcon /> Reset All
+                                <RefreshIcon /> {t('sidebar.reset_btn')}
                             </button>
                             {analysisData.length > 0 && (
                                 <button
                                     onClick={handleExport}
                                     className="w-full mt-2 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-brand-gold text-white font-bold text-xs hover:bg-brand-dark transition-all uppercase tracking-wider shadow-md hover:shadow-lg"
                                 >
-                                    <DownloadIcon /> Export Report
+                                    <DownloadIcon /> {t('sidebar.export_btn')}
                                 </button>
                             )}
                         </div>
@@ -942,7 +1148,7 @@
 
                             {/* Centered Title */}
                             <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm md:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest drop-shadow-sm whitespace-nowrap">
-                                ABC-XYZ ANALYSIS
+                                {t('header.title')}
                             </div>
 
                             <div className="flex items-center gap-2 md:gap-4">
@@ -965,13 +1171,13 @@
                                     onClick={() => setActiveTab('dashboard')}
                                     className={`h-full border-b-2 px-2 text-xs md:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'dashboard' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                                 >
-                                    <GridIcon /> <span className="hidden sm:inline">Matrix Dashboard</span>
+                                    <GridIcon /> <span className="hidden sm:inline">{t('tabs.dashboard')}</span>
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('list')}
                                     className={`h-full border-b-2 px-2 text-xs md:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'list' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                                 >
-                                    <ListIcon /> <span className="hidden sm:inline">Item List</span>
+                                    <ListIcon /> <span className="hidden sm:inline">{t('tabs.list')}</span>
                                     {analysisData.length > 0 && <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-full ml-1">
                                         {filterClass ? (matrix[filterClass]?.count || 0) : analysisData.length}
                                     </span>}
@@ -981,7 +1187,7 @@
                                 <div className="h-8 border-l border-slate-200 dark:border-slate-800 ml-2 pl-4 flex items-center shrink-0 gap-2">
                                     <input
                                         type="text"
-                                        placeholder="Search SKU..."
+                                        placeholder={t('tabs.search_placeholder')}
                                         value={searchTerm}
                                         onChange={e => { setSearchTerm(e.target.value); if (activeTab !== 'list') setActiveTab('list'); }}
                                         className="bg-slate-100 dark:bg-slate-800 border-none rounded-md px-3 py-1.5 text-xs w-48 md:w-64 focus:ring-1 focus:ring-brand-gold outline-none transition-all placeholder-slate-400"
@@ -999,7 +1205,7 @@
                             {analysisData.length > 0 && (
                                 <div className="flex items-center gap-3 shrink-0 ml-auto">
                                     <div className="text-right">
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Inventory Value</div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('tabs.total_val')}</div>
                                         <div className="font-mono font-bold text-sm md:text-base text-slate-800 dark:text-slate-200">{fmtCurrency(summary.totalValue)}</div>
                                     </div>
                                 </div>
@@ -1011,9 +1217,9 @@
                                 <div className="p-6 bg-white dark:bg-slate-900 rounded-full mb-6 shadow-sm border border-slate-100 dark:border-slate-800">
                                     <GridIcon />
                                 </div>
-                                <h2 className="text-2xl font-bold mb-2 text-center">Ready to Analyze</h2>
+                                <h2 className="text-2xl font-bold mb-2 text-center">{t('dashboard.empty_title')}</h2>
                                 <p className="text-slate-500 max-w-md text-center text-sm md:text-base">
-                                    Upload your inventory Excel file to generate the ABC-XYZ matrix, identify critical items, and optimize your supply chain policies.
+                                    {t('dashboard.empty_desc')}
                                 </p>
                             </div>
                         ) : (
@@ -1026,8 +1232,8 @@
                                             {/* THE MATRIX */}
                                             <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 md:p-6">
                                                 <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                                    Inventory Matrix
-                                                    <span className="text-xs font-normal text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">SKU Count & Value %</span>
+                                                    {t('dashboard.matrix_title')}
+                                                    <span className="text-xs font-normal text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{t('dashboard.matrix_subtitle')}</span>
                                                 </h3>
                                                 <div className="grid grid-cols-3 gap-2 md:gap-4 h-[300px] md:h-[400px]">
                                                     {['A', 'B', 'C'].map(row => (
@@ -1064,15 +1270,15 @@
                                                                     </div>
                                                                     <div>
                                                                         <div className="text-xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">{data.count}</div>
-                                                                        <div className="text-[10px] md:text-xs text-slate-500 uppercase font-bold tracking-wider">SKUs</div>
+                                                                        <div className="text-[10px] md:text-xs text-slate-500 uppercase font-bold tracking-wider">{t('dashboard.sku_label')}</div>
                                                                     </div>
                                                                     <div className="mt-2 md:mt-4">
                                                                         <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mb-1 overflow-hidden">
                                                                             <div className="h-full bg-brand-gold" style={{ width: `${data.pctValue}%` }}></div>
                                                                         </div>
                                                                         <div className="flex flex-col md:flex-row justify-between text-[8px] md:text-[10px] font-mono font-bold text-slate-500">
-                                                                            <span>Val: {fmtNum(data.pctValue, 1)}%</span>
-                                                                            <span>Qty: {fmtNum(data.pctCount, 1)}%</span>
+                                                                            <span>{t('dashboard.val_label')}: {fmtNum(data.pctValue, 1)}%</span>
+                                                                            <span>{t('dashboard.qty_label')}: {fmtNum(data.pctCount, 1)}%</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1083,15 +1289,15 @@
 
                                                 {/* Matrix Labels */}
                                                 <div className="flex justify-between mt-4 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest px-2 md:px-4">
-                                                    <span>Stable (X)</span>
-                                                    <span>Fluctuating (Y)</span>
-                                                    <span>Volatile (Z)</span>
+                                                    <span>{t('dashboard.legend_stable')}</span>
+                                                    <span>{t('dashboard.legend_fluctuating')}</span>
+                                                    <span>{t('dashboard.legend_volatile')}</span>
                                                 </div>
                                             </div>
 
                                             {/* Pareto Chart */}
                                             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 md:p-6 flex flex-col">
-                                                <h3 className="text-lg font-bold mb-4">Pareto Curve</h3>
+                                                <h3 className="text-lg font-bold mb-4">{t('dashboard.pareto_title')}</h3>
                                                 <div className="flex-1 w-full min-h-[300px]">
                                                     <ResponsiveContainer width="100%" height="100%">
                                                         <LineChart
@@ -1114,14 +1320,14 @@
                                                                 type="number"
                                                                 domain={[0, 100]}
                                                                 tick={{ fontSize: 10 }}
-                                                                label={{ value: '% of SKUs', position: 'insideBottom', offset: -10, fontSize: 10, fill: '#64748b' }}
+                                                                label={{ value: t('dashboard.pareto_xlabel'), position: 'insideBottom', offset: -10, fontSize: 10, fill: '#64748b' }}
                                                             />
                                                             <YAxis
                                                                 dataKey="cumPct"
                                                                 domain={[0, 100]}
                                                                 tick={{ fontSize: 10 }}
                                                                 unit="%"
-                                                                label={{ value: 'Cumulative Value %', angle: -90, position: 'insideLeft', offset: 10, fontSize: 10, fill: '#64748b' }}
+                                                                label={{ value: t('dashboard.pareto_ylabel'), angle: -90, position: 'insideLeft', offset: 10, fontSize: 10, fill: '#64748b' }}
                                                             />
                                                             <Tooltip content={<CustomParetoTooltip />} cursor={{ stroke: '#64748b', strokeWidth: 1 }} />
                                                             <ReferenceLine y={abcThresholds.a} stroke="#10b981" strokeDasharray="3 3" label={{ value: 'A Limit', fill: '#10b981', fontSize: 10, position: 'insideTopLeft' }} />
@@ -1131,7 +1337,7 @@
                                                     </ResponsiveContainer>
                                                 </div>
                                                 <div className="mt-4 text-xs text-slate-500 text-center">
-                                                    Cumulative Value Distribution
+                                                    {t('dashboard.pareto_caption')}
                                                 </div>
                                             </div>
 
@@ -1147,12 +1353,12 @@
                                             <table className="w-full text-left text-sm min-w-[600px]">
                                                 <thead className="bg-slate-100 dark:bg-slate-900 sticky top-0 z-10 text-xs font-bold uppercase text-slate-500">
                                                     <tr>
-                                                        <th className="px-6 py-3">Class</th>
-                                                        <th className="px-6 py-3">SKU</th>
-                                                        <th className="px-6 py-3 text-right">Total Value</th>
-                                                        <th className="px-6 py-3 text-right">Demand Vol (CV)</th>
-                                                        <th className="px-6 py-3 text-right">Avg Demand</th>
-                                                        <th className="px-6 py-3">Demand Pattern</th>
+                                                        <th className="px-6 py-3">{t('list.col_class')}</th>
+                                                        <th className="px-6 py-3">{t('list.col_sku')}</th>
+                                                        <th className="px-6 py-3 text-right">{t('list.col_val')}</th>
+                                                        <th className="px-6 py-3 text-right">{t('list.col_cv')}</th>
+                                                        <th className="px-6 py-3 text-right">{t('list.col_avg')}</th>
+                                                        <th className="px-6 py-3">{t('list.col_pattern')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-950">
@@ -1191,7 +1397,7 @@
                                             </table>
                                             {analysisData.length > 100 && (
                                                 <div className="p-4 text-center text-xs text-slate-400 italic">
-                                                    Showing first 100 of {analysisData.length} items. Filter to see more.
+                                                    {t('list.showing_msg')} 100 {t('list.items_msg')} {analysisData.length}
                                                 </div>
                                             )}
                                         </div>
@@ -1206,6 +1412,7 @@
                             isOpen={isMappingOpen}
                             onClose={() => { setFile(null); setIsMappingOpen(false); }}
                             onConfirm={processAnalysis}
+                            t={t}
                         />
 
                         {/* Settings Modal */}
@@ -1214,6 +1421,9 @@
                             onClose={() => setIsSettingsOpen(false)}
                             theme={theme}
                             setTheme={setTheme}
+                            lang={lang}
+                            setLang={setLang}
+                            t={t}
                         />
 
                     </main>
