@@ -27,7 +27,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            width: 100vw;
+            width: 100%;
             margin: 0;
         }
 
@@ -123,11 +123,12 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef, useMemo } = React;
-        const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart, ReferenceLine } = window.Recharts;
+        const { LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart, ReferenceLine } = window.Recharts;
 
         // --- ICONS ---
         const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg>;
         const UploadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>;
+        const EyeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>;
         const PlayIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3" /></svg>;
         const TrashIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>;
         const SunIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>;
@@ -151,10 +152,334 @@
         const ClipboardCheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="m9 14 2 2 4-4"></path></svg>;
         const ActivityIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>;
         const ServerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>;
+        const ZapIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>;
+        const GlobeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>;
 
         const API_ENDPOINTS = {
             LOCAL: 'http://127.0.0.1:8000',
             PROD: 'https://95.216.170.251.sslip.io'
+        };
+
+        // --- TRANSLATIONS ---
+        const translations = {
+            en: {
+                appTitle: "Advanced-ML Forecaster",
+                upload: {
+                    title: "Data Upload",
+                    dragDrop: "Drag & drop your dataset here",
+                    browse: "Browse Files",
+                    supported: "Supports CSV, Excel"
+                },
+                tabs: {
+                    batch: "Batch Overview",
+                    detailed: "Detailed View",
+                    causal: "Causal Effect",
+                    scenario: "Scenario Planner"
+                },
+                settings: {
+                    title: "Settings",
+                    subtitle: "Configure application preferences",
+                    language: "Language",
+                    theme: "Theme Mode",
+                    about: "About Us",
+                    interface: "Interface Appearance",
+                    light: "Light Mode",
+                    dark: "Dark Mode",
+                    system: "System Default"
+                },
+                status: {
+                    ready: "Ready to Forecast",
+                    uploadPrompt: "Upload your dataset in the sidebar to begin the forecast process.",
+                    processing: "Running Analytics Algorithms",
+                    simulating: "Simulating..."
+                },
+                kpi: {
+                    totalVol: "Total Forecast Volume",
+                    avgHealth: "Avg Model Health (R²)",
+                    alerts: "Critical Alerts (Low R²)",
+                    skus: "SKUs",
+                    currentVol: "Current Volume",
+                    nextForecast: "Next Forecast",
+                    skuName: "SKU Name"
+                },
+                sidebar: {
+                    import: "Data Import",
+                    config: "Configuration",
+                    uploadSuccess: "Data Uploaded Successfully",
+                    validation: "Validation Method",
+                    trainHorizon: "Train Horizon",
+                    testHorizon: "Test Horizon",
+                    forecastHorizon: "Forecast Horizon"
+                },
+                buttons: {
+                    execute: "EXECUTE FORECAST",
+                    processing: "PROCESSING...",
+                    exportReq: "Export Report",
+                    simulate: "Simulate",
+                    view: "View",
+                    cancel: "Cancel",
+                    confirm: "Confirm",
+                    search: "Search",
+                    invalidSku: "Invalid SKU",
+                    searchPlaceholder: "Search SKU...",
+                    skuNotFound: "SKU Not Found",
+                    resetAll: "Reset All",
+                    selectAll: "Select All",
+                    unselectAll: "Unselect All"
+                },
+                table: {
+                    sku: "SKU",
+                    status: "Status",
+                    bestTs: "Best TS Model",
+                    bestCausal: "Best Causal Model",
+                    valMse: "Validation MSE",
+                    r2: "R² Score",
+                    action: "Action",
+                    date: "Date"
+                },
+                mapping: {
+                    title: "Choose Columns",
+                    id: "ID",
+                    date: "Date",
+                    targetValue: "Target Value",
+                    causalDrivers: "Causal Drivers"
+                },
+                charts: {
+                    actualTrain: "Actual (Train)",
+                    baseline: "Baseline Fit",
+                    actualTest: "Actual (Test)",
+                    prediction: "Synthesis Prediction",
+                    forecast: "Synthesis Forecast",
+                    scenario: "Scenario",
+                    positiveImpact: "Positive Impact",
+                    negativeImpact: "Negative Impact",
+                    fullHistory: "Full History",
+                    finalFit: "Final Fit",
+                    marginalEffect: "Marginal Effect",
+                    attribution: "Attribution (Impact)",
+                    noAttribution: "No Attribution Data"
+                },
+                titles: {
+                    synthesis: "Total Synthesis Forecast",
+                    validation: "Validation",
+                    forecast: "Forecast",
+                    driverImpact: "Driver Impact",
+                    elasticity: "Elasticity",
+                    bridge: "The Bridge"
+                }
+            },
+            vi: {
+                appTitle: "Dự báo ML Nâng cao",
+                upload: {
+                    title: "Tải dữ liệu",
+                    dragDrop: "Kéo & thả tập dữ liệu vào đây",
+                    browse: "Duyệt tệp",
+                    supported: "Hỗ trợ CSV, Excel"
+                },
+                tabs: {
+                    batch: "Tổng quan",
+                    detailed: "Chi tiết",
+                    causal: "Nhân tố ảnh hưởng",
+                    scenario: "Hoạch định kịch bản"
+                },
+                settings: {
+                    title: "Cài đặt",
+                    subtitle: "Cấu hình ứng dụng",
+                    language: "Ngôn ngữ",
+                    theme: "Giao diện",
+                    about: "Về chúng tôi",
+                    interface: "Giao diện người dùng",
+                    light: "Chế độ Sáng",
+                    dark: "Chế độ Tối",
+                    system: "Mặc định hệ thống"
+                },
+                status: {
+                    ready: "Sẵn sàng dự báo",
+                    uploadPrompt: "Tải lên tập dữ liệu của bạn ở cạnh bên để bắt đầu quy trình dự báo.",
+                    processing: "Đang chạy thuật toán phân tích",
+                    simulating: "Đang mô phỏng..."
+                },
+                kpi: {
+                    totalVol: "Tổng lượng dự báo",
+                    avgHealth: "Độ chính xác trung bình (R²)",
+                    alerts: "Cảnh báo (R² thấp)",
+                    skus: "Mã hàng",
+                    currentVol: "Số lượng hiện tại",
+                    nextForecast: "Dự báo tiếp theo",
+                    skuName: "Tên SKU"
+                },
+                sidebar: {
+                    import: "Nhập dữ liệu",
+                    config: "Cấu hình",
+                    uploadSuccess: "Dữ liệu đã tải lên thành công",
+                    validation: "Phương pháp kiểm định",
+                    trainHorizon: "Chu kỳ H.luyện",
+                    testHorizon: "Chu kỳ kiểm tra",
+                    forecastHorizon: "Chu kỳ dự báo"
+                },
+                buttons: {
+                    execute: "CHẠY DỰ BÁO",
+                    processing: "ĐANG XỬ LÝ...",
+                    exportReq: "Xuất báo cáo",
+                    simulate: "Mô phỏng",
+                    view: "Xem",
+                    cancel: "Hủy",
+                    confirm: "Xác nhận",
+                    search: "Tìm kiếm",
+                    invalidSku: "Mã SKU sai",
+                    searchPlaceholder: "Tìm SKU...",
+                    skuNotFound: "Không tìm thấy SKU",
+                    resetAll: "Đặt lại tất cả",
+                    selectAll: "Chọn tất cả",
+                    unselectAll: "Bỏ chọn tất cả"
+                },
+                table: {
+                    sku: "Mã hàng",
+                    status: "Trạng thái",
+                    bestTs: "Mô hình chuỗi thời gian",
+                    bestCausal: "Mô hình nhân quả",
+                    valMse: "Sai số MSE",
+                    r2: "Điểm R²",
+                    action: "Hành động",
+                    date: "Ngày"
+                },
+                mapping: {
+                    title: "Chọn cột dữ liệu",
+                    id: "Mã định danh",
+                    date: "Ngày tháng",
+                    targetValue: "Giá trị mục tiêu",
+                    causalDrivers: "Nhân tố tác động"
+                },
+                charts: {
+                    actualTrain: "Thực tế (HL)",
+                    baseline: "Khớp cơ sở",
+                    actualTest: "Thực tế (KT)",
+                    prediction: "Dự báo thử nghiệm",
+                    forecast: "Dự báo",
+                    scenario: "Kịch bản",
+                    positiveImpact: "Tác động tích cực",
+                    negativeImpact: "Tác động tiêu cực",
+                    fullHistory: "Lịch sử đầy đủ",
+                    finalFit: "Khớp cuối cùng",
+                    marginalEffect: "Hiệu ứng biên",
+                    attribution: "Đóng góp",
+                    noAttribution: "Không có dữ liệu quy kết"
+                },
+                titles: {
+                    synthesis: "Dự báo tổng hợp",
+                    validation: "Kiểm định",
+                    forecast: "Dự báo",
+                    driverImpact: "Tác động nhân tố",
+                    elasticity: "Độ co giãn",
+                    bridge: "Cầu nối"
+                }
+            },
+            de: {
+                appTitle: "Erweiterte ML-Prognose",
+                upload: {
+                    title: "Daten hochladen",
+                    dragDrop: "Datensatz hier ablegen",
+                    browse: "Dateien durchsuchen",
+                    supported: "Unterstützt CSV, Excel"
+                },
+                tabs: {
+                    batch: "Batch-Übersicht",
+                    detailed: "Detailansicht",
+                    causal: "Kausale Effekte",
+                    scenario: "Szenarioplaner"
+                },
+                settings: {
+                    title: "Einstellungen",
+                    subtitle: "Anwendungspräferenzen konfigurieren",
+                    language: "Sprache",
+                    theme: "Design-Modus",
+                    about: "Über uns",
+                    interface: "Erscheinungsbild",
+                    light: "Heller Modus",
+                    dark: "Dunkler Modus",
+                    system: "Systemstandard"
+                },
+                status: {
+                    ready: "Bereit zur Prognose",
+                    uploadPrompt: "Laden Sie Ihren Datensatz hoch, um den Prognoseprozess zu starten.",
+                    processing: "Analytik-Algorithmen laufen",
+                    simulating: "Simuliere..."
+                },
+                kpi: {
+                    totalVol: "Gesamtprognosevolumen",
+                    avgHealth: "Mittlere Modellgüte (R²)",
+                    alerts: "Kritische Warnungen (Niedriger R²)",
+                    skus: "SKUs",
+                    currentVol: "Aktuelles Volumen",
+                    nextForecast: "Nächste Prognose",
+                    skuName: "SKU-Name"
+                },
+                sidebar: {
+                    import: "Datenimport",
+                    config: "Konfiguration",
+                    uploadSuccess: "Daten erfolgreich hochgeladen",
+                    validation: "Validierungsmethode",
+                    trainHorizon: "TRAIN-HORIZONT",
+                    testHorizon: "TEST-HORIZONT",
+                    forecastHorizon: "Prognosehorizont"
+                },
+                buttons: {
+                    execute: "PROGNOSE AUSFÜHREN",
+                    processing: "VERARBEITEN...",
+                    exportReq: "Bericht exportieren",
+                    simulate: "Simulieren",
+                    view: "Ansehen",
+                    cancel: "Abbrechen",
+                    confirm: "Bestätigen",
+                    search: "Suche",
+                    invalidSku: "Ungültige SKU",
+                    searchPlaceholder: "SKU suchen...",
+                    skuNotFound: "SKU nicht gefunden",
+                    resetAll: "Alles zurücksetzen",
+                    selectAll: "Alle auswählen",
+                    unselectAll: "Auswahl aufheben"
+                },
+                table: {
+                    sku: "SKU",
+                    status: "Status",
+                    bestTs: "Bestes ZReihe-Modell",
+                    bestCausal: "Bestes Kausalmodell",
+                    valMse: "Validierungs-MSE",
+                    r2: "R²-Wert",
+                    action: "Aktion",
+                    date: "Datum"
+                },
+                mapping: {
+                    title: "Spalten auswählen",
+                    id: "ID",
+                    date: "Datum",
+                    targetValue: "Zielwert",
+                    causalDrivers: "Kausale Treiber"
+                },
+                charts: {
+                    actualTrain: "Ist (Training)",
+                    baseline: "Basislinie",
+                    actualTest: "Ist (Test)",
+                    prediction: "Synthese-Vorhersage",
+                    forecast: "Zukunfts-Prognose",
+                    scenario: "Szenario",
+                    positiveImpact: "Positiver Einfluss",
+                    negativeImpact: "Negativer Einfluss",
+                    fullHistory: "Vollständiger Verlauf",
+                    finalFit: "Endgültige Anpassung",
+                    marginalEffect: "Grenzeffekt",
+                    attribution: "Zuschreibung (Einfluss)",
+                    noAttribution: "Keine Zuschreibungsdaten"
+                },
+                titles: {
+                    synthesis: "Gesamtprognose",
+                    validation: "Validierung",
+                    forecast: "Prognose",
+                    driverImpact: "Treiber-Einfluss",
+                    elasticity: "Elastizität",
+                    bridge: "Die Brücke"
+                }
+            }
         };
 
         // --- UTILS ---
@@ -168,7 +493,41 @@
 
         // --- SUB-COMPONENTS ---
 
-        const ForecastingLoader = () => (
+        const NavigationTabs = ({ activeTab, onTabChange, t }) => {
+            const tabs = [
+                { id: 'batch', label: t('tabs.batch'), icon: <GridIcon /> },
+                { id: 'all_in_one', label: t('tabs.detailed'), icon: <EyeIcon /> },
+                { id: 'causal', label: t('tabs.causal'), icon: <ZapIcon /> },
+                { id: 'forecast', label: t('tabs.scenario'), icon: <ActivityIcon /> },
+            ];
+            return (
+                <div className="flex w-full min-w-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border-b border-white/50 dark:border-white/10 shrink-0 z-10 shadow-sm ring-1 ring-white/20 dark:ring-white/5">
+                    {tabs.map(tab => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => onTabChange(tab.id)}
+                                className={`
+                                    relative group flex-1 flex items-center justify-center gap-2 px-2 py-3 text-xs font-bold uppercase tracking-wide transition-all duration-300
+                                    ${isActive ? 'text-brand-gold bg-brand-gold/5' : 'text-slate-500 dark:text-slate-400 hover:text-brand-gold hover:bg-slate-50 dark:hover:bg-slate-800'}
+                                `}
+                            >
+                                <span className={isActive ? 'text-brand-gold' : 'text-slate-400 group-hover:text-brand-gold transition-colors'}>
+                                    {tab.icon}
+                                </span>
+                                <span className="hidden sm:inline line-clamp-1 text-center">{tab.label}</span>
+                                {isActive && (
+                                    <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-brand-gold/20 via-brand-gold to-brand-gold/20 shadow-[0_-2px_6px_rgba(245,158,11,0.4)]"></div>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            );
+        };
+
+        const ForecastingLoader = ({ t }) => (
             <div className="h-full flex flex-col items-center justify-center gap-6 animate-fade-in">
                 <div className="relative">
                     <div className="absolute inset-0 bg-brand-gold/20 blur-xl rounded-full animate-pulse"></div>
@@ -178,7 +537,7 @@
                     </svg>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                    <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">Running Analytics Algorithms</h3>
+                    <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">{t('status.processing')}</h3>
                     <div className="flex gap-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce" style={{ animationDelay: '0ms' }}></div>
                         <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -188,7 +547,7 @@
             </div>
         );
 
-        const KPICards = ({ results }) => {
+        const KPICards = ({ results, t }) => {
             const stats = useMemo(() => {
                 if (!results || !results.length) return null;
                 const totalVol = results.reduce((acc, r) => acc + r.forecast_data.reduce((sum, d) => sum + (d.future_forecast || 0), 0), 0);
@@ -202,24 +561,24 @@
             return (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div className="text-xs text-slate-500 uppercase font-bold">Total Forecast Volume</div>
+                        <div className="text-xs text-slate-500 uppercase font-bold">{t('kpi.totalVol')}</div>
                         <div className="text-2xl font-black text-slate-800 dark:text-white mt-1">{Math.round(stats.totalVol).toLocaleString()}</div>
                     </div>
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div className="text-xs text-slate-500 uppercase font-bold">Avg Model Health (R²)</div>
+                        <div className="text-xs text-slate-500 uppercase font-bold">{t('kpi.avgHealth')}</div>
                         <div className={`text-2xl font-black mt-1 ${stats.avgR2 > 0.7 ? 'text-emerald-500' : stats.avgR2 > 0.4 ? 'text-amber-500' : 'text-rose-500'}`}>
                             {(stats.avgR2 * 100).toFixed(1)}%
                         </div>
                     </div>
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div className="text-xs text-slate-500 uppercase font-bold">Critical Alerts (Low R²)</div>
-                        <div className="text-2xl font-black text-rose-500 mt-1">{stats.lowConf} <span className="text-xs text-slate-400 font-normal">SKUs</span></div>
+                        <div className="text-xs text-slate-500 uppercase font-bold">{t('kpi.alerts')}</div>
+                        <div className="text-2xl font-black text-rose-500 mt-1">{stats.lowConf} <span className="text-xs text-slate-400 font-normal">{t('kpi.skus')}</span></div>
                     </div>
                 </div>
             );
         };
 
-        const DetailKPITopBar = ({ data, results, currentSku, handleSkuSelect, cycleSku }) => {
+        const DetailKPITopBar = ({ data, results, currentSku, handleSkuSelect, cycleSku, t }) => {
             if (!data) return null;
             const [searchError, setSearchError] = useState(false);
             const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -233,8 +592,8 @@
             return (
                 <div className="flex gap-4 mb-4 overflow-x-auto pb-2">
                     {/* SKU Selector (Position 1) */}
-                    <div className="flex-none min-w-[160px] bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-2">
-                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">SKU Name</div>
+                    <div className="flex-none min-w-[160px] bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 rounded-2xl border border-white/50 dark:border-white/10 shadow-md ring-1 ring-white/40 dark:ring-white/5 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-2">
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">{t('kpi.skuName')}</div>
                         <div className="flex items-center gap-2 w-full justify-center">
                             <button onClick={() => cycleSku(-1)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-brand-gold transition-colors flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg></button>
                             <select value={currentSku || ''} onChange={(e) => handleSkuSelect(e.target.value)} className="bg-transparent text-sm font-black text-slate-800 dark:text-white w-auto outline-none text-center cursor-pointer appearance-none">
@@ -246,11 +605,11 @@
 
                     {/* Compare Switch (Position 2) */}
                     {/* Search Box (Position 2) */}
-                    <div className="flex-none min-w-[176px] bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px]">
+                    <div className="flex-none min-w-[176px] bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 rounded-2xl border border-white/50 dark:border-white/10 shadow-md ring-1 ring-white/40 dark:ring-white/5 flex flex-col items-center justify-center shadow-sm min-h-[80px]">
                         <div className="relative group w-full h-full flex items-center justify-center">
                             <input
                                 type="text"
-                                placeholder={searchError ? "SKU Not Found" : "Search SKU..."}
+                                placeholder={searchError ? t('buttons.skuNotFound') : t('buttons.searchPlaceholder')}
                                 className={`absolute inset-0 w-full h-full bg-white dark:bg-slate-900 text-sm font-bold placeholder:text-slate-400 transition-opacity duration-200 outline-none text-center z-10 ${isSearchFocused ? 'opacity-100' : 'opacity-0'} ${searchError ? 'text-rose-500 placeholder:text-rose-400' : 'text-slate-700 dark:text-slate-200'}`}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -273,26 +632,26 @@
                             {!isSearchFocused && (
                                 <div className={`flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none ${searchError ? 'text-rose-500' : 'text-slate-500'}`}>
                                     <SearchIcon />
-                                    <span className="text-[10px] font-bold uppercase mt-1">{searchError ? "Invalid SKU" : "Search"}</span>
+                                    <span className="text-[10px] font-bold uppercase mt-1">{searchError ? t('buttons.invalidSku') : t('buttons.search')}</span>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
-                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">Current Vol</div>
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">{t('kpi.currentVol')}</div>
                         <div className="text-lg font-black text-slate-800 dark:text-white leading-none">{Math.round(currentVol).toLocaleString()}</div>
                     </div>
                     <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
-                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">Next Forecast</div>
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">{t('kpi.nextForecast')}</div>
                         <div className="text-lg font-black text-brand-gold leading-none">{Math.round(nextForecast).toLocaleString()}</div>
                     </div>
                     <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
-                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">Avg. MSE</div>
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">{t('table.valMse')}</div>
                         <div className="text-lg font-black text-slate-600 dark:text-slate-300 leading-none">{Math.round(data.mse_validation || 0).toLocaleString()}</div>
                     </div>
                     <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
-                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">R² Score</div>
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">{t('table.r2')}</div>
                         <div className={`text-lg font-black leading-none ${data.r2_score > 0.7 ? 'text-emerald-500' : data.r2_score > 0.4 ? 'text-amber-500' : 'text-rose-500'}`}>
                             {(data.r2_score || 0).toFixed(3)}
                         </div>
@@ -301,7 +660,7 @@
             );
         };
 
-        const BacktestChart = ({ data, syncId, isDark }) => {
+        const BacktestChart = ({ data, syncId, isDark, t }) => {
             if (!data) return null;
             const chartData = data.validation_data || [];
             const forecastData = data.forecast_data || [];
@@ -318,7 +677,7 @@
 
             return (
                 <div className="flex-1 min-h-0 relative">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="99%" height="100%">
                         <ComposedChart data={alignedData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }} syncId={syncId}>
                             <defs>
                                 <linearGradient id="bt_train" x1="0" y1="0" x2="0" y2="1">
@@ -326,12 +685,12 @@
                                     <stop offset="95%" stopColor={mainColor} stopOpacity={0} />
                                 </linearGradient>
                                 <linearGradient id="bt_test" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#a78bfa" stopOpacity={0} />
-                                </linearGradient>
-                                <linearGradient id="bt_pred" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                </linearGradient>
+                                <linearGradient id="bt_pred" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#334155" opacity={0.1} />
@@ -340,18 +699,18 @@
                             <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', border: isDark ? '1px solid #334155' : '1px solid #e2e8f0', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '12px', fontFamily: 'monospace' }} />
                             <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
 
-                            <Area type="monotone" dataKey="actual_train" stroke={mainColor} fill="url(#bt_train)" strokeWidth={2} name="Actual (Train)" connectNulls />
-                            <Line type="monotone" dataKey="baseline_fit" stroke="#64748b" strokeWidth={1} dot={false} strokeDasharray="3 3" name="Baseline Fit" connectNulls />
+                            <Area type="monotone" dataKey="actual_train" stroke={mainColor} fill="url(#bt_train)" strokeWidth={2} name={t('charts.actualTrain')} connectNulls />
+                            <Line type="monotone" dataKey="baseline_fit" stroke="#64748b" strokeWidth={1} dot={false} strokeDasharray="3 3" name={t('charts.baseline')} connectNulls />
 
-                            <Area type="monotone" dataKey="actual_test" stroke="#a78bfa" fill="url(#bt_test)" strokeWidth={2} name="Actual (Test)" connectNulls />
-                            <Area type="monotone" dataKey="val_forecast" stroke="#10b981" fill="url(#bt_pred)" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Synthesis Prediction" connectNulls />
+                            <Area type="monotone" dataKey="actual_test" stroke="#10b981" fill="url(#bt_test)" strokeWidth={2} name={t('charts.actualTest')} connectNulls />
+                            <Area type="monotone" dataKey="val_forecast" stroke="#f59e0b" fill="url(#bt_pred)" strokeWidth={2} strokeDasharray="5 5" dot={false} name={t('charts.prediction')} connectNulls />
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
             );
         };
 
-        const ForecastChart = ({ data, scenarioResults, syncId, isDark }) => {
+        const ForecastChart = ({ data, scenarioResults, syncId, isDark, showScenario, t }) => {
             if (!data) return null;
             const history = data.forecast_data ? data.forecast_data.filter(d => d.actual_history !== undefined) : [];
             const future = data.forecast_data ? data.forecast_data.filter(d => d.future_forecast !== undefined) : [];
@@ -371,7 +730,7 @@
 
             return (
                 <div className="flex-1 min-h-0 relative">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="99%" height="100%">
                         <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }} syncId={syncId}>
                             <defs>
                                 <linearGradient id="fc_hist" x1="0" y1="0" x2="0" y2="1">
@@ -379,12 +738,12 @@
                                     <stop offset="95%" stopColor={mainColor} stopOpacity={0} />
                                 </linearGradient>
                                 <linearGradient id="fc_syn" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                </linearGradient>
-                                <linearGradient id="fc_scen" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
                                     <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                </linearGradient>
+                                <linearGradient id="fc_scen" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#334155" opacity={0.1} />
@@ -393,22 +752,28 @@
                             <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', border: isDark ? '1px solid #334155' : '1px solid #e2e8f0', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '12px', fontFamily: 'monospace' }} />
                             <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
 
-                            <Area type="monotone" dataKey="actual_history" stroke={mainColor} fill="url(#fc_hist)" strokeWidth={2} name="Full History" connectNulls />
-                            <Line type="monotone" dataKey="final_fit" stroke="#64748b" strokeWidth={1} dot={false} strokeDasharray="3 3" name="Final Fit" connectNulls />
-                            <Area type="monotone" dataKey="future_forecast" stroke="#10b981" fill="url(#fc_syn)" strokeWidth={2.5} strokeDasharray="5 5" dot={false} name="Synthesis Forecast" connectNulls />
-                            <Area type="monotone" dataKey="scenario_forecast" stroke="#f59e0b" fill="url(#fc_scen)" strokeWidth={3} strokeDasharray="5 5" dot={{ r: 4 }} name="Scenario" connectNulls />
+                            <Area type="monotone" dataKey="actual_history" stroke={mainColor} fill="url(#fc_hist)" strokeWidth={2} name={t('charts.fullHistory')} connectNulls />
+                            <Line type="monotone" dataKey="final_fit" stroke="#64748b" strokeWidth={1} dot={false} strokeDasharray="3 3" name={t('charts.finalFit')} connectNulls />
+                            <Area type="monotone" dataKey="future_forecast" stroke="#f59e0b" fill="url(#fc_syn)" strokeWidth={2.5} strokeDasharray="5 5" dot={false} name={t('charts.forecast')} connectNulls />
+                            {showScenario && (
+                                <Area type="monotone" dataKey="scenario_forecast" stroke="#10b981" fill="url(#fc_scen)" strokeWidth={3} strokeDasharray="5 5" dot={{ r: 4 }} name={t('charts.scenario')} connectNulls />
+                            )}
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
             );
         };
 
-        const DriverImportance = ({ data, isDark }) => {
+        const DriverImportance = ({ data, isDark, t }) => {
             if (!data || !data.importance) return null;
+            const chartData = Object.entries(data.importance)
+                .map(([k, v]) => ({ name: k, value: v }))
+                .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+
             return (
                 <div className="h-full min-h-0 relative">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={Object.entries(data.importance).map(([k, v]) => ({ name: k, value: v })).sort((a, b) => b.value - a.value)} layout="vertical">
+                    <ResponsiveContainer width="99%" height="100%">
+                        <BarChart data={chartData} layout="vertical">
                             <defs>
                                 <linearGradient id="driverGradient" x1="0" y1="0" x2="1" y2="0">
                                     <stop offset="0%" stopColor="#f59e0b" stopOpacity={1} />
@@ -417,11 +782,18 @@
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#334155" opacity={0.1} />
                             <XAxis type="number" hide />
-                            <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#94a3b8' }} width={80} />
+                            <YAxis
+                                dataKey="name"
+                                type="category"
+                                interval={0}
+                                tick={{ fontSize: 11, fill: '#94a3b8', width: 140 }}
+                                width={150}
+                            />
                             <Tooltip
                                 cursor={{ fill: 'transparent' }}
                                 content={({ active, payload, label }) => {
                                     if (active && payload && payload.length) {
+                                        const val = payload[0].value;
                                         return (
                                             <div style={{
                                                 backgroundColor: isDark ? '#1e293b' : '#ffffff',
@@ -441,7 +813,7 @@
                                                     {label}
                                                 </p>
                                                 <p style={{ fontSize: '12px', color: isDark ? '#f8fafc' : '#0f172a' }}>
-                                                    Importance: {Number(payload[0].value).toFixed(2)}
+                                                    {val >= 0 ? t('charts.positiveImpact') : t('charts.negativeImpact')}: {Math.abs(val).toFixed(2)}
                                                 </p>
                                             </div>
                                         );
@@ -449,14 +821,14 @@
                                     return null;
                                 }}
                             />
-                            <Bar dataKey="value" fill="url(#driverGradient)" radius={[0, 4, 4, 0]} barSize={16} name="Importance" />
+                            <Bar dataKey="value" fill="url(#driverGradient)" radius={[0, 4, 4, 0]} barSize={16} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
             );
         };
 
-        const ScenarioPlanner = ({ data, scenarioData, setScenarioData, runScenario, isSimulating, jobId }) => {
+        const ScenarioPlanner = ({ data, scenarioData, setScenarioData, runScenario, isSimulating, jobId, t }) => {
             if (!data) return null;
             const drivers = data.driver_cols || [];
 
@@ -479,17 +851,14 @@
             return (
                 <div className="flex flex-col h-full">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">Scenario Planner</h3>
+                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('tabs.scenario')}</h3>
                         <div className="flex gap-2">
-                            <button onClick={() => exportToCSV(scenarioData, `scenario_${data.sku}`)} className="text-xs text-slate-400 hover:text-brand-gold flex items-center gap-1">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg> Export
-                            </button>
                             <button
                                 onClick={runScenario}
                                 disabled={!jobId || isSimulating}
                                 className={`text-xs px-3 py-1 rounded font-bold transition-colors ${!jobId || isSimulating ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
                             >
-                                {isSimulating ? 'Simulating...' : 'Simulate'}
+                                {isSimulating ? t('status.simulating') : t('buttons.simulate')}
                             </button>
                         </div>
                     </div>
@@ -516,7 +885,7 @@
                                     <tr key={i} className="border-b border-slate-100 dark:border-slate-800">
                                         <td className="py-2 font-mono">{row.date}</td>
                                         {drivers.map(d => (
-                                            <td key={d}><input type="number" className="scenario-input" value={row[d]} onChange={(e) => updateDriver(i, d, e.target.value)} /></td>
+                                            <td key={d}><input type="number" className="scenario-input dark:[color-scheme:dark] dark:text-slate-200" value={row[d]} onChange={(e) => updateDriver(i, d, e.target.value)} /></td>
                                         ))}
                                     </tr>
                                 ))}
@@ -527,28 +896,27 @@
             );
         };
 
-        const BatchOverview = ({ results, onSelectSku }) => {
+        const BatchOverview = ({ results, onSelectSku, t }) => {
             if (!results || results.length === 0) return null;
             return (
                 <div className="flex flex-col h-full">
-                    <KPICards results={results} />
+                    <KPICards results={results} t={t} />
 
-                    <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col min-h-0">
+                    <div className="flex-1 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 overflow-hidden flex flex-col min-h-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Batch Forecast Overview</h3>
-                            <button onClick={() => exportToCSV(results.map(r => ({ sku: r.sku, r2: r.r2_score, mse: r.mse_validation })), 'batch_summary')} className="text-xs text-brand-gold font-bold">Download Summary</button>
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('tabs.batch')}</h3>
                         </div>
                         <div className="flex-1 overflow-auto scroller p-0">
                             <table className="w-full text-left text-sm">
                                 <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 sticky top-0 font-semibold shadow-sm z-10">
                                     <tr>
-                                        <th className="p-4">SKU</th>
-                                        <th className="p-4">Status</th>
-                                        <th className="p-4">Best TS Model</th>
-                                        <th className="p-4">Best Causal Model</th>
-                                        <th className="p-4 text-right">Validation MSE</th>
-                                        <th className="p-4 text-right">R² Score</th>
-                                        <th className="p-4 text-center">Action</th>
+                                        <th className="p-4">{t('table.sku')}</th>
+                                        <th className="p-4">{t('table.status')}</th>
+                                        <th className="p-4">{t('table.bestTs')}</th>
+                                        <th className="p-4">{t('table.bestCausal')}</th>
+                                        <th className="p-4 text-right">{t('table.valMse')}</th>
+                                        <th className="p-4 text-right">{t('table.r2')}</th>
+                                        <th className="p-4 text-center">{t('table.action')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -566,7 +934,7 @@
                                                 <td className="p-4 text-right font-mono text-slate-600 dark:text-slate-300">{res.mse_validation?.toLocaleString()}</td>
                                                 <td className="p-4 text-right font-mono text-slate-600 dark:text-slate-300">{res.r2_score?.toFixed(3)}</td>
                                                 <td className="p-4 text-center">
-                                                    <button className="text-xs bg-brand-gold/10 text-brand-gold px-3 py-1 rounded font-bold hover:bg-brand-gold hover:text-white transition-colors">View</button>
+                                                    <button className="text-xs bg-brand-gold/10 text-brand-gold px-3 py-1 rounded font-bold hover:bg-brand-gold hover:text-white transition-colors">{t('buttons.view')}</button>
                                                 </td>
                                             </tr>
                                         );
@@ -579,7 +947,7 @@
             );
         };
 
-        const MappingModal = ({ headers, isOpen, onClose, onConfirm }) => {
+        const MappingModal = ({ headers, isOpen, onClose, onConfirm, t }) => {
             const [sku, setSku] = useState('');
             const [date, setDate] = useState('');
             const [val, setVal] = useState('');
@@ -616,31 +984,31 @@
             return (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-lg border border-slate-200 dark:border-slate-700 flex flex-col max-h-[90vh]">
-                        <div className="p-6 border-b border-slate-200 dark:border-slate-800"><h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Choose Columns</h2></div>
+                        <div className="p-6 border-b border-slate-200 dark:border-slate-800"><h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">{t('mapping.title')}</h2></div>
                         <div className="p-6 overflow-y-auto space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                                <div><label className="text-xs font-bold uppercase text-slate-500">ID</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={sku} onChange={e => setSku(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
-                                <div><label className="text-xs font-bold uppercase text-slate-500">Date</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={date} onChange={e => setDate(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                                <div><label className="text-xs font-bold uppercase text-slate-500">{t('mapping.id')}</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={sku} onChange={e => setSku(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                                <div><label className="text-xs font-bold uppercase text-slate-500">{t('mapping.date')}</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={date} onChange={e => setDate(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
                             </div>
-                            <div><label className="text-xs font-bold uppercase text-slate-500">Target Value</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={val} onChange={e => setVal(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                            <div><label className="text-xs font-bold uppercase text-slate-500">{t('mapping.targetValue')}</label><select className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-white" value={val} onChange={e => setVal(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
                             <div>
                                 <div className="flex justify-between items-center mb-2">
-                                    <label className="text-xs font-bold uppercase text-slate-500">Causal Drivers</label>
+                                    <label className="text-xs font-bold uppercase text-slate-500">{t('mapping.causalDrivers')}</label>
                                     <div className="flex gap-2">
-                                        <button onClick={unselectAllDrivers} className="text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase">Unselect All</button>
-                                        <button onClick={selectAllDrivers} className="text-[10px] font-bold text-brand-gold hover:text-brand-dark uppercase">Select All</button>
+                                        <button onClick={unselectAllDrivers} className="text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase">{t('buttons.unselectAll')}</button>
+                                        <button onClick={selectAllDrivers} className="text-[10px] font-bold text-brand-gold hover:text-brand-dark uppercase">{t('buttons.selectAll')}</button>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 border p-2 rounded bg-slate-50 dark:bg-slate-800 max-h-40 overflow-y-auto">{headers.map(h => <button key={h} onClick={() => toggleDriver(h)} className={`text-xs px-2 py-1 rounded truncate text-left ${drivers.includes(h) ? 'bg-brand-gold text-white' : 'bg-white dark:bg-slate-800 text-slate-500'} ${[sku, date, val].includes(h) ? 'opacity-30' : ''}`} disabled={[sku, date, val].includes(h)}>{h}</button>)}</div>
                             </div>
                         </div>
-                        <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-3"><button onClick={onClose} className="text-sm text-slate-500">Cancel</button><button onClick={handleConfirm} disabled={!sku || !date || !val} className="px-4 py-2 bg-brand-gold text-white text-sm font-bold rounded">Confirm</button></div>
+                        <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-3"><button onClick={onClose} className="text-sm text-slate-500">{t('buttons.cancel')}</button><button onClick={handleConfirm} disabled={!sku || !date || !val} className="px-4 py-2 bg-brand-gold text-white text-sm font-bold rounded">{t('buttons.confirm')}</button></div>
                     </div>
                 </div>
             );
         };
 
-        const SettingsModal = ({ isOpen, onClose, theme, setTheme }) => {
+        const SettingsModal = ({ isOpen, onClose, theme, setTheme, lang, setLang, t }) => {
             const [copied, setCopied] = useState(null);
             const [activeTab, setActiveTab] = useState("theme");
             // const endpoint = `${apiUrl}/api/v1/forecast`; // Unused variable removed
@@ -685,8 +1053,8 @@
                                     <SettingsIcon />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Settings</h2>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">Configure application preferences.</p>
+                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('settings.title')}</h2>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.subtitle')}</p>
                                 </div>
                             </div>
                             <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
@@ -702,15 +1070,20 @@
                                     onClick={() => setActiveTab("theme")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'theme' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
-                                    <PaletteIcon /> Theme Mode
+                                    <PaletteIcon /> {t('settings.theme')}
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("language")}
+                                    className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'language' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                >
+                                    <GlobeIcon /> {t('settings.language')}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab("about")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'about' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
-                                    <InfoIcon /> About Us
+                                    <InfoIcon /> {t('settings.about')}
                                 </button>
-
                             </div>
 
                             {/* Content Area */}
@@ -718,19 +1091,41 @@
                                 {activeTab === 'theme' && (
                                     <div className="space-y-6 animate-fade-in">
                                         <div>
-                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Interface Appearance</h3>
+                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{t('settings.interface')}</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <button onClick={() => setTheme('light')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'light' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-white rounded-full shadow-sm"><SunIcon /></div>
-                                                    <span className="text-sm font-bold">Light Mode</span>
+                                                    <span className="text-sm font-bold">{t('settings.light')}</span>
                                                 </button>
                                                 <button onClick={() => setTheme('dark')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'dark' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-slate-800 text-white rounded-full shadow-sm"><MoonIcon /></div>
-                                                    <span className="text-sm font-bold">Dark Mode</span>
+                                                    <span className="text-sm font-bold">{t('settings.dark')}</span>
                                                 </button>
                                                 <button onClick={() => setTheme('system')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'system' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full shadow-sm"><SystemIcon /></div>
-                                                    <span className="text-sm font-bold">System Default</span>
+                                                    <span className="text-sm font-bold">{t('settings.system')}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'language' && (
+                                    <div className="space-y-6 animate-fade-in">
+                                        <div>
+                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{t('settings.language')}</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <button onClick={() => setLang('en')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${lang === 'en' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                    <div className="text-4xl">🇬🇧</div>
+                                                    <span className="text-sm font-bold">English</span>
+                                                </button>
+                                                <button onClick={() => setLang('vi')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${lang === 'vi' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                    <div className="text-4xl">🇻🇳</div>
+                                                    <span className="text-sm font-bold">Tiếng Việt</span>
+                                                </button>
+                                                <button onClick={() => setLang('de')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${lang === 'de' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                    <div className="text-4xl">🇩🇪</div>
+                                                    <span className="text-sm font-bold">Deutsch</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -785,12 +1180,260 @@
             );
         };
 
+        const ElasticityChart = ({ data, isDark, t }) => {
+            const pdpData = data.pdp_data || {};
+            const availableDrivers = Object.keys(pdpData);
+
+            // Fallback Logic: If no PDP data, try to synthesize for top driver
+            const hasRealData = availableDrivers.length > 0;
+
+            // Get Top Driver for fallback
+            const driverCols = data.driver_cols || [];
+            const importance = data.importance || {};
+            const topDriverObj = driverCols.map(d => ({ name: d, val: importance[d] || 0 }))
+                .sort((a, b) => Math.abs(b.val) - Math.abs(a.val))[0];
+
+            // State
+            const [selectedDriver, setSelectedDriver] = useState(null);
+
+            useEffect(() => {
+                // Only auto-select if nothing is selected OR the current selection is no longer valid
+                if (hasRealData) {
+                    if (!selectedDriver || !availableDrivers.includes(selectedDriver)) {
+                        setSelectedDriver(availableDrivers[0]);
+                    }
+                } else if (!hasRealData && topDriverObj) {
+                    if (!selectedDriver || selectedDriver !== topDriverObj.name) {
+                        setSelectedDriver(topDriverObj.name);
+                    }
+                }
+            }, [availableDrivers, hasRealData, topDriverObj, selectedDriver]);
+
+            // Determine Points
+            let points = [];
+            let driversList = [];
+
+            if (hasRealData) {
+                driversList = availableDrivers;
+                points = pdpData[selectedDriver] || [];
+            } else if (topDriverObj) {
+                // Synthetic Generation
+                driversList = [topDriverObj.name];
+                // Use selected driver coeff if available (or top driver if match)
+                const coeff = importance[selectedDriver] || topDriverObj.val;
+
+                for (let i = -3; i <= 3; i += 0.5) {
+                    points.push({ x: i, y: coeff * i });
+                }
+            }
+
+            if (points.length === 0) return <div className="flex h-full items-center justify-center text-xs text-slate-400">No Elasticity Data</div>;
+
+            return (
+                <div className="h-full flex flex-col">
+                    <div className="flex justify-between items-center mb-2">
+                        <div className="text-xs font-bold text-slate-500">{t('charts.marginalEffect')}</div>
+                        {driversList.length > 0 && (
+                            <select
+                                className="text-[10px] bg-slate-100 dark:bg-slate-800 border-none rounded px-2 py-1 outline-none text-slate-700 dark:text-slate-300 max-w-[120px]"
+                                value={selectedDriver || ''}
+                                onChange={e => setSelectedDriver(e.target.value)}
+                            >
+                                {driversList.map(d => <option key={d} value={d}>{d}</option>)}
+                            </select>
+                        )}
+                    </div>
+                    <div className="flex-1 min-h-0">
+                        <ResponsiveContainer width="99%" height="100%">
+                            <LineChart data={points} margin={{ top: 5, right: 10, left: 15, bottom: 20 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e2e8f0"} />
+                                <XAxis
+                                    dataKey="x"
+                                    type="number"
+                                    tick={{ fontSize: 10, fill: isDark ? "#94a3b8" : "#64748b" }}
+                                    domain={['auto', 'auto']}
+                                    label={{ value: selectedDriver || 'Driver', position: 'insideBottom', offset: -5, fontSize: 11, fill: isDark ? "#94a3b8" : "#64748b" }}
+                                />
+                                <YAxis
+                                    tick={{ fontSize: 10, fill: isDark ? "#94a3b8" : "#64748b" }}
+                                    domain={['auto', 'auto']}
+                                    label={{ value: data.target_col || 'Target Impact', angle: -90, position: 'insideLeft', offset: 0, fontSize: 11, fill: isDark ? "#94a3b8" : "#64748b" }}
+                                />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#fff', borderColor: isDark ? '#334155' : '#e2e8f0', fontFamily: 'monospace', fontSize: '12px' }}
+                                    itemStyle={{ fontFamily: 'monospace', fontSize: '12px' }}
+                                    labelStyle={{ fontFamily: 'monospace', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}
+                                    formatter={(val) => val.toFixed(2)}
+                                    labelFormatter={(lbl) => `${selectedDriver || 'Value'}: ${parseFloat(lbl).toFixed(2)}`}
+                                />
+                                <Line type="monotone" dataKey="y" stroke="#10b981" strokeWidth={3} dot={{ r: 2, fill: '#10b981' }} activeDot={{ r: 5, fill: '#10b981' }} name={data.target_col ? `${data.target_col} Impact` : "Impact"} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            );
+        };
+
+        const WaterfallChart = ({ data, isDark, t }) => {
+            const [selDate, setSelDate] = useState(null);
+            const contribs = data.forecast_contributions || [];
+
+            useEffect(() => {
+                if (contribs.length > 0 && !selDate) {
+                    setSelDate(contribs[contribs.length - 1].date);
+                }
+            }, [contribs]);
+
+            if (!contribs || contribs.length === 0) return (
+                <div className="flex flex-col h-full items-center justify-center text-xs text-slate-400 gap-2">
+                    <p>{t('charts.noAttribution')}</p>
+                    <button onClick={() => alert("Please run 'Execute Forecast' again to generate attribution data.")} className="underline hover:text-brand-gold">Why?</button>
+                </div>
+            );
+
+            const rec = contribs.find(r => r.date === selDate) || contribs[0];
+
+            // Robustly identify driver keys: use metadata OR fallback to record keys
+            let drivers = data.driver_cols || [];
+            if (!drivers.length) {
+                drivers = Object.keys(rec).filter(k => k !== 'date' && k !== 'base');
+            }
+
+            // Prepare Waterfall Data
+            // Order: Base -> Driver 1 -> Driver N -> Total
+
+            const chartData = [];
+
+            // 1. Base Column
+            const baseVal = rec.base || 0;
+            // For Contribution Chart: Base is just a bar
+            chartData.push({ name: 'Base', val: baseVal, fill: 'url(#baseGradient)', isTotal: false });
+
+            // 2. Drivers - Plot actual values (positive or negative)
+            drivers.forEach(d => {
+                const val = rec[d] || 0;
+                chartData.push({
+                    name: d,
+                    val: val,
+                    fill: val >= 0 ? '#10b981' : '#f59e0b',
+                    isTotal: false
+                });
+            });
+
+            // 3. Total Column - Sum of Base + Drivers
+            // We calculate explicit total to ensure it matches
+            const calcTotal = baseVal + drivers.reduce((acc, d) => acc + (rec[d] || 0), 0);
+            chartData.push({ name: 'Total', val: calcTotal, fill: 'url(#totalGradient)', isTotal: true });
+
+            // Determine label rotation based on number of items and screen size
+            const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+            const shouldRotate = chartData.length > 4;
+            const labelAngle = isMobile ? -90 : (shouldRotate ? -45 : 0);
+            const bottomMargin = isMobile ? 60 : (shouldRotate ? 40 : 20);
+
+            return (
+                <div className="h-full flex flex-col">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-bold text-slate-500">{t('charts.attribution')}</span>
+                        <select className="text-[10px] bg-slate-100 dark:bg-slate-800 border-none rounded px-2 py-1 outline-none" value={selDate || ''} onChange={e => setSelDate(e.target.value)}>
+                            {contribs.map(c => <option key={c.date} value={c.date}>{c.date}</option>)}
+                        </select>
+                    </div>
+                    <div className="flex-1 min-h-0">
+                        <ResponsiveContainer width="99%" height="100%">
+                            <BarChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: bottomMargin }}>
+                                <defs>
+                                    <linearGradient id="baseGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#64748b" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#334155" stopOpacity={1} />
+                                    </linearGradient>
+                                    <linearGradient id="totalGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#f59e0b" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#10b981" stopOpacity={1} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e2e8f0"} vertical={false} />
+                                <XAxis
+                                    dataKey="name"
+                                    tick={{ fontSize: 9, fill: isDark ? "#94a3b8" : "#64748b" }}
+                                    interval={0}
+                                    angle={labelAngle}
+                                    textAnchor={labelAngle !== 0 ? "end" : "middle"}
+                                    height={bottomMargin}
+                                />
+                                <YAxis tick={{ fontSize: 10, fill: isDark ? "#94a3b8" : "#64748b" }} />
+                                <Tooltip content={({ active, payload }) => {
+                                    if (active && payload && payload.length) {
+                                        const d = payload[0].payload;
+                                        return (
+                                            <div className={`p-2 rounded shadow-lg border font-mono ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'}`}>
+                                                <div className="text-[12px] font-bold mb-1">{d.name}</div>
+                                                <div className="text-[12px]">Value: {d.val.toFixed(2)}</div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                }} cursor={{ fill: 'transparent' }} />
+                                <ReferenceLine y={0} stroke={isDark ? "#475569" : "#cbd5e1"} />
+                                <Bar dataKey="val" radius={[2, 2, 0, 0]}>
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            );
+        };
+
         const MainApp = () => {
-            const [activeTab, setActiveTab] = useState('validation');
+            const [activeTab, setActiveTab] = useState('all_in_one');
             const [viewMode, setViewMode] = useState('overview');
             const [sidebarTab, setSidebarTab] = useState('import');
             const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
             const [isDark, setIsDark] = useState(false);
+            const [lang, setLang] = useState(() => localStorage.getItem('preferredLang') || 'en');
+
+            // --- Auto-detect Language (only for first-time visitors) ---
+            useEffect(() => {
+                const savedLang = localStorage.getItem('preferredLang');
+                if (savedLang) return; // User has visited before, use saved preference
+
+                const detectLanguage = async () => {
+                    try {
+                        const response = await fetch('https://ipapi.co/json/');
+                        if (response.ok) {
+                            const data = await response.json();
+                            const country = data.country_code;
+                            let detectedLang = 'en';
+                            if (country === 'VN') detectedLang = 'vi';
+                            else if (country === 'DE') detectedLang = 'de';
+                            setLang(detectedLang);
+                            localStorage.setItem('preferredLang', detectedLang);
+                        }
+                    } catch (error) {
+                        console.warn("Language auto-detection failed, using default.");
+                    }
+                };
+                detectLanguage();
+            }, []);
+
+            // --- Save language preference when changed ---
+            useEffect(() => {
+                localStorage.setItem('preferredLang', lang);
+            }, [lang]);
+
+            // Helper for translations
+            const t = (path) => {
+                const keys = path.split('.');
+                let current = translations[lang] || translations['en'];
+                for (const key of keys) {
+                    if (current[key] === undefined) return path;
+                    current = current[key];
+                }
+                return current;
+            };
 
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [time, setTime] = useState(new Date());
@@ -802,14 +1445,15 @@
 
             useEffect(() => {
                 const checkConnection = async () => {
-                    // Check if we are running in a local environment
-                    const isLocalDomain = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    // Check if we are running in a local environment (localhost or file protocol)
+                    const isLocal = window.location.hostname === 'localhost' ||
+                        window.location.hostname === '127.0.0.1' ||
+                        window.location.protocol === 'file:';
 
-                    if (!isLocalDomain) {
-                        // If not local, default immediately to Cloud API and skip local check
+                    if (!isLocal) {
+                        // If on a real production domain, default immediately to Cloud API
                         setApiUrl(API_ENDPOINTS.PROD);
                         setConnectionStatus('cloud');
-                        console.log("Running in Cloud environment. Skipping Local API check.");
                         return;
                     }
 
@@ -970,6 +1614,45 @@
                     .catch(e => setStatus('failed'));
             };
 
+            const handleExport = async () => {
+                if (!file || !mapping) return;
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('sku_col', mapping.sku);
+                fd.append('date_col', mapping.date);
+                fd.append('value_col', mapping.value);
+                fd.append('driver_cols', mapping.drivers.join(','));
+                fd.append('validation_method', valMethod);
+                fd.append('train_horizon', Math.max(1, trainHorizon));
+                fd.append('test_horizon', Math.max(1, testHorizon));
+                fd.append('forecast_steps', Math.max(1, forecastHorizon));
+
+                // Pass scenario results if user has run the Scenario Planner
+                if (scenarioResults && scenarioResults.length > 0 && currentSku) {
+                    fd.append('use_scenario', 'true');
+                    fd.append('scenario_sku', currentSku);
+                    fd.append('scenario_forecasts', JSON.stringify(scenarioResults));
+                    fd.append('scenario_drivers', JSON.stringify(scenarioData));
+                }
+
+                try {
+                    const res = await fetch(`${apiUrl}/synthesis/export`, { method: 'POST', body: fd });
+                    if (!res.ok) throw new Error("Export failed");
+                    let filename = `Operartis_AdvancedForecast_${file.name.replace(/\.[^/.]+$/, '')}_${new Date().toISOString().slice(0, 19).replace(/[-:T]/g, '')}.xlsx`;
+                    const disposition = res.headers.get('Content-Disposition');
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        const filenameRegex = /filename[^;=\\n]*=((['"]).*?\\2|[^;\\n]*)/;
+                        const matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) { filename = matches[1].replace(/['"]/g, ''); }
+                    }
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = filename;
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                } catch (e) { console.error('Export error:', e); }
+            };
+
             const resetApp = () => {
                 setFile(null);
                 setMapping(null);
@@ -1023,25 +1706,49 @@
                 setCurrentSku(results[nextIdx].sku);
             };
 
+            const EyeIcon = () => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+            );
+
             // Sidebar Section Component
             const SidebarSection = ({ id, label, children }) => {
                 const isActive = sidebarTab === id;
                 return (
                     <div className="mb-4">
-                        <div
-                            className={`cursor-pointer p-3 rounded-lg border transition-all duration-300 mb-2 flex items-center justify-center ${isActive ? 'border-brand-gold bg-white dark:bg-slate-800 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50'}`}
-                            onClick={() => {
-                                setSidebarTab(id);
-                                if (id === 'validation') { setActiveTab('validation'); }
-                                if (id === 'forecast') { setActiveTab('forecast'); }
-                                if (id === 'batch') setViewMode('overview');
-                                else setViewMode('detail');
-                            }}
-                        >
-                            <h3 className={`text-xxs font-bold uppercase tracking-wider transition-colors text-center ${isActive ? 'text-brand-gold' : 'text-slate-500 dark:text-slate-400 dark:group-hover:text-slate-200'}`}>
-                                {label}
-                            </h3>
-                        </div>
+                        {id === 'all_in_one' ? (
+                            <div
+                                className={`p-2 rounded-lg cursor-pointer mb-1 transition-colors flex items-center justify-between group ${sidebarTab === 'all_in_one' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                onClick={() => {
+                                    setSidebarTab('all_in_one');
+                                    setActiveTab('all_in_one');
+                                    setViewMode('detail');
+                                }}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-1.5 rounded transition-colors ${sidebarTab === 'all_in_one' ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-white'}`}>
+                                        <EyeIcon />
+                                    </div>
+                                    <span className="text-xs font-bold">Detailed View</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div
+                                className={`cursor-pointer p-3 rounded-lg border transition-all duration-300 mb-2 flex items-center justify-center ${isActive ? 'border-brand-gold bg-white dark:bg-slate-800 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50'}`}
+                                onClick={() => {
+                                    setSidebarTab(id);
+                                    if (id === 'forecast') { setActiveTab('forecast'); }
+                                    if (id === 'batch') setViewMode('overview');
+                                    else setViewMode('detail');
+                                }}
+                            >
+                                <h3 className={`text-xxs font-bold uppercase tracking-wider transition-colors text-center ${isActive ? 'text-brand-gold' : 'text-slate-500 dark:text-slate-400 dark:group-hover:text-slate-200'}`}>
+                                    {label}
+                                </h3>
+                            </div>
+                        )}
                         <div className={`px-2 transition-opacity duration-200 opacity-100`}>
                             {children}
                         </div>
@@ -1065,219 +1772,182 @@
 
 
             const renderDetailContent = () => {
-                if (!selectedResult) return <div className="h-full flex items-center justify-center text-slate-400">Select a valid SKU</div>;
+                if (!selectedResult && status !== 'running') return <div className="flex h-full items-center justify-center text-slate-400">Select a SKU to view details</div>;
+                if (!selectedResult) return null;
 
-                if (sidebarTab === 'all_in_one') {
-                    return (
-                        <div className="flex flex-col h-full overflow-y-auto md:overflow-hidden">
-                            <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} />
-                            <div className="flex flex-col md:flex-row h-full gap-4 min-h-0 flex-1">
-                                <div className="flex flex-col w-full md:w-1/2 gap-4 h-full md:h-auto shrink-0 min-h-[500px] md:min-h-0">
-                                    <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col min-h-[250px] md:min-h-0">
-                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Backtesting</h3>
-                                        <BacktestChart data={selectedResult} syncId="syncedCharts" isDark={isDark} />
-                                    </div>
-                                    <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col min-h-[250px] md:min-h-0">
-                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Forecast</h3>
-                                        <ForecastChart data={selectedResult} scenarioResults={scenarioResults} syncId="syncedCharts" isDark={isDark} />
-                                    </div>
-                                </div>
-                                <div className="flex flex-col w-full md:w-1/2 gap-4 h-full md:h-auto shrink-0 min-h-[500px] md:min-h-0">
-                                    <div className="h-1/3 min-h-[200px] bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col">
-                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Driver Impact</h3>
-                                        <DriverImportance data={selectedResult} isDark={isDark} />
-                                    </div>
-                                    <div className="flex-1 min-h-[300px] bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col">
-                                        <ScenarioPlanner
-                                            data={selectedResult}
-                                            scenarioData={scenarioData}
-                                            setScenarioData={setScenarioData}
-                                            runScenario={runScenario}
-                                            isSimulating={isSimulating}
-                                            jobId={jobId}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                } else {
-                    if (activeTab === 'validation') {
+                switch (sidebarTab) {
+
+
+                    case 'forecast':
                         return (
-                            <div className="flex flex-col h-full gap-4">
-                                <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} />
-                                <div className="flex-1 flex flex-col gap-6 min-h-0">
-                                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex-1 min-h-0 flex flex-col">
-                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Backtesting (Historical Validation)</h3>
-                                        <BacktestChart data={selectedResult} isDark={isDark} />
+                            <div className="flex flex-col h-full overflow-y-auto md:overflow-hidden gap-4">
+                                <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
+                                <div className="flex flex-col h-auto md:h-full gap-6 min-h-0 flex-1 pb-4 md:pb-0">
+                                    <div className="flex flex-col w-full h-[350px] md:h-0 md:flex-[2] min-h-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 p-4 min-w-0 w-full max-w-full overflow-hidden shadow-sm">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">{t('titles.synthesis')}</h3>
+                                        <ForecastChart data={selectedResult} scenarioResults={scenarioResults} isDark={isDark} showScenario={true} t={t} />
                                     </div>
-                                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 h-1/3 min-h-[200px] flex flex-col">
-                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Driver Impact (Importance)</h3>
-                                        <DriverImportance data={selectedResult} isDark={isDark} />
+                                    <div className="flex flex-col w-full h-[400px] md:h-0 md:flex-[3] min-h-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 p-4 min-w-0 w-full max-w-full overflow-hidden shadow-sm">
+                                        <ScenarioPlanner data={selectedResult} scenarioData={scenarioData} setScenarioData={setScenarioData} runScenario={runScenario} isSimulating={isSimulating} jobId={jobId} t={t} />
                                     </div>
                                 </div>
                             </div>
                         );
-                    } else {
+
+                    case 'all_in_one':
                         return (
-                            <div className="flex flex-col h-full gap-4 overflow-y-auto md:overflow-hidden">
-                                <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} />
-                                <div className="flex flex-col md:flex-row h-full gap-6 min-h-0 flex-1">
-                                    <div className="flex-1 min-h-[400px] md:min-h-0 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col">
-                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Total Synthesis Forecast</h3>
-                                        <ForecastChart data={selectedResult} scenarioResults={scenarioResults} isDark={isDark} />
+                            <div className="flex flex-col h-full overflow-y-auto md:overflow-hidden gap-4">
+                                <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
+                                <div className="flex flex-col flex-1 min-h-0 gap-4 pb-4 md:pb-0">
+                                    {/* Top: Validation */}
+                                    <div className="flex flex-col w-full h-[400px] md:h-auto md:flex-1 min-h-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 p-4 min-w-0 w-full max-w-full overflow-hidden shadow-sm">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">{t('titles.validation')}</h3>
+                                        <BacktestChart data={selectedResult} syncId="syncedCharts" isDark={isDark} t={t} />
                                     </div>
-                                    <div className="w-full md:w-1/3 min-h-[400px] md:min-h-0 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col">
-                                        <ScenarioPlanner
-                                            data={selectedResult}
-                                            scenarioData={scenarioData}
-                                            setScenarioData={setScenarioData}
-                                            runScenario={runScenario}
-                                            isSimulating={isSimulating}
-                                            jobId={jobId}
-                                        />
+                                    {/* Bottom: Forecast */}
+                                    <div className="flex flex-col w-full h-[400px] md:h-auto md:flex-1 min-h-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 p-4 min-w-0 w-full max-w-full overflow-hidden shadow-sm">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">{t('titles.forecast')}</h3>
+                                        <ForecastChart data={selectedResult} scenarioResults={scenarioResults} syncId="syncedCharts" isDark={isDark} showScenario={false} t={t} />
                                     </div>
                                 </div>
                             </div>
                         );
-                    }
+
+                    case 'causal':
+                        return (
+                            <div className="flex flex-col h-full overflow-y-auto md:overflow-hidden gap-4">
+                                <DetailKPITopBar data={selectedResult} results={results} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
+                                <div className="flex flex-col h-auto md:h-full gap-4 min-h-0 md:flex-1 pb-4 md:pb-0">
+                                    <div className="h-[300px] md:h-1/3 flex-none bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 p-4 flex flex-col w-full max-w-full overflow-hidden shadow-sm">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">{t('titles.driverImpact')}</h3>
+                                        <DriverImportance data={selectedResult} isDark={isDark} t={t} />
+                                    </div>
+                                    <div className="flex flex-col md:flex-row w-full h-auto md:flex-1 gap-4 min-h-0">
+                                        <div className="w-full md:flex-1 h-[300px] md:h-auto bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 p-4 flex flex-col min-h-0 w-full max-w-full overflow-hidden shadow-sm">
+                                            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">{t('titles.elasticity')}</h3>
+                                            <ElasticityChart data={selectedResult} isDark={isDark} t={t} />
+                                        </div>
+                                        <div className="w-full md:flex-1 h-[300px] md:h-auto bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 p-4 flex flex-col min-h-0 w-full max-w-full overflow-hidden shadow-sm">
+                                            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">{t('titles.bridge')}</h3>
+                                            <WaterfallChart data={selectedResult} isDark={isDark} t={t} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    default:
+                        return null;
                 }
             };
 
             return (
-                <div className="flex min-h-[100dvh] lg:h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
-                    <aside className={`bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-xl z-20 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-16'} relative`}>
-                        <div className={`h-16 flex items-center border-b border-slate-200 dark:border-slate-800 flex-shrink-0 transition-all ${sidebarOpen ? 'px-4 gap-3 justify-center' : 'justify-center'}`}>
-                            {/* Logo */}
-                            <a href="https://operartis.vercel.app/terminal.html" className="flex-shrink-0">
-                                <img
-                                    src="./icononly_transparent_nobuffer.png"
-                                    alt="Operartis Logo"
-                                    className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer hover:opacity-80 transition-opacity"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.style.display = 'none';
-                                    }}
-                                />
-                            </a>
+                <div className="flex min-h-[100dvh] lg:h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-100 via-slate-50 to-teal-100 dark:from-slate-950 dark:via-slate-900 dark:to-cyan-950 text-slate-800 dark:text-slate-100 relative">
+                    {sidebarOpen && <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-20 md:hidden" onClick={() => setSidebarOpen(false)}></div>}
+                    <aside className={`bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border-r border-white/40 dark:border-white/10 flex flex-col shadow-2xl z-30 w-64 fixed inset-y-0 left-0 h-full shrink-0 ring-1 ring-white/20 dark:ring-white/5 transform transition-transform duration-300 md:translate-x-0 md:static ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                        <div className="h-16 relative flex items-center justify-center border-b border-slate-200 dark:border-slate-800 flex-shrink-0 px-10">
+                            <div className="flex items-center gap-3 w-full justify-center">
+                                {/* Logo */}
+                                <a href="https://operartis.vercel.app/terminal.html" className="flex-shrink-0">
+                                    <img
+                                        src="./icononly_transparent_nobuffer.png"
+                                        alt="Operartis Logo"
+                                        className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.style.display = 'none';
+                                        }}
+                                    />
+                                </a>
 
-                            {/* Title */}
-                            {sidebarOpen && <span className="font-bold text-lg animate-fade-in truncate">OPERARTIS</span>}
+                                {/* Title */}
+                                <span className="font-bold text-base md:text-lg animate-fade-in truncate">OPERARTIS</span>
+                            </div>
+                            <button onClick={() => setSidebarOpen(false)} className="md:hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-colors p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"><XIcon /></button>
                         </div>
 
-                        {sidebarOpen && (
-                            <div className="flex-1 flex flex-col overflow-hidden animate-fade-in">
-                                <div className="flex-1 overflow-y-auto px-2 py-4">
+                        <div className="flex-1 flex flex-col overflow-hidden animate-fade-in">
+                            <div className="flex-1 overflow-y-auto px-2 py-4">
 
-
-                                    <div className="flex items-center gap-2 mb-2 mt-2 px-1"><h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">Data Import</h3><div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div></div>
-                                    <div className="px-1">
-                                        <div className="space-y-4">
-                                            <div onClick={() => document.getElementById('upl').click()} className={`border-2 border-dashed rounded-xl p-4 mx-4 text-center cursor-pointer transition-all hover:scale-[1.02] ${file ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'border-slate-300 dark:border-slate-700 hover:border-brand-gold'}`}>
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <UploadIcon />
-                                                    <p className="text-xs font-bold text-slate-600 dark:text-slate-300 truncate w-full">{file ? file.name : "Upload Data"}</p>
-                                                    {file && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-full">Data Uploaded Successfully</span>}
-                                                </div>
+                                <div className="flex items-center gap-2 mb-2 mt-2 px-1"><h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">{t('sidebar.import')}</h3><div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div></div>
+                                <div className="px-1">
+                                    <div className="space-y-4">
+                                        <div onClick={() => document.getElementById('upl').click()} className={`border-2 border-dashed rounded-xl p-4 mx-4 text-center cursor-pointer transition-all hover:scale-[1.02] ${file ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'border-slate-300 dark:border-slate-700 hover:border-brand-gold'}`}>
+                                            <div className="flex flex-col items-center gap-2">
+                                                <UploadIcon />
+                                                <p className="text-xs font-bold text-slate-600 dark:text-slate-300 truncate w-full">{file ? file.name : t('upload.title')}</p>
+                                                {file && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-full">{t('sidebar.uploadSuccess')}</span>}
                                             </div>
-                                            <input id="upl" type="file" hidden onChange={handleFileUpload} />
-
                                         </div>
+                                        <input id="upl" type="file" hidden onChange={handleFileUpload} />
+
                                     </div>
-
-                                    <div className="flex items-center gap-2 mb-2 mt-6 px-1"><h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">Configuration</h3><div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div></div>
-                                    <div className="px-1">
-                                        <div className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
-                                            <div><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">Validation Method</label><select className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200" value={valMethod} onChange={e => setValMethod(e.target.value)}><option value="simple">Simple Split</option><option value="rolling_window">Rolling Window</option><option value="walk_forward">Walk-Forward</option></select></div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div className="flex flex-col"><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end">Train Horizon</label><input type="number" min="1" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={trainHorizon} onChange={e => setTrainHorizon(Math.max(1, parseInt(e.target.value) || 1))} /></div>
-                                                <div className="flex flex-col"><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end">Test Horizon</label><input type="number" min="1" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={testHorizon} onChange={e => setTestHorizon(Math.max(1, parseInt(e.target.value) || 1))} /></div>
-                                            </div>
-                                            <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                                                <div><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">Forecast Horizon</label><input type="number" min="1" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={forecastHorizon} onChange={e => setForecastHorizon(Math.max(1, parseInt(e.target.value) || 1))} /></div>
-                                            </div>
-                                            <button onClick={runSynthesis} disabled={status === 'running' || !mapping} className="w-full py-3 mt-2 bg-brand-gold text-white text-xs font-bold rounded-lg shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                                                {status === 'running' ? 'Processing...' : 'Execute Forecast'}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 mb-2 mt-6 px-1"><h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">Forecasting Results</h3><div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div></div>
-
-                                    <SidebarSection id="batch" label="Batch Overview">
-                                    </SidebarSection>
-
-                                    <SidebarSection id="all_in_one" label="All-In-One View">
-                                    </SidebarSection>
-
-                                    <SidebarSection id="validation" label="Data Validation">
-                                    </SidebarSection>
-
-                                    <SidebarSection id="forecast" label="Forecast Running">
-                                    </SidebarSection>
-
-
-                                    <button onClick={resetApp} className="w-full py-2 mt-2 flex items-center justify-center gap-2 text-xxs font-bold text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded transition-colors">
-                                        <TrashIcon /> Reset All
-                                    </button>
                                 </div>
 
-                                <div className="relative p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
-                                    <div className="text-center">
-                                        <div className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Operartis Analytics</div>
-                                        <div className="text-[10px] text-amber-600 dark:text-amber-500 italic mt-1 font-medium">Optimizing Today, Growing Tomorrow</div>
+                                <div className="flex items-center gap-2 mb-2 mt-6 px-1"><h3 className="text-xxs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest whitespace-nowrap">{t('sidebar.config')}</h3><div className="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div></div>
+                                <div className="px-1">
+                                    <div className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                                        <div><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.validation')}</label><select className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200" value={valMethod} onChange={e => setValMethod(e.target.value)}><option value="simple">Simple Split</option><option value="rolling_window">Rolling Window</option><option value="walk_forward">Walk-Forward</option></select></div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="flex flex-col"><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end">{t('sidebar.trainHorizon')}</label><input type="number" min="1" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={trainHorizon} onChange={e => setTrainHorizon(e.target.value === '' ? '' : parseInt(e.target.value) || '')} onBlur={e => setTrainHorizon(Math.max(1, parseInt(e.target.value) || 1))} /></div>
+                                            <div className="flex flex-col"><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end">{t('sidebar.testHorizon')}</label><input type="number" min="1" max="12" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={testHorizon} onChange={e => setTestHorizon(e.target.value === '' ? '' : parseInt(e.target.value) || '')} onBlur={e => setTestHorizon(Math.min(12, Math.max(1, parseInt(e.target.value) || 1)))} /></div>
+                                        </div>
+                                        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                                            <div><label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.forecastHorizon')}</label><input type="number" min="1" max="12" className="w-full text-xxs p-2 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 dark:[color-scheme:dark]" value={forecastHorizon} onChange={e => setForecastHorizon(e.target.value === '' ? '' : parseInt(e.target.value) || '')} onBlur={e => setForecastHorizon(Math.min(12, Math.max(1, parseInt(e.target.value) || 1)))} /></div>
+                                        </div>
+                                        <button onClick={runSynthesis} disabled={status === 'running' || !mapping} className="w-full py-3 mt-2 bg-brand-gold text-white text-xs font-bold rounded-lg shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                            {status === 'running' ? (
+                                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" /></svg>
+                                            )}
+                                            {status === 'running' ? t('buttons.processing') : t('buttons.execute')}
+                                        </button>
+                                        <button onClick={handleExport} disabled={!file || !mapping} className={`w-full py-3 mt-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || !mapping ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 hover:shadow-emerald-500/40'}`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                                            {t('buttons.exportReq')}
+                                        </button>
                                     </div>
-
-                                    <button
-                                        onClick={() => setSidebarOpen(false)}
-                                        className="absolute right-0 top-0 bottom-0 w-8 flex items-center justify-center text-slate-400 hover:text-brand-gold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                                        title="Collapse Sidebar"
-                                    >
-                                        <SidebarCloseIcon />
-                                    </button>
                                 </div>
+
+
                             </div>
-                        )}
-                        {!sidebarOpen && (
-                            <div className="flex flex-col items-center mt-4 gap-4 flex-1">
-                                <button className="bg-white dark:bg-slate-800 text-slate-400 hover:text-brand-gold border border-slate-200 dark:border-slate-700 rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors" title="Import" onClick={() => { setSidebarOpen(true); setSidebarTab('import'); }}><UploadIcon /></button>
-                                <button className="bg-white dark:bg-slate-800 text-slate-400 hover:text-brand-gold border border-slate-200 dark:border-slate-700 rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors" title="Run" onClick={() => { if (status !== 'running' && mapping) runSynthesis(); }}><PlayIcon /></button>
-                                <div className="w-8 h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
-                                <button className={`bg-white dark:bg-slate-800 border rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors ${sidebarTab === 'batch' ? 'text-brand-gold border-brand-gold' : 'text-slate-400 hover:text-brand-gold border-slate-200 dark:border-slate-700'}`} title="Batch Overview" onClick={() => { setSidebarTab('batch'); setViewMode('overview'); }}><GridIcon /></button>
-                                <button className={`bg-white dark:bg-slate-800 border rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors ${sidebarTab === 'all_in_one' ? 'text-brand-gold border-brand-gold' : 'text-slate-400 hover:text-brand-gold border-slate-200 dark:border-slate-700'}`} title="All-In-One View" onClick={() => { setSidebarTab('all_in_one'); setViewMode('detail'); }}><LayoutIcon /></button>
-                                <button className={`bg-white dark:bg-slate-800 border rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors ${sidebarTab === 'validation' ? 'text-brand-gold border-brand-gold' : 'text-slate-400 hover:text-brand-gold border-slate-200 dark:border-slate-700'}`} title="Data Validation" onClick={() => { setSidebarTab('validation'); setActiveTab('validation'); setViewMode('detail'); }}><ClipboardCheckIcon /></button>
-                                <button className={`bg-white dark:bg-slate-800 border rounded-full p-2 shadow-md z-30 flex items-center justify-center transition-colors ${sidebarTab === 'forecast' ? 'text-brand-gold border-brand-gold' : 'text-slate-400 hover:text-brand-gold border-slate-200 dark:border-slate-700'}`} title="Forecast Running" onClick={() => { setSidebarTab('forecast'); setActiveTab('forecast'); setViewMode('detail'); }}><ActivityIcon /></button>
-                            </div>
-                        )}
-                        {!sidebarOpen && (
-                            <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-center relative">
-                                <button
-                                    onClick={() => setSidebarOpen(true)}
-                                    className="bg-white dark:bg-slate-800 text-slate-400 hover:text-brand-gold border border-slate-200 dark:border-slate-700 rounded-full p-1 shadow-md z-30 flex items-center justify-center transition-colors"
-                                    title="Expand Sidebar"
-                                >
-                                    <SidebarOpenIcon />
+
+                            <div className="px-4 pb-2">
+                                <button onClick={resetApp} className="w-full py-2 flex items-center justify-center gap-2 text-xxs font-bold text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded transition-colors border border-transparent hover:border-rose-200 dark:hover:border-rose-900/40">
+                                    <TrashIcon /> {t('buttons.resetAll')}
                                 </button>
                             </div>
-                        )}
+
+                            <div className="relative p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                                <div className="text-center">
+                                    <div className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Operartis Analytics</div>
+                                    <div className="text-[10px] text-amber-600 dark:text-amber-500 italic mt-1 font-medium">Optimizing Today, Growing Tomorrow</div>
+                                </div>
+                            </div>
+                        </div>
                     </aside>
 
-                    <main className="flex-1 flex flex-col overflow-visible lg:overflow-hidden bg-slate-50 dark:bg-slate-950">
+                    <main className="flex-1 min-w-0 flex flex-col overflow-hidden bg-transparent">
                         {/* Header */}
-                        <div className="h-16 flex justify-between items-center px-6 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex-none z-10 sticky top-0 lg:static">
-                            <div></div> {/* Spacer to balance flex */}
-                            <h2 className="text-lg md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest pl-12 md:pl-20 truncate">
+                        <div className="h-16 flex justify-between items-center px-4 md:px-6 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border-b border-white/50 dark:border-white/10 flex-none z-10 sticky top-0 lg:static relative shadow-sm ring-1 ring-white/20 dark:ring-white/5">
+                            <div className="flex items-center">
+                                <button onClick={() => setSidebarOpen(true)} className="md:hidden mr-4 text-slate-500 hover:text-brand-gold"><MenuIcon /></button>
+                            </div> {/* Spacer to balance flex */}
+                            <h2 className="absolute left-1/2 -translate-x-1/2 text-center w-auto max-w-[45%] md:max-w-[50%] lg:max-w-[60%] truncate text-sm md:text-base lg:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest">
                                 ADVANCED-ML FORECASTER
                             </h2>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-400 dark:text-slate-500 hidden md:flex">
                                     <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${connectionStatus === 'local' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-800'}`}>
                                         <ServerIcon />
-                                        <span>{connectionStatus === 'local' ? 'LOCAL' : connectionStatus === 'cloud' ? 'CLOUD' : 'CONNECTING...'}</span>
+                                        <span className="hidden lg:inline">{connectionStatus === 'local' ? 'LOCAL' : connectionStatus === 'cloud' ? 'CLOUD' : 'CONNECTING...'}</span>
                                     </div>
-                                    <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-2"></div>
-                                    <ClockIcon />
-                                    <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                                    <div className="hidden lg:flex items-center gap-2">
+                                        <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-2"></div>
+                                        <ClockIcon />
+                                        <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    </div>
                                 </div>
                                 <button onClick={() => setIsSettingsOpen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-brand-gold transition-colors">
                                     <div className="group-hover:rotate-90 transition-transform duration-500">
@@ -1289,35 +1959,54 @@
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 lg:overflow-hidden relative p-6">
-                            {results.length === 0 && status !== 'running' ? (
-                                <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-4">
-                                    <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300">
-                                        <UploadIcon />
+                        <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+                            <NavigationTabs
+                                activeTab={sidebarTab}
+                                onTabChange={(id) => {
+                                    setSidebarTab(id);
+                                    if (id === 'batch') setViewMode('overview');
+                                    else setViewMode('detail');
+                                    if (id === 'forecast') setActiveTab('forecast');
+                                }}
+                                t={t}
+                            />
+                            <div className="flex-1 overflow-y-auto scroller p-2 md:p-6 relative">
+                                {results.length === 0 && status !== 'running' ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-4">
+                                        <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300">
+                                            <UploadIcon />
+                                        </div>
+                                        <p className="font-medium">{t('status.ready')}</p>
+                                        <p className="text-xs opacity-60 max-w-xs text-center">{t('status.uploadPrompt')}</p>
                                     </div>
-                                    <p className="font-medium">Ready to Forecast</p>
-                                    <p className="text-xs opacity-60 max-w-xs text-center">Upload your dataset in the sidebar to begin the forecast process.</p>
-                                </div>
-                            ) : (
-                                status === 'running' ? (
-                                    <ForecastingLoader />
                                 ) : (
-                                    sidebarTab === 'batch' ? (
-                                        <BatchOverview results={results} onSelectSku={handleSkuSelect} />
+                                    status === 'running' ? (
+                                        <ForecastingLoader t={t} />
                                     ) : (
-                                        renderDetailContent()
+                                        <div className="flex flex-col h-full">
+                                            <div className="flex-1 min-h-0 relative">
+                                                {sidebarTab === 'batch' ? (
+                                                    <BatchOverview results={results} onSelectSku={handleSkuSelect} t={t} />
+                                                ) : (
+                                                    renderDetailContent()
+                                                )}
+                                            </div>
+                                        </div>
                                     )
-                                )
-                            )}
+                                )}
+                            </div>
                         </div>
                     </main>
 
-                    <MappingModal headers={headers} isOpen={mappingOpen} onClose={() => setMappingOpen(false)} onConfirm={(sku, d, v, dr, count) => { setMapping({ sku, date: d, value: v, drivers: dr }); setMappingOpen(false); }} />
+                    <MappingModal headers={headers} isOpen={mappingOpen} onClose={() => setMappingOpen(false)} onConfirm={(sku, d, v, dr, count) => { setMapping({ sku, date: d, value: v, drivers: dr }); setMappingOpen(false); }} t={t} />
                     <SettingsModal
                         isOpen={isSettingsOpen}
                         onClose={() => setIsSettingsOpen(false)}
                         theme={theme}
                         setTheme={setTheme}
+                        lang={lang}
+                        setLang={setLang}
+                        t={t}
                     />
                 </div>
             );
