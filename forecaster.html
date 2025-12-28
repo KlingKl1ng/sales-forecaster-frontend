@@ -891,7 +891,10 @@
                 try {
                     const res = await fetch(`${BASE_URL}/export`, { method: 'POST', body: fd });
                     if (!res.ok) throw new Error("Export failed");
-                    let filename = `Forecast_Report_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                    // Generate filename: Operartis_Forecast_{input filename}_{timestamp}.xlsx
+                    const inputBaseName = file.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19); // Format: YYYY-MM-DDTHH-MM-SS
+                    let filename = `Operartis_Forecast_${inputBaseName}_${timestamp}.xlsx`;
                     const disposition = res.headers.get('Content-Disposition');
                     if (disposition && disposition.indexOf('attachment') !== -1) {
                         const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
