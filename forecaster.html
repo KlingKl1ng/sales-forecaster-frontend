@@ -151,6 +151,7 @@
                     execute_btn: "Execute Forecast",
                     processing: "Processing...",
                     export_btn: "Export Report",
+                    downloading: "Downloading...",
                     reset_btn: "Reset Application",
                     footer_title: "Operartis Analytics",
                     footer_slogan: "Optimizing Today, Growing Tomorrow"
@@ -226,6 +227,7 @@
                     execute_btn: "Chạy dự báo",
                     processing: "Đang xử lý...",
                     export_btn: "Xuất báo cáo",
+                    downloading: "Đang tải xuống...",
                     reset_btn: "Đặt lại ứng dụng",
                     footer_title: "Operartis Analytics",
                     footer_slogan: "Optimizing Today, Growing Tomorrow"
@@ -725,6 +727,7 @@
             const [batchResults, setBatchResults] = useState(null);
             const [jobStatus, setJobStatus] = useState(null);
             const [error, setError] = useState(null);
+            const [isExporting, setIsExporting] = useState(false);
 
             // UI State
             const [currentSku, setCurrentSku] = useState(null);
@@ -877,42 +880,82 @@
 
             const handleExport = async () => {
                 if (!file || !dateCol || !skuCol || !valCol) { setError("Please load and map data first."); return; }
-                const fd = new FormData();
-                fd.append('file', file);
-                fd.append('model_type', 'auto');
-                fd.append('validation_method', validationMethod);
-                fd.append('train_horizon', parseInt(trainHorizon) || 24);
-                fd.append('test_horizon', parseInt(testHorizon) || 6);
-                fd.append('forecast_steps', parseInt(forecastSteps) || 6);
-                fd.append('sku_col', skuCol);
-                fd.append('date_col', dateCol);
-                fd.append('value_col', valCol);
+                if (isExporting) return;
+                setIsExporting(true);
 
-                try {
-                    const res = await fetch(`${BASE_URL}/export`, { method: 'POST', body: fd });
-                    if (!res.ok) throw new Error("Export failed");
-                    // Generate filename: Operartis_Forecast_{input filename}_{timestamp}.xlsx
-                    const inputBaseName = file.name.replace(/\.[^/.]+$/, ""); // Remove file extension
-                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19); // Format: YYYY-MM-DDTHH-MM-SS
-                    let filename = `Operartis_Forecast_${inputBaseName}_${timestamp}.xlsx`;
-                    const disposition = res.headers.get('Content-Disposition');
-                    if (disposition && disposition.indexOf('attachment') !== -1) {
-                        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                        const matches = filenameRegex.exec(disposition);
-                        if (matches != null && matches[1]) {
-                            filename = matches[1].replace(/['"]/g, '');
+                // Use fast export if cached results are available
+                if (batchResults && batchResults.length > 0) {
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    fd.append('validation_method', validationMethod);
+                    fd.append('forecast_steps', parseInt(forecastSteps) || 6);
+                    fd.append('sku_col', skuCol);
+                    fd.append('date_col', dateCol);
+                    fd.append('value_col', valCol);
+                    fd.append('cached_results', JSON.stringify(batchResults));
+
+                    try {
+                        const res = await fetch(`${BASE_URL}/export-fast`, { method: 'POST', body: fd });
+                        if (!res.ok) throw new Error("Export failed");
+                        const inputBaseName = file.name.replace(/\.[^/.]+$/, "");
+                        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                        let filename = `Operartis_Forecast_${inputBaseName}_${timestamp}.xlsx`;
+                        const disposition = res.headers.get('Content-Disposition');
+                        if (disposition && disposition.indexOf('attachment') !== -1) {
+                            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                            const matches = filenameRegex.exec(disposition);
+                            if (matches != null && matches[1]) {
+                                filename = matches[1].replace(/['"]/g, '');
+                            }
                         }
-                    }
+                        const blob = await res.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    } catch (e) { setError(e.message); }
+                    finally { setIsExporting(false); }
+                } else {
+                    // Fallback to slow export if no cached results
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    fd.append('model_type', 'auto');
+                    fd.append('validation_method', validationMethod);
+                    fd.append('train_horizon', parseInt(trainHorizon) || 24);
+                    fd.append('test_horizon', parseInt(testHorizon) || 6);
+                    fd.append('forecast_steps', parseInt(forecastSteps) || 6);
+                    fd.append('sku_col', skuCol);
+                    fd.append('date_col', dateCol);
+                    fd.append('value_col', valCol);
 
-                    const blob = await res.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                } catch (e) { setError(e.message); }
+                    try {
+                        const res = await fetch(`${BASE_URL}/export`, { method: 'POST', body: fd });
+                        if (!res.ok) throw new Error("Export failed");
+                        const inputBaseName = file.name.replace(/\.[^/.]+$/, "");
+                        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                        let filename = `Operartis_Forecast_${inputBaseName}_${timestamp}.xlsx`;
+                        const disposition = res.headers.get('Content-Disposition');
+                        if (disposition && disposition.indexOf('attachment') !== -1) {
+                            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                            const matches = filenameRegex.exec(disposition);
+                            if (matches != null && matches[1]) {
+                                filename = matches[1].replace(/['"]/g, '');
+                            }
+                        }
+                        const blob = await res.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    } catch (e) { setError(e.message); }
+                    finally { setIsExporting(false); }
+                }
             };
 
             const handleReset = () => {
@@ -1057,8 +1100,9 @@
                                         {isPolling ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
                                         {isPolling ? t('sidebar.processing') : t('sidebar.execute_btn')}
                                     </button>
-                                    <button onClick={handleExport} disabled={!file} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}>
-                                        <DownloadIcon /> {t('sidebar.export_btn')}
+                                    <button onClick={handleExport} disabled={!file || isExporting || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}>
+                                        {isExporting ? <div className="animate-spin"><RefreshIcon /></div> : <DownloadIcon />}
+                                        {isExporting ? t('sidebar.downloading') : t('sidebar.export_btn')}
                                     </button>
                                 </div>
                             </div>
