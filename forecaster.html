@@ -143,11 +143,17 @@
                 sidebar: {
                     source_data: "Source Data",
                     upload_label: "Upload Data",
+                    uploaded_mapped: "Uploaded & Mapped",
+                    action_required: "Action Required",
+                    reupload_file: "Re-upload File",
+                    edit_mapping: "Edit Mapping",
                     configuration: "Configuration",
                     val_method: "Validation Method",
                     train_h: "Train Horizon",
                     test_h: "Test Horizon",
                     fc_h: "Forecast Horizon",
+                    total_periods: "Total time periods",
+                    horizon_mismatch: "Train + Test must equal",
                     execute_btn: "Execute Forecast",
                     processing: "Processing...",
                     export_btn: "Export Report",
@@ -173,9 +179,11 @@
                 },
                 mapping: {
                     title: "Map Columns",
-                    date_col: "Date Column",
-                    sku_col: "SKU Column",
-                    val_col: "Value Column",
+                    sku_col: "SKU/Item ID Column",
+                    start_col: "First Month Column",
+                    end_col: "Last Month Column",
+                    preview: "Data Preview",
+                    months_detected: "months detected",
                     cancel: "Cancel",
                     confirm: "Confirm Mapping"
                 },
@@ -219,11 +227,17 @@
                 sidebar: {
                     source_data: "Dữ liệu nguồn",
                     upload_label: "Tải lên dữ liệu",
+                    uploaded_mapped: "Đã tải lên & Chọn dữ liệu",
+                    action_required: "Cần hành động",
+                    reupload_file: "Tải lại tệp",
+                    edit_mapping: "Chỉnh sửa dữ liệu",
                     configuration: "Cấu hình",
                     val_method: "Phương pháp kiểm định",
                     train_h: "Chu kỳ huấn luyện",
                     test_h: "Chu kỳ thử nghiệm",
                     fc_h: "Chu kỳ dự báo",
+                    total_periods: "Tổng số chu kỳ",
+                    horizon_mismatch: "Huấn luyện + Thử nghiệm phải bằng",
                     execute_btn: "Chạy dự báo",
                     processing: "Đang xử lý...",
                     export_btn: "Xuất báo cáo",
@@ -244,14 +258,16 @@
                     system: "Mặc định hệ thống",
                     about_title: "OPERARTIS",
                     about_slogan: "Optimizing today, Growing tomorrow.",
-                    about_text_1: "Được thành lập vào năm 2025, OPERARTIS là một công ty tư vấn và công nghệ chuyên dụng nhằm giúp các doanh nghiệp hợp lý hóa, tối ưu hóa và chuyển đổi hoạt động của họ. Công cụ dự báo máy học này là minh chứng cho cam kết của chúng tôi trong việc làm cho các công cụ phân tích nâng cao trở nên dễ tiếp cận.",
-                    about_text_2: "Chúng tôi chuyên về các hệ thống Lập kế hoạch và Lên lịch trình nâng cao (APS), thu hẹp khoảng cách giữa dữ liệu ERP thô và thông tin chiến lược có thể được biến đổi thành hành động hỗ trợ đưa ra quyết định."
+                    about_text_1: "OPERARTIS là một công ty tư vấn và công nghệ chuyên giúp các doanh nghiệp hợp lý hóa, tối ưu hóa quy trình vận hành của họ. Công cụ dự báo máy học này là minh chứng cho cam kết của chúng tôi trong việc làm cho các công cụ phân tích nâng cao trở nên dễ tiếp cận.",
+                    about_text_2: "Chúng tôi chuyên về các hệ thống Lập kế hoạch và Lên lịch trình cao cấp (APS), thu hẹp khoảng cách giữa dữ liệu ERP thô và thông tin chiến lược có thể được biến đổi thành hành động hỗ trợ đưa ra quyết định."
                 },
                 mapping: {
                     title: "Chọn cột dữ liệu",
-                    date_col: "Cột ngày tháng",
-                    sku_col: "Cột mã hàng (SKU)",
-                    val_col: "Cột giá trị",
+                    sku_col: "Cột mã hàng (SKU/Item ID)",
+                    start_col: "Cột thời gian đầu tiên",
+                    end_col: "Cột thời gian cuối cùng",
+                    preview: "Xem trước dữ liệu",
+                    months_detected: "chu kỳ được phát hiện",
                     cancel: "Hủy bỏ",
                     confirm: "Xác nhận"
                 },
@@ -528,44 +544,125 @@
 
         const MappingModal = ({ headers, isOpen, onClose, onConfirm, t }) => {
             const [sku, setSku] = useState('');
-            const [date, setDate] = useState('');
-            const [val, setVal] = useState('');
+            const [startCol, setStartCol] = useState('');
+            const [endCol, setEndCol] = useState('');
+
+            // Calculate number of months between start and end columns
+            const monthCount = useMemo(() => {
+                if (!startCol || !endCol || !headers.length) return 0;
+                const startIdx = headers.indexOf(startCol);
+                const endIdx = headers.indexOf(endCol);
+                if (startIdx < 0 || endIdx < 0 || endIdx < startIdx) return 0;
+                return endIdx - startIdx + 1;
+            }, [startCol, endCol, headers]);
 
             useEffect(() => {
                 if (isOpen && headers.length) {
-                    const lower = headers.map(h => String(h).toLowerCase());
-                    const find = (patterns) => {
-                        const idx = lower.findIndex(h => patterns.some(p => h.includes(p)));
-                        return idx >= 0 ? headers[idx] : "";
+                    console.log('MappingModal headers:', headers.slice(0, 5), '...');
+
+                    // Auto-detect date/month columns FIRST
+                    // Check for text month patterns OR datetime format patterns
+                    const monthPatterns = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+                    const datePatterns = [/^\d{4}-\d{2}-\d{2}/, /^\d{4}\/\d{2}\/\d{2}/, /^\d{2}[-\/]\d{2}[-\/]\d{4}/];
+
+                    const dateIndices = headers.map((h, i) => {
+                        const headerStr = String(h);
+                        const headerLower = headerStr.toLowerCase();
+                        // Check text month patterns (case insensitive)
+                        if (monthPatterns.some(p => headerLower.includes(p))) return i;
+                        // Check datetime patterns (YYYY-MM-DD, etc.) on original string
+                        if (datePatterns.some(p => p.test(headerStr))) return i;
+                        // Check if it looks like a date string (contains year numbers)
+                        if (/20\d{2}/.test(headerStr) || /19\d{2}/.test(headerStr)) return i;
+                        return -1;
+                    }).filter(i => i >= 0);
+
+                    console.log('Detected date column indices:', dateIndices);
+
+                    // Auto-detect SKU column (first non-date column that matches patterns)
+                    const findSku = () => {
+                        const patterns = ['sku', 'id', 'item', 'product', 'unique_id', 'item_id'];
+                        for (let i = 0; i < headers.length; i++) {
+                            // Skip if this is a detected date column
+                            if (dateIndices.includes(i)) continue;
+                            const headerLower = String(headers[i]).toLowerCase();
+                            if (patterns.some(p => headerLower.includes(p))) {
+                                return headers[i];
+                            }
+                        }
+                        // Fallback: first non-date column
+                        for (let i = 0; i < headers.length; i++) {
+                            if (!dateIndices.includes(i)) return headers[i];
+                        }
+                        return headers[0];
                     };
-                    if (!sku) setSku(find(['sku', 'id', 'item', 'product', 'unique_id']) || headers[0]);
-                    if (!date) setDate(find(['date', 'period', 'time', 'ds', 'timestamp']) || headers[1]);
-                    if (!val) setVal(find(['value', 'sales', 'demand', 'actual', 'qty', 'y']) || headers[2] || '');
+
+                    if (!sku) setSku(findSku());
+                    if (!startCol && dateIndices.length > 0) setStartCol(headers[dateIndices[0]]);
+                    if (!endCol && dateIndices.length > 0) setEndCol(headers[dateIndices[dateIndices.length - 1]]);
                 }
             }, [isOpen, headers]);
 
             const handleConfirm = () => {
-                onConfirm(sku, date, val);
+                onConfirm(sku, startCol, endCol);
             };
 
             if (!isOpen) return null;
 
+            // Filter headers for month selection (exclude SKU column and other non-numeric columns)
+            const potentialMonthCols = headers;
+
             return (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm modal-backdrop transition-opacity" onClick={onClose}></div>
-                    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-xl shadow-2xl w-full max-w-sm border border-white/20 dark:border-white/10 flex flex-col relative animate-slide-up z-10 ring-1 ring-black/5 dark:ring-white/5">
+                    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-xl shadow-2xl w-full max-w-md border border-white/20 dark:border-white/10 flex flex-col relative animate-slide-up z-10 ring-1 ring-black/5 dark:ring-white/5">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                             <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wide">{t('mapping.title')}</h2>
                             <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><XIcon /></button>
                         </div>
                         <div className="p-4 space-y-4">
-                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.date_col')}</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={date} onChange={e => setDate(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
-                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.sku_col')}</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={sku} onChange={e => setSku(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
-                            <div><label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.val_col')}</label><select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={val} onChange={e => setVal(e.target.value)}>{headers.map(h => <option key={h} value={h}>{h}</option>)}</select></div>
+                            {/* SKU Column */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.sku_col')}</label>
+                                <select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={sku} onChange={e => setSku(e.target.value)}>
+                                    {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                </select>
+                            </div>
+
+                            {/* Month Range Selection */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.start_col')}</label>
+                                    <select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={startCol} onChange={e => setStartCol(e.target.value)}>
+                                        {potentialMonthCols.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.end_col')}</label>
+                                    <select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={endCol} onChange={e => setEndCol(e.target.value)}>
+                                        {potentialMonthCols.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Preview Info */}
+                            {monthCount > 0 && (
+                                <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                                            {monthCount} {t('mapping.months_detected')}
+                                        </span>
+                                    </div>
+                                    <div className="mt-2 text-[10px] text-emerald-600 dark:text-emerald-500 font-mono">
+                                        {startCol} → {endCol}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
                             <button onClick={onClose} className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700">{t('mapping.cancel')}</button>
-                            <button onClick={handleConfirm} disabled={!sku || !date || !val} className="px-3 py-1.5 bg-brand-gold text-white text-xs font-bold rounded hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{t('mapping.confirm')}</button>
+                            <button onClick={handleConfirm} disabled={!sku || !startCol || !endCol || monthCount < 1} className="px-3 py-1.5 bg-brand-gold text-white text-xs font-bold rounded hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{t('mapping.confirm')}</button>
                         </div>
                     </div>
                 </div>
@@ -712,14 +809,22 @@
         const App = () => {
             const [file, setFile] = useState(null);
             const [availableCols, setAvailableCols] = useState([]);
-            const [dateCol, setDateCol] = useState("");
             const [skuCol, setSkuCol] = useState("");
-            const [valCol, setValCol] = useState("");
+            const [startCol, setStartCol] = useState("");
+            const [endCol, setEndCol] = useState("");
+            // Store indices directly to avoid string matching issues
+            const [skuColIdx, setSkuColIdx] = useState(-1);
+            const [startColIdx, setStartColIdx] = useState(-1);
+            const [endColIdx, setEndColIdx] = useState(-1);
 
             const [trainHorizon, setTrainHorizon] = useState("24");
             const [testHorizon, setTestHorizon] = useState("6");
             const [validationMethod, setValidationMethod] = useState("simple");
             const [forecastSteps, setForecastSteps] = useState("6");
+            const [totalTimeSeries, setTotalTimeSeries] = useState(0);
+
+            // Computed: Check if train + test equals total
+            const horizonMismatch = totalTimeSeries > 0 && (parseInt(trainHorizon) || 0) + (parseInt(testHorizon) || 0) !== totalTimeSeries;
 
             // Job State
             const [jobId, setJobId] = useState(null);
@@ -824,45 +929,97 @@
                 setFile(f);
                 setError(null);
                 setAvailableCols([]);
-                setDateCol("");
                 setSkuCol("");
-                setValCol("");
+                setStartCol("");
+                setEndCol("");
                 const reader = new FileReader();
                 reader.onload = (evt) => {
                     try {
-                        const wb = XLSX.read(evt.target.result, { type: 'binary' });
+                        const wb = XLSX.read(evt.target.result, { type: 'binary', cellDates: true });
                         const ws = wb.Sheets[wb.SheetNames[0]];
-                        const headers = XLSX.utils.sheet_to_json(ws, { header: 1 })[0];
+                        const rawHeaders = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false })[0];
+
+                        // Convert headers - handle Date objects and other types
+                        const headers = rawHeaders.map(h => {
+                            if (h instanceof Date) {
+                                // Format Date as YYYY-MM-DD
+                                return h.toISOString().split('T')[0];
+                            } else if (typeof h === 'number') {
+                                // Could be Excel serial date number - try to convert
+                                // Excel serial date: days since 1900-01-01
+                                const excelEpoch = new Date(1899, 11, 30);
+                                const possibleDate = new Date(excelEpoch.getTime() + h * 24 * 60 * 60 * 1000);
+                                // Check if it's a reasonable date (between 1990 and 2100)
+                                if (possibleDate.getFullYear() >= 1990 && possibleDate.getFullYear() <= 2100) {
+                                    return possibleDate.toISOString().split('T')[0];
+                                }
+                                return String(h);
+                            }
+                            return String(h);
+                        });
+
+                        console.log('Parsed headers:', headers.slice(0, 5), '...');
+
                         if (headers && headers.length > 0) {
                             setAvailableCols(headers);
                             setIsMappingModalOpen(true);
                         } else {
                             setError("No headers found in file.");
                         }
-                    } catch (err) { setError("Failed to parse file headers"); }
+                    } catch (err) {
+                        console.error('File parse error:', err);
+                        setError("Failed to parse file headers");
+                    }
                 };
                 reader.readAsBinaryString(f);
             };
 
-            const handleMappingConfirm = (sku, date, val) => {
+            const handleMappingConfirm = (sku, start, end) => {
                 setSkuCol(sku);
-                setDateCol(date);
-                setValCol(val);
+                setStartCol(start);
+                setEndCol(end);
                 setIsMappingModalOpen(false);
+
+                // Calculate and store column indices immediately
+                const skuIdx = availableCols.indexOf(sku);
+                const startIdx = availableCols.indexOf(start);
+                const endIdx = availableCols.indexOf(end);
+
+                setSkuColIdx(skuIdx);
+                setStartColIdx(startIdx);
+                setEndColIdx(endIdx);
+
+                console.log('Mapping confirmed - Indices:', { skuIdx, startIdx, endIdx });
+
+                // Calculate total time series from column range
+                const total = endIdx - startIdx + 1;
+                setTotalTimeSeries(total);
+
+                // Set initial values: Test = 6, Train = Total - 6, Forecast = Test
+                const initialTest = Math.min(6, Math.floor(total / 2));
+                const initialTrain = total - initialTest;
+                setTestHorizon(initialTest.toString());
+                setTrainHorizon(initialTrain.toString());
+                setForecastSteps(initialTest.toString());
             };
 
             const handleExecute = async () => {
-                if (!file || !dateCol || !skuCol || !valCol) { setError("Please select file and map generic columns."); return; }
+                if (!file || !skuCol || !startCol || !endCol) { setError("Please select file and map columns."); return; }
+                if (skuColIdx < 0 || startColIdx < 0 || endColIdx < 0) { setError("Invalid column mapping. Please re-map columns."); return; }
                 setError(null);
                 setBatchResults(null);
                 setJobStatus("queued");
                 setActiveTab("overview");
 
+                // Use stored indices directly
+                console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx });
+
                 const fd = new FormData();
                 fd.append('file', file);
-                fd.append('value_col', valCol);
-                fd.append('sku_col', skuCol);
-                fd.append('date_col', dateCol);
+                fd.append('sku_col_idx', skuColIdx);
+                fd.append('start_col_idx', startColIdx);
+                fd.append('end_col_idx', endColIdx);
+                fd.append('data_format', 'horizontal');
                 fd.append('model_type', 'auto');
                 fd.append('validation_method', validationMethod);
                 fd.append('train_horizon', parseInt(trainHorizon) || 24);
@@ -879,7 +1036,7 @@
             };
 
             const handleExport = async () => {
-                if (!file || !dateCol || !skuCol || !valCol) { setError("Please load and map data first."); return; }
+                if (!file || !skuCol || !startCol || !endCol) { setError("Please load and map data first."); return; }
                 if (isExporting) return;
                 setIsExporting(true);
 
@@ -889,9 +1046,10 @@
                     fd.append('file', file);
                     fd.append('validation_method', validationMethod);
                     fd.append('forecast_steps', parseInt(forecastSteps) || 6);
-                    fd.append('sku_col', skuCol);
-                    fd.append('date_col', dateCol);
-                    fd.append('value_col', valCol);
+                    fd.append('sku_col_idx', skuColIdx);
+                    fd.append('start_col_idx', startColIdx);
+                    fd.append('end_col_idx', endColIdx);
+                    fd.append('data_format', 'horizontal');
                     fd.append('cached_results', JSON.stringify(batchResults));
 
                     try {
@@ -927,9 +1085,10 @@
                     fd.append('train_horizon', parseInt(trainHorizon) || 24);
                     fd.append('test_horizon', parseInt(testHorizon) || 6);
                     fd.append('forecast_steps', parseInt(forecastSteps) || 6);
-                    fd.append('sku_col', skuCol);
-                    fd.append('date_col', dateCol);
-                    fd.append('value_col', valCol);
+                    fd.append('sku_col_idx', skuColIdx);
+                    fd.append('start_col_idx', startColIdx);
+                    fd.append('end_col_idx', endColIdx);
+                    fd.append('data_format', 'horizontal');
 
                     try {
                         const res = await fetch(`${BASE_URL}/export`, { method: 'POST', body: fd });
@@ -960,6 +1119,9 @@
 
             const handleReset = () => {
                 setFile(null); setBatchResults(null); setJobId(null); setIsPolling(false); setError(null);
+                setSkuCol(""); setStartCol(""); setEndCol("");
+                setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
+                setTotalTimeSeries(0); setAvailableCols([]);
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
 
@@ -1020,25 +1182,25 @@
                             {/* 1. Source Data */}
                             <div>
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                <div className={`relative border border-dashed rounded px-3 py-6 text-center transition-colors group ${file ? (dateCol && skuCol && valCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
+                                <div className={`relative border border-dashed rounded px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
                                     <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
                                     <div onClick={() => !file && fileInputRef.current.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
                                         {file ? (
                                             <div className="flex flex-col items-center gap-1">
                                                 <div onClick={() => fileInputRef.current.click()} className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 cursor-pointer hover:underline mb-1">{file.name}</div>
-                                                <div className="text-[10px] text-emerald-500 font-bold uppercase">{dateCol && skuCol && valCol ? 'Uploaded & Mapped' : 'Action Required'}</div>
+                                                <div className="text-[10px] text-emerald-500 font-bold uppercase">{skuCol && startCol && endCol ? t('sidebar.uploaded_mapped') : t('sidebar.action_required')}</div>
                                                 <div className="flex gap-2 mt-2 justify-center">
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); fileInputRef.current.click(); }}
                                                         className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
-                                                        title="Re-upload File"
+                                                        title={t('sidebar.reupload_file')}
                                                     >
                                                         <UploadIcon width="14" height="14" />
                                                     </button>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); setIsMappingModalOpen(true); }}
                                                         className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
-                                                        title="Edit Mapping"
+                                                        title={t('sidebar.edit_mapping')}
                                                     >
                                                         <SettingsIcon width="14" height="14" />
                                                     </button>
@@ -1070,7 +1232,7 @@
                                                 value={trainHorizon}
                                                 onChange={(e) => setTrainHorizon(e.target.value)}
                                                 onBlur={() => setTrainHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
-                                                className="w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
+                                                className={`w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                         <div className="flex-1">
@@ -1078,21 +1240,36 @@
                                             <input
                                                 type="number"
                                                 value={testHorizon}
-                                                onChange={(e) => setTestHorizon(e.target.value)}
-                                                onBlur={() => setTestHorizon(prev => Math.min(12, Math.max(1, parseInt(prev) || 1)).toString())}
-                                                min="1" max="12"
-                                                className="w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
+                                                onChange={(e) => {
+                                                    const newTest = parseInt(e.target.value) || 0;
+                                                    setTestHorizon(e.target.value);
+                                                    // Auto-update train horizon when test changes
+                                                    if (totalTimeSeries > 0 && newTest > 0 && newTest < totalTimeSeries) {
+                                                        setTrainHorizon((totalTimeSeries - newTest).toString());
+                                                    }
+                                                }}
+                                                onBlur={() => setTestHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
+                                                min="1"
+                                                className={`w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                     </div>
+                                    {totalTimeSeries > 0 && (
+                                        <div className={`text-[9px] ${horizonMismatch ? 'text-red-500' : 'text-slate-400'}`}>
+                                            {horizonMismatch
+                                                ? `⚠️ ${t('sidebar.horizon_mismatch')} ${totalTimeSeries}`
+                                                : `${t('sidebar.total_periods')}: ${totalTimeSeries}`
+                                            }
+                                        </div>
+                                    )}
                                     <div>
                                         <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.fc_h')}</label>
                                         <input
                                             type="number"
                                             value={forecastSteps}
                                             onChange={(e) => setForecastSteps(e.target.value)}
-                                            onBlur={() => setForecastSteps(prev => Math.min(12, Math.max(1, parseInt(prev) || 1)).toString())}
-                                            min="1" max="12"
+                                            onBlur={() => setForecastSteps(prev => Math.min(24, Math.max(1, parseInt(prev) || 1)).toString())}
+                                            min="1" max="24"
                                             className="w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
@@ -1100,7 +1277,7 @@
                                         {isPolling ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
                                         {isPolling ? t('sidebar.processing') : t('sidebar.execute_btn')}
                                     </button>
-                                    <button onClick={handleExport} disabled={!file || isExporting || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}>
+                                    <button onClick={handleExport} disabled={!file || !batchResults || isExporting || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || !batchResults || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}>
                                         {isExporting ? <div className="animate-spin"><RefreshIcon /></div> : <DownloadIcon />}
                                         {isExporting ? t('sidebar.downloading') : t('sidebar.export_btn')}
                                     </button>
