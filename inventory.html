@@ -3359,6 +3359,8 @@
                         } else {
                             paramsMsg = `Connection failed to ${apiUrl}. Check backend status.`;
                         }
+                    } else if (error.message && error.message.includes('Not Found')) {
+                        paramsMsg = `Endpoint verify failed (404). The backend might be running an older version.`;
                     }
                     showToast(`Simulation failed: ${paramsMsg}`, 'error');
                 } finally {
@@ -3435,6 +3437,8 @@
                         } else {
                             paramsMsg = `Connection failed to ${apiUrl}. Check backend status.`;
                         }
+                    } else if (error.message && error.message.includes('Not Found')) {
+                        paramsMsg = `Endpoint verify failed (404). The backend might be running an older version.`;
                     }
                     showToast(`Optimization failed: ${paramsMsg}`, 'error');
                 } finally {
