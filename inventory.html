@@ -1758,9 +1758,9 @@
                                 </h2>
                                 {isAutoFormat && (
                                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${isOperartisResidual ? 'text-amber-600 bg-amber-100 dark:bg-amber-900/30' :
-                                            isForecasterPrefixed ? 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30' :
-                                                isForecaster ? 'text-purple-600 bg-purple-100 dark:bg-purple-900/30' :
-                                                    'text-cyan-600 bg-cyan-100 dark:bg-cyan-900/30'
+                                        isForecasterPrefixed ? 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30' :
+                                            isForecaster ? 'text-purple-600 bg-purple-100 dark:bg-purple-900/30' :
+                                                'text-cyan-600 bg-cyan-100 dark:bg-cyan-900/30'
                                         }`}>{t ? t('auto') : 'AUTO'}</span>
                                 )}
                             </div>
@@ -3351,7 +3351,16 @@
                     console.log(`Simulation complete for ${currentSku}:`, { timeline: result.metrics, mc: mcResult });
                 } catch (error) {
                     console.error('Simulation error:', error);
-                    showToast(`Simulation failed: ${error.message}`, 'error');
+                    let paramsMsg = error.message;
+                    if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
+                        const isMixedContent = window.location.protocol === 'https:' && apiUrl.startsWith('http:');
+                        if (isMixedContent) {
+                            paramsMsg = `Mixed Content Blocked: HTTPS frontend cannot access HTTP backend (${apiUrl}). Please use HTTPS backend or run frontend locally (http).`;
+                        } else {
+                            paramsMsg = `Connection failed to ${apiUrl}. Check backend status.`;
+                        }
+                    }
+                    showToast(`Simulation failed: ${paramsMsg}`, 'error');
                 } finally {
                     setIsRunningMC(false);
                 }
@@ -3418,7 +3427,16 @@
                     console.log(`Optimization complete for ${currentSku}:`, result);
                 } catch (error) {
                     console.error('Optimization error:', error);
-                    showToast(`Optimization failed: ${error.message}`, 'error');
+                    let paramsMsg = error.message;
+                    if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
+                        const isMixedContent = window.location.protocol === 'https:' && apiUrl.startsWith('http:');
+                        if (isMixedContent) {
+                            paramsMsg = `Mixed Content Blocked: HTTPS frontend cannot access HTTP backend (${apiUrl}). Please use HTTPS backend or run frontend locally (http).`;
+                        } else {
+                            paramsMsg = `Connection failed to ${apiUrl}. Check backend status.`;
+                        }
+                    }
+                    showToast(`Optimization failed: ${paramsMsg}`, 'error');
                 } finally {
                     setIsOptimizing(false);
                 }
@@ -4678,8 +4696,8 @@
                                         onClick={handleExportReport}
                                         disabled={isExporting}
                                         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${isExporting
-                                                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-wait dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700'
-                                                : 'bg-brand-gold/10 text-brand-gold border-brand-gold/30 hover:bg-brand-gold/20 hover:border-brand-gold/50'
+                                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-wait dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700'
+                                            : 'bg-brand-gold/10 text-brand-gold border-brand-gold/30 hover:bg-brand-gold/20 hover:border-brand-gold/50'
                                             }`}
                                         title={t('exportReport')}
                                     >
