@@ -1695,11 +1695,11 @@
                                             className="w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
-                                    <button onClick={handleExecute} disabled={!file || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}>
+                                    <button type="button" onClick={handleExecute} disabled={!file || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}>
                                         {isPolling ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
                                         {isPolling ? t('sidebar.processing') : t('sidebar.execute_btn')}
                                     </button>
-                                    <button onClick={handleExport} disabled={!file || !batchResults || isExporting || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || !batchResults || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}>
+                                    <button type="button" onClick={handleExport} disabled={!file || !batchResults || isExporting || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || !batchResults || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}>
                                         {isExporting ? <div className="animate-spin"><RefreshIcon /></div> : <DownloadIcon />}
                                         {isExporting ? t('sidebar.downloading') : t('sidebar.export_btn')}
                                     </button>
@@ -1711,7 +1711,7 @@
                             {/* Reset Button Area - Inside Body, Pushed to Bottom */}
                             <div className="px-3 pb-1 pt-4 !mt-auto">
                                 <div className="pt-4 border-t border-dashed border-slate-200 dark:border-slate-700">
-                                    <button onClick={handleReset} className="w-full py-2 text-xxs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2 transition-all"><RefreshIcon /> {t('sidebar.reset_btn')}</button>
+                                    <button type="button" onClick={handleReset} className="w-full py-2 text-xxs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2 transition-all"><RefreshIcon /> {t('sidebar.reset_btn')}</button>
                                 </div>
                             </div>
                         </div>
