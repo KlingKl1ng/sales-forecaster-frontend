@@ -694,61 +694,99 @@
                 setZoomDomain({ start: 0, end: dataLength - 1 });
             };
 
-            // Touch support for mobile pinch-to-zoom
+            // Explicit Zoom Helpers
+            const zoomIn = () => {
+                const { start, end } = zoomDomain;
+                const range = end - start;
+                const minRange = Math.max(5, Math.floor(dataLength * 0.05));
+                if (range <= minRange) return;
+
+                const reduction = Math.max(1, Math.floor(range * 0.25)); // 25% zoom
+                setZoomDomain({
+                    start: Math.min(start + Math.floor(reduction / 2), end - minRange),
+                    end: Math.max(end - Math.floor(reduction / 2), start + minRange)
+                });
+            };
+
+            const zoomOut = () => {
+                const { start, end } = zoomDomain;
+                const range = end - start;
+                if (start <= 0 && end >= dataLength - 1) return;
+
+                const expansion = Math.max(1, Math.floor(range * 0.25)); // 25% zoom out
+                setZoomDomain({
+                    start: Math.max(0, start - Math.floor(expansion / 2)),
+                    end: Math.min(dataLength - 1, end + Math.floor(expansion / 2))
+                });
+            };
+
+            // Touch support for mobile pinch-to-zoom (Native Listeners for passive: false)
             const lastTouchDistance = useRef(null);
             const lastTouchCenter = useRef(null);
 
-            const handleTouchStart = (e) => {
-                if (e.touches.length === 2) {
-                    const dx = e.touches[0].clientX - e.touches[1].clientX;
-                    const dy = e.touches[0].clientY - e.touches[1].clientY;
-                    lastTouchDistance.current = Math.sqrt(dx * dx + dy * dy);
-                    lastTouchCenter.current = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                }
-            };
+            useEffect(() => {
+                const el = containerRef.current;
+                if (!el) return;
 
-            const handleTouchMove = (e) => {
-                if (e.touches.length === 2 && lastTouchDistance.current) {
-                    e.preventDefault();
-                    const dx = e.touches[0].clientX - e.touches[1].clientX;
-                    const dy = e.touches[0].clientY - e.touches[1].clientY;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const scale = distance / lastTouchDistance.current;
-
-                    const { start, end } = zoomDomain;
-                    const range = end - start;
-                    const minRange = Math.max(5, Math.floor(dataLength * 0.05));
-
-                    const rect = containerRef.current?.getBoundingClientRect();
-                    const center = lastTouchCenter.current;
-                    const cursorRatio = rect ? (center - rect.left) / rect.width : 0.5;
-
-                    if (scale > 1 && range > minRange) {
-                        // Pinch out = zoom in
-                        const reduction = Math.max(1, Math.floor(range * (scale - 1) * 0.5));
-                        setZoomDomain({
-                            start: Math.min(start + Math.floor(reduction * cursorRatio), end - minRange),
-                            end: Math.max(end - Math.floor(reduction * (1 - cursorRatio)), start + minRange)
-                        });
-                    } else if (scale < 1 && range < dataLength - 1) {
-                        // Pinch in = zoom out
-                        const expansion = Math.max(1, Math.floor(range * (1 - scale) * 0.5));
-                        setZoomDomain({
-                            start: Math.max(0, start - Math.floor(expansion * cursorRatio)),
-                            end: Math.min(dataLength - 1, end + Math.floor(expansion * (1 - cursorRatio)))
-                        });
+                const onTouchStart = (e) => {
+                    if (e.touches.length === 2) {
+                        const dx = e.touches[0].clientX - e.touches[1].clientX;
+                        const dy = e.touches[0].clientY - e.touches[1].clientY;
+                        lastTouchDistance.current = Math.sqrt(dx * dx + dy * dy);
+                        lastTouchCenter.current = (e.touches[0].clientX + e.touches[1].clientX) / 2;
                     }
+                };
 
-                    lastTouchDistance.current = distance;
-                }
-            };
+                const onTouchMove = (e) => {
+                    if (e.touches.length === 2 && lastTouchDistance.current) {
+                        e.preventDefault(); // CRITICAL: Stop browser zoom
+                        const dx = e.touches[0].clientX - e.touches[1].clientX;
+                        const dy = e.touches[0].clientY - e.touches[1].clientY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const scale = distance / lastTouchDistance.current;
 
-            const handleTouchEnd = () => {
-                lastTouchDistance.current = null;
-                lastTouchCenter.current = null;
-                setIsDragging(false);
-                setDragStart(null);
-            };
+                        const { start, end } = zoomDomain;
+                        const range = end - start;
+                        const minRange = Math.max(5, Math.floor(dataLength * 0.05));
+
+                        const rect = el.getBoundingClientRect();
+                        const center = lastTouchCenter.current;
+                        const cursorRatio = rect ? (center - rect.left) / rect.width : 0.5;
+
+                        if (scale > 1 && range > minRange) {
+                            // Pinch out = zoom in
+                            const reduction = Math.max(1, Math.floor(range * (scale - 1) * 0.5));
+                            setZoomDomain({
+                                start: Math.min(start + Math.floor(reduction * cursorRatio), end - minRange),
+                                end: Math.max(end - Math.floor(reduction * (1 - cursorRatio)), start + minRange)
+                            });
+                        } else if (scale < 1 && range < dataLength - 1) {
+                            // Pinch in = zoom out
+                            const expansion = Math.max(1, Math.floor(range * (1 - scale) * 0.5));
+                            setZoomDomain({
+                                start: Math.max(0, start - Math.floor(expansion * cursorRatio)),
+                                end: Math.min(dataLength - 1, end + Math.floor(expansion * (1 - cursorRatio)))
+                            });
+                        }
+                        lastTouchDistance.current = distance;
+                    }
+                };
+
+                const onTouchEnd = () => {
+                    lastTouchDistance.current = null;
+                    lastTouchCenter.current = null;
+                };
+
+                el.addEventListener('touchstart', onTouchStart, { passive: true });
+                el.addEventListener('touchmove', onTouchMove, { passive: false }); // Key fix for iOS
+                el.addEventListener('touchend', onTouchEnd);
+
+                return () => {
+                    el.removeEventListener('touchstart', onTouchStart);
+                    el.removeEventListener('touchmove', onTouchMove);
+                    el.removeEventListener('touchend', onTouchEnd);
+                };
+            }, [zoomDomain, dataLength]); // Re-bind when state changes to capture correct values
 
             return {
                 zoomDomain,
@@ -759,19 +797,19 @@
                     onMouseMove: handleMouseMove,
                     onMouseUp: handleMouseUp,
                     onMouseLeave: handleMouseUp,
-                    onDoubleClick: handleDoubleClick,
-                    onTouchStart: handleTouchStart,
-                    onTouchMove: handleTouchMove,
-                    onTouchEnd: handleTouchEnd,
+                    onDoubleClick: handleDoubleClick
+                    // Touch handlers removed from here, handled natively
                 },
-                isDragging
+                isDragging,
+                zoomIn,
+                zoomOut
             };
         };
 
         const BacktestChart = ({ data, syncId, isDark, t }) => {
             if (!data) return null;
 
-            const { zoomDomain, containerRef, handlers, isDragging } = useChartZoom(data.length);
+            const { zoomDomain, containerRef, handlers, isDragging, zoomIn, zoomOut } = useChartZoom(data.length);
             const visibleData = data.slice(zoomDomain.start, zoomDomain.end + 1);
             const isZoomed = zoomDomain.start > 0 || zoomDomain.end < data.length - 1;
 
@@ -782,19 +820,27 @@
                     {...handlers}
                     style={{ touchAction: 'none' }}
                 >
-                    {isZoomed && (
-                        <div className="absolute top-14 right-2 z-10 flex items-center gap-2 bg-white/80 dark:bg-slate-900/80 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
-                            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                                {zoomDomain.end - zoomDomain.start + 1} / {data.length} points
-                            </span>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handlers.onDoubleClick(); }}
-                                className="text-[10px] text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 px-1.5 py-0.5 rounded transition-colors"
-                            >
-                                Reset
-                            </button>
+                    <div className="absolute top-14 right-2 z-10 flex items-center gap-1">
+                        {/* Zoom Controls */}
+                        <div className="flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm mr-1">
+                            <button onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom In">+</button>
+                            <button onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom Out">-</button>
                         </div>
-                    )}
+
+                        {isZoomed && (
+                            <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-900/80 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                    {zoomDomain.end - zoomDomain.start + 1} / {data.length} pts
+                                </span>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handlers.onDoubleClick(); }}
+                                    className="text-[10px] text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 px-1.5 py-0.5 rounded transition-colors"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={visibleData} syncId={syncId} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
                             <defs>
@@ -843,7 +889,7 @@
         const ForecastChart = ({ data, syncId, isDark, t }) => {
             if (!data) return null;
 
-            const { zoomDomain, containerRef, handlers, isDragging } = useChartZoom(data.length);
+            const { zoomDomain, containerRef, handlers, isDragging, zoomIn, zoomOut } = useChartZoom(data.length);
             const visibleData = data.slice(zoomDomain.start, zoomDomain.end + 1);
             const isZoomed = zoomDomain.start > 0 || zoomDomain.end < data.length - 1;
 
@@ -854,19 +900,28 @@
                     {...handlers}
                     style={{ touchAction: 'none' }}
                 >
-                    {isZoomed && (
-                        <div className="absolute top-1 right-2 z-10 flex items-center gap-2 bg-white/80 dark:bg-slate-900/80 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
-                            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                                {zoomDomain.end - zoomDomain.start + 1} / {data.length} points
-                            </span>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handlers.onDoubleClick(); }}
-                                className="text-[10px] text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 px-1.5 py-0.5 rounded transition-colors"
-                            >
-                                Reset
-                            </button>
+                    <div className="absolute top-14 right-2 z-10 flex items-center gap-1">
+                        {/* Zoom Controls */}
+                        <div className="flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm mr-1">
+                            <button onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom In">+</button>
+                            <button onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom Out">-</button>
                         </div>
-                    )}
+
+                        {isZoomed && (
+                            <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-900/80 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                    {zoomDomain.end - zoomDomain.start + 1} / {data.length} pts
+                                </span>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handlers.onDoubleClick(); }}
+                                    className="text-[10px] text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 px-1.5 py-0.5 rounded transition-colors"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={visibleData} syncId={syncId} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
                             <defs>
