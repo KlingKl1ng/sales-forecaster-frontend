@@ -818,9 +818,9 @@
                     touchState.current.mode = null;
                 };
 
-                el.addEventListener('touchstart', onTouchStart, { passive: true });
+                el.addEventListener('touchstart', onTouchStart, { passive: false });
                 el.addEventListener('touchmove', onTouchMove, { passive: false });
-                el.addEventListener('touchend', onTouchEnd);
+                el.addEventListener('touchend', onTouchEnd, { passive: false });
 
                 return () => {
                     el.removeEventListener('touchstart', onTouchStart);
