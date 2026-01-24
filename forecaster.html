@@ -730,16 +730,22 @@
 
                 const onTouchStart = (e) => {
                     if (e.touches.length === 2) {
+                        // Pinch Start
                         const dx = e.touches[0].clientX - e.touches[1].clientX;
                         const dy = e.touches[0].clientY - e.touches[1].clientY;
                         lastTouchDistance.current = Math.sqrt(dx * dx + dy * dy);
                         lastTouchCenter.current = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                        lastTouchX.current = null;
+                    } else if (e.touches.length === 1) {
+                        // Pan Start (Single Finger)
+                        lastTouchX.current = e.touches[0].clientX;
                     }
                 };
 
                 const onTouchMove = (e) => {
+                    // Handle Pinch Zoom (2 fingers)
                     if (e.touches.length === 2 && lastTouchDistance.current) {
-                        e.preventDefault(); // CRITICAL: Stop browser zoom
+                        e.preventDefault(); // Stop browser zoom
                         const dx = e.touches[0].clientX - e.touches[1].clientX;
                         const dy = e.touches[0].clientY - e.touches[1].clientY;
                         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -770,12 +776,40 @@
                         }
                         lastTouchDistance.current = distance;
                     }
+                    // Handle Panning (1 finger) ONLY when zoomed
+                    else if (e.touches.length === 1 && lastTouchX.current !== null) {
+                        const { start, end } = zoomDomain;
+                        // Allow panning only if not fully zoomed out
+                        if (start > 0 || end < dataLength - 1) {
+                            e.preventDefault(); // Stop page scroll while panning chart
+                            const currentX = e.touches[0].clientX;
+                            const deltaXPixels = currentX - lastTouchX.current;
+
+                            const range = end - start;
+                            const rect = el.getBoundingClientRect();
+                            // Calculate how many data points one pixel represents
+                            const pixelsPerPoint = rect.width / range;
+                            const pointsDelta = Math.round(deltaXPixels / pixelsPerPoint); // Negative delta = move right, Positive = move left? 
+                            // If I drag right (positive delta), I want to see left data -> decrease start.
+                            // So subtract pointsDelta.
+
+                            if (pointsDelta !== 0) {
+                                const newStart = Math.max(0, Math.min(dataLength - 1 - range, start - pointsDelta));
+                                const newEnd = newStart + range;
+                                setZoomDomain({ start: newStart, end: newEnd });
+                                lastTouchX.current = currentX;
+                            }
+                        }
+                    }
                 };
 
                 const onTouchEnd = () => {
                     lastTouchDistance.current = null;
                     lastTouchCenter.current = null;
+                    lastTouchX.current = null;
                 };
+
+
 
                 el.addEventListener('touchstart', onTouchStart, { passive: true });
                 el.addEventListener('touchmove', onTouchMove, { passive: false }); // Key fix for iOS
