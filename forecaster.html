@@ -661,7 +661,7 @@
             };
 
             const handleMouseDown = (e) => {
-                if (e.button === 0) {
+                if (e.button === 0) { // Left click only
                     setIsDragging(true);
                     setDragStart({ x: e.clientX, domain: { ...zoomDomain } });
                 }
@@ -669,6 +669,7 @@
 
             const handleMouseMove = (e) => {
                 if (!isDragging || !dragStart) return;
+
                 const rect = containerRef.current?.getBoundingClientRect();
                 if (!rect) return;
 
@@ -689,7 +690,8 @@
             };
 
             const handleDoubleClick = () => {
-                setZoomDomain({ start: 0, end: Math.max(0, stateRef.current.dataLength - 1) });
+                // Reset to full view
+                setZoomDomain({ start: 0, end: dataLength - 1 });
             };
 
             // Explicit Zoom Helpers
@@ -699,7 +701,7 @@
                 const minRange = Math.max(5, Math.floor(dataLength * 0.05));
                 if (range <= minRange) return;
 
-                const reduction = Math.max(1, Math.floor(range * 0.25));
+                const reduction = Math.max(1, Math.floor(range * 0.25)); // 25% zoom
                 setZoomDomain({
                     start: Math.min(start + Math.floor(reduction / 2), end - minRange),
                     end: Math.max(end - Math.floor(reduction / 2), start + minRange)
@@ -711,123 +713,101 @@
                 const range = end - start;
                 if (start <= 0 && end >= dataLength - 1) return;
 
-                const expansion = Math.max(1, Math.floor(range * 0.25));
+                const expansion = Math.max(1, Math.floor(range * 0.25)); // 25% zoom out
                 setZoomDomain({
                     start: Math.max(0, start - Math.floor(expansion / 2)),
                     end: Math.min(dataLength - 1, end + Math.floor(expansion / 2))
                 });
             };
 
-            // Unified Touch Handling (Pinch + Pan)
-            const touchState = useRef({
-                mode: null, // 'pinch' or 'pan'
-                startDist: 0,
-                startCenter: 0,
-                startX: 0,
-                startY: 0,
-                startDomain: null
-            });
+            // Touch support for mobile pinch-to-zoom (Native Listeners for passive: false)
+            const lastTouchDistance = useRef(null);
+            const lastTouchCenter = useRef(null);
 
             useEffect(() => {
                 const el = containerRef.current;
                 if (!el) return;
 
                 const onTouchStart = (e) => {
-                    const { zoomDomain, dataLength } = stateRef.current;
+                    const rect = el.getBoundingClientRect();
+                    const touchY = e.touches[0].clientY - rect.top;
+                    const isBottomArea = touchY > rect.height * 0.85; // Bottom 15% is axis/slice area
 
                     if (e.touches.length === 2) {
-                        // PINCH START
-                        touchState.current.mode = 'pinch';
                         const dx = e.touches[0].clientX - e.touches[1].clientX;
                         const dy = e.touches[0].clientY - e.touches[1].clientY;
-                        touchState.current.startDist = Math.sqrt(dx * dx + dy * dy);
-                        touchState.current.startCenter = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                        touchState.current.startDomain = { ...zoomDomain };
-                    } else if (e.touches.length === 1) {
-                        // PAN START
-                        touchState.current.mode = 'pan';
-                        touchState.current.startX = e.touches[0].clientX;
-                        touchState.current.startY = e.touches[0].clientY; // capture Y to detect scroll vs pan
-                        touchState.current.startDomain = { ...zoomDomain };
+                        lastTouchDistance.current = Math.sqrt(dx * dx + dy * dy);
+                        lastTouchCenter.current = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    } else if (e.touches.length === 1 && isBottomArea) {
+                        // Single touch on x-axis area: initiate drag/pan
+                        setIsDragging(true);
+                        setDragStart({ x: e.touches[0].clientX, domain: { ...zoomDomain } });
                     }
                 };
 
                 const onTouchMove = (e) => {
-                    const { zoomDomain, dataLength } = stateRef.current;
-                    const { start, end } = touchState.current.startDomain || zoomDomain;
-                    const range = end - start;
-                    const rect = el.getBoundingClientRect();
-
-                    if (touchState.current.mode === 'pinch' && e.touches.length === 2) {
-                        e.preventDefault(); // Always prevent default on pinch
-
+                    if (e.touches.length === 2 && lastTouchDistance.current) {
+                        e.preventDefault(); // CRITICAL: Stop browser zoom
                         const dx = e.touches[0].clientX - e.touches[1].clientX;
                         const dy = e.touches[0].clientY - e.touches[1].clientY;
                         const distance = Math.sqrt(dx * dx + dy * dy);
-                        const scale = distance / touchState.current.startDist;
+                        const scale = distance / lastTouchDistance.current;
 
+                        const { start, end } = zoomDomain;
+                        const range = end - start;
                         const minRange = Math.max(5, Math.floor(dataLength * 0.05));
 
-                        // Calculate Zoom
+                        const rect = el.getBoundingClientRect();
+                        const center = lastTouchCenter.current;
+                        const cursorRatio = rect ? (center - rect.left) / rect.width : 0.5;
+
                         if (scale > 1 && range > minRange) {
-                            // Zoom In
-                            const cursorRatio = rect ? (touchState.current.startCenter - rect.left) / rect.width : 0.5;
+                            // Pinch out = zoom in
                             const reduction = Math.max(1, Math.floor(range * (scale - 1) * 0.5));
                             setZoomDomain({
                                 start: Math.min(start + Math.floor(reduction * cursorRatio), end - minRange),
                                 end: Math.max(end - Math.floor(reduction * (1 - cursorRatio)), start + minRange)
                             });
                         } else if (scale < 1 && range < dataLength - 1) {
-                            // Zoom Out
-                            const cursorRatio = rect ? (touchState.current.startCenter - rect.left) / rect.width : 0.5;
+                            // Pinch in = zoom out
                             const expansion = Math.max(1, Math.floor(range * (1 - scale) * 0.5));
                             setZoomDomain({
                                 start: Math.max(0, start - Math.floor(expansion * cursorRatio)),
                                 end: Math.min(dataLength - 1, end + Math.floor(expansion * (1 - cursorRatio)))
                             });
                         }
-                    } else if (touchState.current.mode === 'pan' && e.touches.length === 1) {
-                        const dx = e.touches[0].clientX - touchState.current.startX;
-                        const dy = e.touches[0].clientY - touchState.current.startY;
+                        lastTouchDistance.current = distance;
+                    } else if (e.touches.length === 1 && isDragging && dragStart) {
+                        // Single touch pan/slice logic
+                        e.preventDefault(); // Prevent page scroll while dragging chart
+                        const rect = el.getBoundingClientRect();
+                        const deltaX = e.touches[0].clientX - dragStart.x;
+                        const range = dragStart.domain.end - dragStart.domain.start;
+                        const pixelsPerPoint = rect.width / range;
+                        const pointsDelta = Math.round(-deltaX / pixelsPerPoint);
 
-                        // Direction Lock: Only pan if movement is horizontal-ish
-                        if (Math.abs(dx) > Math.abs(dy)) {
-                            if (e.cancelable) e.preventDefault(); // Lock scroll
+                        const newStart = Math.max(0, Math.min(dataLength - 1 - range, dragStart.domain.start + pointsDelta));
+                        const newEnd = newStart + range;
 
-                            const pixelsPerPoint = rect.width / range;
-                            const pointsDelta = Math.round(-dx / pixelsPerPoint); // -dx because drag left = move right
-
-                            let newStart = start + pointsDelta;
-                            let newEnd = end + pointsDelta;
-
-                            // Clamp Logic
-                            if (newStart < 0) {
-                                newEnd = range;
-                                newStart = 0;
-                            } else if (newEnd > dataLength - 1) {
-                                newStart = (dataLength - 1) - range;
-                                newEnd = dataLength - 1;
-                            }
-
-                            setZoomDomain({ start: newStart, end: newEnd });
-                        }
+                        setZoomDomain({ start: newStart, end: Math.min(dataLength - 1, newEnd) });
                     }
                 };
 
                 const onTouchEnd = () => {
-                    touchState.current.mode = null;
+                    lastTouchDistance.current = null;
+                    lastTouchCenter.current = null;
                 };
 
-                el.addEventListener('touchstart', onTouchStart, { passive: false });
-                el.addEventListener('touchmove', onTouchMove, { passive: false });
-                el.addEventListener('touchend', onTouchEnd, { passive: false });
+                el.addEventListener('touchstart', onTouchStart, { passive: true });
+                el.addEventListener('touchmove', onTouchMove, { passive: false }); // Key fix for iOS
+                el.addEventListener('touchend', onTouchEnd);
 
                 return () => {
                     el.removeEventListener('touchstart', onTouchStart);
                     el.removeEventListener('touchmove', onTouchMove);
                     el.removeEventListener('touchend', onTouchEnd);
                 };
-            }, []); // Empty dependency array = stable listeners!
+            }, [zoomDomain, dataLength]); // Re-bind when state changes to capture correct values
 
             return {
                 zoomDomain,
@@ -839,6 +819,7 @@
                     onMouseUp: handleMouseUp,
                     onMouseLeave: handleMouseUp,
                     onDoubleClick: handleDoubleClick
+                    // Touch handlers removed from here, handled natively
                 },
                 isDragging,
                 zoomIn,
