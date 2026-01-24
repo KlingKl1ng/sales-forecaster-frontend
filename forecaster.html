@@ -1640,7 +1640,7 @@
                             {/* 2. Configuration */}
                             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                <div className="space-y-3">
+                                <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
                                     <div>
                                         <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.val_method')}</label>
                                         <select value={validationMethod} onChange={(e) => setValidationMethod(e.target.value)} className="w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors"><option value="simple">Simple Split (Fast)</option><option value="walk_forward">Walk-Forward (Adaptive)</option><option value="rolling_window">Rolling Window (Adaptive)</option></select>
@@ -1705,7 +1705,7 @@
                                     </button>
 
                                     {/* Removed Reset Button from here */}
-                                </div>
+                                </form>
                             </div>
 
                             {/* Reset Button Area - Inside Body, Pushed to Bottom */}
@@ -1716,6 +1716,7 @@
                             </div>
                         </div>
 
+
                         {/* Sticky Sidebar Footer */}
                         <div className="sticky bottom-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-white/20 dark:border-white/10 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
                             <div className="p-4 text-center">
@@ -1723,12 +1724,12 @@
                                 <p className="text-[10px] text-brand-gold mt-1 font-medium italic">Optimizing Today, Growing Tomorrow</p>
                             </div>
                         </div>
-                    </aside>
+                    </aside >
 
                     {/* MAIN CONTENT */}
-                    <div className="flex flex-col flex-grow min-w-0 transition-all relative">
+                    < div className="flex flex-col flex-grow min-w-0 transition-all relative" >
                         {/* Combined Header & Metrics Bar */}
-                        <div className={`flex flex-col sticky top-0 z-30 ${isFullScreen ? 'hidden' : ''}`}>
+                        < div className={`flex flex-col sticky top-0 z-30 ${isFullScreen ? 'hidden' : ''}`}>
                             <header className="h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-b border-white/20 dark:border-white/10 flex items-center justify-between px-6 shrink-0 shadow-sm relative">
                                 <div className="flex items-center gap-4"><button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden text-slate-500"><MenuIcon /></button></div>
                                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-sm md:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest whitespace-nowrap">{t('header.title')}</div>
@@ -1745,7 +1746,7 @@
                             <div className="min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex items-center shrink-0 shadow-sm overflow-x-auto relative">
                                 <KPICards results={batchResults} activeTab={activeTab} setActiveTab={setActiveTab} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
                             </div>
-                        </div>
+                        </div >
 
                         <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full h-full overflow-hidden mobile-landscape-main ${isFullScreen ? 'hidden' : 'flex'}`}>
 
