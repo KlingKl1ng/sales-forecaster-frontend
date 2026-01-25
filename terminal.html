@@ -659,12 +659,18 @@
 
         // ModulaBlock Component
         const ModulaBlock = ({ block, colorClass, onClick }) => {
+            // Check if any sub-module is live (for Go-Live indicator)
+            const hasLiveModule = block.subModules.some(modId => MODULE_REGISTRY[modId]?.status === 'live');
+
             return (
                 <div
                     onClick={() => onClick(block)}
                     className={`
-                        relative group flex flex-col justify-between p-5 rounded-xl border border-slate-200 dark:border-slate-700/50
-                        bg-white/50 dark:bg-slate-800/30 backdrop-blur-sm cursor-pointer overflow-hidden
+                        relative group flex flex-col justify-between p-5 rounded-xl border 
+                        ${hasLiveModule
+                            ? 'border-emerald-400/50 bg-emerald-50/30 dark:bg-emerald-900/10 dark:border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                            : 'border-slate-200 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/30'}
+                        backdrop-blur-sm cursor-pointer overflow-hidden
                         transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-brand-gold/30
                         h-full min-h-[140px]
                     `}
@@ -685,10 +691,12 @@
                                 block.subModules.map(modId => {
                                     const mod = MODULE_REGISTRY[modId];
                                     if (!mod) return null;
+                                    const isLive = mod.status === 'live';
                                     return (
                                         <div key={modId} className="flex items-center gap-2 text-xs text-slate-300">
-                                            <div className="text-brand-gold shrink-0 scale-75 opacity-80">{mod.icon}</div>
-                                            <span className="truncate">{mod.name}</span>
+                                            <div className={`${isLive ? 'text-emerald-400' : 'text-brand-gold'} shrink-0 scale-75 opacity-80`}>{mod.icon}</div>
+                                            <span className={`truncate ${isLive ? 'text-emerald-400 font-bold' : ''}`}>{mod.name}</span>
+                                            {isLive && <span className="ml-auto text-[8px] bg-emerald-500/20 text-emerald-400 px-1 rounded">LIVE</span>}
                                         </div>
                                     )
                                 })
@@ -705,14 +713,23 @@
                     <div className="relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
                         {/* Badge/Icon Placeholder */}
                         <div className="flex justify-between items-start mb-3">
-                            <div className="p-2 rounded-md bg-slate-100 dark:bg-slate-700/50 text-slate-400 group-hover:text-brand-gold transition-colors">
+                            <div className={`p-2 rounded-md transition-colors ${hasLiveModule ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 group-hover:text-brand-gold'}`}>
                                 {block.icon || <SystemIcon />}
                             </div>
-                            {block.subModules.length > 0 && (
-                                <span className="text-[10px] bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-full font-mono text-slate-500 dark:text-slate-300">
-                                    {block.subModules.length} Modules
-                                </span>
-                            )}
+                            {/* Status Badges */}
+                            <div className="flex items-center gap-2">
+                                {block.subModules.length > 0 && (
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${hasLiveModule ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'}`}>
+                                        {block.subModules.length} Modules
+                                    </span>
+                                )}
+                                {hasLiveModule && (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white shadow-sm animate-pulse">
+                                        <span className="w-1.5 h-1.5 bg-white rounded-full mr-1"></span>
+                                        GO-LIVE
+                                    </span>
+                                )}
+                            </div>
                         </div>
 
                         <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight mb-2 group-hover:text-brand-gold transition-colors">
