@@ -631,8 +631,8 @@
                     className={`
                         relative group flex flex-col justify-between p-5 rounded-2xl border border-transparent
                         ${hasLiveModule
-                            ? 'bg-gradient-to-br from-emerald-500/10 to-emerald-900/20 shadow-[0_8px_32px_rgba(16,185,129,0.2),inset_0_1px_0_0_rgba(255,255,255,0.3)] ring-1 ring-emerald-400/20'
-                            : 'bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/60 dark:to-slate-900/60 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.15)] hover:from-white/30 hover:to-white/10 dark:hover:from-slate-800/80 dark:hover:to-slate-900/80 ring-1 ring-white/30 dark:ring-white/5'}
+                            ? 'bg-gradient-to-br from-brand-gold/5 to-brand-dark/10 shadow-[0_8px_32px_rgba(245,158,11,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-1 ring-brand-gold/20'
+                            : 'bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.15)] hover:from-white/30 hover:to-white/10 dark:hover:from-slate-800/50 dark:hover:to-slate-900/30 ring-1 ring-white/30 dark:ring-white/5'}
                         backdrop-blur-xl cursor-pointer overflow-hidden
                         transition-all duration-500 ease-out 
                         hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)] 
@@ -657,9 +657,9 @@
                                     const isLive = mod.status === 'live';
                                     return (
                                         <div key={mod.id} className="flex items-center gap-2 text-xs text-slate-300">
-                                            <div className={`${isLive ? 'text-emerald-400' : 'text-brand-gold'} shrink-0 scale-75 opacity-80`}>{mod.icon}</div>
-                                            <span className={`truncate ${isLive ? 'text-emerald-400 font-bold' : ''}`}>{mod.name}</span>
-                                            {isLive && <span className="ml-auto text-[8px] bg-emerald-500/20 text-emerald-400 px-1 rounded">LIVE</span>}
+                                            <div className={`${isLive ? 'text-brand-gold' : 'text-slate-500'} shrink-0 scale-75 opacity-80`}>{mod.icon}</div>
+                                            <span className={`truncate ${isLive ? 'text-white font-bold' : 'text-slate-400'}`}>{mod.name}</span>
+                                            {isLive && <span className="ml-auto text-[8px] bg-emerald-500/20 text-emerald-500 px-1 rounded font-bold">LIVE</span>}
                                         </div>
                                     )
                                 })
@@ -675,12 +675,12 @@
                     {/* Default Content */}
                     <div className="relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
                         <div className="flex justify-between items-start mb-3">
-                            <div className={`p-2 rounded-md transition-colors ${hasLiveModule ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 group-hover:text-brand-gold'}`}>
+                            <div className={`p-2 rounded-md transition-colors ${hasLiveModule ? 'bg-brand-gold/20 text-brand-gold' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 group-hover:text-brand-gold'}`}>
                                 {block.icon || <SystemIcon />}
                             </div>
                             <div className="flex items-center gap-2">
                                 {subModulesList.length > 0 && (
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${hasLiveModule ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'}`}>
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${hasLiveModule ? 'bg-brand-gold/20 text-brand-gold' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'}`}>
                                         {subModulesList.length} {content?.ui?.modules || "Modules"}
                                     </span>
                                 )}
@@ -823,23 +823,13 @@
 
             return (
                 <div className="relative flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 last:mb-0">
-                    {/* Vertical Line Segment (Left) - Adjusted for SM breakpoint */}
-                    <div className="absolute left-[8px] top-4 bottom-[-32px] w-px bg-brand-gold/30 sm:block hidden z-0"></div>
-
-                    {!isLast && (
-                        <div className="absolute left-[1.5rem] top-[3rem] bottom-[-2rem] w-px bg-brand-gold/50 sm:block hidden z-0"></div>
-                    )}
-
-                    {/* Horizontal Line separating sections */}
-                    <div className="absolute top-1/2 left-0 w-4 h-px bg-brand-gold/50 hidden sm:block -translate-x-full"></div>
-
                     {/* Left Title Box Container */}
                     <div className="relative sm:w-40 md:w-48 shrink-0 z-20">
                         {/* Horizontal Line to the right */}
                         <div className="absolute top-8 right-[-1.5rem] w-6 h-px bg-brand-gold/50 hidden sm:block"></div>
 
                         {/* The Title Box itself */}
-                        <div className="flex sm:flex-col justify-center sm:justify-start items-center sm:items-start gap-2 sm:gap-1 p-4 rounded-xl border border-slate-200 dark:border-brand-gold/30 bg-slate-50/50 dark:bg-slate-900/40 relative h-full">
+                        <div className="flex sm:flex-col justify-center sm:justify-start items-center sm:items-start gap-2 sm:gap-1 p-4 rounded-2xl border border-transparent bg-gradient-to-br from-white/10 to-white/5 dark:from-slate-800/20 dark:to-slate-900/5 shadow-[0_8px_32px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.1)] backdrop-blur-xl ring-1 ring-white/20 dark:ring-white/5 relative h-full">
                             {/* Small dot on the left */}
                             <div className="absolute top-8 left-[-5px] w-2.5 h-2.5 rounded-full bg-slate-900 border-2 border-brand-gold z-30 hidden sm:block"></div>
 
@@ -860,7 +850,7 @@
                             </div>
 
                             <span
-                                className="block text-xs uppercase tracking-wider font-extrabold text-slate-900 dark:text-white drop-shadow-md cursor-help select-none"
+                                className="block text-xs uppercase tracking-wider font-extrabold text-brand-gold drop-shadow-sm cursor-help select-none"
                                 onMouseEnter={() => setShowTooltip(true)}
                                 onMouseLeave={() => setShowTooltip(false)}
                                 onClick={() => setShowTooltip(!showTooltip)}
@@ -872,9 +862,9 @@
                             </span>
                         </div>
 
-                        {/* Vertical line connecting to next row */}
+                        {/* Vertical line connecting to next row - Simplified */}
                         {!isLast && (
-                            <div className="absolute left-[-1px] top-[calc(2rem_+_5px)] bottom-[-2rem] w-px bg-brand-gold/50 hidden sm:block"></div>
+                            <div className="absolute left-0 top-8 bottom-[-2rem] w-px bg-brand-gold/30 hidden sm:block -translate-x-1/2"></div>
                         )}
                         {/* Horizontal divider line at the bottom */}
                         {!isLast && (
@@ -1053,16 +1043,7 @@
             return (
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
                     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                        {/* Atmospheric Glows */}
-                        {/* Atmospheric Glows */}
-                        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-brand-gold/20 dark:bg-brand-gold/20 rounded-full blur-[100px] opacity-70 animate-blob"></div>
-                        <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-500/20 dark:bg-indigo-600/30 rounded-full blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
-                        <div className="absolute top-[30%] left-[20%] w-[500px] h-[500px] bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full blur-[100px] opacity-60 animate-blob animation-delay-4000"></div>
-
-                        {/* Tech Grid with Vignette Mask */}
-                        <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-grid-pattern opacity-[0.03]' : 'bg-grid-pattern-light opacity-[0.2]'}`}
-                            style={{ maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 100%)' }}>
-                        </div>
+                        {/* Background effects removed for cleaner look */}
                     </div>
 
                     <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel flex items-center justify-between px-4 md:px-6 z-10 shrink-0">
@@ -1082,21 +1063,23 @@
                                 <span className="text-[10px] font-mono text-slate-500 dark:text-slate-300 font-bold">{content.ui.status_operational}</span>
                             </div>
                             <div className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
-                            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
-                                <ClockIcon />
-                                <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            <div className="hidden sm:flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                                <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700/50 pr-3">
+                                    <ClockIcon />
+                                    <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+
+                                {/* Theme Toggle */}
+                                <button onClick={toggleTheme} className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                                    {theme === 'dark' ? <SunIcon /> : theme === 'light' ? <MoonIcon /> : <SystemIcon />}
+                                </button>
+
+                                {/* Language Toggle */}
+                                <button onClick={toggleLang} className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors flex items-center gap-1 font-mono text-xs font-bold pl-2">
+                                    <GlobeIcon />
+                                    <span>{lang.toUpperCase()}</span>
+                                </button>
                             </div>
-
-                            {/* Theme Toggle */}
-                            <button onClick={toggleTheme} className="p-1.5 md:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
-                                {theme === 'dark' ? <SunIcon /> : theme === 'light' ? <MoonIcon /> : <SystemIcon />}
-                            </button>
-
-                            {/* Language Toggle */}
-                            <button onClick={toggleLang} className="p-1.5 md:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors flex items-center gap-1 font-mono text-xs font-bold">
-                                <GlobeIcon />
-                                <span>{lang.toUpperCase()}</span>
-                            </button>
 
                             <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shadow-md cursor-pointer">
                                 <UserIcon />
