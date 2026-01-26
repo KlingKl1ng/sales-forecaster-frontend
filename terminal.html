@@ -149,6 +149,37 @@
         .dark .connector-line {
             background: rgba(51, 65, 85, 0.3);
         }
+
+        /* Background Blob Animation */
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
     </style>
 
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
@@ -205,305 +236,343 @@
 
         // --- DATA & CONFIG ---
 
-        // 1. Module Registry - Available Tools
-        const MODULE_REGISTRY = {
-            'abc': {
-                id: 'abc',
-                name: 'ABC-XYZ Analysis',
-                desc: 'Classification matrix for inventory segmentation based on value and volatility.',
-                icon: <BarChartIcon />,
-                status: 'live',
-                version: 'v1.0_PRO',
-                href: './abcxyz.html'
+        // 1. Translations & Registry
+        const TRANSLATIONS = {
+            en: {
+                ui: {
+                    system_terminal: "System Terminal",
+                    status_operational: "SYSTEM OPERATIONAL",
+                    header_title_1: "Advanced Planning &",
+                    header_title_2: "Scheduling System",
+                    header_desc: "Select a functional module block to access specific planning tools and optimization engines.",
+                    explore: "Explore",
+                    quick_view: "Quick View",
+                    modules: "Modules",
+                    go_live: "GO-LIVE",
+                    launch_tool: "Launch Tool",
+                    click_to_open: "Click to Open",
+                    no_modules: "No modules enabled.",
+                    check_later: "Check back later for updates.",
+                    about_title: "About Operartis",
+                    about_who: "Who We Are",
+                    about_what: "What We Do",
+                    about_vision: "Vision & Philosophy",
+                    about_why: "Why Choose Operartis",
+                    about_who_text: [
+                        "Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations.",
+                        "We combine deep expertise in supply chain, logistics, production, warehousing and manufacturing processes with advanced quantitative-optimization and simulation methods to deliver meaningful, measurable improvements.",
+                        "At Operartis, we understand that having data in an Enterprise Resource Planning (ERP) system is only the first step. True operational excellence requires turning that data into actionable planning, forecasting and scheduling insights. That’s why we focus on building, developing, and continuously improving a tailored Advanced Planning and Scheduling System (APS) — helping our clients leverage their data not just for record-keeping, but for real operational advantage."
+                    ],
+                    about_what_text: [
+                        "We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.",
+                        "We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.",
+                        "We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.",
+                        "Our quantitative-driven approach allows clients to make data-backed decisions, reduce operational costs, minimize waste, shorten lead times and improve overall efficiency."
+                    ],
+                    about_vision_text: [
+                        "We aim to democratize operational and supply-chain optimization. We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.",
+                        "We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.",
+                        "By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness."
+                    ],
+                    about_why_items: [
+                        { title: "Specialization & Expertise", text: "We are not a generalist IT or consulting firm. Our core competence lies in operations, supply-chain optimization, and APS/ERP integration." },
+                        { title: "Quantitative & Data-Driven", text: "Our approaches rely on simulation, modeling and data analytics — not guesswork. This ensures improvements are measurable and repeatable." },
+                        { title: "Tailored & Pragmatic Solutions", text: "We design APS systems that reflect your real-world constraints. What we build fits your operations — not the other way around." },
+                        { title: "Affordability & Value", text: "We strive to provide our services at reasonable price levels, making high-quality optimization accessible to a broad range of enterprises." },
+                        { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." }
+                    ],
+                    invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
+                    rights_reserved: "v2.0.0 Matrix UI • Latency: 24ms"
+                },
+                registry: {
+                    'abc': { name: 'ABC-XYZ Analysis', desc: 'Classification matrix for inventory segmentation based on value and volatility.' },
+                    'forecaster': { name: 'ML Forecaster', desc: 'Time-series prediction engine using advanced modern machine-learning models.' },
+                    'advanced_forecaster': { name: 'Advanced-ML Forecaster', desc: 'Advanced predictive analytics with scenario planning, driver importance analysis.' },
+                    'inventory': { name: 'Inventory Optimizer', desc: 'Dynamic safety stock calculation, reorder point analysis, and EOQ optimization.' },
+                    'logistics': { name: 'Logistics Control', desc: 'Route optimization, carrier management, and lead-time tracking.' },
+                    'vrp': { name: 'Vehicle Routing Problem', desc: 'Optimization of delivery routes under multiple constraints to minimize cost.' },
+                    'clsp': { name: 'Capacitated Lot-sizing', desc: 'Determination of optimal production lot sizes considering capacity limitations.' },
+                    'median_prob': { name: 'Median Problem', desc: 'Minimizing the total weighted distance to all customers.' },
+                    'cover_prob': { name: 'Cover Problem', desc: 'Finding the minimum number of facilities to cover all demand points.' },
+                    'facility_loc': { name: 'Facilities Location Problem', desc: 'Optimizing facility numbers and locations to minimize costs.' },
+                    'atp': { name: 'Available to Promise (ATP)', desc: 'Real-time availability check based on current inventory and future production.' },
+                    'aggregated_planning': { name: 'Aggregated Production Planning', desc: 'Macro-level production planning to balance capacity and demand.' },
+                    'cap_main_planning': { name: 'Capacitated Main Production Planning', desc: 'High-level production planning with critical capacity constraints.' },
+                    'scheduling_prob': { name: 'Scheduling Problem', desc: 'Job-sequencing optimization on machines to minimize lateness.' },
+                    'queuing_sim': { name: 'Queuing System Simulation', desc: 'Simulating waiting lines to optimize service levels and resources.' },
+                    'center_prob': { name: 'Center Problem', desc: 'Finding a central location to minimize maximum distance to any customer.' },
+                    'warehouse_loc': { name: 'Warehouse Location Problem', desc: 'Determining optimal warehouse sites to balance costs and service.' },
+                    'hub_loc': { name: 'Hub Location Problem', desc: 'Locating hubs to consolidate flow and minimize network costs.' },
+                    'shortest_path': { name: 'Shortest Path Problem', desc: 'Optimizing routes to find the quickest or shortest path between points.' },
+                    'long_haul': { name: 'Long Haul Transport Planning', desc: 'Planning long-distance freight movements and carrier selection.' },
+                    'short_haul': { name: 'Short Haul Transport Planning', desc: 'Managing local delivery runs, milk runs, and last-mile logistics.' }
+                },
+                matrix: [
+                    {
+                        id: 'strategic', title: 'Strategic', subtitle: 'Years to Months',
+                        definition: 'Strategic planning sets the long-term direction (1-10 years), focusing on high-stakes capital decisions like network design, facility locations, and market entry. These decisions determine the supply chain limits and are difficult to reverse.',
+                        blocks: [
+                            {
+                                name: 'Strategic Network Planning',
+                                desc: 'Supply Chain Design & Optimization',
+                                fullDesc: 'Designing the physical supply chain network (facilities, warehouses) to minimize costs.',
+                                icon: <GlobeIcon />,
+                                subModules: ['median_prob', 'cover_prob', 'facility_loc', 'center_prob', 'warehouse_loc', 'hub_loc']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'tactical', title: 'Tactical', subtitle: 'Months to Weeks',
+                        definition: 'Tactical planning (6-18 months) translates strategic goals into executable plans. It balances supply and demand through master production scheduling, inventory policy setting, and workforce capacity management to optimize resource utilization.',
+                        blocks: [
+                            {
+                                name: 'Demand Planning & Forecasting',
+                                desc: 'Predicting Future Demand',
+                                fullDesc: 'Using historical data, ML, and market intelligence to forecast demand.',
+                                icon: <BarChartIcon />,
+                                subModules: ['forecaster', 'advanced_forecaster']
+                            },
+                            {
+                                name: 'Master Planning (MPS & DRP)',
+                                desc: 'Balancing Supply & Demand',
+                                fullDesc: 'Medium-term production planning (MPS) and inventory replenishment (DRP).',
+                                icon: <GridIcon />,
+                                subModules: ['aggregated_planning']
+                            },
+                            {
+                                name: 'Inventory Planning & Optimization',
+                                desc: 'Setting Inventory Targets',
+                                fullDesc: 'Determining optimal inventory levels (safety stock, cycle stock) across the chain.',
+                                icon: <BoxIcon />,
+                                subModules: ['abc', 'inventory']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'operational', title: 'Operational', subtitle: 'Weeks to Hours',
+                        definition: 'Operational planning focuses on short-term execution (days to weeks) and immediate order fulfillment. It involves detailed scheduling, vehicle routing, and shop floor control to meet specific customer requirements within fixed constraints.',
+                        blocks: [
+                            {
+                                name: 'Production Planning & Detailed Scheduling',
+                                desc: 'Finite Capacity Scheduling',
+                                fullDesc: 'Detailed shop floor scheduling respecting resource constraints (machines, labor).',
+                                icon: <FactoryIcon />,
+                                subModules: ['clsp', 'cap_main_planning', 'scheduling_prob']
+                            },
+                            {
+                                name: 'Transportation Planning & Vehicle Routing',
+                                desc: 'Optimizing Logistics',
+                                fullDesc: 'Planning movement of goods, load consolidation, and route optimization.',
+                                icon: <TruckIcon />,
+                                subModules: ['logistics', 'vrp', 'shortest_path', 'long_haul', 'short_haul']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'cross', title: 'Cross-Functional', subtitle: 'All Horizons',
+                        definition: 'Cross-functional processes span all time horizons, bridging departments to ensure alignment. This includes Sales & Operations Planning (S&OP), real-time data sharing, and collaborative scenario analysis to synchronize the entire value chain.',
+                        blocks: [
+                            {
+                                name: 'What-If Scenario Analysis',
+                                desc: 'Simulation & Support',
+                                fullDesc: 'Simulating various scenarios to evaluate impact and compare actions.',
+                                icon: <GitBranchIcon />,
+                                subModules: ['queuing_sim']
+                            },
+                            {
+                                name: 'Supply Chain Collaboration',
+                                desc: 'Visibility & Alignment',
+                                fullDesc: 'Platform for sharing real-time info with internal departments and external partners.',
+                                icon: <UsersIcon />,
+                                subModules: ['atp']
+                            }
+                        ]
+                    }
+                ]
             },
-            'forecaster': {
-                id: 'forecaster',
-                name: 'ML Forecaster',
-                desc: 'Time-series prediction engine using advanced modern machine-learning models.',
-                icon: <ActivityIcon />,
-                status: 'live',
-                version: 'v7.5_PRO',
-                href: './forecaster.html'
-            },
-            'advanced_forecaster': {
-                id: 'advanced_forecaster',
-                name: 'Advanced-ML Forecaster',
-                desc: 'Advanced predictive analytics with scenario planning, driver importance analysis.',
-                icon: <AdvancedForecasterIcon />,
-                status: 'live',
-                version: 'v2.0_BETA',
-                href: './mlforecaster.html'
-            },
-            'inventory': {
-                id: 'inventory',
-                name: 'Inventory Optimizer',
-                desc: 'Dynamic safety stock calculation, reorder point analysis, and EOQ optimization.',
-                icon: <BoxIcon />,
-                status: 'live',
-                version: 'v1.0_LIVE',
-                href: './inventory.html'
-            },
-            'logistics': {
-                id: 'logistics',
-                name: 'Logistics Control',
-                desc: 'Route optimization, carrier management, and lead-time tracking.',
-                icon: <TruckIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            // NEW PLACEHOLDERS
-            'vrp': {
-                id: 'vrp',
-                name: 'Vehicle Routing Problem',
-                desc: 'Optimization of delivery routes under multiple constraints to minimize cost.',
-                icon: <TruckIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'clsp': {
-                id: 'clsp',
-                name: 'Capacitated Lot-sizing',
-                desc: 'Determination of optimal production lot sizes considering capacity limitations.',
-                icon: <SettingsIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            // STRATEGIC NETWORK PLANNING MODULES
-            'median_prob': {
-                id: 'median_prob',
-                name: 'Median Problem',
-                desc: 'Minimizing the total weighted distance to all customers.',
-                icon: <MedianIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'cover_prob': {
-                id: 'cover_prob',
-                name: 'Cover Problem',
-                desc: 'Finding the minimum number of facilities to cover all demand points.',
-                icon: <CoverIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'facility_loc': {
-                id: 'facility_loc',
-                name: 'Facilities Location Problem',
-                desc: 'Optimizing facility numbers and locations to minimize costs.',
-                icon: <LocationIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'atp': {
-                id: 'atp',
-                name: 'Available to Promise (ATP)',
-                desc: 'Real-time availability check based on current inventory and future production.',
-                icon: <ATPIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'aggregated_planning': {
-                id: 'aggregated_planning',
-                name: 'Aggregated Production Planning',
-                desc: 'Macro-level production planning to balance capacity and demand.',
-                icon: <AggregatedIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'cap_main_planning': {
-                id: 'cap_main_planning',
-                name: 'Capacitated Main Production Planning',
-                desc: 'High-level production planning with critical capacity constraints.',
-                icon: <CapacitatedIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'scheduling_prob': {
-                id: 'scheduling_prob',
-                name: 'Scheduling Problem',
-                desc: 'Job-sequencing optimization on machines to minimize lateness.',
-                icon: <SchedulingIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'queuing_sim': {
-                id: 'queuing_sim',
-                name: 'Queuing System Simulation',
-                desc: 'Simulating waiting lines to optimize service levels and resources.',
-                icon: <QueuingIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            // NEW STRATEGIC
-            'center_prob': {
-                id: 'center_prob',
-                name: 'Center Problem',
-                desc: 'Finding a central location to minimize maximum distance to any customer.',
-                icon: <CenterIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'warehouse_loc': {
-                id: 'warehouse_loc',
-                name: 'Warehouse Location Problem',
-                desc: 'Determining optimal warehouse sites to balance costs and service.',
-                icon: <WarehouseIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'hub_loc': {
-                id: 'hub_loc',
-                name: 'Hub Location Problem',
-                desc: 'Locating hubs to consolidate flow and minimize network costs.',
-                icon: <HubIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            // NEW TRANSPORTATION
-            'shortest_path': {
-                id: 'shortest_path',
-                name: 'Shortest Path Problem',
-                desc: 'Optimizing routes to find the quickest or shortest path between points.',
-                icon: <ShortestPathIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'long_haul': {
-                id: 'long_haul',
-                name: 'Long Haul Transport Planning',
-                desc: 'Planning long-distance freight movements and carrier selection.',
-                icon: <LongHaulIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
-            },
-            'short_haul': {
-                id: 'short_haul',
-                name: 'Short Haul Transport Planning',
-                desc: 'Managing local delivery runs, milk runs, and last-mile logistics.',
-                icon: <ShortHaulIcon />,
-                status: 'planned',
-                version: 'CONCEPT',
-                href: '#'
+            vi: {
+                ui: {
+                    system_terminal: "Bảng Điều Hành Hệ Thống",
+                    status_operational: "HỆ THỐNG HOẠT ĐỘNG",
+                    header_title_1: "Hệ Thống Hoạch Định &",
+                    header_title_2: "Lập Kế Hoạch Nâng Cao",
+                    header_desc: "Chọn một khối chức năng để trải nghiệm các công cụ, giải pháp tối ưu hóa chuyên sâu.",
+                    explore: "Khám Phá",
+                    quick_view: "Xem Nhanh",
+                    modules: "Mô-đun",
+                    go_live: "HOẠT ĐỘNG",
+                    launch_tool: "Mở Công Cụ",
+                    click_to_open: "Nhấn để Mở",
+                    no_modules: "Chưa có mô-đun kích hoạt.",
+                    check_later: "Vui lòng quay lại sau.",
+                    about_title: "Về Operartis",
+                    about_who: "Chúng Tôi Là Ai",
+                    about_what: "Chúng Tôi Làm Gì",
+                    about_vision: "Tầm Nhìn & Triết Lý",
+                    about_why: "Tại Sao Chọn Operartis",
+                    about_who_text: [
+                        "Operartis là đơn vị tư vấn và công nghệ chuyên sâu, giúp doanh nghiệp vận hành trơn tru và tối ưu hóa quy trình.",
+                        "Chúng tôi kết hợp chuyên môn sâu rộng về chuỗi cung ứng, logistics, sản xuất và kho bãi với các phương pháp định lượng và mô phỏng tiên tiến để mang lại cải tiến rõ rệt, có thể đo lường.",
+                        "Tại Operartis, chúng tôi hiểu rằng dữ liệu trong hệ thống ERP chỉ là bước đầu. Sự tối ưu trong vận hành đòi hỏi phải biến dữ liệu đó thành thông tin chi tiết để hoạch định, dự báo và lập kế hoạch. Đó là lý do chúng tôi tập trung phát triển Hệ thống Hoạch định và Lập kế hoạch Nâng cao (APS) riêng biệt — giúp khách hàng tận dụng dữ liệu không chỉ để lưu trữ mà còn tạo lợi thế vận hành thực sự."
+                    ],
+                    about_what_text: [
+                        "Chúng tôi tư vấn doanh nghiệp phân tích kỹ lưỡng quy trình chuỗi cung ứng, kho bãi, logistics và sản xuất — nhận diện các điểm nghẽn, kém hiệu quả và cơ hội tối ưu hóa.",
+                        "Chúng tôi thiết kế và triển khai hệ thống APS tích hợp với ERP hiện có (hoặc độc lập), cho phép hoạch định nâng cao, mô phỏng, dự báo nhu cầu, hoạch định năng lực và lịch trình sản xuất, tối ưu hoá quản lý tồn kho, và vận tải.",
+                        "Chúng tôi đồng hành cùng khách hàng qua mọi giai đoạn: từ đánh giá ban đầu, thiết kế hệ thống, đến triển khai, đào tạo nhân sự và cải tiến liên tục — đảm bảo giá trị bền vững.",
+                        "Cách tiếp cận dựa trên định lượng của chúng tôi giúp khách hàng ra quyết định dựa trên dữ liệu, giảm chi phí vận hành, giảm lãng phí, rút ngắn thời gian giao hàng và nâng cao hiệu quả tổng thể."
+                    ],
+                    about_vision_text: [
+                        "Chúng tôi hướng đến việc phổ cập tối ưu hóa vận hành và chuỗi cung ứng. Chúng tôi tin rằng mọi doanh nghiệp — dù nhỏ, vừa hay lớn — đều xứng đáng tiếp cận các công cụ mạnh mẽ và chuyên nghiệp với chi phí hợp lý.",
+                        "Chúng tôi hình dung một thế giới nơi các công ty có thể an tâm rằng toàn chuỗi cung ứng hoạt động hiệu quả và tối ưu — tiết kiệm thời gian, công sức và chi phí, đồng thời đảm bảo vận hành trơn tru và sự hài lòng cao của khách hàng.",
+                        "Bằng cách tích hợp các phương pháp tối ưu hóa tiên tiến vào hệ thống APS tất cả trong một, Operartis giúp khai phá tiềm năng ẩn trong dữ liệu vận hành — biến thông tin thô thành lợi thế chiến lược, tăng trưởng bền vững và năng lực cạnh tranh mạnh mẽ."
+                    ],
+                    about_why_items: [
+                        { title: "Chuyên Môn & Kinh Nghiệm", text: "Chúng tôi không phải là công ty tư vấn CNTT nói chung. Năng lực cốt lõi của chúng tôi nằm ở tư vấn vận hành, tối ưu hóa chuỗi cung ứng và tích hợp APS/ERP." },
+                        { title: "Định Lượng & Dựa Trên Dữ liệu", text: "Phương pháp của chúng tôi dựa trên mô phỏng, mô hình hóa và phân tích dữ liệu, xây dựng thuật toán tối ưu hoá — không phỏng đoán. Điều này đảm bảo cải tiến có thể đo lường và lặp lại." },
+                        { title: "Giải Pháp Thực Tế & Chuyên Biệt", text: "Chúng tôi thiết kế hệ thống APS đáp ứng đúng với điều kiện thực tế của doanh nghiệp. Những gì chúng tôi xây dựng phù hợp với vận hành thực tế — chứ không phải ngược lại." },
+                        { title: "Chi Phí Hợp Lý & Giá Trị", text: "Chúng tôi nỗ lực cung cấp dịch vụ với mức giá hợp lý, giúp việc triển khai các phương pháp tối ưu hóa chất lượng cao tiếp cận được với nhiều doanh nghiệp." },
+                        { title: "Cam Kết Kết Quả", text: "Sứ mệnh của chúng tôi không chỉ là bàn giao hệ thống, mà là giúp bạn đạt được cải thiện thực sự về hiệu quả, tiết kiệm chi phí và sự bền bỉ trong vận hành." }
+                    ],
+                    invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
+                    rights_reserved: "v2.0.0 Giao diện Ma Trận • Độ trễ: 24ms"
+                },
+                registry: {
+                    'abc': { name: 'Phân Tích ABC-XYZ', desc: 'Ma trận giúp phân loại tồn kho theo giá trị và độ biến động.' },
+                    'forecaster': { name: 'Dự Báo Học Máy', desc: 'Dự đoán chuỗi thời gian sử dụng các mô hình học máy hiện đại.' },
+                    'advanced_forecaster': { name: 'Dự Báo Học Máy Nâng Cao', desc: 'Phân tích dự đoán nâng cao với lập kế hoạch kịch bản và phân tích nhân tố tác động.' },
+                    'inventory': { name: 'Tối Ưu Hóa Tồn Kho', desc: 'Tính toán tồn kho an toàn, điểm đặt hàng lại và tối ưu hóa lượng đặt hàng (EOQ).' },
+                    'logistics': { name: 'Kiểm Soát Logistics', desc: 'Tối ưu hóa tuyến đường, quản lý nhà vận chuyển và theo dõi thời gian giao hàng.' },
+                    'vrp': { name: 'Bài Toán Định Tuyến Xe', desc: 'Tối ưu hóa tuyến giao hàng theo nhiều ràng buộc để giảm thiểu chi phí.' },
+                    'clsp': { name: 'Kích Thước Lô Có Ràng Buộc', desc: 'Xác định kích thước lô sản xuất tối ưu dựa trên giới hạn năng lực.' },
+                    'median_prob': { name: 'Bài Toán Trung Vị', desc: 'Giảm thiểu tổng khoảng cách có trọng số đến tất cả khách hàng.' },
+                    'cover_prob': { name: 'Bài Toán Bao Phủ', desc: 'Tìm số lượng cơ sở tối thiểu để bao phủ tất cả điểm cầu.' },
+                    'facility_loc': { name: 'Định Vị Cơ Sở', desc: 'Tối ưu hóa số lượng và vị trí cơ sở để giảm thiểu chi phí.' },
+                    'atp': { name: 'Sẵn Sàng Cam Kết (ATP)', desc: 'Kiểm tra khả năng đáp ứng đơn hàng dựa trên tồn kho và sản xuất tương lai.' },
+                    'aggregated_planning': { name: 'Hoạch Định Tổng Hợp', desc: 'Lập kế hoạch sản xuất vĩ mô để cân đối năng lực và nhu cầu.' },
+                    'cap_main_planning': { name: 'Hoạch Định Năng Lực Chính', desc: 'Lập kế hoạch sản xuất cấp cao với ràng buộc năng lực quan trọng.' },
+                    'scheduling_prob': { name: 'Bài Toán Lịch Trình', desc: 'Tối ưu hóa thứ tự công việc trên máy móc để giảm thiểu độ trễ.' },
+                    'queuing_sim': { name: 'Mô Phỏng Hàng Đợi', desc: 'Mô phỏng hàng chờ để tối ưu hóa mức độ dịch vụ và tài nguyên.' },
+                    'center_prob': { name: 'Bài Toán Trung Tâm', desc: 'Tìm vị trí trung tâm để giảm thiểu khoảng cách tối đa đến bất kỳ khách hàng nào.' },
+                    'warehouse_loc': { name: 'Định Vị Kho Bãi', desc: 'Xác định vị trí kho tối ưu để cân bằng chi phí và dịch vụ.' },
+                    'hub_loc': { name: 'Định Vị Trung Chuyển', desc: 'Đặt trạm trung chuyển để gom dòng hàng và giảm chi phí mạng lưới.' },
+                    'shortest_path': { name: 'Đường Đi Ngắn Nhất', desc: 'Tối ưu hóa lộ trình để có thời gian hoặc khoảng cách ngắn nhất.' },
+                    'long_haul': { name: 'Vận Tải Đường Dài', desc: 'Lập kế hoạch vận chuyển hàng hóa đường dài và chọn nhà vận tải.' },
+                    'short_haul': { name: 'Vận Tải Chặng Ngắn', desc: 'Quản lý giao hàng địa phương, milk-run và logistics chặng cuối.' }
+                },
+                matrix: [
+                    {
+                        id: 'strategic', title: 'Chiến Lược', subtitle: 'Năm đến Tháng',
+                        definition: 'Hoạch định chiến lược xác định phương hướng dài hạn (1-10 năm), tập trung vào các quyết định vốn lớn như thiết kế mạng lưới, vị trí cơ sở và thâm nhập thị trường. Những quyết định này định hình giới hạn chuỗi cung ứng và khó đảo ngược.',
+                        blocks: [
+                            {
+                                name: 'Hoạch Định Mạng Lưới Chiến Lược',
+                                desc: 'Thiết Kế & Tối Ưu Chuỗi Cung Ứng',
+                                fullDesc: 'Thiết kế mạng lưới chuỗi cung ứng vật lý (cơ sở, kho bãi) để giảm thiểu chi phí.',
+                                icon: <GlobeIcon />,
+                                subModules: ['median_prob', 'cover_prob', 'facility_loc', 'center_prob', 'warehouse_loc', 'hub_loc']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'tactical', title: 'Chiến Thuật', subtitle: 'Tháng đến Tuần',
+                        definition: 'Hoạch định chiến thuật (6-18 tháng) chuyển đổi mục tiêu chiến lược thành kế hoạch khả thi. Nó cân đối cung cầu thông qua lịch trình sản xuất chính, thiết lập chính sách tồn kho và quản lý năng lực nhân sự để tối ưu hóa sử dụng tài nguyên.',
+                        blocks: [
+                            {
+                                name: 'Hoạch Định & Dự Báo Nhu Cầu',
+                                desc: 'Dự Đoán Nhu Cầu Tương Lai',
+                                fullDesc: 'Sử dụng dữ liệu lịch sử, máy học và thông tin thị trường để dự báo nhu cầu.',
+                                icon: <BarChartIcon />,
+                                subModules: ['forecaster', 'advanced_forecaster']
+                            },
+                            {
+                                name: 'Hoạch Định Chính (MPS & DRP)',
+                                desc: 'Cân Đối Cung & Cầu',
+                                fullDesc: 'Lập kế hoạch sản xuất trung hạn (MPS) và bổ sung tồn kho (DRP).',
+                                icon: <GridIcon />,
+                                subModules: ['aggregated_planning']
+                            },
+                            {
+                                name: 'Hoạch Định & Tối Ưu Tồn Kho',
+                                desc: 'Thiết Lập Mục Tiêu Tồn Kho',
+                                fullDesc: 'Xác định mức tồn kho tối ưu (an toàn, chu kỳ) trên toàn chuỗi.',
+                                icon: <BoxIcon />,
+                                subModules: ['abc', 'inventory']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'operational', title: 'Vận Hành', subtitle: 'Tuần đến Giờ',
+                        definition: 'Hoạch định vận hành tập trung vào thực thi ngắn hạn (ngày đến tuần) và đáp ứng đơn hàng ngay lập tức. Bao gồm lịch trình chi tiết, định tuyến xe và kiểm soát xưởng để đáp ứng yêu cầu cụ thể của khách hàng trong các ràng buộc cố định.',
+                        blocks: [
+                            {
+                                name: 'Hoạch Định Sản Xuất & Lịch Trình Chi Tiết',
+                                desc: 'Lịch Trình Năng Lực Hữu Hạn',
+                                fullDesc: 'Lịch trình xưởng chi tiết tuân thủ ràng buộc tài nguyên (máy móc, nhân công).',
+                                icon: <FactoryIcon />,
+                                subModules: ['clsp', 'cap_main_planning', 'scheduling_prob']
+                            },
+                            {
+                                name: 'Hoạch Định Vận Tải & Định Tuyến Xe',
+                                desc: 'Tối Ưu Hóa Logistics',
+                                fullDesc: 'Lập kế hoạch di chuyển hàng hóa, gom hàng và tối ưu hóa lộ trình.',
+                                icon: <TruckIcon />,
+                                subModules: ['logistics', 'vrp', 'shortest_path', 'long_haul', 'short_haul']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'cross', title: 'Đa Chức Năng', subtitle: 'Mọi Khung Thời Gian',
+                        definition: 'Quy trình đa chức năng trải dài mọi khung thời gian, kết nối các phòng ban để đảm bảo sự đồng bộ. Bao gồm Hoạch định Bán hàng & Vận hành (S&OP), chia sẻ dữ liệu thời gian thực và phân tích kịch bản cộng tác để đồng bộ hóa toàn bộ chuỗi giá trị.',
+                        blocks: [
+                            {
+                                name: 'Phân Tích Kịch Bản What-If',
+                                desc: 'Mô Phỏng & Hỗ Trợ',
+                                fullDesc: 'Mô phỏng các kịch bản khác nhau để đánh giá tác động và so sánh hành động.',
+                                icon: <GitBranchIcon />,
+                                subModules: ['queuing_sim']
+                            },
+                            {
+                                name: 'Hợp Tác Chuỗi Cung Ứng',
+                                desc: 'Minh Bạch & Đồng Bộ',
+                                fullDesc: 'Nền tảng chia sẻ thông tin thời gian thực với nội bộ và đối tác bên ngoài.',
+                                icon: <UsersIcon />,
+                                subModules: ['atp']
+                            }
+                        ]
+                    }
+                ]
             }
         };
 
-        // 2. APS Matrix Structure
-        const APS_MATRIX = [
-            {
-                id: 'strategic',
-                title: 'Strategic',
-                subtitle: 'Years to Months',
-                definition: 'Strategic planning sets the long-term direction (1-10 years), focusing on high-stakes capital decisions like network design, facility locations, and market entry. These decisions determine the supply chain limits and are difficult to reverse.',
-                color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text',
-                bg: 'bg-brand-gold',
-                border: 'border-brand-gold',
-                blocks: [
-                    {
-                        name: 'Strategic Network Planning',
-                        desc: 'Supply Chain Design & Optimization',
-                        fullDesc: 'Designing the physical supply chain network (facilities, warehouses) to minimize costs.',
-                        icon: <GlobeIcon />,
-                        subModules: ['median_prob', 'cover_prob', 'facility_loc', 'center_prob', 'warehouse_loc', 'hub_loc']
-                    }
-                ]
-            },
-            {
-                id: 'tactical',
-                title: 'Tactical',
-                subtitle: 'Months to Weeks',
-                definition: 'Tactical planning (6-18 months) translates strategic goals into executable plans. It balances supply and demand through master production scheduling, inventory policy setting, and workforce capacity management to optimize resource utilization.',
-                color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text',
-                bg: 'bg-emerald-500',
-                border: 'border-emerald-500',
-                blocks: [
-                    {
-                        name: 'Demand Planning & Forecasting',
-                        desc: 'Predicting Future Demand',
-                        fullDesc: 'Using historical data, ML, and market intelligence to forecast demand.',
-                        icon: <BarChartIcon />,
-                        subModules: ['forecaster', 'advanced_forecaster']
-                    },
-                    {
-                        name: 'Master Planning (MPS & DRP)',
-                        desc: 'Balancing Supply & Demand',
-                        fullDesc: 'Medium-term production planning (MPS) and inventory replenishment (DRP).',
-                        icon: <GridIcon />,
-                        subModules: ['aggregated_planning']
-                    },
-                    {
-                        name: 'Inventory Planning & Optimization',
-                        desc: 'Setting Inventory Targets',
-                        fullDesc: 'Determining optimal inventory levels (safety stock, cycle stock) across the chain.',
-                        icon: <BoxIcon />,
-                        subModules: ['abc', 'inventory']
-                    }
-                ]
-            },
-            {
-                id: 'operational',
-                title: 'Operational',
-                subtitle: 'Weeks to Hours',
-                definition: 'Operational planning focuses on short-term execution (days to weeks) and immediate order fulfillment. It involves detailed scheduling, vehicle routing, and shop floor control to meet specific customer requirements within fixed constraints.',
-                color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text',
-                bg: 'bg-brand-gold',
-                border: 'border-brand-gold',
-                blocks: [
-                    {
-                        name: 'Production Planning & Detailed Scheduling',
-                        desc: 'Finite Capacity Scheduling',
-                        fullDesc: 'Detailed shop floor scheduling respecting resource constraints (machines, labor).',
-                        icon: <FactoryIcon />,
-                        subModules: ['clsp', 'cap_main_planning', 'scheduling_prob']
-                    },
-                    {
-                        name: 'Transportation Planning & Vehicle Routing',
-                        desc: 'Optimizing Logistics',
-                        fullDesc: 'Planning movement of goods, load consolidation, and route optimization.',
-                        icon: <TruckIcon />,
-                        subModules: ['logistics', 'vrp', 'shortest_path', 'long_haul', 'short_haul']
-                    }
-                ]
-            },
-            {
-                id: 'cross',
-                title: 'Cross-Functional',
-                subtitle: 'All Horizons',
-                definition: 'Cross-functional processes span all time horizons, bridging departments to ensure alignment. This includes Sales & Operations Planning (S&OP), real-time data sharing, and collaborative scenario analysis to synchronize the entire value chain.',
-                color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text',
-                bg: 'bg-emerald-500',
-                border: 'border-emerald-500',
-                blocks: [
-                    {
-                        name: 'What-If Scenario Analysis',
-                        desc: 'Simulation & Support',
-                        fullDesc: 'Simulating various scenarios to evaluate impact and compare actions.',
-                        icon: <GitBranchIcon />,
-                        subModules: ['queuing_sim']
-                    },
-                    {
-                        name: 'Supply Chain Collaboration',
-                        desc: 'Visibility & Alignment',
-                        fullDesc: 'Platform for sharing real-time info with internal departments and external partners.',
-                        icon: <UsersIcon />,
-                        subModules: ['atp']
-                    }
-                ]
-            }
+        const MODULE_STATIC_DATA = {
+            'abc': { id: 'abc', icon: <BarChartIcon />, status: 'live', href: './abcxyz.html', version: 'v1.0_PRO' },
+            'forecaster': { id: 'forecaster', icon: <ActivityIcon />, status: 'live', href: './forecaster.html', version: 'v7.5_PRO' },
+            'advanced_forecaster': { id: 'advanced_forecaster', icon: <AdvancedForecasterIcon />, status: 'live', href: './mlforecaster.html', version: 'v2.0_BETA' },
+            'inventory': { id: 'inventory', icon: <BoxIcon />, status: 'live', href: './inventory.html', version: 'v1.0_LIVE' },
+            'logistics': { id: 'logistics', icon: <TruckIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'vrp': { id: 'vrp', icon: <TruckIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'clsp': { id: 'clsp', icon: <SettingsIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'median_prob': { id: 'median_prob', icon: <MedianIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'cover_prob': { id: 'cover_prob', icon: <CoverIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'facility_loc': { id: 'facility_loc', icon: <LocationIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'atp': { id: 'atp', icon: <ATPIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'aggregated_planning': { id: 'aggregated_planning', icon: <AggregatedIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'cap_main_planning': { id: 'cap_main_planning', icon: <CapacitatedIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'scheduling_prob': { id: 'scheduling_prob', icon: <SchedulingIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'queuing_sim': { id: 'queuing_sim', icon: <QueuingIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'center_prob': { id: 'center_prob', icon: <CenterIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'warehouse_loc': { id: 'warehouse_loc', icon: <WarehouseIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'hub_loc': { id: 'hub_loc', icon: <HubIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'shortest_path': { id: 'shortest_path', icon: <ShortestPathIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'long_haul': { id: 'long_haul', icon: <LongHaulIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'short_haul': { id: 'short_haul', icon: <ShortHaulIcon />, status: 'planned', href: '#', version: 'CONCEPT' }
+        };
+
+        const MATRIX_STRUCTURE = [
+            { id: 'strategic', color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text', subModules: [['median_prob', 'cover_prob', 'facility_loc', 'center_prob', 'warehouse_loc', 'hub_loc']] },
+            { id: 'tactical', color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text', subModules: [['forecaster', 'advanced_forecaster'], ['aggregated_planning'], ['abc', 'inventory']] },
+            { id: 'operational', color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text', subModules: [['clsp', 'cap_main_planning', 'scheduling_prob'], ['logistics', 'vrp', 'shortest_path', 'long_haul', 'short_haul']] },
+            { id: 'cross', color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text', subModules: [['queuing_sim'], ['atp']] }
         ];
 
         // --- COMPONENTS ---
@@ -538,162 +607,56 @@
             );
         };
 
-        // Sub-Module Card (Inside Modal)
-        const SubModuleCard = ({ moduleId }) => {
-            if (typeof moduleId === 'object') {
-                // Handle directly passed object (e.g. ad-hoc implementation)
-                // But generally we use registry logic. 
-                // We'll stick to registry lookups for now.
-                return null;
-            }
+        // ModulaBlock Component (Updated to use Props for Modules)
+        const ModulaBlock = ({ block, content, colorClass, onClick }) => {
+            if (!block) return null;
 
-            const module = MODULE_REGISTRY[moduleId];
-            if (!module) return null;
+            // Safety check for subModules - Ensure it is an array
+            const rawSubModules = block.subModules;
+            const subModules = Array.isArray(rawSubModules) ? rawSubModules : [];
 
-            const isLive = module.status === 'live';
-            const isDev = module.status === 'dev';
+            // Re-map subModules from IDs to full objects
+            const subModulesList = subModules.map(modId => {
+                const staticData = MODULE_STATIC_DATA[modId] || { icon: <ActivityIcon />, status: 'planned', href: '#' };
+                const textData = (content && content.registry && content.registry[modId]) || { name: modId, desc: '' };
+                return { ...staticData, ...textData, id: modId };
+            });
 
-            const CardContent = (
-                <div className={`
-                    relative group p-4 rounded-xl border border-slate-200 dark:border-slate-700 
-                    hover:border-brand-gold dark:hover:border-brand-gold transition-all duration-300 flex flex-col gap-3 h-full
-                    ${isLive ? 'bg-white dark:bg-slate-800/50 hover:shadow-lg hover:-translate-y-1' : 'bg-slate-50 dark:bg-slate-900/30 opacity-70'}
-                `}>
-                    <div className="flex justify-between items-start">
-                        <div className={`p-2 rounded-lg ${isLive ? 'bg-brand-gold/10 text-brand-gold' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
-                            {module.icon}
-                        </div>
-                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${isLive ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' :
-                            'bg-slate-200 dark:bg-slate-700 text-slate-500'
-                            }`}>
-                            {module.status.toUpperCase()}
-                        </span>
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-brand-gold transition-colors">{module.name}</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{module.desc}</p>
-                    </div>
-                    {isLive && (
-                        <div className="mt-auto pt-3 flex items-center text-xs font-bold text-brand-gold gap-1">
-                            Launch Tool <ArrowRightIcon />
-                        </div>
-                    )}
-                </div>
-            );
-
-            if (isLive) {
-                return <a href={module.href} className="block h-full">{CardContent}</a>;
-            }
-            return <div className="h-full">{CardContent}</div>;
-        };
-
-        // Module Modal / Overlay
-        const ModuleModal = ({ block, isOpen, onClose }) => {
-            if (!isOpen || !block) return null;
-
-            useEffect(() => {
-                const handleEsc = (e) => e.key === 'Escape' && onClose();
-                window.addEventListener('keydown', handleEsc);
-                return () => window.removeEventListener('keydown', handleEsc);
-            }, [onClose]);
-
-            // Prevent scroll on body when modal is open
-            useEffect(() => {
-                document.body.style.overflow = 'hidden';
-                return () => document.body.style.overflow = 'unset';
-            }, []);
-
-            return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    {/* Backdrop */}
-                    <div
-                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm modal-backdrop"
-                        onClick={onClose}
-                    ></div>
-
-                    {/* Content */}
-                    <div className="
-                        relative w-full max-w-2xl bg-white dark:bg-[#0f172a] 
-                        rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 
-                        p-6 md:p-8 modal-content overflow-hidden flex flex-col max-h-[90vh]
-                    ">
-                        {/* Background Decoration */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-gold/10 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-
-                        {/* Header */}
-                        <div className="flex justify-between items-start mb-6 relative z-10 shrink-0">
-                            <div>
-                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{block.name}</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">{block.fullDesc}</p>
-                            </div>
-                            <button
-                                onClick={onClose}
-                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500"
-                            >
-                                <CloseIcon />
-                            </button>
-                        </div>
-
-                        {/* Sub-Modules Grid */}
-                        <div className="relative z-10 overflow-y-auto custom-scrollbar p-1 -m-1">
-                            {block.subModules && block.subModules.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {block.subModules.map((modId) => (
-                                        <SubModuleCard key={modId} moduleId={modId} />
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                                    <div className="mb-4 inline-flex p-4 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-300 dark:text-slate-600">
-                                        <GlobeIcon />
-                                    </div>
-                                    <p className="text-slate-500 font-medium">No active modules in this block yet.</p>
-                                    <p className="text-slate-400 text-xs mt-1">Check back later for updates.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // ModulaBlock Component
-        const ModulaBlock = ({ block, colorClass, onClick }) => {
-            // Check if any sub-module is live (for Go-Live indicator)
-            const hasLiveModule = block.subModules.some(modId => MODULE_REGISTRY[modId]?.status === 'live');
+            // Check if any sub-module is live
+            const hasLiveModule = subModulesList.some(m => m.status === 'live');
 
             return (
                 <div
                     onClick={() => onClick(block)}
                     className={`
-                        relative group flex flex-col justify-between p-5 rounded-xl border 
+                        relative group flex flex-col justify-between p-5 rounded-2xl border border-transparent
                         ${hasLiveModule
-                            ? 'border-emerald-400/50 bg-emerald-50/30 dark:bg-emerald-900/10 dark:border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                            : 'border-slate-200 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/30'}
-                        backdrop-blur-sm cursor-pointer overflow-hidden
-                        transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-brand-gold/30
-                        h-full min-h-[140px]
+                            ? 'bg-gradient-to-br from-emerald-500/10 to-emerald-900/20 shadow-[0_8px_32px_rgba(16,185,129,0.2),inset_0_1px_0_0_rgba(255,255,255,0.3)] ring-1 ring-emerald-400/20'
+                            : 'bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/60 dark:to-slate-900/60 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.15)] hover:from-white/30 hover:to-white/10 dark:hover:from-slate-800/80 dark:hover:to-slate-900/80 ring-1 ring-white/30 dark:ring-white/5'}
+                        backdrop-blur-xl cursor-pointer overflow-hidden
+                        transition-all duration-500 ease-out 
+                        hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)] 
+                        hover:-translate-y-2 hover:scale-[1.02] 
+                        h-full min-h-[140px] appearance-3d
                     `}
                 >
                     {/* Hover Glow */}
                     <div className={`absolute inset-0 bg-gradient-to-br from-brand-gold/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-duration-500`}></div>
 
-                    {/* Quick View Overlay (Visible on Hover) */}
+                    {/* Quick View Overlay */}
                     <div className="absolute inset-0 z-20 bg-slate-900/95 backdrop-blur-md p-5 
                                     opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out
                                     flex flex-col transform translate-y-4 group-hover:translate-y-0">
                         <div className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider border-b border-slate-700 pb-2 flex justify-between items-center">
-                            <span>Quick View</span>
-                            <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded">{block.subModules.length}</span>
+                            <span>{content?.ui?.quick_view || "Quick View"}</span>
+                            <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded">{subModulesList.length}</span>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2">
-                            {block.subModules.length > 0 ? (
-                                block.subModules.map(modId => {
-                                    const mod = MODULE_REGISTRY[modId];
-                                    if (!mod) return null;
+                            {subModulesList.length > 0 ? (
+                                subModulesList.map(mod => {
                                     const isLive = mod.status === 'live';
                                     return (
-                                        <div key={modId} className="flex items-center gap-2 text-xs text-slate-300">
+                                        <div key={mod.id} className="flex items-center gap-2 text-xs text-slate-300">
                                             <div className={`${isLive ? 'text-emerald-400' : 'text-brand-gold'} shrink-0 scale-75 opacity-80`}>{mod.icon}</div>
                                             <span className={`truncate ${isLive ? 'text-emerald-400 font-bold' : ''}`}>{mod.name}</span>
                                             {isLive && <span className="ml-auto text-[8px] bg-emerald-500/20 text-emerald-400 px-1 rounded">LIVE</span>}
@@ -701,32 +664,30 @@
                                     )
                                 })
                             ) : (
-                                <p className="text-xs text-slate-500 italic">No modules enabled.</p>
+                                <p className="text-xs text-slate-500 italic">{content?.ui?.no_modules || "No modules"}</p>
                             )}
                         </div>
                         <div className="mt-3 pt-2 text-[10px] font-bold text-brand-gold flex items-center justify-end border-t border-slate-800">
-                            Click to Open <ArrowRightIcon />
+                            {content?.ui?.click_to_open || "Open"} <ArrowRightIcon />
                         </div>
                     </div>
 
-                    {/* Default Content (Dimmed on Hover) */}
+                    {/* Default Content */}
                     <div className="relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
-                        {/* Badge/Icon Placeholder */}
                         <div className="flex justify-between items-start mb-3">
                             <div className={`p-2 rounded-md transition-colors ${hasLiveModule ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 group-hover:text-brand-gold'}`}>
                                 {block.icon || <SystemIcon />}
                             </div>
-                            {/* Status Badges */}
                             <div className="flex items-center gap-2">
-                                {block.subModules.length > 0 && (
+                                {subModulesList.length > 0 && (
                                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${hasLiveModule ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'}`}>
-                                        {block.subModules.length} Modules
+                                        {subModulesList.length} {content?.ui?.modules || "Modules"}
                                     </span>
                                 )}
                                 {hasLiveModule && (
                                     <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white shadow-sm animate-pulse">
                                         <span className="w-1.5 h-1.5 bg-white rounded-full mr-1"></span>
-                                        GO-LIVE
+                                        {content?.ui?.go_live || "GO-LIVE"}
                                     </span>
                                 )}
                             </div>
@@ -740,60 +701,193 @@
                         </p>
                     </div>
 
-                    {/* Bottom Indicator */}
                     <div className="relative z-10 mt-4 flex items-center text-[10px] font-bold text-slate-400 transition-opacity duration-300 group-hover:opacity-10 uppercase tracking-wider">
-                        Explore <ArrowRightIcon />
+                        {content?.ui?.explore || "Explore"} <ArrowRightIcon />
                     </div>
                 </div>
             );
         };
 
-        // Horizon Row Component
-        const HorizonRow = ({ horizon, onBlockClick }) => {
+        // SubModule Card (Inside Modal)
+        const SubModuleCard = ({ moduleId, content }) => {
+            const staticData = MODULE_STATIC_DATA[moduleId] || {};
+            const textData = (content && content.registry && content.registry[moduleId]) || { name: moduleId, desc: '' };
+
+            const module = { ...staticData, ...textData };
+            const isLive = module.status === 'live';
+
+            const CardContent = (
+                <div className={`
+                    relative group p-4 rounded-xl border border-slate-200 dark:border-slate-700 
+                    hover:border-brand-gold dark:hover:border-brand-gold transition-all duration-300 flex flex-col gap-3 h-full
+                    ${isLive ? 'bg-white dark:bg-slate-800/50 hover:shadow-lg hover:-translate-y-1' : 'bg-slate-50 dark:bg-slate-900/30 opacity-70'}
+                `}>
+                    <div className="flex justify-between items-start">
+                        <div className={`p-2 rounded-lg ${isLive ? 'bg-brand-gold/10 text-brand-gold' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
+                            {module.icon || <ActivityIcon />}
+                        </div>
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${isLive ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' :
+                            'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                            }`}>
+                            {(module.status || 'unknown').toUpperCase()}
+                        </span>
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-brand-gold transition-colors">{module.name}</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{module.desc}</p>
+                    </div>
+                    {isLive && (
+                        <div className="mt-auto pt-3 flex items-center text-xs font-bold text-brand-gold gap-1">
+                            {content?.ui?.launch_tool} <ArrowRightIcon />
+                        </div>
+                    )}
+                </div>
+            );
+
+            if (isLive) {
+                return <a href={module.href} className="block h-full">{CardContent}</a>;
+            }
+            return <div className="h-full">{CardContent}</div>;
+        };
+
+        // ModuleModal Component (Updated to handle missing subModules)
+        const ModuleModal = ({ block, content, isOpen, onClose }) => {
+            if (!isOpen || !block) return null;
+
+            // Safe subModules access
+            const subModules = (block.subModules && Array.isArray(block.subModules)) ? block.subModules : [];
+
+            useEffect(() => {
+                const handleEsc = (e) => e.key === 'Escape' && onClose();
+                window.addEventListener('keydown', handleEsc);
+                return () => window.removeEventListener('keydown', handleEsc);
+            }, [onClose]);
+
+            useEffect(() => {
+                document.body.style.overflow = 'hidden';
+                return () => document.body.style.overflow = 'unset';
+            }, []);
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm modal-backdrop"
+                        onClick={onClose}
+                    ></div>
+
+                    <div className="
+                        relative w-full max-w-2xl bg-white dark:bg-[#0f172a] 
+                        rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 
+                        p-6 md:p-8 modal-content overflow-hidden flex flex-col max-h-[90vh]
+                    ">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-gold/10 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+                        <div className="flex justify-between items-start mb-6 relative z-10 shrink-0">
+                            <div>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{block.name}</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">{block.fullDesc}</p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500"
+                            >
+                                <CloseIcon />
+                            </button>
+                        </div>
+
+                        <div className="relative z-10 overflow-y-auto custom-scrollbar p-1 -m-1">
+                            {subModules.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {subModules.map((modId) => (
+                                        <SubModuleCard key={modId} moduleId={modId} content={content} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+                                    <div className="mb-4 inline-flex p-4 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-300 dark:text-slate-600">
+                                        <GlobeIcon />
+                                    </div>
+                                    <p className="text-slate-500 font-medium">{content?.ui?.no_modules}</p>
+                                    <p className="text-slate-400 text-xs mt-1">{content?.ui?.check_later}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // HorizonRow Component
+        const HorizonRow = ({ horizon, content, onBlockClick, isLast }) => {
             const [showTooltip, setShowTooltip] = useState(false);
 
             return (
-                <div className="flex flex-col md:flex-row gap-6 mb-8 last:mb-0">
-                    {/* Left: Horizon Header */}
-                    <div className="relative md:w-48 shrink-0 flex md:flex-col justify-center md:justify-start items-center md:items-start gap-2 md:gap-1 p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 z-20">
-                        {/* Tooltip Popup */}
-                        <div
-                            className={`
-                                absolute left-0 bottom-full md:bottom-auto md:left-full md:top-0 
-                                mb-2 md:mb-0 md:ml-3 w-64 p-4 rounded-xl 
-                                bg-slate-800/95 dark:bg-slate-800/95 text-white backdrop-blur-md border border-slate-700 shadow-2xl
-                                transition-all duration-300 ease-out origin-bottom md:origin-left z-50
-                                ${showTooltip ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}
-                            `}
-                        >
-                            <div className="text-xs font-bold text-brand-gold mb-1 uppercase tracking-wider">{horizon.title}</div>
-                            <p className="text-[11px] leading-relaxed text-slate-300 font-medium font-sans">{horizon.definition}</p>
+                <div className="relative flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 last:mb-0">
+                    {/* Vertical Line Segment (Left) - Adjusted for SM breakpoint */}
+                    <div className="absolute left-[8px] top-4 bottom-[-32px] w-px bg-brand-gold/30 sm:block hidden z-0"></div>
 
-                            {/* Arrow for Desktop (Left) */}
-                            <div className="absolute hidden md:block w-3 h-3 bg-slate-800/95 border-l border-b border-slate-700 transform rotate-45 -left-1.5 top-6"></div>
-                            {/* Arrow for Mobile (Bottom) */}
-                            <div className="absolute block md:hidden w-3 h-3 bg-slate-800/95 border-l border-b border-slate-700 transform -rotate-45 left-1/2 -bottom-1.5 -translate-x-1/2"></div>
+                    {!isLast && (
+                        <div className="absolute left-[1.5rem] top-[3rem] bottom-[-2rem] w-px bg-brand-gold/50 sm:block hidden z-0"></div>
+                    )}
+
+                    {/* Horizontal Line separating sections */}
+                    <div className="absolute top-1/2 left-0 w-4 h-px bg-brand-gold/50 hidden sm:block -translate-x-full"></div>
+
+                    {/* Left Title Box Container */}
+                    <div className="relative sm:w-40 md:w-48 shrink-0 z-20">
+                        {/* Horizontal Line to the right */}
+                        <div className="absolute top-8 right-[-1.5rem] w-6 h-px bg-brand-gold/50 hidden sm:block"></div>
+
+                        {/* The Title Box itself */}
+                        <div className="flex sm:flex-col justify-center sm:justify-start items-center sm:items-start gap-2 sm:gap-1 p-4 rounded-xl border border-slate-200 dark:border-brand-gold/30 bg-slate-50/50 dark:bg-slate-900/40 relative h-full">
+                            {/* Small dot on the left */}
+                            <div className="absolute top-8 left-[-5px] w-2.5 h-2.5 rounded-full bg-slate-900 border-2 border-brand-gold z-30 hidden sm:block"></div>
+
+                            <div
+                                className={`
+                                    absolute left-0 bottom-full sm:bottom-auto sm:left-full sm:top-0 
+                                    mb-2 sm:mb-0 sm:ml-3 w-64 p-4 rounded-xl 
+                                    bg-slate-800/95 dark:bg-slate-800/95 text-white backdrop-blur-md border border-slate-700 shadow-2xl
+                                    transition-all duration-300 ease-out origin-bottom sm:origin-left z-50
+                                    ${showTooltip ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}
+                                `}
+                            >
+                                <div className="text-xs font-bold text-brand-gold mb-1 uppercase tracking-wider">{horizon.title}</div>
+                                <p className="text-[11px] leading-relaxed text-slate-300 font-medium font-sans">{horizon.definition}</p>
+
+                                <div className="absolute hidden sm:block w-3 h-3 bg-slate-800/95 border-l border-b border-slate-700 transform rotate-45 -left-1.5 top-6"></div>
+                                <div className="absolute block sm:hidden w-3 h-3 bg-slate-800/95 border-l border-b border-slate-700 transform -rotate-45 left-1/2 -bottom-1.5 -translate-x-1/2"></div>
+                            </div>
+
+                            <span
+                                className="block text-xs uppercase tracking-wider font-extrabold text-slate-900 dark:text-white drop-shadow-md cursor-help select-none"
+                                onMouseEnter={() => setShowTooltip(true)}
+                                onMouseLeave={() => setShowTooltip(false)}
+                                onClick={() => setShowTooltip(!showTooltip)}
+                            >
+                                {horizon.title}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                                {horizon.subtitle}
+                            </span>
                         </div>
 
-                        <span
-                            className={`text-xs font-bold uppercase tracking-widest cursor-help select-none ${horizon.color}`}
-                            onMouseEnter={() => setShowTooltip(true)}
-                            onMouseLeave={() => setShowTooltip(false)}
-                            onClick={() => setShowTooltip(!showTooltip)}
-                        >
-                            {horizon.title}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-mono">
-                            {horizon.subtitle}
-                        </span>
+                        {/* Vertical line connecting to next row */}
+                        {!isLast && (
+                            <div className="absolute left-[-1px] top-[calc(2rem_+_5px)] bottom-[-2rem] w-px bg-brand-gold/50 hidden sm:block"></div>
+                        )}
+                        {/* Horizontal divider line at the bottom */}
+                        {!isLast && (
+                            <div className="absolute left-0 w-screen bottom-[-1rem] h-px bg-brand-gold/30 hidden sm:block pointer-events-none opacity-50"></div>
+                        )}
                     </div>
 
-                    {/* Right: Blocks Grid */}
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {horizon.blocks.map((block, idx) => (
                             <Reveal key={idx} delay={idx * 100}>
                                 <ModulaBlock
                                     block={block}
+                                    content={content}
                                     colorClass={horizon.color}
                                     onClick={onBlockClick}
                                 />
@@ -807,38 +901,31 @@
 
         // --- MAIN APP ---
 
-        const AboutSection = () => (
+        const AboutSection = ({ content }) => (
             <div className="mt-16 border-t border-slate-200 dark:border-slate-800 pt-10 pb-16">
                 <Reveal>
                     <div className="flex items-center gap-3 mb-8">
                         <span className="w-8 h-1 bg-brand-gold rounded-full"></span>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">About Operartis</h2>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{content.ui.about_title}</h2>
                     </div>
                 </Reveal>
 
                 <div className="grid md:grid-cols-2 gap-12 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
 
-                    {/* LEFT COLUMN: WHO WE ARE (TOP) + LOGO (MIDDLE) + WHAT WE DO (BOTTOM) */}
                     <div className="flex flex-col h-full justify-between gap-12">
-                        {/* Block 1: Intro */}
                         <Reveal delay={100}>
                             <div>
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
-                                    Who We Are
+                                    {content.ui.about_who}
                                 </h3>
-                                <p className="mb-4 text-slate-800 dark:text-slate-300 font-medium">
-                                    Founded in 2025, Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations.
-                                </p>
-                                <p>
-                                    We combine deep expertise in supply chain, logistics, production, warehousing and manufacturing processes with advanced quantitative-optimization and simulation methods to deliver meaningful, measurable improvements.
-                                </p>
-                                <p className="mt-4">
-                                    At Operartis, we understand that having data in an Enterprise Resource Planning (ERP) system is only the first step. True operational excellence requires turning that data into actionable planning, forecasting and scheduling insights. That’s why we focus on building, developing, and continuously improving a tailored Advanced Planning and Scheduling System (APS) — helping our clients leverage their data not just for record-keeping, but for real operational advantage.
-                                </p>
+                                {content.ui.about_who_text.map((text, i) => (
+                                    <p key={i} className={`mb-4 ${i === 0 ? 'text-slate-800 dark:text-slate-300 font-medium' : ''}`}>
+                                        {text}
+                                    </p>
+                                ))}
                             </div>
                         </Reveal>
 
-                        {/* NEW: Logo Filler - INCREASED SIZE */}
                         <Reveal delay={150}>
                             <div className="w-full flex justify-center py-8 opacity-90">
                                 <a href="https://operartis.vercel.app/terminal.html" className="hover:opacity-80 transition-opacity">
@@ -852,67 +939,43 @@
                             </div>
                         </Reveal>
 
-                        {/* Block 2: What We Do */}
                         <Reveal delay={200}>
                             <div>
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
-                                    What We Do
+                                    {content.ui.about_what}
                                 </h3>
                                 <div className="space-y-4">
-                                    <p className="leading-relaxed">
-                                        We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.
-                                    </p>
-                                    <p className="leading-relaxed">
-                                        We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.
-                                    </p>
-                                    <p className="leading-relaxed">
-                                        We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.
-                                    </p>
-                                    <p className="leading-relaxed">
-                                        Our quantitative-driven approach allows clients to make data-backed decisions, reduce operational costs, minimize waste, shorten lead times and improve overall efficiency.
-                                    </p>
+                                    {content.ui.about_what_text.map((text, i) => (
+                                        <p key={i} className="leading-relaxed">{text}</p>
+                                    ))}
                                 </div>
                             </div>
                         </Reveal>
                     </div>
 
-                    {/* RIGHT COLUMN: VISION (TOP) + WHY CHOOSE (BOTTOM) */}
                     <div className="flex flex-col h-full justify-between gap-12">
-                        {/* Block 3: Vision */}
                         <Reveal delay={300}>
                             <div>
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
-                                    Vision & Philosophy
+                                    {content.ui.about_vision}
                                 </h3>
+                                {/* Brand Motto - Keeping in English as requested */}
                                 <div className="bg-slate-100 dark:bg-slate-900/50 p-6 rounded-lg border border-slate-200 dark:border-slate-800 mb-6 text-center shadow-inner">
                                     <p className="text-brand-gold font-bold italic text-lg tracking-wide">“Optimizing today, Growing tomorrow.”</p>
                                 </div>
-                                <p className="mb-4">
-                                    We aim to democratize operational and supply-chain optimization. We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.
-                                </p>
-                                <p className="mb-4">
-                                    We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.
-                                </p>
-                                <p>
-                                    By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness.
-                                </p>
+                                {content.ui.about_vision_text.map((text, i) => (
+                                    <p key={i} className="mb-4">{text}</p>
+                                ))}
                             </div>
                         </Reveal>
 
-                        {/* Block 4: Why Choose - UPDATED COLOR SCHEME */}
                         <Reveal delay={400}>
                             <div>
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
-                                    Why Choose Operartis
+                                    {content.ui.about_why}
                                 </h3>
                                 <div className="space-y-6">
-                                    {[
-                                        { title: "Specialization & Expertise", text: "We are not a generalist IT or consulting firm. Our core competence lies in operations, supply-chain optimization, and APS/ERP integration." },
-                                        { title: "Quantitative & Data-Driven", text: "Our approaches rely on simulation, modeling and data analytics — not guesswork. This ensures improvements are measurable and repeatable." },
-                                        { title: "Tailored & Pragmatic Solutions", text: "We design APS systems that reflect your real-world constraints. What we build fits your operations — not the other way around." },
-                                        { title: "Affordability & Value", text: "We strive to provide our services at reasonable price levels, making high-quality optimization accessible to a broad range of enterprises." },
-                                        { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." }
-                                    ].map((item, i) => (
+                                    {content.ui.about_why_items.map((item, i) => (
                                         <div key={i}>
                                             <strong className="block text-xs uppercase tracking-wider mb-1 font-extrabold text-slate-900 dark:text-white drop-shadow-md">{item.title}</strong>
                                             <p className="leading-relaxed">{item.text}</p>
@@ -927,7 +990,7 @@
                 <Reveal delay={800}>
                     <div className="mt-16 pt-10 border-t border-dashed border-slate-200 dark:border-slate-800 text-center">
                         <p className="text-slate-800 dark:text-slate-200 font-medium max-w-3xl mx-auto text-base">
-                            We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.
+                            {content.ui.invite_text}
                         </p>
                         <p className="text-brand-gold font-bold uppercase tracking-widest mt-4 text-xs">Let’s optimize today — so you can grow stronger tomorrow.</p>
                     </div>
@@ -937,8 +1000,13 @@
 
         const App = () => {
             const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
+            // Default to 'vi' (Vietnamese) as requested
+            const [lang, setLang] = useState('vi');
             const [time, setTime] = useState(new Date());
             const [selectedBlock, setSelectedBlock] = useState(null);
+
+            // Derived Content
+            const content = TRANSLATIONS[lang];
 
             useEffect(() => {
                 const applyTheme = () => {
@@ -970,6 +1038,10 @@
                 else setTheme('light');
             };
 
+            const toggleLang = () => {
+                setLang(prev => prev === 'en' ? 'vi' : 'en');
+            };
+
             const handleBlockClick = (block) => {
                 setSelectedBlock(block);
             };
@@ -979,71 +1051,85 @@
             };
 
             return (
-                <div className="h-full flex flex-col relative">
-                    {/* Background Grid */}
-                    <div className="absolute inset-0 pointer-events-none z-0">
-                        <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-grid-pattern opacity-[0.03]' : 'bg-grid-pattern-light opacity-[0.4]'}`}></div>
-                        <div className="absolute inset-0 bg-grid"></div>
+                <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
+                    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+                        {/* Atmospheric Glows */}
+                        {/* Atmospheric Glows */}
+                        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-brand-gold/20 dark:bg-brand-gold/20 rounded-full blur-[100px] opacity-70 animate-blob"></div>
+                        <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-500/20 dark:bg-indigo-600/30 rounded-full blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
+                        <div className="absolute top-[30%] left-[20%] w-[500px] h-[500px] bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full blur-[100px] opacity-60 animate-blob animation-delay-4000"></div>
+
+                        {/* Tech Grid with Vignette Mask */}
+                        <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-grid-pattern opacity-[0.03]' : 'bg-grid-pattern-light opacity-[0.2]'}`}
+                            style={{ maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 100%)' }}>
+                        </div>
                     </div>
 
-                    {/* Navigation Bar */}
-                    <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel flex items-center justify-between px-6 z-10 shrink-0">
-                        <div className="flex items-center gap-4">
+                    <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel flex items-center justify-between px-4 md:px-6 z-10 shrink-0">
+                        <div className="flex items-center gap-2 md:gap-4 shrink-0">
                             <a href="https://operartis.vercel.app/terminal.html" className="hover:opacity-80 transition-opacity">
-                                <img src="./icononly_transparent_nobuffer.png" className="h-10 w-10 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                                <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain" onError={(e) => e.target.style.display = 'none'} />
                             </a>
                             <div className="flex flex-col">
-                                <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS <span className="text-brand-gold font-normal">APS</span></span>
-                                <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase">System Terminal</span>
+                                <span className="font-bold text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS <span className="text-brand-gold font-normal">APS</span></span>
+                                <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase hidden hover:block xs:block">{content.ui.system_terminal}</span>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-6">
-                            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-1.5 md:gap-6 shrink-0">
+                            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
                                 <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-300 font-bold">SYSTEM OPERATIONAL</span>
+                                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-300 font-bold">{content.ui.status_operational}</span>
                             </div>
-                            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
+                            <div className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
                             <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
                                 <ClockIcon />
                                 <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
-                            <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+
+                            {/* Theme Toggle */}
+                            <button onClick={toggleTheme} className="p-1.5 md:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
                                 {theme === 'dark' ? <SunIcon /> : theme === 'light' ? <MoonIcon /> : <SystemIcon />}
                             </button>
+
+                            {/* Language Toggle */}
+                            <button onClick={toggleLang} className="p-1.5 md:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors flex items-center gap-1 font-mono text-xs font-bold">
+                                <GlobeIcon />
+                                <span>{lang.toUpperCase()}</span>
+                            </button>
+
                             <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shadow-md cursor-pointer">
                                 <UserIcon />
                             </div>
                         </div>
                     </nav>
 
-                    {/* Main Content */}
-                    <main className="flex-1 overflow-y-auto z-10 w-full flex flex-col">
-                        <div className="max-w-7xl mx-auto w-full p-6 md:p-12 flex flex-col flex-1">
+                    <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
+                        <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 md:p-12 flex flex-col flex-1">
                             <Reveal>
                                 <div className="mb-12 text-center md:text-left">
                                     <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
-                                        Advanced Planning & <br />
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark">Scheduling Matrix</span>
+                                        {content.ui.header_title_1} <br />
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark">{content.ui.header_title_2}</span>
                                     </h1>
                                     <p className="text-slate-500 dark:text-slate-400 max-w-xl text-sm md:text-base leading-relaxed mt-4">
-                                        Select a functional module block to access specific planning tools and optimization engines.
+                                        {content.ui.header_desc}
                                     </p>
                                 </div>
                             </Reveal>
 
-                            {/* APS MATRIX CONTAINER */}
                             <div className="space-y-4">
-                                {APS_MATRIX.map((horizon) => (
+                                {content.matrix.map((horizon) => (
                                     <HorizonRow
                                         key={horizon.id}
                                         horizon={horizon}
+                                        content={content}
                                         onBlockClick={handleBlockClick}
                                     />
                                 ))}
                             </div>
 
-                            <AboutSection />
+                            <AboutSection content={content} />
                         </div>
                     </main>
 
@@ -1051,16 +1137,14 @@
                         <div className="w-full flex flex-col md:flex-row justify-between items-center gap-2">
                             <p className="text-[10px] text-slate-400">© 2025 Operartis Analytics. All rights reserved.</p>
                             <div className="flex items-center gap-4 text-[10px] text-slate-500 font-mono">
-                                <span>v2.0.0 Matrix UI</span>
-                                <span className="text-brand-gold">•</span>
-                                <span>Latency: 24ms</span>
+                                <span>{content.ui.rights_reserved}</span>
                             </div>
                         </div>
                     </footer>
 
-                    {/* Module Overlay/Modal */}
                     <ModuleModal
                         block={selectedBlock}
+                        content={content}
                         isOpen={!!selectedBlock}
                         onClose={handleCloseModal}
                     />
