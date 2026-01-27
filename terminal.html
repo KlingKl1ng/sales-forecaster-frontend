@@ -685,8 +685,11 @@
                                     </span>
                                 )}
                                 {hasLiveModule && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white shadow-sm animate-pulse">
-                                        <span className="w-1.5 h-1.5 bg-white rounded-full mr-1"></span>
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                        <span className="relative flex h-1.5 w-1.5 mr-1.5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                                        </span>
                                         {content?.ui?.go_live || "GO-LIVE"}
                                     </span>
                                 )}
@@ -803,12 +806,12 @@
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                                    <div className="mb-4 inline-flex p-4 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-300 dark:text-slate-600">
+                                <div className="text-center py-12 rounded-xl border border-white/20 dark:border-white/5 bg-white/5 dark:bg-slate-800/20 backdrop-blur-sm">
+                                    <div className="mb-4 inline-flex p-4 rounded-full bg-gradient-to-br from-white/50 to-white/10 dark:from-slate-700/50 dark:to-slate-800/30 shadow-inner text-slate-400 dark:text-slate-500">
                                         <GlobeIcon />
                                     </div>
-                                    <p className="text-slate-500 font-medium">{content?.ui?.no_modules}</p>
-                                    <p className="text-slate-400 text-xs mt-1">{content?.ui?.check_later}</p>
+                                    <p className="text-slate-600 dark:text-slate-400 font-medium">{content?.ui?.no_modules}</p>
+                                    <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">{content?.ui?.check_later}</p>
                                 </div>
                             )}
                         </div>
@@ -892,7 +895,7 @@
         // --- MAIN APP ---
 
         const AboutSection = ({ content }) => (
-            <div className="mt-16 border-t border-slate-200 dark:border-slate-800 pt-10 pb-16">
+            <div className="mt-16 border-t border-slate-200/60 dark:border-white/5 pt-10 pb-16">
                 <Reveal>
                     <div className="flex items-center gap-3 mb-8">
                         <span className="w-8 h-1 bg-brand-gold rounded-full"></span>
@@ -1063,8 +1066,8 @@
                                 <span className="text-[10px] font-mono text-slate-500 dark:text-slate-300 font-bold">{content.ui.status_operational}</span>
                             </div>
                             <div className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
-                            <div className="hidden sm:flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
-                                <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700/50 pr-3">
+                            <div className="flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs font-mono text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700/50 pr-3">
                                     <ClockIcon />
                                     <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
