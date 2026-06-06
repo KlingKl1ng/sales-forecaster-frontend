@@ -54,6 +54,7 @@
             try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
         })();
     </script>
+    <script src="./operartis-lang.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
 
@@ -1043,8 +1044,7 @@
 
         const App = () => {
             const [theme, setTheme] = useState(() => window.getOperartisTheme());
-            // Default to 'vi' (Vietnamese) as requested
-            const [lang, setLang] = useState('vi');
+            const [lang, setLang] = useState(() => window.getOperartisLang());
             const [time, setTime] = useState(new Date());
             const [selectedBlock, setSelectedBlock] = useState(null);
 
@@ -1067,6 +1067,10 @@
                 const timer = setInterval(() => setTime(new Date()), 1000);
                 return () => clearInterval(timer);
             }, []);
+
+            useEffect(() => {
+                window.persistOperartisLang(lang);
+            }, [lang]);
 
             const toggleTheme = () => {
                 if (theme === 'system') setTheme('light');
@@ -1104,11 +1108,6 @@
                         </div>
 
                         <div className="flex items-center gap-1.5 md:gap-6 shrink-0">
-                            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-300 font-bold">{content.ui.status_operational}</span>
-                            </div>
-                            <div className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
                             <div className="flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs font-mono text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700/50 pr-3">
                                     <ClockIcon />

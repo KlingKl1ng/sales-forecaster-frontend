@@ -43,6 +43,7 @@
             try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
         })();
     </script>
+    <script src="./operartis-lang.js"></script>
 
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
     <script crossorigin
@@ -3440,7 +3441,7 @@
             // UI State
             const [theme, setTheme] = useState(() => window.getOperartisTheme());
             const [isDark, setIsDark] = useState(false);
-            const [language, setLanguage] = useState(() => localStorage.getItem('inv-lang') || 'en');
+            const [language, setLanguage] = useState(() => window.getOperartisLang());
             const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
             // API URL State & Auto-Detection
@@ -3495,9 +3496,9 @@
             // Translation helper
             const t = (key) => translations[language]?.[key] || translations.en[key] || key;
 
-            // Language Effect
+            // Language Effect — synced across Operartis pages via localStorage('lang')
             useEffect(() => {
-                localStorage.setItem('inv-lang', language);
+                window.persistOperartisLang(language);
             }, [language]);
 
             // Theme Effect — default system (OS); synced with terminal.html in same tab
