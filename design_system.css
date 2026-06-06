@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
+
+/* Base Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
+    margin: 0;
+}
+
+/* Scrollbar Customization */
+.scroller {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+.dark body {
+    background: #0f172a;
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+    backdrop-filter: blur(4px);
+}
+
+/* Scenario Input Component */
+.scenario-input {
+    background: transparent;
+    border: 1px solid transparent;
+    width: 100%;
+    text-align: right;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.scenario-input:hover {
+    border-color: #cbd5e1;
+}
+
+.dark .scenario-input:hover {
+    border-color: #475569;
+}
+
+.scenario-input:focus {
+    border-color: #f59e0b;
+    /* brand-gold */
+    background: rgba(245, 158, 11, 0.1);
+    outline: none;
+}
+
+/* Table Row Hover Effect */
+.table-row-hover:hover td {
+    background-color: #f8fafc;
+}
+
+.dark .table-row-hover:hover td {
+    background-color: #1e293b;
+}
+
+/* 
+   Usage Guide:
+   1. Include this CSS file in your HTML head:
+      <link rel="stylesheet" href="design_system.css">
+   
+   2. Include the Tailwind script and config:
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="tailwind_config.js"></script>
+*/
