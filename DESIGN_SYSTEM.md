@@ -280,7 +280,10 @@ After toggling, bump a `layoutKey` (~320ms delay) so Recharts re-measures the wi
 3. Hairline divider (`h-px w-8`).
 4. **Execute** — gold fill when enabled; spinner when processing.
 5. **Export** — emerald fill when enabled; spinner when exporting.
-6. **Reset** — `mt-auto`, muted gray → red on hover.
+6. **Interface** (only when `batchResults` is loaded) — hairline divider, then:
+   - **Batch Overview** (`LayoutDashboardIcon`) — active: `border-brand-gold/40 bg-brand-gold/10 text-brand-gold`.
+   - **Detailed View** (`ChartLineIcon`) — same active treatment.
+7. **Reset** — `mt-auto`, muted gray → red on hover.
 
 Hide the expanded scroll body and footer with `lg:hidden` when collapsed.
 
@@ -290,7 +293,7 @@ Top→bottom:
 
 1. **Logo header** — `h-16 shrink-0 sticky top-0 z-20`, `border-b border-white/20 dark:border-white/10`, `bg-white/80 dark:bg-slate-900/80 backdrop-blur-md`. Centered logo (`icononly_transparent_nobuffer.png`, `h-8 w-8 md:h-10 md:w-10`, `hover:scale-110`) + `OPERARTIS` wordmark (`font-bold text-base`). Logo links to Terminal.
 
-2. **Scrollable body** — `flex-1 overflow-y-auto scroller px-3 pt-3 gap-6 min-h-0 flex flex-col`.
+2. **Scrollable body** — `flex-1 overflow-y-auto scroller px-3 pt-3 gap-6 min-h-0 flex flex-col`. Sections: Source Data → Configuration → Interface (conditional) → Reset (`!mt-auto`).
 
 3. **Sticky footer** — `border-t border-white/20`, `bg-white/80 dark:bg-slate-900/80 backdrop-blur-md`, `shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]`. Centered `Operartis Analytics` (`text-xs font-bold uppercase tracking-wide`) + italic gold slogan.
 
@@ -306,7 +309,9 @@ Gold eyebrow with trailing rule (forecaster uses `text-brand-gold` on the line):
 </h3>
 ```
 
-Standard sections in forecaster: **Source Data** → **Configuration** → actions at bottom of scroll area.
+Standard sections in forecaster (expanded body, top→bottom): **Source Data** → **Configuration** → **Interface** (after results load) → **Reset** at bottom of scroll area.
+
+View switching (**Batch Overview** / **Detailed View**) lives in the sidebar **Interface** section — not in the KPI bar.
 
 #### 5.2.5 Source Data dropzone
 
@@ -331,7 +336,25 @@ Separated from Source Data by `border-t border-slate-100 dark:border-slate-800 p
   - **Execute Forecast** — primary gold (`bg-brand-gold`, disabled = slate muted).
   - **Export Report** — secondary emerald (`bg-emerald-500`, requires results).
 
-#### 5.2.7 Reset (destructive, bottom of scroll)
+#### 5.2.7 Interface (view mode)
+
+Shown only when forecast results exist (`batchResults`). Separated from Configuration by `border-t border-slate-100 dark:border-slate-800 pt-4`. Section label uses `sidebar.interface` (EN: *Interface*, VI: *Giao diện*, DE: *Ansicht*).
+
+Stacked full-width nav buttons (`flex flex-col gap-2`). Mirrors settings-modal nav styling:
+
+| State | Classes |
+|---|---|
+| **Active** | `bg-brand-gold text-white shadow-md` |
+| **Inactive** | `text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800` |
+
+Buttons (icon + label, `text-xs font-bold uppercase tracking-wide`):
+
+1. **Batch Overview** — `LayoutDashboardIcon`; sets `activeTab` to `'overview'`.
+2. **Detailed View** — `ChartLineIcon`; sets `activeTab` to `'details'`.
+
+Selecting a SKU from the overview table or search also switches to `'details'`. Execute resets to `'overview'` while polling.
+
+#### 5.2.8 Reset (destructive, bottom of scroll)
 
 Pushed to bottom with `!mt-auto` inside the scroll column. Not in the configuration form.
 
@@ -345,7 +368,7 @@ Pushed to bottom with `!mt-auto` inside the scroll column. Not in the configurat
 
 No top border/divider above reset in forecaster (keeps the footer area visually clean).
 
-#### 5.2.8 React state (forecaster)
+#### 5.2.9 React state (forecaster)
 
 ```js
 const [isSidebarOpen, setIsSidebarOpen] = useState(false);           // mobile drawer
@@ -353,9 +376,12 @@ const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
   () => localStorage.getItem('fc-sidebar-collapsed') === '1'
 );
 const [isFullScreen, setIsFullScreen] = useState(false);             // hides sidebar entirely
+const [activeTab, setActiveTab] = useState('overview');              // 'overview' | 'details' — Interface section
 ```
 
-Copy keys under `TRANSLATIONS.*.sidebar`: `source_data`, `upload_label`, `uploaded_mapped`, `action_required`, `configuration`, `val_method`, `train_h`, `test_h`, `fc_h`, `execute_btn`, `export_btn`, `reset_btn`, `footer_title`, `footer_slogan`, etc.
+Copy keys under `TRANSLATIONS.*.sidebar`: `source_data`, `upload_label`, `uploaded_mapped`, `action_required`, `configuration`, `interface`, `val_method`, `train_h`, `test_h`, `fc_h`, `execute_btn`, `export_btn`, `reset_btn`, `footer_title`, `footer_slogan`, etc.
+
+View-mode labels live under `TRANSLATIONS.*.dashboard`: `batch_overview`, `detailed_view`.
 
 ### 5.3 Buttons
 
@@ -373,12 +399,30 @@ Copy keys under `TRANSLATIONS.*.sidebar`: `source_data`, `upload_label`, `upload
 
 ### 5.4 KPI / Metric Tiles
 
-Compact stat with mono value + uppercase label. Used in dashboard headers and overviews. Keep them quiet — value in primary text, label in `text-xxs uppercase tracking-wider text-slate-500`.
+Compact stat with mono value + uppercase label. Used in the module KPI bar and overviews. Keep them quiet — value in primary text, label in `text-xxs uppercase tracking-wider text-slate-500`.
+
+**Forecaster KPI bar** (`forecaster.html`): four glass metric tiles only — no view tabs (those moved to sidebar §5.2.7). Layout uses a balanced 3-column grid so metrics sit centered while SKU search stays right-aligned:
 
 ```html
-<div class="px-4 flex flex-col justify-center border-r border-slate-200 dark:border-slate-800">
-  <span class="text-xxs uppercase tracking-wider text-slate-500 dark:text-slate-400">Total SKUs</span>
-  <span class="text-lg font-bold font-mono text-slate-800 dark:text-slate-100 tabular-nums">1,248</span>
+<div class="grid grid-cols-[1fr_auto_1fr] h-full w-full min-h-16 items-center">
+  <div aria-hidden="true"></div>
+  <div class="flex items-stretch h-full overflow-x-auto snap-x snap-mandatory">
+    <!-- MetricTile × 4 -->
+  </div>
+  <div class="flex items-center justify-end pl-6 pr-4">{SKU search}</div>
+</div>
+```
+
+**Metric tile** (glass inset, `snap-start`):
+
+```html
+<div class="flex flex-col justify-center items-center px-3 md:px-6
+            border-r border-white/20 dark:border-white/10
+            bg-white/40 dark:bg-white/5 backdrop-blur-md h-full
+            min-w-[100px] md:min-w-[140px] snap-start
+            shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
+  <span class="text-[9px] uppercase font-bold text-slate-500/80 tracking-wider">Total SKUs</span>
+  <span class="text-base md:text-lg font-bold font-mono tabular-nums">1,248</span>
 </div>
 ```
 
@@ -546,7 +590,7 @@ useEffect(() => {
     <!-- optional: collapse toggle at -right-3 top-8 (lg+ only); see §5.2.2 -->
     <div class="h-16 border-b ...">{logo + wordmark}</div>
     <!-- collapsed: icon rail (lg only) OR expanded scroll body -->
-    <div class="flex-1 overflow-y-auto scroller px-3 pt-3">{source data · config · reset}</div>
+    <div class="flex-1 overflow-y-auto scroller px-3 pt-3">{source data · config · interface · reset}</div>
     <div class="sticky bottom-0 border-t p-4 backdrop-blur-md">{Operartis Analytics + slogan}</div>
   </aside>
 
