@@ -34,6 +34,26 @@
             }
         }
     </script>
+    <script>
+        window.getOperartisTheme = function () {
+            var session = sessionStorage.getItem('theme');
+            if (session === 'light' || session === 'dark') return session;
+            return 'system';
+        };
+        window.applyOperartisThemeClass = function (theme) {
+            var dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', dark);
+            return dark;
+        };
+        window.persistOperartisTheme = function (theme) {
+            localStorage.setItem('theme', theme);
+            if (theme === 'system') sessionStorage.removeItem('theme');
+            else sessionStorage.setItem('theme', theme);
+        };
+        (function () {
+            try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
+        })();
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
 
@@ -996,7 +1016,7 @@
         );
 
         const App = () => {
-            const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
+            const [theme, setTheme] = useState(() => window.getOperartisTheme());
             // Default to 'vi' (Vietnamese) as requested
             const [lang, setLang] = useState('vi');
             const [time, setTime] = useState(new Date());
@@ -1007,15 +1027,8 @@
 
             useEffect(() => {
                 const applyTheme = () => {
-                    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    let effectiveDark = false;
-                    if (theme === 'dark') effectiveDark = true;
-                    else if (theme === 'light') effectiveDark = false;
-                    else effectiveDark = systemPrefersDark;
-
-                    if (effectiveDark) { document.documentElement.classList.add('dark'); }
-                    else { document.documentElement.classList.remove('dark'); }
-                    localStorage.setItem('theme', theme);
+                    window.applyOperartisThemeClass(theme);
+                    window.persistOperartisTheme(theme);
                 };
                 applyTheme();
                 const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -1030,9 +1043,9 @@
             }, []);
 
             const toggleTheme = () => {
-                if (theme === 'light') setTheme('dark');
-                else if (theme === 'dark') setTheme('system');
-                else setTheme('light');
+                if (theme === 'system') setTheme('light');
+                else if (theme === 'light') setTheme('dark');
+                else setTheme('system');
             };
 
             const toggleLang = () => {
@@ -1076,9 +1089,13 @@
                                     <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
 
-                                {/* Theme Toggle */}
-                                <button onClick={toggleTheme} className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
-                                    {theme === 'dark' ? <SunIcon /> : theme === 'light' ? <MoonIcon /> : <SystemIcon />}
+                                {/* Theme Toggle — default system; cycle: system → light → dark → system */}
+                                <button
+                                    onClick={toggleTheme}
+                                    className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors"
+                                    title={theme === 'light' ? 'Light mode — click for dark' : theme === 'dark' ? 'Dark mode — click for system' : 'System theme — follows OS — click for light'}
+                                >
+                                    {theme === 'light' ? <SunIcon /> : theme === 'dark' ? <MoonIcon /> : <SystemIcon />}
                                 </button>
 
                                 {/* Language Toggle */}

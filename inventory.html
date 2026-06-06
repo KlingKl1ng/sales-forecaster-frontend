@@ -23,6 +23,26 @@
             }
         }
     </script>
+    <script>
+        window.getOperartisTheme = function () {
+            var session = sessionStorage.getItem('theme');
+            if (session === 'light' || session === 'dark') return session;
+            return 'system';
+        };
+        window.applyOperartisThemeClass = function (theme) {
+            var dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', dark);
+            return dark;
+        };
+        window.persistOperartisTheme = function (theme) {
+            localStorage.setItem('theme', theme);
+            if (theme === 'system') sessionStorage.removeItem('theme');
+            else sessionStorage.setItem('theme', theme);
+        };
+        (function () {
+            try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
+        })();
+    </script>
 
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
     <script crossorigin
@@ -1144,6 +1164,7 @@
         const AlertTriangleIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" /></svg>;
         const SunIcon = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" x2="12" y1="1" y2="3" /><line x1="12" x2="12" y1="21" y2="23" /><line x1="4.22" x2="5.64" y1="4.22" y2="5.64" /><line x1="18.36" x2="19.78" y1="18.36" y2="19.78" /><line x1="1" x2="3" y1="12" y2="12" /><line x1="21" x2="23" y1="12" y2="12" /><line x1="4.22" x2="5.64" y1="19.78" y2="18.36" /><line x1="18.36" x2="19.78" y1="5.64" y2="4.22" /></svg>;
         const MoonIcon = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>;
+        const SystemIcon = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
         const FileIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg>;
         const LoaderIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>;
         const GlobeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" x2="22" y1="12" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>;
@@ -1154,7 +1175,7 @@
             en: {
                 // Header
                 inventoryOptimizer: 'Inventory Optimizer',
-                stochasticPolicy: 'Stochastic (s, S) Policy',
+                stochasticPolicy: 'STOCHASTIC (s, S) POLICY',
 
                 // Sidebar - Mode Toggle
                 optimizeMode: 'Optimize',
@@ -3417,7 +3438,7 @@
             const hasAllResults = skuList.length > 0 && skuList.every(sku => simResults[sku]);
 
             // UI State
-            const [theme, setTheme] = useState(() => localStorage.getItem('inv-theme') || 'system');
+            const [theme, setTheme] = useState(() => window.getOperartisTheme());
             const [isDark, setIsDark] = useState(false);
             const [language, setLanguage] = useState(() => localStorage.getItem('inv-lang') || 'en');
             const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -3479,19 +3500,36 @@
                 localStorage.setItem('inv-lang', language);
             }, [language]);
 
-            // Theme Effect
+            // Theme Effect — default system (OS); synced with terminal.html in same tab
             useEffect(() => {
                 const applyTheme = () => {
-                    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    const isD = theme === 'dark' || (theme === 'system' && sysDark);
-                    setIsDark(isD);
-                    if (isD) document.documentElement.classList.add('dark');
-                    else document.documentElement.classList.remove('dark');
-                    localStorage.setItem('inv-theme', theme);
+                    const effectiveDark = window.applyOperartisThemeClass(theme);
+                    setIsDark(effectiveDark);
+                    window.persistOperartisTheme(theme);
                 };
                 applyTheme();
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                const handleSystemChange = () => { if (theme === 'system') applyTheme(); };
+                mediaQuery.addEventListener('change', handleSystemChange);
+                return () => mediaQuery.removeEventListener('change', handleSystemChange);
             }, [theme]);
+
+            const toggleTheme = () => {
+                if (theme === 'system') setTheme('light');
+                else if (theme === 'light') setTheme('dark');
+                else setTheme('system');
+            };
+
+            const themeIcon = theme === 'light'
+                ? <SunIcon className="w-4 h-4 md:w-5 md:h-5" />
+                : theme === 'dark'
+                    ? <MoonIcon className="w-4 h-4 md:w-5 md:h-5" />
+                    : <SystemIcon className="w-4 h-4 md:w-5 md:h-5" />;
+            const themeTitle = theme === 'light'
+                ? 'Light mode — click for dark'
+                : theme === 'dark'
+                    ? 'Dark mode — click for system'
+                    : `System theme — follows OS (${isDark ? 'dark' : 'light'}) — click for light`;
 
             // Track previous SKU for saving params before switch
             const prevSkuRef = React.useRef(null);
@@ -5004,7 +5042,7 @@
                                     <h3 className={`text-xs font-bold uppercase tracking-widest ${simulationMode === 'optimize' ? 'text-brand-gold' : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500'}`}>{t('inventoryPolicy')}</h3>
                                     <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-brand-gold/50' : 'bg-gradient-to-r from-emerald-500/50 to-teal-500/50'}`}></div>
                                 </div>
-                                <div className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold text-black dark:text-white uppercase text-center border border-slate-200 dark:border-slate-700">
+                                <div className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold text-black dark:text-white text-center border border-slate-200 dark:border-slate-700">
                                     {t('stochasticPolicy')}
                                 </div>
                             </div>
@@ -5678,8 +5716,12 @@
                                     </button>
                                     <div className="w-px h-3 bg-slate-300 dark:bg-slate-600"></div>
                                     {/* Theme Toggle - Compact force */}
-                                    <button onClick={() => setTheme(isDark ? 'light' : 'dark')} className="p-1 md:p-1.5 rounded hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-all">
-                                        {isDark ? <SunIcon className="w-4 h-4 md:w-5 md:h-5" /> : <MoonIcon className="w-4 h-4 md:w-5 md:h-5" />}
+                                    <button
+                                        onClick={toggleTheme}
+                                        className="p-1 md:p-1.5 rounded hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-all"
+                                        title={themeTitle}
+                                    >
+                                        {themeIcon}
                                     </button>
                                 </div>
                             </div>
