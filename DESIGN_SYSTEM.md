@@ -158,7 +158,7 @@ tailwind.config = {
 
 - **Radius scale:** `rounded-lg` (controls/inputs) → `rounded-xl` (cards) → `rounded-2xl` (panels, module blocks) → `rounded-full` (pills, toggles, avatars).
 - **Chrome height:** header and sidebar-header are both `h-16`.
-- **Sidebar width:** `w-64`.
+- **Sidebar width:** `w-64` expanded · `w-[76px]` collapsed (desktop rail; see §5.2).
 - **Content max width:** `max-w-7xl mx-auto` for Terminal/dashboard content.
 - **Padding rhythm:** `p-4` (compact cards) · `p-5`/`p-6` (cards/panels) · `p-6 md:p-8` (modals) · page gutters `p-4 sm:p-6 md:p-12`.
 - **Shadows:** soft and layered. Signature glass shadow:
@@ -226,21 +226,136 @@ Both are `h-16` glass bars with a left brand cluster and right utility cluster.
 
 ### 5.2 Sidebar (Modules)
 
-`w-64` glass aside; off-canvas on mobile (`fixed -translate-x-full` → `translate-x-0`, with a `backdrop-blur` scrim), static on `md+`.
+Glass aside for data import, configuration, and primary actions. **Reference implementation:** `forecaster.html` (ML Forecaster).
 
-Structure top→bottom:
-1. **Logo header** (`h-16`, bordered bottom).
-2. **Scrollable body** with labeled sections. Section label pattern:
-   ```html
-   <div class="flex items-center gap-2 px-1">
-     <h3 class="text-xxs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500 whitespace-nowrap">Import</h3>
-     <div class="h-px flex-1 bg-amber-600 dark:bg-amber-500"></div>
-   </div>
-   ```
-3. **Upload dropzone:** `border-2 border-dashed rounded-xl`, turns `emerald` when a file is loaded, `hover:border-brand-gold`.
-4. **Config block:** grouped inputs in a `bg-slate-50 dark:bg-slate-800/50 rounded-xl border` container.
-5. **Primary action** (Execute), **secondary** (Export), **destructive** (Reset) — see buttons.
-6. **Footer signature:** `Operartis Analytics` (black, uppercase, tracked) + italic gold slogan.
+#### 5.2.1 Layout & responsive behavior
+
+| Breakpoint | Behavior |
+|---|---|
+| **Mobile / tablet** (`< lg`) | `fixed inset-y-0 left-0 z-50 w-64`. Hidden off-canvas (`-translate-x-full`); hamburger in main header opens it (`translate-x-0`). Semi-transparent scrim (`bg-slate-900/20 backdrop-blur-sm`) closes on tap. Close `X` in sidebar header. **No collapse rail** on small screens. |
+| **Desktop** (`lg+`) | `relative` in flex row; always visible. Supports **expanded** (`lg:w-64`) and **collapsed** (`lg:w-[76px]`) widths with `transition-all duration-300`. Main content uses `flex-grow min-w-0` so charts expand when the rail is narrow. |
+
+**Shell classes (forecaster pattern):**
+```html
+<aside class="
+  flex fixed lg:relative inset-y-0 left-0 z-50
+  w-64 lg:w-64                    /* lg:w-[76px] when collapsed */
+  bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl
+  border-r border-white/20 dark:border-white/10
+  flex-col h-full shadow-2xl lg:shadow-none
+  transition-all duration-300 ease-in-out
+  -translate-x-full lg:translate-x-0   /* mobile drawer */
+">
+```
+
+#### 5.2.2 Collapsible rail (desktop only)
+
+Maximize chart area by collapsing the sidebar to a **76px icon rail**. State is persisted in `localStorage` (`fc-sidebar-collapsed`: `'1'` | `'0'`).
+
+**Edge toggle** — circular chevron on the sidebar's right border, vertically centered in the header (`top-8 -translate-y-1/2 -right-3`), `hidden lg:flex`:
+
+```html
+<button class="
+  hidden lg:flex absolute -right-3 top-8 -translate-y-1/2 z-30
+  h-6 w-6 rounded-full
+  bg-white dark:bg-slate-800
+  border border-slate-200 dark:border-slate-700
+  text-slate-500 hover:text-brand-gold hover:border-brand-gold shadow-md
+">
+  <!-- ChevronLeft when expanded · ChevronRight when collapsed -->
+</button>
+```
+
+After toggling, bump a `layoutKey` (~320ms delay) so Recharts re-measures the wider main pane.
+
+| State | Visible regions | Width |
+|---|---|---|
+| **Expanded** | Full scroll body + sticky footer | `lg:w-64` (256px) |
+| **Collapsed** | Logo header (wordmark hidden) + icon rail only | `lg:w-[76px]` |
+
+**Collapsed rail** (`hidden lg:flex` when collapsed): vertical stack of `h-11 w-11 rounded-xl` icon buttons with `title` tooltips (no text labels). Order top→bottom:
+
+1. **Upload** — opens file picker; status dot on icon (`emerald-500` = mapped, `brand-gold` = action required).
+2. **Mapping** (gear) — only when a file is loaded; opens column-mapping modal.
+3. Hairline divider (`h-px w-8`).
+4. **Execute** — gold fill when enabled; spinner when processing.
+5. **Export** — emerald fill when enabled; spinner when exporting.
+6. **Reset** — `mt-auto`, muted gray → red on hover.
+
+Hide the expanded scroll body and footer with `lg:hidden` when collapsed.
+
+#### 5.2.3 Structure (expanded)
+
+Top→bottom:
+
+1. **Logo header** — `h-16 shrink-0 sticky top-0 z-20`, `border-b border-white/20 dark:border-white/10`, `bg-white/80 dark:bg-slate-900/80 backdrop-blur-md`. Centered logo (`icononly_transparent_nobuffer.png`, `h-8 w-8 md:h-10 md:w-10`, `hover:scale-110`) + `OPERARTIS` wordmark (`font-bold text-base`). Logo links to Terminal.
+
+2. **Scrollable body** — `flex-1 overflow-y-auto scroller px-3 pt-3 gap-6 min-h-0 flex flex-col`.
+
+3. **Sticky footer** — `border-t border-white/20`, `bg-white/80 dark:bg-slate-900/80 backdrop-blur-md`, `shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]`. Centered `Operartis Analytics` (`text-xs font-bold uppercase tracking-wide`) + italic gold slogan.
+
+#### 5.2.4 Section labels
+
+Gold eyebrow with trailing rule (forecaster uses `text-brand-gold` on the line):
+
+```html
+<h3 class="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2
+           flex items-center gap-2">
+  Source Data
+  <span class="h-px flex-1 bg-brand-gold"></span>
+</h3>
+```
+
+Standard sections in forecaster: **Source Data** → **Configuration** → actions at bottom of scroll area.
+
+#### 5.2.5 Source Data dropzone
+
+Dashed upload card; state-driven border and background:
+
+| State | Border / background | Label |
+|---|---|---|
+| **Empty** | `border-dashed border-slate-300 dark:border-slate-700`; hover `bg-slate-50 dark:bg-slate-800` | Upload icon + `text-xs` prompt; whole card clickable |
+| **Loaded + mapped** | `border-emerald-500` + `bg-gradient-to-br from-emerald-500/10 to-teal-500/10` | Filename (`truncate`), `UPLOADED & MAPPED` in `text-[10px] text-emerald-500 font-bold uppercase` |
+| **Loaded, mapping incomplete** | `border-brand-gold` + `bg-amber-50/10` | `ACTION REQUIRED` in gold |
+
+When a file is present, show two circular icon actions (`min-w-[28px] min-h-[28px] rounded-full`): **re-upload** and **edit mapping** (opens modal). Hidden `<input type="file" accept=".xlsx,.xls">` triggered by ref.
+
+#### 5.2.6 Configuration block
+
+Separated from Source Data by `border-t border-slate-100 dark:border-slate-800 pt-4`.
+
+- **Field labels:** `text-[10px] font-bold text-slate-500 uppercase block mb-1`.
+- **Inputs / selects:** `h-8 text-xxs`, `rounded`, `bg-white dark:bg-slate-800`, `focus:border-brand-gold`, `dark:[color-scheme:dark]` on number inputs.
+- **Horizon row:** two `flex-1` number fields (Train / Test) side by side; helper line `text-[9px]` (`text-red-500` on validation mismatch).
+- **Actions in form** (full-width, stacked):
+  - **Execute Forecast** — primary gold (`bg-brand-gold`, disabled = slate muted).
+  - **Export Report** — secondary emerald (`bg-emerald-500`, requires results).
+
+#### 5.2.7 Reset (destructive, bottom of scroll)
+
+Pushed to bottom with `!mt-auto` inside the scroll column. Not in the configuration form.
+
+```html
+<button class="w-full py-2 text-xxs font-bold text-slate-400
+               hover:text-red-500 uppercase tracking-wide
+               flex items-center justify-center gap-2">
+  <RefreshIcon /> Reset Application
+</button>
+```
+
+No top border/divider above reset in forecaster (keeps the footer area visually clean).
+
+#### 5.2.8 React state (forecaster)
+
+```js
+const [isSidebarOpen, setIsSidebarOpen] = useState(false);           // mobile drawer
+const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
+  () => localStorage.getItem('fc-sidebar-collapsed') === '1'
+);
+const [isFullScreen, setIsFullScreen] = useState(false);             // hides sidebar entirely
+```
+
+Copy keys under `TRANSLATIONS.*.sidebar`: `source_data`, `upload_label`, `uploaded_mapped`, `action_required`, `configuration`, `val_method`, `train_h`, `test_h`, `fc_h`, `execute_btn`, `export_btn`, `reset_btn`, `footer_title`, `footer_slogan`, etc.
 
 ### 5.3 Buttons
 
@@ -424,13 +539,15 @@ useEffect(() => {
             from-indigo-100 via-slate-50 to-teal-100
             dark:from-slate-950 dark:via-slate-900 dark:to-cyan-950">
   <!-- mobile scrim -->
-  <aside class="w-64 fixed inset-y-0 left-0 md:static
-                bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl
-                border-r border-white/40 dark:border-white/10
-                ring-1 ring-white/20 dark:ring-white/5 flex flex-col">
+  <aside class="w-64 lg:w-64 fixed inset-y-0 left-0 lg:relative
+                bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl
+                border-r border-white/20 dark:border-white/10 flex flex-col
+                transition-all duration-300">
+    <!-- optional: collapse toggle at -right-3 top-8 (lg+ only); see §5.2.2 -->
     <div class="h-16 border-b ...">{logo + wordmark}</div>
-    <div class="flex-1 overflow-y-auto px-2 py-4">{sections, upload, config, actions}</div>
-    <div class="border-t p-4">{Operartis Analytics + slogan}</div>
+    <!-- collapsed: icon rail (lg only) OR expanded scroll body -->
+    <div class="flex-1 overflow-y-auto scroller px-3 pt-3">{source data · config · reset}</div>
+    <div class="sticky bottom-0 border-t p-4 backdrop-blur-md">{Operartis Analytics + slogan}</div>
   </aside>
 
   <main class="flex-1 min-w-0 flex flex-col overflow-hidden">
@@ -470,7 +587,7 @@ When you build the next module, follow this so it stays consistent:
 
 **Build the module page**
 1. Duplicate the boilerplate (`<head>` stack, Tailwind config, `<style>` scrollbars/backdrops, React/Babel mount) from Section 2–3.
-2. Use the **Detailed Module skeleton** (9.1): glass sidebar + glass `h-16` header + content area.
+2. Use the **Detailed Module skeleton** (9.1): glass sidebar (§5.2, copy `forecaster.html` for collapse rail) + glass `h-16` header + content area.
 3. Title in header: `font-black uppercase tracking-widest` gold gradient (e.g. `PRODUCTION SCHEDULER`).
 4. Reuse shared components: status pill, clock, theme toggle (3-state), language toggle, settings modal, upload dropzone, KPI tiles, glass cards, buttons, modals, custom scrollbars.
 5. Add full `TRANSLATIONS` (`en` + `vi`). No hardcoded strings.
