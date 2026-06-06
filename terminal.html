@@ -842,26 +842,54 @@
         };
 
         // HorizonRow Component
-        const HorizonRow = ({ horizon, content, onBlockClick, isLast }) => {
+        const HorizonRow = ({ horizon, content, onBlockClick, isFirst, isLast }) => {
             const [showTooltip, setShowTooltip] = useState(false);
+            const trunkLeft = '-10px';
+            const dotCenterY = 'calc(1rem + 8px)';
 
             return (
                 <div className="relative">
-                {/* Vertical segment: below dot → above next dot (aligned to gold title row) */}
-                {!isLast && (
+                {/* Origin dot — first row only, on the trunk */}
+                {isFirst && (
                     <div
-                        className="absolute left-0 top-[calc(1rem+13px)] bottom-[calc(-1rem-3px)] w-px bg-brand-gold/40 dark:bg-brand-gold/30 hidden sm:block -translate-x-1/2 pointer-events-none z-10"
+                        className="absolute w-2.5 h-2.5 rounded-full bg-slate-900 border-2 border-brand-gold z-30 hidden sm:block -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ left: trunkLeft, top: dotCenterY }}
                         aria-hidden="true"
                     />
+                )}
+                {/* Main vertical trunk — one segment per row, stops at row bottom (no bleed into next row) */}
+                {!isLast && (
+                    <div
+                        className={`absolute w-0.5 bg-brand-gold/80 dark:bg-brand-gold/70 hidden sm:block pointer-events-none z-10 -translate-x-1/2 bottom-0 ${isFirst ? '' : 'top-0'}`}
+                        style={{ left: trunkLeft, ...(isFirst ? { top: dotCenterY } : {}) }}
+                        aria-hidden="true"
+                    />
+                )}
+                {/* Last row: trunk stub down to the branch (no segment below) */}
+                {isLast && !isFirst && (
+                    <div
+                        className="absolute w-0.5 bg-brand-gold/80 dark:bg-brand-gold/70 hidden sm:block pointer-events-none z-10 -translate-x-1/2 top-0"
+                        style={{ left: trunkLeft, height: dotCenterY }}
+                        aria-hidden="true"
+                    />
+                )}
+                {/* Horizontal branch + arrow as one connected path */}
+                {!isFirst && (
+                    <svg
+                        className="absolute hidden sm:block pointer-events-none z-20 text-brand-gold/80 dark:text-brand-gold/70 overflow-visible"
+                        style={{ left: trunkLeft, top: dotCenterY, width: '10px', height: '10px', transform: 'translateY(-50%)' }}
+                        viewBox="0 0 10 10"
+                        aria-hidden="true"
+                    >
+                        <line x1="0" y1="5" x2="6.5" y2="5" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                        <path d="M6.5 2 L10 5 L6.5 8 Z" fill="currentColor" />
+                    </svg>
                 )}
                 <div className="relative flex flex-col sm:flex-row gap-4 sm:gap-6">
                     {/* Left Title Box Container */}
                     <div className="relative sm:w-40 md:w-48 shrink-0 z-20">
                         {/* The Title Box itself */}
                         <div className="flex sm:flex-col justify-center sm:justify-start items-center sm:items-start gap-2 sm:gap-1 p-4 rounded-2xl border border-transparent bg-gradient-to-br from-white/10 to-white/5 dark:from-slate-800/20 dark:to-slate-900/5 shadow-[0_8px_32px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.1)] backdrop-blur-xl ring-1 ring-white/20 dark:ring-white/5 relative h-full">
-                            {/* Small dot on the left */}
-                            <div className="absolute top-[calc(1rem+3px)] left-[-5px] w-2.5 h-2.5 rounded-full bg-slate-900 border-2 border-brand-gold z-30 hidden sm:block"></div>
-
                             <div
                                 className={`
                                     absolute left-0 bottom-full sm:bottom-auto sm:left-full sm:top-0 
@@ -907,9 +935,7 @@
                     </div>
                 </div>
                 {!isLast && (
-                    <div className="flex items-center h-8 pointer-events-none" aria-hidden="true">
-                        <div className="w-full h-px bg-brand-gold/40 dark:bg-brand-gold/30" />
-                    </div>
+                    <div className="h-8 pointer-events-none" aria-hidden="true" />
                 )}
                 </div>
             );
@@ -1132,6 +1158,7 @@
                                         horizon={horizon}
                                         content={content}
                                         onBlockClick={handleBlockClick}
+                                        isFirst={index === 0}
                                         isLast={index === content.matrix.length - 1}
                                     />
                                 ))}
