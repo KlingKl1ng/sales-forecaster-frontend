@@ -228,7 +228,7 @@
         }
 
         .horizon-pill {
-            scroll-margin-top: 6rem;
+            scroll-margin-top: 5.5rem;
         }
 
         /* Supply chain flow diagram */
@@ -302,7 +302,25 @@
     <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        const getMainScrollRoot = () => document.querySelector('main.flex-1.overflow-y-auto');
+
+        const getSectionTopInRoot = (el, scrollRoot) => {
+            if (!el || !scrollRoot) return 0;
+            return el.getBoundingClientRect().top - scrollRoot.getBoundingClientRect().top + scrollRoot.scrollTop;
+        };
+
+        const resolveActiveHorizonId = (sections, scrollRoot, anchorOffset) => {
+            const scrollPos = scrollRoot.scrollTop + anchorOffset;
+            let activeId = sections[0]?.id ?? null;
+            for (const section of sections) {
+                if (scrollPos >= getSectionTopInRoot(section.el, scrollRoot) - 2) {
+                    activeId = section.id;
+                }
+            }
+            return activeId;
+        };
 
         // --- ICONS ---
         const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
@@ -1108,7 +1126,7 @@
 
         // Horizon section — INFORM/Zentio-style planning horizon blocks (APS matrix preserved)
         const HorizonSection = ({ horizon, content, onBlockClick, index }) => (
-            <section id={`horizon-${horizon.id}`} className="horizon-pill scroll-mt-16 mb-16 md:mb-20 last:mb-8">
+            <section id={`horizon-${horizon.id}`} className="horizon-pill mb-16 md:mb-20 last:mb-8">
                 <Reveal delay={index * 80}>
                     <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-8 pb-6 border-b border-slate-200/80 dark:border-slate-800">
                         <div className="max-w-2xl">
@@ -1401,15 +1419,15 @@
             </div>
         );
 
-        const HorizonNav = ({ horizons, activeId, onNav, onAboutNav, aboutVisible, content }) => (
-            <div className="sticky top-0 z-30 -mx-4 sm:-mx-6 md:-mx-10 px-4 sm:px-6 md:px-10 py-2 mb-10 bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200/70 dark:border-white/5 shadow-sm">
+        const HorizonNav = ({ horizons, activeId, onNav, onAboutNav, aboutVisible, content, navRef }) => (
+            <div ref={navRef} data-horizon-nav className="sticky top-0 z-30 -mx-4 sm:-mx-6 md:-mx-10 px-4 sm:px-6 md:px-10 py-2 mb-10 bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200/70 dark:border-white/5 shadow-sm">
                 <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-0.5">
                     {horizons.map(h => (
                         <button
                             key={h.id}
                             type="button"
                             onClick={() => onNav(h.id)}
-                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${activeId === h.id ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
+                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all duration-300 ${activeId === h.id ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
                         >
                             {h.title}
                         </button>
@@ -1418,7 +1436,7 @@
                         <button
                             type="button"
                             onClick={onAboutNav}
-                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${activeId === 'about' ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
+                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all duration-300 ${activeId === 'about' ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
                         >
                             {content.ui.about_vision}
                         </button>
@@ -1431,7 +1449,7 @@
         // --- MAIN APP ---
 
         const AboutSection = ({ content }) => (
-            <div id="about" className="scroll-mt-16 mt-8 pt-16 border-t border-slate-200/80 dark:border-slate-800 pb-8">
+            <div id="about" className="horizon-pill mt-8 pt-16 border-t border-slate-200/80 dark:border-slate-800 pb-8">
                 <Reveal>
                     <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
                         <h2 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">{content.ui.about_title}</h2>
@@ -1507,20 +1525,70 @@
             const [selectedBlock, setSelectedBlock] = useState(null);
             const [activeHorizon, setActiveHorizon] = useState('strategic');
             const [aboutNavVisible, setAboutNavVisible] = useState(false);
+            const horizonNavRef = useRef(null);
+            const scrollLockRef = useRef(false);
+            const scrollEndTimerRef = useRef(null);
 
             const content = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
-            const scrollToHorizon = (id) => {
-                setActiveHorizon(id);
-                const el = document.getElementById(`horizon-${id}`);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            };
+            const getAnchorOffset = useCallback(() => (horizonNavRef.current?.offsetHeight ?? 52) + 8, []);
 
-            const scrollToAbout = () => {
-                setActiveHorizon('about');
-                const el = document.getElementById('about');
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            };
+            const getSectionList = useCallback(() => {
+                const sections = content.matrix
+                    .map(h => ({ id: h.id, el: document.getElementById(`horizon-${h.id}`) }))
+                    .filter(s => s.el);
+                const aboutEl = document.getElementById('about');
+                if (aboutEl) sections.push({ id: 'about', el: aboutEl });
+                return sections;
+            }, [content]);
+
+            const updateActiveFromScroll = useCallback(() => {
+                if (scrollLockRef.current) return;
+                const scrollRoot = getMainScrollRoot();
+                const sections = getSectionList();
+                if (!scrollRoot || !sections.length) return;
+
+                const activeId = resolveActiveHorizonId(sections, scrollRoot, getAnchorOffset());
+                if (activeId) setActiveHorizon(activeId);
+
+                const aboutEl = document.getElementById('about');
+                if (aboutEl) {
+                    const aboutTop = getSectionTopInRoot(aboutEl, scrollRoot);
+                    setAboutNavVisible(scrollRoot.scrollTop + scrollRoot.clientHeight * 0.45 > aboutTop);
+                }
+            }, [getSectionList, getAnchorOffset]);
+
+            const scrollToSectionById = useCallback((id) => {
+                const scrollRoot = getMainScrollRoot();
+                const targetId = id === 'about' ? 'about' : `horizon-${id}`;
+                const el = document.getElementById(targetId);
+                if (!scrollRoot || !el) return;
+
+                scrollLockRef.current = true;
+                setActiveHorizon(id);
+
+                const targetTop = getSectionTopInRoot(el, scrollRoot) - getAnchorOffset();
+                scrollRoot.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+
+                if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
+
+                const finishScrollLock = () => {
+                    scrollLockRef.current = false;
+                    scrollRoot.removeEventListener('scroll', onScrollWhileAnimating);
+                    updateActiveFromScroll();
+                };
+
+                const onScrollWhileAnimating = () => {
+                    if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
+                    scrollEndTimerRef.current = setTimeout(finishScrollLock, 120);
+                };
+
+                scrollRoot.addEventListener('scroll', onScrollWhileAnimating, { passive: true });
+                scrollEndTimerRef.current = setTimeout(finishScrollLock, 1000);
+            }, [getAnchorOffset, updateActiveFromScroll]);
+
+            const scrollToHorizon = useCallback((id) => scrollToSectionById(id), [scrollToSectionById]);
+            const scrollToAbout = useCallback(() => scrollToSectionById('about'), [scrollToSectionById]);
 
             useEffect(() => {
                 const applyTheme = () => {
@@ -1543,51 +1611,28 @@
                 window.persistOperartisLang(lang);
             }, [lang]);
 
-            // Scroll-spy: horizons + About (Vision & Philosophy nav pill)
+            // Scroll-spy: sync HorizonNav highlight with section position in main scroll container
             useEffect(() => {
-                const scrollRoot = document.querySelector('main.flex-1.overflow-y-auto');
-                const horizonSections = content.matrix
-                    .map(h => ({ id: h.id, el: document.getElementById(`horizon-${h.id}`) }))
-                    .filter(h => h.el);
-                const aboutSection = document.getElementById('about');
-                const sectionOrder = [...horizonSections];
-                if (aboutSection) sectionOrder.push({ id: 'about', el: aboutSection });
+                const scrollRoot = getMainScrollRoot();
+                if (!scrollRoot) return undefined;
 
-                const visibility = new Map();
+                const onScroll = () => requestAnimationFrame(updateActiveFromScroll);
+                scrollRoot.addEventListener('scroll', onScroll, { passive: true });
 
-                const updateActive = () => {
-                    let active = content.matrix[0]?.id;
-                    for (const { id, el } of sectionOrder) {
-                        if (visibility.get(el)) active = id;
-                    }
-                    if (active) setActiveHorizon(active);
-                };
+                let navObserver;
+                if (typeof ResizeObserver !== 'undefined' && horizonNavRef.current) {
+                    navObserver = new ResizeObserver(() => requestAnimationFrame(updateActiveFromScroll));
+                    navObserver.observe(horizonNavRef.current);
+                }
 
-                const aboutObserver = new IntersectionObserver(([entry]) => {
-                    setAboutNavVisible(entry.isIntersecting);
-                }, {
-                    root: scrollRoot,
-                    threshold: 0,
-                    rootMargin: '-12% 0px -40% 0px'
-                });
-
-                const activeObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => visibility.set(entry.target, entry.isIntersecting));
-                    updateActive();
-                }, {
-                    root: scrollRoot,
-                    rootMargin: '-20% 0px -55% 0px',
-                    threshold: 0
-                });
-
-                sectionOrder.forEach(({ el }) => activeObserver.observe(el));
-                if (aboutSection) aboutObserver.observe(aboutSection);
+                requestAnimationFrame(updateActiveFromScroll);
 
                 return () => {
-                    activeObserver.disconnect();
-                    aboutObserver.disconnect();
+                    scrollRoot.removeEventListener('scroll', onScroll);
+                    if (navObserver) navObserver.disconnect();
+                    if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
                 };
-            }, [content]);
+            }, [content, updateActiveFromScroll]);
 
             const toggleTheme = () => {
                 if (theme === 'system') setTheme('light');
@@ -1683,6 +1728,7 @@
                             </Reveal>
 
                             <HorizonNav
+                                navRef={horizonNavRef}
                                 horizons={content.matrix}
                                 activeId={activeHorizon}
                                 onNav={scrollToHorizon}
