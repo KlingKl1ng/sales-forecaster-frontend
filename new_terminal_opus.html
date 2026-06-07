@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operartis APS | Command Center</title>
+
+    <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#f59e0b',
+                            dark: '#b45309',
+                            obsidian: '#0f172a',
+                            slate: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)",
+                        'grid-pattern-light': "linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        window.getOperartisTheme = function () {
+            var session = sessionStorage.getItem('theme');
+            if (session === 'light' || session === 'dark') return session;
+            return 'system';
+        };
+        window.applyOperartisThemeClass = function (theme) {
+            var dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', dark);
+            return dark;
+        };
+        window.persistOperartisTheme = function (theme) {
+            localStorage.setItem('theme', theme);
+            if (theme === 'system') sessionStorage.removeItem('theme');
+            else sessionStorage.setItem('theme', theme);
+        };
+        (function () {
+            try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
+        })();
+    </script>
+    <script src="./operartis-lang.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Subtle Grid Animation */
+        .bg-grid {
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+        }
+
+        /* Modern Scrollbar for Main Page */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        /* Custom Scrollbar for Module Cards (Thinner) */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+
+        /* Reveal Animation Base Classes */
+        .reveal-base {
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-hidden {
+            opacity: 0;
+            transform: translateY(40px);
+            filter: blur(8px);
+        }
+
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        /* Modal / Overlay Animations */
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+
+            to {
+                opacity: 1;
+                backdrop-filter: blur(12px);
+            }
+        }
+
+        @keyframes modalContentSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-backdrop {
+            animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .modal-content {
+            animation: modalContentSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards opacity;
+        }
+
+        /* Matrix Connector Lines (Optional/Advanced) */
+        .connector-line {
+            position: absolute;
+            background: rgba(148, 163, 184, 0.2);
+            z-index: 0;
+        }
+
+        .dark .connector-line {
+            background: rgba(51, 65, 85, 0.3);
+        }
+
+        /* Background Blob Animation */
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+
+        /* ============================================================
+           OPUS LAYER — enterprise homepage system
+           (inspired by Odoo / INFORM / Zentio, tuned to Operartis DS)
+           ============================================================ */
+
+        /* Cinematic hero mesh: layered gold + cyan glows over the grid */
+        .opus-hero-glow {
+            background-image:
+                radial-gradient(60% 80% at 15% 10%, rgba(245, 158, 11, 0.11), transparent 60%),
+                radial-gradient(50% 60% at 90% 0%, rgba(14, 165, 233, 0.06), transparent 55%),
+                radial-gradient(70% 70% at 70% 100%, rgba(180, 83, 9, 0.06), transparent 60%);
+        }
+
+        /* Animated gold sweep for the hero headline accent */
+        @keyframes opusSheen {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .opus-sheen {
+            background: linear-gradient(100deg, #b45309, #f59e0b, #fde68a, #f59e0b, #b45309);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: opusSheen 6s linear infinite;
+        }
+
+        /* Editorial section eyebrow with leading rule */
+        .opus-eyebrow {
+            letter-spacing: 0.24em;
+        }
+
+        /* Module tile lift */
+        .opus-tile {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.25s ease;
+        }
+        .opus-tile:hover {
+            transform: translateY(-6px);
+        }
+
+        /* Sticky horizon info column on desktop — below pinned HorizonNav */
+        @media (min-width: 1024px) {
+            .opus-sticky-info { position: sticky; top: 3.5rem; }
+        }
+
+        .opus-scroll-target { scroll-margin-top: 3.5rem; }
+
+        /* Marquee capability ribbon */
+        @keyframes opusMarquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .opus-marquee {
+            animation: opusMarquee 38s linear infinite;
+        }
+        .opus-marquee-wrap:hover .opus-marquee {
+            animation-play-state: paused;
+        }
+
+        /* Supply chain flow diagram */
+        @keyframes sc-flow-dash {
+            to { stroke-dashoffset: -22; }
+        }
+
+        @keyframes sc-arrow-pulse {
+            0%, 100% { opacity: 0.45; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes sc-pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 0.45; }
+            50% { transform: scale(1.06); opacity: 0.15; }
+        }
+
+        @keyframes sc-node-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35); }
+            50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+        }
+
+        .sc-flow-arrow {
+            stroke-dasharray: 5 4;
+            animation: sc-flow-dash 1.1s linear infinite;
+        }
+
+        .sc-flow-arrow-active {
+            animation: sc-flow-dash 0.65s linear infinite, sc-arrow-pulse 1.8s ease-in-out infinite;
+        }
+
+        .sc-arrow-pulse {
+            animation: sc-arrow-pulse 1.8s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .sc-pulse-ring {
+            animation: sc-pulse-ring 2.4s ease-in-out infinite;
+        }
+
+        .sc-node-active {
+            animation: sc-node-glow 2.4s ease-in-out infinite;
+        }
+
+        .sc-flow-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-gutter: stable;
+        }
+
+        .sc-flow-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .sc-flow-scroll::-webkit-scrollbar:vertical {
+            width: 0;
+            display: none;
+        }
+    </style>
+
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+    <script crossorigin
+        src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-100 transition-colors duration-500">
+
+    <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+        // --- ICONS ---
+        const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
+        const ActivityIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>;
+        const BoxIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>;
+        const TruckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>;
+        const BarChartIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>;
+        const SunIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>;
+        const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>;
+        const ArrowRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
+        const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
+        const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
+        const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
+        const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
+        const CloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
+        const GlobeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>;
+        // NEW ICONS
+        const FactoryIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="17" y1="13" x2="17" y2="13.01"></line><line x1="7" y1="13" x2="7" y2="13.01"></line></svg>;
+        const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>;
+        const GitBranchIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>;
+        // STRATEGIC ICONS
+        const MedianIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="12" x2="4" y2="4"></line><line x1="12" y1="12" x2="20" y2="4"></line><line x1="12" y1="12" x2="12" y2="20"></line><circle cx="4" cy="4" r="2"></circle><circle cx="20" cy="4" r="2"></circle><circle cx="12" cy="20" r="2"></circle></svg>;
+        const CoverIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><circle cx="12" cy="11" r="3"></circle><path d="M12 2v2"></path><path d="M12 22v-2"></path></svg>;
+        const LocationIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle><path d="M12 2a8 8 0 0 1 8 8"></path></svg>;
+        // NEW ICONS FOR UPDATE
+        const ATPIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="m9 16 2 2 4-4"></path></svg>;
+        const AdvancedForecasterIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20h20"></path><path d="M4 17c2-4 4-7 7-7 2 0 3 2 5 2 2.5 0 3.5-4 6-5"></path><path d="m4 8 3.5 3.5"></path><path d="m14 3.5 3.5 3.5"></path><circle cx="17.5" cy="7" r="1.5"></circle><circle cx="7.5" cy="11.5" r="1.5"></circle></svg>;
+        const AggregatedIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="14" width="20" height="8" rx="2"></rect><rect x="6" y="6" width="12" height="8" rx="2"></rect><path d="M12 2v4"></path></svg>;
+        const CapacitatedIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 20h12a2 2 0 0 0 2-2V8l-8-6-8 6v10a2 2 0 0 0 2 2Z"></path><path d="M12 14v6"></path><path d="M12 14a4 4 0 0 1 0-8 4 4 0 0 1 0 8Z"></path></svg>;
+        const SchedulingIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="18" rx="2" ry="2"></rect><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="13" y2="11"></line><line x1="8" y1="15" x2="16" y2="15"></line></svg>;
+        const QueuingIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="4" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="12" r="2"></circle><path d="M6 12h4"></path><path d="M14 12h4"></path></svg>;
+        // NEW ICONS 2
+        const CenterIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><rect x="10" y="10" width="4" height="4"></rect></svg>;
+        const WarehouseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 20h12a2 2 0 0 0 2-2V8l-8-6-8 6v10a2 2 0 0 0 2 2Z"></path><path d="M10 14h4"></path><path d="M12 12v4"></path></svg>;
+        const HubIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="m3 3 7 7"></path><path d="m21 3-7 7"></path><path d="m3 21 7-7"></path><path d="m21 21-7-7"></path></svg>;
+        const ShortestPathIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 13l-4 4-4-4"></path><path d="M15 17V3"></path><path d="M5 21h14"></path></svg>;
+        const LongHaulIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>;
+        const ShortHaulIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle><line x1="2" y1="9" x2="12" y2="9"></line></svg>;
+        const StoreIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9 12 2l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>;
+        const ProcurementIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 16h6"></path><path d="M19 13v6"></path><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"></path><path d="M7.5 4.21 12 6.81l4.5-2.6"></path><path d="M3.29 7 12 12l8.71-5"></path><path d="M12 22V12"></path></svg>;
+
+        // --- DATA & CONFIG ---
+
+        // 1. Translations & Registry
+        const TRANSLATIONS = {
+            en: {
+                ui: {
+                    system_terminal: "System Terminal",
+                    status_operational: "SYSTEM OPERATIONAL",
+                    header_title_1: "Advanced Planning &",
+                    header_title_2: "Scheduling System",
+                    header_desc: "Select a functional module block to access specific planning tools and optimization engines.",
+                    explore: "Explore",
+                    quick_view: "Quick View",
+                    modules: "Modules",
+                    go_live: "GO-LIVE",
+                    launch_tool: "Launch Tool",
+                    click_to_open: "Click to Open",
+                    no_modules: "No modules enabled.",
+                    check_later: "Check back later for updates.",
+                    about_title: "About Operartis",
+                    about_who: "Who We Are",
+                    about_what: "What We Do",
+                    about_vision: "Vision & Philosophy",
+                    about_why: "Why Choose Operartis",
+                    about_who_text: [
+                        "Operartis is a specialized consulting and technology firm dedicated to helping enterprises streamline, optimize, and transform their operations.",
+                        "We combine deep expertise in supply chain, logistics, production, warehousing and manufacturing processes with advanced quantitative-optimization and simulation methods to deliver meaningful, measurable improvements.",
+                        "At Operartis, we understand that having data in an Enterprise Resource Planning (ERP) system is only the first step. True operational excellence requires turning that data into actionable planning, forecasting and scheduling insights. That’s why we focus on building, developing, and continuously improving a tailored Advanced Planning and Scheduling System (APS) — helping our clients leverage their data not just for record-keeping, but for real operational advantage."
+                    ],
+                    about_what_text: [
+                        "We consult with businesses to thoroughly analyze their supply chain, warehousing, logistics and production workflows — identifying inefficiencies, bottlenecks, and opportunities for optimization.",
+                        "We design and implement APS systems that integrate with existing ERPs (or, where needed, stand-alone), enabling advanced planning, simulation, demand forecasting, capacity planning and production scheduling.",
+                        "We support companies through all stages: from initial assessment and system design, to deployment, staff training, and continuous improvement — ensuring sustainable value over time.",
+                        "Our quantitative-driven approach allows clients to make data-backed decisions, reduce operational costs, minimize waste, shorten lead times and improve overall efficiency."
+                    ],
+                    about_vision_text: [
+                        "We aim to democratize operational and supply-chain optimization. We believe that every enterprise — whether small, medium or large — deserves access to powerful tools and expert guidance at reasonable price levels.",
+                        "We envision a world in which companies can guarantee that their entire supply chain works efficiently and in an optimized manner — saving time, effort, and costs, while ensuring smooth operations and high customer satisfaction.",
+                        "By embedding advanced optimization methods into an all-in-one APS system, Operartis helps unlock hidden potential in operational data — transforming raw information into strategic advantage, sustainable growth, and robust competitiveness."
+                    ],
+                    about_why_items: [
+                        { title: "Specialization & Expertise", text: "We are not a generalist IT or consulting firm. Our core competence lies in operations, supply-chain optimization, and APS/ERP integration." },
+                        { title: "Quantitative & Data-Driven", text: "Our approaches rely on simulation, modeling and data analytics — not guesswork. This ensures improvements are measurable and repeatable." },
+                        { title: "Tailored & Pragmatic Solutions", text: "We design APS systems that reflect your real-world constraints. What we build fits your operations — not the other way around." },
+                        { title: "Affordability & Value", text: "We strive to provide our services at reasonable price levels, making high-quality optimization accessible to a broad range of enterprises." },
+                        { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." }
+                    ],
+                    invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
+                    rights_reserved: "v2.0.0 Matrix UI • Latency: 24ms",
+                    cta_explore: "Explore the Platform",
+                    cta_why: "Why Operartis",
+                    metrics_eyebrow: "Built for measurable impact",
+                    metrics_title: "One platform. Every planning horizon.",
+                    stat_live: "Live Modules",
+                    stat_horizons: "Planning Horizons",
+                    stat_blocks: "Module Blocks",
+                    stat_engines: "Optimization Engines",
+                    journey_eyebrow: "How the matrix fits together",
+                    journey_title: "From strategy to the shop floor",
+                    journey_desc: "Every Operartis module maps to a planning horizon — connecting long-range network design down to real-time execution in one continuous decision chain.",
+                    platform_eyebrow: "The APS Platform",
+                    platform_title: "Select a functional module block",
+                    capabilities_label: "Optimization coverage",
+                    sc_eyebrow: "End-to-End Supply Chain",
+                    sc_title: "From Raw Materials to End Customer",
+                    sc_live: "Live flow",
+                    sc_steps: [
+                        { id: 'procurement', label: 'Procurement', tag: 'Source', desc: 'Strategic sourcing, supplier selection, purchase orders, inbound quality checks, and raw-material staging before production.' },
+                        { id: 'production', label: 'Production', tag: 'Make', desc: 'Factory planning, MRP/MPS, shop-floor scheduling, assembly lines, quality control, and finished-goods output.' },
+                        { id: 'transport', label: 'Transportation', tag: 'Move', desc: 'Line-haul and last-mile shipment, carrier routing, cross-docking, tracking, and in-transit visibility across the network.' },
+                        { id: 'distribution', label: 'Hubs & DCs', tag: 'Store', desc: 'Regional hubs, warehouses, and distribution centers — receiving, put-away, inventory allocation, and order consolidation.' },
+                        { id: 'stores', label: 'Retail Stores', tag: 'Sell', desc: 'Store replenishment, shelf availability, localized demand, promotions, and point-of-sale fulfillment.' },
+                        { id: 'customers', label: 'End Customers', tag: 'Deliver', desc: 'Final delivery, click-and-collect, returns, service levels, and demand signals feeding back into planning.' }
+                    ]
+                },
+                registry: {
+                    'abc': { name: 'ABC-XYZ Analysis', desc: 'Classification matrix for inventory segmentation based on value and volatility.' },
+                    'forecaster': { name: 'ML Forecaster', desc: 'Time-series prediction engine using advanced modern machine-learning models.' },
+                    'advanced_forecaster': { name: 'Advanced-ML Forecaster', desc: 'Advanced predictive analytics with scenario planning, driver importance analysis.' },
+                    'inventory': { name: 'Inventory Optimizer', desc: 'Dynamic safety stock calculation, reorder point analysis, and EOQ optimization.' },
+                    'logistics': { name: 'Logistics Control', desc: 'Route optimization, carrier management, and lead-time tracking.' },
+                    'vrp': { name: 'Vehicle Routing Problem', desc: 'Optimization of delivery routes under multiple constraints to minimize cost.' },
+                    'clsp': { name: 'Capacitated Lot-sizing', desc: 'Determination of optimal production lot sizes considering capacity limitations.' },
+                    'median_prob': { name: 'Median Problem', desc: 'Minimizing the total weighted distance to all customers.' },
+                    'cover_prob': { name: 'Cover Problem', desc: 'Finding the minimum number of facilities to cover all demand points.' },
+                    'facility_loc': { name: 'Facilities Location Problem', desc: 'Optimizing facility numbers and locations to minimize costs.' },
+                    'atp': { name: 'Available to Promise (ATP)', desc: 'Real-time availability check based on current inventory and future production.' },
+                    'aggregated_planning': { name: 'Aggregated Production Planning', desc: 'Macro-level production planning to balance capacity and demand.' },
+                    'cap_main_planning': { name: 'Capacitated Main Production Planning', desc: 'High-level production planning with critical capacity constraints.' },
+                    'scheduling_prob': { name: 'Scheduling Problem', desc: 'Job-sequencing optimization on machines to minimize lateness.' },
+                    'queuing_sim': { name: 'Queuing System Simulation', desc: 'Simulating waiting lines to optimize service levels and resources.' },
+                    'center_prob': { name: 'Center Problem', desc: 'Finding a central location to minimize maximum distance to any customer.' },
+                    'warehouse_loc': { name: 'Warehouse Location Problem', desc: 'Determining optimal warehouse sites to balance costs and service.' },
+                    'hub_loc': { name: 'Hub Location Problem', desc: 'Locating hubs to consolidate flow and minimize network costs.' },
+                    'shortest_path': { name: 'Shortest Path Problem', desc: 'Optimizing routes to find the quickest or shortest path between points.' },
+                    'long_haul': { name: 'Long Haul Transport Planning', desc: 'Planning long-distance freight movements and carrier selection.' },
+                    'short_haul': { name: 'Short Haul Transport Planning', desc: 'Managing local delivery runs, milk runs, and last-mile logistics.' }
+                },
+                matrix: [
+                    {
+                        id: 'strategic', title: 'Strategic', subtitle: 'Years to Months',
+                        definition: 'Strategic planning sets the long-term direction (1-10 years), focusing on high-stakes capital decisions like network design, facility locations, and market entry. These decisions determine the supply chain limits and are difficult to reverse.',
+                        blocks: [
+                            {
+                                name: 'Strategic Network Planning',
+                                desc: 'Supply Chain Design & Optimization',
+                                fullDesc: 'Designing the physical supply chain network (facilities, warehouses) to minimize costs.',
+                                icon: <GlobeIcon />,
+                                subModules: ['median_prob', 'cover_prob', 'facility_loc', 'center_prob', 'warehouse_loc', 'hub_loc']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'tactical', title: 'Tactical', subtitle: 'Months to Weeks',
+                        definition: 'Tactical planning (6-18 months) translates strategic goals into executable plans. It balances supply and demand through master production scheduling, inventory policy setting, and workforce capacity management to optimize resource utilization.',
+                        blocks: [
+                            {
+                                name: 'Demand Planning & Forecasting',
+                                desc: 'Predicting Future Demand',
+                                fullDesc: 'Using historical data, ML, and market intelligence to forecast demand.',
+                                icon: <BarChartIcon />,
+                                subModules: ['forecaster', 'advanced_forecaster']
+                            },
+                            {
+                                name: 'Master Production Planning',
+                                desc: 'Balancing Supply & Demand',
+                                fullDesc: 'Medium-term production planning (MPS) and inventory replenishment (DRP).',
+                                icon: <GridIcon />,
+                                subModules: ['aggregated_planning']
+                            },
+                            {
+                                name: 'Inventory Planning & Optimization',
+                                desc: 'Setting Inventory Targets',
+                                fullDesc: 'Determining optimal inventory levels (safety stock, cycle stock) across the chain.',
+                                icon: <BoxIcon />,
+                                subModules: ['abc', 'inventory']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'operational', title: 'Operational', subtitle: 'Weeks to Hours',
+                        definition: 'Operational planning focuses on short-term execution (days to weeks) and immediate order fulfillment. It involves detailed scheduling, vehicle routing, and shop floor control to meet specific customer requirements within fixed constraints.',
+                        blocks: [
+                            {
+                                name: 'Production Planning & Detailed Scheduling',
+                                desc: 'Finite Capacity Scheduling',
+                                fullDesc: 'Detailed shop floor scheduling respecting resource constraints (machines, labor).',
+                                icon: <FactoryIcon />,
+                                subModules: ['clsp', 'cap_main_planning', 'scheduling_prob']
+                            },
+                            {
+                                name: 'Transportation Planning & Vehicle Routing',
+                                desc: 'Optimizing Logistics',
+                                fullDesc: 'Planning movement of goods, load consolidation, and route optimization.',
+                                icon: <TruckIcon />,
+                                subModules: ['logistics', 'vrp', 'shortest_path', 'long_haul', 'short_haul']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'cross', title: 'Cross-Functional', subtitle: 'All Horizons',
+                        definition: 'Cross-functional processes span all time horizons, bridging departments to ensure alignment. This includes Sales & Operations Planning (S&OP), real-time data sharing, and collaborative scenario analysis to synchronize the entire value chain.',
+                        blocks: [
+                            {
+                                name: 'What-If Scenario Analysis',
+                                desc: 'Simulation & Support',
+                                fullDesc: 'Simulating various scenarios to evaluate impact and compare actions.',
+                                icon: <GitBranchIcon />,
+                                subModules: ['queuing_sim']
+                            },
+                            {
+                                name: 'Supply Chain Collaboration',
+                                desc: 'Visibility & Alignment',
+                                fullDesc: 'Platform for sharing real-time info with internal departments and external partners.',
+                                icon: <UsersIcon />,
+                                subModules: ['atp']
+                            }
+                        ]
+                    }
+                ]
+            },
+            vi: {
+                ui: {
+                    system_terminal: "Bảng Điều Hành Hệ Thống",
+                    status_operational: "HỆ THỐNG HOẠT ĐỘNG",
+                    header_title_1: "Hệ Thống Hoạch Định &",
+                    header_title_2: "Lập Kế Hoạch Nâng Cao",
+                    header_desc: "Chọn một khối chức năng để trải nghiệm các công cụ, giải pháp tối ưu hóa chuyên sâu.",
+                    explore: "Khám Phá",
+                    quick_view: "Xem Nhanh",
+                    modules: "Mô-đun",
+                    go_live: "HOẠT ĐỘNG",
+                    launch_tool: "Mở Công Cụ",
+                    click_to_open: "Nhấn để Mở",
+                    no_modules: "Chưa có mô-đun kích hoạt.",
+                    check_later: "Vui lòng quay lại sau.",
+                    about_title: "Về Operartis",
+                    about_who: "Chúng Tôi Là Ai",
+                    about_what: "Chúng Tôi Làm Gì",
+                    about_vision: "Tầm Nhìn & Triết Lý",
+                    about_why: "Tại Sao Chọn Operartis",
+                    about_who_text: [
+                        "Operartis là đơn vị tư vấn và công nghệ chuyên sâu, giúp doanh nghiệp vận hành trơn tru và tối ưu hóa quy trình.",
+                        "Chúng tôi kết hợp chuyên môn sâu rộng về chuỗi cung ứng, logistics, sản xuất và kho bãi với các phương pháp định lượng và mô phỏng tiên tiến để mang lại cải tiến rõ rệt, có thể đo lường.",
+                        "Tại Operartis, chúng tôi hiểu rằng dữ liệu trong hệ thống ERP chỉ là bước đầu. Sự tối ưu trong vận hành đòi hỏi phải biến dữ liệu đó thành thông tin chi tiết để hoạch định, dự báo và lập kế hoạch. Đó là lý do chúng tôi tập trung phát triển Hệ thống Hoạch định và Lập kế hoạch Nâng cao (APS) riêng biệt — giúp khách hàng tận dụng dữ liệu không chỉ để lưu trữ mà còn tạo lợi thế vận hành thực sự."
+                    ],
+                    about_what_text: [
+                        "Chúng tôi tư vấn doanh nghiệp phân tích kỹ lưỡng quy trình chuỗi cung ứng, kho bãi, logistics và sản xuất — nhận diện các điểm nghẽn, kém hiệu quả và cơ hội tối ưu hóa.",
+                        "Chúng tôi thiết kế và triển khai hệ thống APS tích hợp với ERP hiện có (hoặc độc lập), cho phép hoạch định nâng cao, mô phỏng, dự báo nhu cầu, hoạch định năng lực và lịch trình sản xuất, tối ưu hoá quản lý tồn kho, và vận tải.",
+                        "Chúng tôi đồng hành cùng khách hàng qua mọi giai đoạn: từ đánh giá ban đầu, thiết kế hệ thống, đến triển khai, đào tạo nhân sự và cải tiến liên tục — đảm bảo giá trị bền vững.",
+                        "Cách tiếp cận dựa trên định lượng của chúng tôi giúp khách hàng ra quyết định dựa trên dữ liệu, giảm chi phí vận hành, giảm lãng phí, rút ngắn thời gian giao hàng và nâng cao hiệu quả tổng thể."
+                    ],
+                    about_vision_text: [
+                        "Chúng tôi hướng đến việc phổ cập tối ưu hóa vận hành và chuỗi cung ứng. Chúng tôi tin rằng mọi doanh nghiệp — dù nhỏ, vừa hay lớn — đều xứng đáng tiếp cận các công cụ mạnh mẽ và chuyên nghiệp với chi phí hợp lý.",
+                        "Chúng tôi hình dung một thế giới nơi các công ty có thể an tâm rằng toàn chuỗi cung ứng hoạt động hiệu quả và tối ưu — tiết kiệm thời gian, công sức và chi phí, đồng thời đảm bảo vận hành trơn tru và sự hài lòng cao của khách hàng.",
+                        "Bằng cách tích hợp các phương pháp tối ưu hóa tiên tiến vào hệ thống APS tất cả trong một, Operartis giúp khai phá tiềm năng ẩn trong dữ liệu vận hành — biến thông tin thô thành lợi thế chiến lược, tăng trưởng bền vững và năng lực cạnh tranh mạnh mẽ."
+                    ],
+                    about_why_items: [
+                        { title: "Chuyên Môn & Kinh Nghiệm", text: "Chúng tôi không phải là công ty tư vấn CNTT nói chung. Năng lực cốt lõi của chúng tôi nằm ở tư vấn vận hành, tối ưu hóa chuỗi cung ứng và tích hợp APS/ERP." },
+                        { title: "Định Lượng & Dựa Trên Dữ liệu", text: "Phương pháp của chúng tôi dựa trên mô phỏng, mô hình hóa và phân tích dữ liệu, xây dựng thuật toán tối ưu hoá — không phỏng đoán. Điều này đảm bảo cải tiến có thể đo lường và lặp lại." },
+                        { title: "Giải Pháp Thực Tế & Chuyên Biệt", text: "Chúng tôi thiết kế hệ thống APS đáp ứng đúng với điều kiện thực tế của doanh nghiệp. Những gì chúng tôi xây dựng phù hợp với vận hành thực tế — chứ không phải ngược lại." },
+                        { title: "Chi Phí Hợp Lý & Giá Trị", text: "Chúng tôi nỗ lực cung cấp dịch vụ với mức giá hợp lý, giúp việc triển khai các phương pháp tối ưu hóa chất lượng cao tiếp cận được với nhiều doanh nghiệp." },
+                        { title: "Cam Kết Kết Quả", text: "Sứ mệnh của chúng tôi không chỉ là bàn giao hệ thống, mà là giúp bạn đạt được cải thiện thực sự về hiệu quả, tiết kiệm chi phí và sự bền bỉ trong vận hành." }
+                    ],
+                    invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
+                    rights_reserved: "v2.0.0 Giao diện Ma Trận • Độ trễ: 24ms",
+                    cta_explore: "Khám Phá Nền Tảng",
+                    cta_why: "Vì Sao Chọn Operartis",
+                    metrics_eyebrow: "Được xây dựng cho tác động đo lường được",
+                    metrics_title: "Một nền tảng. Mọi khung hoạch định.",
+                    stat_live: "Mô-đun Hoạt Động",
+                    stat_horizons: "Khung Hoạch Định",
+                    stat_blocks: "Khối Chức Năng",
+                    stat_engines: "Công Cụ Tối Ưu",
+                    journey_eyebrow: "Cách ma trận kết nối với nhau",
+                    journey_title: "Từ chiến lược đến sàn sản xuất",
+                    journey_desc: "Mỗi mô-đun Operartis tương ứng với một khung hoạch định — kết nối từ thiết kế mạng lưới dài hạn đến thực thi thời gian thực trong một chuỗi quyết định liền mạch.",
+                    platform_eyebrow: "Nền Tảng APS",
+                    platform_title: "Chọn một khối chức năng",
+                    capabilities_label: "Phạm vi tối ưu hóa",
+                    sc_eyebrow: "Chuỗi cung ứng toàn trình",
+                    sc_title: "Từ nguyên vật liệu đến khách hàng cuối",
+                    sc_live: "Luồng trực tiếp",
+                    sc_steps: [
+                        { id: 'procurement', label: 'Mua hàng', tag: 'Nguồn', desc: 'Tìm nguồn cung, lựa chọn nhà cung cấp, đặt hàng, kiểm tra chất lượng đầu vào và chuẩn bị nguyên liệu trước sản xuất.' },
+                        { id: 'production', label: 'Sản xuất', tag: 'Sản xuất', desc: 'Hoạch định nhà máy, MRP/MPS, lịch xưởng, dây chuyền lắp ráp, kiểm soát chất lượng và thành phẩm.' },
+                        { id: 'transport', label: 'Vận chuyển', tag: 'Di chuyển', desc: 'Vận tải đường dài và chặng cuối, định tuyến đơn vị vận chuyển, cross-dock, theo dõi và hiển thị hàng đang luân chuyển.' },
+                        { id: 'distribution', label: 'Hub & Kho', tag: 'Lưu trữ', desc: 'Trung tâm vùng, kho và trung tâm phân phối — nhận hàng, xếp kho, phân bổ tồn kho và gom đơn.' },
+                        { id: 'stores', label: 'Cửa hàng', tag: 'Bán lẻ', desc: 'Bổ sung hàng cho cửa hàng, sẵn có trên kệ, nhu cầu địa phương, khuyến mãi và thực hiện tại quầy.' },
+                        { id: 'customers', label: 'Khách hàng', tag: 'Giao hàng', desc: 'Giao hàng cuối cùng, click-and-collect, trả hàng, mức dịch vụ và tín hiệu nhu cầu phản hồi vào hoạch định.' }
+                    ]
+                },
+                registry: {
+                    'abc': { name: 'Phân Tích ABC-XYZ', desc: 'Ma trận giúp phân loại tồn kho theo giá trị và độ biến động.' },
+                    'forecaster': { name: 'Dự Báo Học Máy', desc: 'Dự đoán chuỗi thời gian sử dụng các mô hình học máy hiện đại.' },
+                    'advanced_forecaster': { name: 'Dự Báo Học Máy Nâng Cao', desc: 'Phân tích dự đoán nâng cao với lập kế hoạch kịch bản và phân tích nhân tố tác động.' },
+                    'inventory': { name: 'Tối Ưu Hóa Tồn Kho', desc: 'Tính toán tồn kho an toàn, điểm đặt hàng lại và tối ưu hóa lượng đặt hàng (EOQ).' },
+                    'logistics': { name: 'Kiểm Soát Logistics', desc: 'Tối ưu hóa tuyến đường, quản lý nhà vận chuyển và theo dõi thời gian giao hàng.' },
+                    'vrp': { name: 'Bài Toán Định Tuyến Xe', desc: 'Tối ưu hóa tuyến giao hàng theo nhiều ràng buộc để giảm thiểu chi phí.' },
+                    'clsp': { name: 'Kích Thước Lô Có Ràng Buộc', desc: 'Xác định kích thước lô sản xuất tối ưu dựa trên giới hạn năng lực.' },
+                    'median_prob': { name: 'Bài Toán Trung Vị', desc: 'Giảm thiểu tổng khoảng cách có trọng số đến tất cả khách hàng.' },
+                    'cover_prob': { name: 'Bài Toán Bao Phủ', desc: 'Tìm số lượng cơ sở tối thiểu để bao phủ tất cả điểm cầu.' },
+                    'facility_loc': { name: 'Định Vị Cơ Sở', desc: 'Tối ưu hóa số lượng và vị trí cơ sở để giảm thiểu chi phí.' },
+                    'atp': { name: 'Sẵn Sàng Cam Kết (ATP)', desc: 'Kiểm tra khả năng đáp ứng đơn hàng dựa trên tồn kho và sản xuất tương lai.' },
+                    'aggregated_planning': { name: 'Hoạch Định Tổng Hợp', desc: 'Lập kế hoạch sản xuất vĩ mô để cân đối năng lực và nhu cầu.' },
+                    'cap_main_planning': { name: 'Hoạch Định Năng Lực Chính', desc: 'Lập kế hoạch sản xuất cấp cao với ràng buộc năng lực quan trọng.' },
+                    'scheduling_prob': { name: 'Bài Toán Lịch Trình', desc: 'Tối ưu hóa thứ tự công việc trên máy móc để giảm thiểu độ trễ.' },
+                    'queuing_sim': { name: 'Mô Phỏng Hàng Đợi', desc: 'Mô phỏng hàng chờ để tối ưu hóa mức độ dịch vụ và tài nguyên.' },
+                    'center_prob': { name: 'Bài Toán Trung Tâm', desc: 'Tìm vị trí trung tâm để giảm thiểu khoảng cách tối đa đến bất kỳ khách hàng nào.' },
+                    'warehouse_loc': { name: 'Định Vị Kho Bãi', desc: 'Xác định vị trí kho tối ưu để cân bằng chi phí và dịch vụ.' },
+                    'hub_loc': { name: 'Định Vị Trung Chuyển', desc: 'Đặt trạm trung chuyển để gom dòng hàng và giảm chi phí mạng lưới.' },
+                    'shortest_path': { name: 'Đường Đi Ngắn Nhất', desc: 'Tối ưu hóa lộ trình để có thời gian hoặc khoảng cách ngắn nhất.' },
+                    'long_haul': { name: 'Vận Tải Đường Dài', desc: 'Lập kế hoạch vận chuyển hàng hóa đường dài và chọn nhà vận tải.' },
+                    'short_haul': { name: 'Vận Tải Chặng Ngắn', desc: 'Quản lý giao hàng địa phương, milk-run và logistics chặng cuối.' }
+                },
+                matrix: [
+                    {
+                        id: 'strategic', title: 'Chiến Lược', subtitle: 'Năm đến Tháng',
+                        definition: 'Hoạch định chiến lược xác định phương hướng dài hạn (1-10 năm), tập trung vào các quyết định vốn lớn như thiết kế mạng lưới, vị trí cơ sở và thâm nhập thị trường. Những quyết định này định hình giới hạn chuỗi cung ứng và khó đảo ngược.',
+                        blocks: [
+                            {
+                                name: 'Hoạch Định Mạng Lưới Chiến Lược',
+                                desc: 'Thiết Kế & Tối Ưu Chuỗi Cung Ứng',
+                                fullDesc: 'Thiết kế mạng lưới chuỗi cung ứng vật lý (cơ sở, kho bãi) để giảm thiểu chi phí.',
+                                icon: <GlobeIcon />,
+                                subModules: ['median_prob', 'cover_prob', 'facility_loc', 'center_prob', 'warehouse_loc', 'hub_loc']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'tactical', title: 'Chiến Thuật', subtitle: 'Tháng đến Tuần',
+                        definition: 'Hoạch định chiến thuật (6-18 tháng) chuyển đổi mục tiêu chiến lược thành kế hoạch khả thi. Nó cân đối cung cầu thông qua lịch trình sản xuất chính, thiết lập chính sách tồn kho và quản lý năng lực nhân sự để tối ưu hóa sử dụng tài nguyên.',
+                        blocks: [
+                            {
+                                name: 'Hoạch Định & Dự Báo Nhu Cầu',
+                                desc: 'Dự Đoán Nhu Cầu Tương Lai',
+                                fullDesc: 'Sử dụng dữ liệu lịch sử, máy học và thông tin thị trường để dự báo nhu cầu.',
+                                icon: <BarChartIcon />,
+                                subModules: ['forecaster', 'advanced_forecaster']
+                            },
+                            {
+                                name: 'Hoạch Định Sản Xuất Chính',
+                                desc: 'Cân Đối Cung & Cầu',
+                                fullDesc: 'Lập kế hoạch sản xuất trung hạn (MPS) và bổ sung tồn kho (DRP).',
+                                icon: <GridIcon />,
+                                subModules: ['aggregated_planning']
+                            },
+                            {
+                                name: 'Hoạch Định & Tối Ưu Tồn Kho',
+                                desc: 'Thiết Lập Mục Tiêu Tồn Kho',
+                                fullDesc: 'Xác định mức tồn kho tối ưu (an toàn, chu kỳ) trên toàn chuỗi.',
+                                icon: <BoxIcon />,
+                                subModules: ['abc', 'inventory']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'operational', title: 'Vận Hành', subtitle: 'Tuần đến Giờ',
+                        definition: 'Hoạch định vận hành tập trung vào thực thi ngắn hạn (ngày đến tuần) và đáp ứng đơn hàng ngay lập tức. Bao gồm lịch trình chi tiết, định tuyến xe và kiểm soát xưởng để đáp ứng yêu cầu cụ thể của khách hàng trong các ràng buộc cố định.',
+                        blocks: [
+                            {
+                                name: 'Hoạch Định Sản Xuất & Lịch Trình Chi Tiết',
+                                desc: 'Lịch Trình Năng Lực Hữu Hạn',
+                                fullDesc: 'Lịch trình xưởng chi tiết tuân thủ ràng buộc tài nguyên (máy móc, nhân công).',
+                                icon: <FactoryIcon />,
+                                subModules: ['clsp', 'cap_main_planning', 'scheduling_prob']
+                            },
+                            {
+                                name: 'Hoạch Định Vận Tải & Định Tuyến Xe',
+                                desc: 'Tối Ưu Hóa Logistics',
+                                fullDesc: 'Lập kế hoạch di chuyển hàng hóa, gom hàng và tối ưu hóa lộ trình.',
+                                icon: <TruckIcon />,
+                                subModules: ['logistics', 'vrp', 'shortest_path', 'long_haul', 'short_haul']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'cross', title: 'Đa Chức Năng', subtitle: 'Mọi Khung Thời Gian',
+                        definition: 'Quy trình đa chức năng trải dài mọi khung thời gian, kết nối các phòng ban để đảm bảo sự đồng bộ. Bao gồm Hoạch định Bán hàng & Vận hành (S&OP), chia sẻ dữ liệu thời gian thực và phân tích kịch bản cộng tác để đồng bộ hóa toàn bộ chuỗi giá trị.',
+                        blocks: [
+                            {
+                                name: 'Phân Tích Kịch Bản What-If',
+                                desc: 'Mô Phỏng & Hỗ Trợ',
+                                fullDesc: 'Mô phỏng các kịch bản khác nhau để đánh giá tác động và so sánh hành động.',
+                                icon: <GitBranchIcon />,
+                                subModules: ['queuing_sim']
+                            },
+                            {
+                                name: 'Hợp Tác Chuỗi Cung Ứng',
+                                desc: 'Minh Bạch & Đồng Bộ',
+                                fullDesc: 'Nền tảng chia sẻ thông tin thời gian thực với nội bộ và đối tác bên ngoài.',
+                                icon: <UsersIcon />,
+                                subModules: ['atp']
+                            }
+                        ]
+                    }
+                ]
+            },
+            de: {
+                ui: {
+                    system_terminal: "Systemterminal",
+                    status_operational: "SYSTEM BETRIEBSBEREIT",
+                    header_title_1: "Erweiterte Planungs- &",
+                    header_title_2: "Terminierungssystem",
+                    header_desc: "Wählen Sie ein Funktionsmodul, um auf spezifische Planungstools und Optimierungs-Engines zuzugreifen.",
+                    explore: "Entdecken",
+                    quick_view: "Schnellansicht",
+                    modules: "Module",
+                    go_live: "LIVE",
+                    launch_tool: "Tool starten",
+                    click_to_open: "Zum Öffnen klicken",
+                    no_modules: "Keine Module aktiviert.",
+                    check_later: "Bitte später erneut prüfen.",
+                    about_title: "Über Operartis",
+                    about_who: "Wer wir sind",
+                    about_what: "Was wir tun",
+                    about_vision: "Vision & Philosophie",
+                    about_why: "Warum Operartis",
+                    about_who_text: [
+                        "Operartis ist ein spezialisiertes Beratungs- und Technologieunternehmen, das Unternehmen dabei unterstützt, ihre Abläufe zu straffen, zu optimieren und zu transformieren.",
+                        "Wir verbinden tiefes Fachwissen in Supply Chain, Logistik, Produktion, Lagerhaltung und Fertigung mit fortgeschrittenen quantitativen Optimierungs- und Simulationsmethoden, um messbare Verbesserungen zu erzielen.",
+                        "Bei Operartis wissen wir, dass Daten im ERP-System nur der erste Schritt sind. Echte operative Exzellenz erfordert, diese Daten in umsetzbare Planungs-, Prognose- und Terminierungserkenntnisse zu verwandeln. Deshalb entwickeln wir ein maßgeschneidertes Advanced Planning and Scheduling System (APS) — damit unsere Kunden ihre Daten nicht nur zur Dokumentation, sondern für echten operativen Vorteil nutzen."
+                    ],
+                    about_what_text: [
+                        "Wir beraten Unternehmen bei der gründlichen Analyse ihrer Supply-Chain-, Lager-, Logistik- und Produktionsabläufe — und identifizieren Ineffizienzen, Engpässe und Optimierungspotenziale.",
+                        "Wir entwerfen und implementieren APS-Systeme, die in bestehende ERPs integriert werden (oder bei Bedarf eigenständig arbeiten), und ermöglichen erweiterte Planung, Simulation, Nachfrageprognose, Kapazitätsplanung und Produktionsterminierung.",
+                        "Wir begleiten Unternehmen in allen Phasen: von der Erstbewertung und Systemgestaltung über die Einführung und Schulung bis zur kontinuierlichen Verbesserung — für nachhaltigen Mehrwert.",
+                        "Unser quantitativer Ansatz ermöglicht datenbasierte Entscheidungen, senkt Betriebskosten, reduziert Verschwendung, verkürzt Durchlaufzeiten und steigert die Gesamteffizienz."
+                    ],
+                    about_vision_text: [
+                        "Wir wollen operative und Supply-Chain-Optimierung demokratisieren. Jedes Unternehmen — ob klein, mittel oder groß — verdient Zugang zu leistungsstarken Tools und fachkundiger Beratung zu angemessenen Preisen.",
+                        "Wir stellen uns eine Welt vor, in der Unternehmen sicher sein können, dass ihre gesamte Supply Chain effizient und optimiert arbeitet — Zeit, Aufwand und Kosten spart und gleichzeitig reibungslose Abläufe und hohe Kundenzufriedenheit sicherstellt.",
+                        "Durch die Einbettung fortgeschrittener Optimierungsmethoden in ein All-in-One-APS-System hilft Operartis, verborgenes Potenzial in Betriebsdaten freizusetzen — und Rohinformationen in strategischen Vorteil, nachhaltiges Wachstum und starke Wettbewerbsfähigkeit zu verwandeln."
+                    ],
+                    about_why_items: [
+                        { title: "Spezialisierung & Expertise", text: "Wir sind keine allgemeine IT- oder Beratungsfirma. Unsere Kernkompetenz liegt in Operations, Supply-Chain-Optimierung und APS/ERP-Integration." },
+                        { title: "Quantitativ & datengetrieben", text: "Unsere Ansätze basieren auf Simulation, Modellierung und Datenanalyse — nicht auf Vermutungen. So sind Verbesserungen messbar und wiederholbar." },
+                        { title: "Maßgeschneiderte & pragmatische Lösungen", text: "Wir entwickeln APS-Systeme, die Ihre realen Rahmenbedingungen widerspiegeln. Was wir bauen, passt zu Ihren Abläufen — nicht umgekehrt." },
+                        { title: "Erschwinglichkeit & Mehrwert", text: "Wir streben angemessene Preise an und machen hochwertige Optimierung für ein breites Spektrum von Unternehmen zugänglich." },
+                        { title: "Ergebnisorientierung", text: "Unsere Mission ist nicht nur die Lieferung eines Systems, sondern echte Verbesserungen in Effizienz, Kosteneinsparung und operativer Resilienz." }
+                    ],
+                    invite_text: "Wir laden Unternehmen ein, die ihre Abläufe transformieren, ihre Supply Chain optimieren und einen Wettbewerbsvorteil aufbauen wollen, mit Operartis zusammenzuarbeiten.",
+                    rights_reserved: "v2.0.0 Matrix-UI • Latenz: 24ms",
+                    cta_explore: "Plattform entdecken",
+                    cta_why: "Warum Operartis",
+                    metrics_eyebrow: "Für messbare Wirkung entwickelt",
+                    metrics_title: "Eine Plattform. Jeder Planungshorizont.",
+                    stat_live: "Aktive Module",
+                    stat_horizons: "Planungshorizonte",
+                    stat_blocks: "Funktionsblöcke",
+                    stat_engines: "Optimierungs-Engines",
+                    journey_eyebrow: "Wie die Matrix zusammenpasst",
+                    journey_title: "Von der Strategie bis zum Shopfloor",
+                    journey_desc: "Jedes Operartis-Modul ist einem Planungshorizont zugeordnet — von der langfristigen Netzwerkplanung bis zur Echtzeit-Ausführung in einer durchgängigen Entscheidungskette.",
+                    platform_eyebrow: "Die APS-Plattform",
+                    platform_title: "Funktionsmodul auswählen",
+                    capabilities_label: "Optimierungsabdeckung",
+                    sc_eyebrow: "End-to-End-Lieferkette",
+                    sc_title: "Von Rohmaterial bis Endkunde",
+                    sc_live: "Live-Fluss",
+                    sc_steps: [
+                        { id: 'procurement', label: 'Beschaffung', tag: 'Bezug', desc: 'Strategischer Einkauf, Lieferantenauswahl, Bestellungen, Wareneingangsprüfung und Materialbereitstellung vor der Produktion.' },
+                        { id: 'production', label: 'Produktion', tag: 'Fertigung', desc: 'Werkplanung, MRP/MPS, Feinplanung, Montagelinien, Qualitätskontrolle und Fertigwarenausgang.' },
+                        { id: 'transport', label: 'Transport', tag: 'Transport', desc: 'Fern- und Nahverkehr, Carrier-Routing, Cross-Docking, Tracking und Transparenz während des Transports.' },
+                        { id: 'distribution', label: 'Hubs & Lager', tag: 'Lager', desc: 'Regionale Hubs, Lager und Verteilzentren — Wareneingang, Einlagerung, Bestandsallokation und Auftragsbündelung.' },
+                        { id: 'stores', label: 'Filialen', tag: 'Verkauf', desc: 'Filialbelieferung, Regalverfügbarkeit, lokale Nachfrage, Aktionen und Abwicklung an der Kasse.' },
+                        { id: 'customers', label: 'Endkunden', tag: 'Lieferung', desc: 'Finale Zustellung, Click & Collect, Retouren, Servicelevel und Nachfragesignale zurück in die Planung.' }
+                    ]
+                },
+                registry: {
+                    'abc': { name: 'ABC-XYZ-Analyse', desc: 'Klassifikationsmatrix zur Inventarsegmentierung nach Wert und Volatilität.' },
+                    'forecaster': { name: 'ML-Prognose', desc: 'Zeitreihenprognose mit modernen Machine-Learning-Modellen.' },
+                    'advanced_forecaster': { name: 'Erweiterte ML-Prognose', desc: 'Erweiterte prädiktive Analytik mit Szenarioplanung und Treiberanalyse.' },
+                    'inventory': { name: 'Bestandsoptimierung', desc: 'Dynamische Sicherheitsbestandsberechnung, Bestellpunktanalyse und EOQ-Optimierung.' },
+                    'logistics': { name: 'Logistiksteuerung', desc: 'Routenoptimierung, Spediteursmanagement und Lieferzeitverfolgung.' },
+                    'vrp': { name: 'Vehicle Routing Problem', desc: 'Optimierung von Lieferrouten unter mehreren Nebenbedingungen zur Kostenminimierung.' },
+                    'clsp': { name: 'Kapazitätsgebundene Losgröße', desc: 'Bestimmung optimaler Produktionslosgrößen unter Kapazitätsbeschränkungen.' },
+                    'median_prob': { name: 'Median-Problem', desc: 'Minimierung der gewichteten Gesamtentfernung zu allen Kunden.' },
+                    'cover_prob': { name: 'Cover-Problem', desc: 'Ermittlung der minimalen Anzahl von Standorten zur Abdeckung aller Nachfragepunkte.' },
+                    'facility_loc': { name: 'Standortplanung', desc: 'Optimierung von Standortanzahl und -positionen zur Kostenminimierung.' },
+                    'atp': { name: 'Available to Promise (ATP)', desc: 'Echtzeit-Verfügbarkeitsprüfung basierend auf Bestand und zukünftiger Produktion.' },
+                    'aggregated_planning': { name: 'Aggregierte Produktionsplanung', desc: 'Makro-Produktionsplanung zum Ausgleich von Kapazität und Nachfrage.' },
+                    'cap_main_planning': { name: 'Kapazitätsgebundene Hauptproduktionsplanung', desc: 'Übergeordnete Produktionsplanung mit kritischen Kapazitätsbeschränkungen.' },
+                    'scheduling_prob': { name: 'Scheduling-Problem', desc: 'Auftragsreihenfolgeoptimierung auf Maschinen zur Minimierung von Verspätungen.' },
+                    'queuing_sim': { name: 'Warteschlangensimulation', desc: 'Simulation von Warteschlangen zur Optimierung von Servicelevel und Ressourcen.' },
+                    'center_prob': { name: 'Center-Problem', desc: 'Ermittlung eines zentralen Standorts zur Minimierung der maximalen Entfernung zu jedem Kunden.' },
+                    'warehouse_loc': { name: 'Lagerstandortplanung', desc: 'Bestimmung optimaler Lagerstandorte zum Ausgleich von Kosten und Service.' },
+                    'hub_loc': { name: 'Hub-Standortplanung', desc: 'Platzierung von Hubs zur Bündelung von Flüssen und Minimierung der Netzwerkkosten.' },
+                    'shortest_path': { name: 'Kürzester-Weg-Problem', desc: 'Optimierung von Routen für den schnellsten oder kürzesten Weg zwischen Punkten.' },
+                    'long_haul': { name: 'Fernverkehrsplanung', desc: 'Planung von Fernfrachttransporten und Spediteursauswahl.' },
+                    'short_haul': { name: 'Nahverkehrsplanung', desc: 'Verwaltung lokaler Lieferungen, Milk Runs und Last-Mile-Logistik.' }
+                },
+                matrix: [
+                    {
+                        id: 'strategic', title: 'Strategisch', subtitle: 'Jahre bis Monate',
+                        definition: 'Die strategische Planung legt die langfristige Ausrichtung (1–10 Jahre) fest und konzentriert sich auf Kapitalentscheidungen wie Netzwerkdesign, Standortwahl und Markteintritt. Diese Entscheidungen prägen die Grenzen der Supply Chain und sind schwer rückgängig zu machen.',
+                        blocks: [
+                            {
+                                name: 'Strategische Netzwerkplanung',
+                                desc: 'Supply-Chain-Design & Optimierung',
+                                fullDesc: 'Gestaltung des physischen Supply-Chain-Netzwerks (Standorte, Lager) zur Kostenminimierung.',
+                                icon: <GlobeIcon />,
+                                subModules: ['median_prob', 'cover_prob', 'facility_loc', 'center_prob', 'warehouse_loc', 'hub_loc']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'tactical', title: 'Taktisch', subtitle: 'Monate bis Wochen',
+                        definition: 'Die taktische Planung (6–18 Monate) übersetzt strategische Ziele in umsetzbare Pläne. Sie gleicht Angebot und Nachfrage durch Master Production Scheduling, Bestandspolitik und Kapazitätsmanagement aus, um die Ressourcennutzung zu optimieren.',
+                        blocks: [
+                            {
+                                name: 'Bedarfsplanung & Prognose',
+                                desc: 'Zukünftige Nachfrage vorhersagen',
+                                fullDesc: 'Prognose der Nachfrage mit historischen Daten, ML und Marktinformationen.',
+                                icon: <BarChartIcon />,
+                                subModules: ['forecaster', 'advanced_forecaster']
+                            },
+                            {
+                                name: 'Hauptproduktionsplanung',
+                                desc: 'Angebot & Nachfrage ausgleichen',
+                                fullDesc: 'Mittelfristige Produktionsplanung (MPS) und Bestandsauffüllung (DRP).',
+                                icon: <GridIcon />,
+                                subModules: ['aggregated_planning']
+                            },
+                            {
+                                name: 'Bestandsplanung & Optimierung',
+                                desc: 'Bestandsziele festlegen',
+                                fullDesc: 'Bestimmung optimaler Bestandsniveaus (Sicherheits- und Zyklusbestand) entlang der Kette.',
+                                icon: <BoxIcon />,
+                                subModules: ['abc', 'inventory']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'operational', title: 'Operativ', subtitle: 'Wochen bis Stunden',
+                        definition: 'Die operative Planung konzentriert sich auf kurzfristige Ausführung (Tage bis Wochen) und unmittelbare Auftragserfüllung. Sie umfasst detaillierte Terminierung, Fahrzeugrouting und Shopfloor-Steuerung unter festen Rahmenbedingungen.',
+                        blocks: [
+                            {
+                                name: 'Produktionsplanung & Feinterminierung',
+                                desc: 'Terminierung mit endlicher Kapazität',
+                                fullDesc: 'Detaillierte Shopfloor-Terminierung unter Berücksichtigung von Ressourcenbeschränkungen (Maschinen, Personal).',
+                                icon: <FactoryIcon />,
+                                subModules: ['clsp', 'cap_main_planning', 'scheduling_prob']
+                            },
+                            {
+                                name: 'Transportplanung & Fahrzeugrouting',
+                                desc: 'Logistik optimieren',
+                                fullDesc: 'Planung von Warenströmen, Ladungskonsolidierung und Routenoptimierung.',
+                                icon: <TruckIcon />,
+                                subModules: ['logistics', 'vrp', 'shortest_path', 'long_haul', 'short_haul']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'cross', title: 'Funktionsübergreifend', subtitle: 'Alle Horizonte',
+                        definition: 'Funktionsübergreifende Prozesse erstrecken sich über alle Zeithorizonte und verbinden Abteilungen für Abstimmung. Dazu gehören Sales & Operations Planning (S&OP), Echtzeit-Datenaustausch und kollaborative Szenarioanalyse zur Synchronisation der gesamten Wertschöpfungskette.',
+                        blocks: [
+                            {
+                                name: 'What-If-Szenarioanalyse',
+                                desc: 'Simulation & Entscheidungsunterstützung',
+                                fullDesc: 'Simulation verschiedener Szenarien zur Bewertung von Auswirkungen und zum Vergleich von Maßnahmen.',
+                                icon: <GitBranchIcon />,
+                                subModules: ['queuing_sim']
+                            },
+                            {
+                                name: 'Supply-Chain-Kollaboration',
+                                desc: 'Transparenz & Abstimmung',
+                                fullDesc: 'Plattform für den Echtzeit-Austausch von Informationen mit internen Bereichen und externen Partnern.',
+                                icon: <UsersIcon />,
+                                subModules: ['atp']
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        const MODULE_STATIC_DATA = {
+            'abc': { id: 'abc', icon: <BarChartIcon />, status: 'live', href: './abcxyz.html', version: 'v1.0_PRO' },
+            'forecaster': { id: 'forecaster', icon: <ActivityIcon />, status: 'live', href: './forecaster.html', version: 'v7.5_PRO' },
+            'advanced_forecaster': { id: 'advanced_forecaster', icon: <AdvancedForecasterIcon />, status: 'live', href: './mlforecaster.html', version: 'v2.0_BETA' },
+            'inventory': { id: 'inventory', icon: <BoxIcon />, status: 'live', href: './inventory.html', version: 'v1.0_LIVE' },
+            'logistics': { id: 'logistics', icon: <TruckIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'vrp': { id: 'vrp', icon: <TruckIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'clsp': { id: 'clsp', icon: <SettingsIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'median_prob': { id: 'median_prob', icon: <MedianIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'cover_prob': { id: 'cover_prob', icon: <CoverIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'facility_loc': { id: 'facility_loc', icon: <LocationIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'atp': { id: 'atp', icon: <ATPIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'aggregated_planning': { id: 'aggregated_planning', icon: <AggregatedIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'cap_main_planning': { id: 'cap_main_planning', icon: <CapacitatedIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'scheduling_prob': { id: 'scheduling_prob', icon: <SchedulingIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'queuing_sim': { id: 'queuing_sim', icon: <QueuingIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'center_prob': { id: 'center_prob', icon: <CenterIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'warehouse_loc': { id: 'warehouse_loc', icon: <WarehouseIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'hub_loc': { id: 'hub_loc', icon: <HubIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'shortest_path': { id: 'shortest_path', icon: <ShortestPathIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'long_haul': { id: 'long_haul', icon: <LongHaulIcon />, status: 'planned', href: '#', version: 'CONCEPT' },
+            'short_haul': { id: 'short_haul', icon: <ShortHaulIcon />, status: 'planned', href: '#', version: 'CONCEPT' }
+        };
+
+        const MATRIX_STRUCTURE = [
+            { id: 'strategic', color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text', subModules: [['median_prob', 'cover_prob', 'facility_loc', 'center_prob', 'warehouse_loc', 'hub_loc']] },
+            { id: 'tactical', color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text', subModules: [['forecaster', 'advanced_forecaster'], ['aggregated_planning'], ['abc', 'inventory']] },
+            { id: 'operational', color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text', subModules: [['clsp', 'cap_main_planning', 'scheduling_prob'], ['logistics', 'vrp', 'shortest_path', 'long_haul', 'short_haul']] },
+            { id: 'cross', color: 'bg-gradient-to-r from-[#b45309] via-[#f59e0b] to-[#fde68a] text-transparent bg-clip-text', subModules: [['queuing_sim'], ['atp']] }
+        ];
+
+        // --- COMPONENTS ---
+
+        // Reveal Animation Component
+        const Reveal = ({ children, className = "", delay = 0, threshold = 0.1 }) => {
+            const [isVisible, setIsVisible] = useState(false);
+            const ref = useRef(null);
+
+            useEffect(() => {
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) {
+                        setIsVisible(true);
+                        observer.disconnect();
+                    }
+                }, { threshold, rootMargin: "0px 0px -50px 0px" });
+
+                if (ref.current) observer.observe(ref.current);
+                return () => {
+                    if (ref.current) observer.unobserve(ref.current);
+                };
+            }, [threshold]);
+
+            return (
+                <div
+                    ref={ref}
+                    className={`reveal-base ${isVisible ? 'reveal-visible' : 'reveal-hidden'} ${className}`}
+                    style={{ transitionDelay: `${delay}ms` }}
+                >
+                    {children}
+                </div>
+            );
+        };
+
+        // ModulaBlock — Opus app tile: editorial card w/ gold live-accent + Quick View (DS §5.5)
+        const ModulaBlock = ({ block, content, onClick }) => {
+            if (!block) return null;
+
+            const rawSubModules = block.subModules;
+            const subModules = Array.isArray(rawSubModules) ? rawSubModules : [];
+
+            const subModulesList = subModules.map(modId => {
+                const staticData = MODULE_STATIC_DATA[modId] || { icon: <ActivityIcon />, status: 'planned', href: '#' };
+                const textData = (content && content.registry && content.registry[modId]) || { name: modId, desc: '' };
+                return { ...staticData, ...textData, id: modId };
+            });
+
+            const hasLiveModule = subModulesList.some(m => m.status === 'live');
+            const liveCount = subModulesList.filter(m => m.status === 'live').length;
+
+            return (
+                <div
+                    onClick={() => onClick(block)}
+                    className={`
+                        opus-tile relative group flex h-full min-h-[150px] cursor-pointer overflow-hidden rounded-2xl
+                        border bg-white/90 dark:bg-slate-900/70 backdrop-blur-md
+                        ${hasLiveModule
+                            ? 'border-brand-gold/30 ring-1 ring-brand-gold/10 shadow-[0_8px_32px_rgba(245,158,11,0.08)]'
+                            : 'border-slate-200/80 dark:border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.06)] hover:border-slate-300 dark:hover:border-white/10'}
+                        hover:shadow-[0_24px_48px_rgba(0,0,0,0.12)]
+                    `}
+                >
+                    {/* Gold accent rail on live blocks */}
+                    <span className={`absolute left-0 top-0 h-full w-1 ${hasLiveModule ? 'bg-gradient-to-b from-brand-gold to-brand-dark' : 'bg-transparent group-hover:bg-slate-200 dark:group-hover:bg-slate-700'}`}></span>
+
+                    {/* Quick View overlay (DS §5.5 — dark, slides up on hover) */}
+                    <div className="absolute inset-0 z-20 bg-white/98 dark:bg-slate-950/98 backdrop-blur-md p-5 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col translate-y-3 group-hover:translate-y-0">
+                        <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase opus-eyebrow border-b border-slate-100 dark:border-slate-800 pb-2 flex justify-between items-center">
+                            <span>{content?.ui?.quick_view}</span>
+                            <span className="text-[10px] bg-brand-gold/15 text-brand-gold px-2 py-0.5 rounded-full font-mono">{subModulesList.length}</span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
+                            {subModulesList.length > 0 ? subModulesList.map(mod => {
+                                const isLive = mod.status === 'live';
+                                return (
+                                    <div key={mod.id} className="flex items-center gap-2 text-xs py-0.5">
+                                        <div className={`${isLive ? 'text-brand-gold' : 'text-slate-400'} shrink-0 scale-[0.7]`}>{mod.icon}</div>
+                                        <span className={`truncate ${isLive ? 'font-semibold text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>{mod.name}</span>
+                                        {isLive && <span className="ml-auto text-[8px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-bold">LIVE</span>}
+                                    </div>
+                                );
+                            }) : (
+                                <p className="text-xs text-slate-500 italic">{content?.ui?.no_modules}</p>
+                            )}
+                        </div>
+                        <div className="mt-3 pt-2 text-[10px] font-bold text-brand-gold flex items-center justify-end gap-1 border-t border-slate-100 dark:border-slate-800">
+                            {content?.ui?.click_to_open} <ArrowRightIcon />
+                        </div>
+                    </div>
+
+                    {/* Default face */}
+                    <div className="relative z-10 p-5 pl-6 flex flex-col h-full w-full transition-all duration-300 group-hover:opacity-0">
+                        <div className="flex items-start justify-between gap-3 mb-4">
+                            <div className={`flex h-11 w-11 items-center justify-center rounded-xl shrink-0 ${hasLiveModule ? 'bg-brand-gold/15 text-brand-gold' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                                {block.icon || <SystemIcon />}
+                            </div>
+                            {hasLiveModule ? (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide bg-emerald-500 text-white">
+                                    <span className="relative flex h-1.5 w-1.5 mr-1">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                                    </span>
+                                    {content?.ui?.go_live}
+                                </span>
+                            ) : (
+                                <span className="text-[9px] font-mono font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
+                                    {subModulesList.length} {content?.ui?.modules}
+                                </span>
+                            )}
+                        </div>
+                        <h3 className="font-bold text-slate-900 dark:text-white text-sm leading-snug mb-1.5 group-hover:text-brand-gold transition-colors">{block.name}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 flex-1">{block.desc}</p>
+                        <div className="mt-4 flex items-center justify-between">
+                            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-brand-gold/80 group-hover:text-brand-gold">
+                                {content?.ui?.explore} <ArrowRightIcon />
+                            </span>
+                            {hasLiveModule && (
+                                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{liveCount}/{subModulesList.length}</span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // SubModule Card (Inside Modal)
+        const SubModuleCard = ({ moduleId, content }) => {
+            const staticData = MODULE_STATIC_DATA[moduleId] || {};
+            const textData = (content && content.registry && content.registry[moduleId]) || { name: moduleId, desc: '' };
+
+            const module = { ...staticData, ...textData };
+            const isLive = module.status === 'live';
+
+            const CardContent = (
+                <div className={`
+                    relative group p-4 rounded-xl border border-slate-200 dark:border-slate-700 
+                    hover:border-brand-gold dark:hover:border-brand-gold transition-all duration-300 flex flex-col gap-3 h-full
+                    ${isLive ? 'bg-white dark:bg-slate-800/50 hover:shadow-lg hover:-translate-y-1' : 'bg-slate-50 dark:bg-slate-900/30 opacity-70'}
+                `}>
+                    <div className="flex justify-between items-start">
+                        <div className={`p-2 rounded-lg ${isLive ? 'bg-brand-gold/10 text-brand-gold' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
+                            {module.icon || <ActivityIcon />}
+                        </div>
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${isLive ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' :
+                            'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                            }`}>
+                            {(module.status || 'unknown').toUpperCase()}
+                        </span>
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-brand-gold transition-colors">{module.name}</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{module.desc}</p>
+                    </div>
+                    {isLive && (
+                        <div className="mt-auto pt-3 flex items-center text-xs font-bold text-brand-gold gap-1">
+                            {content?.ui?.launch_tool} <ArrowRightIcon />
+                        </div>
+                    )}
+                </div>
+            );
+
+            if (isLive) {
+                return <a href={module.href} className="block h-full">{CardContent}</a>;
+            }
+            return <div className="h-full">{CardContent}</div>;
+        };
+
+        // ModuleModal Component (Updated to handle missing subModules)
+        const ModuleModal = ({ block, content, isOpen, onClose }) => {
+            if (!isOpen || !block) return null;
+
+            // Safe subModules access
+            const subModules = (block.subModules && Array.isArray(block.subModules)) ? block.subModules : [];
+
+            useEffect(() => {
+                const handleEsc = (e) => e.key === 'Escape' && onClose();
+                window.addEventListener('keydown', handleEsc);
+                return () => window.removeEventListener('keydown', handleEsc);
+            }, [onClose]);
+
+            useEffect(() => {
+                document.body.style.overflow = 'hidden';
+                return () => document.body.style.overflow = 'unset';
+            }, []);
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm modal-backdrop"
+                        onClick={onClose}
+                    ></div>
+
+                    <div className="
+                        relative w-full max-w-2xl bg-white dark:bg-[#0f172a] 
+                        rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 
+                        p-6 md:p-8 modal-content overflow-hidden flex flex-col max-h-[90vh]
+                    ">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-gold/10 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+                        <div className="flex justify-between items-start mb-6 relative z-10 shrink-0">
+                            <div>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{block.name}</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">{block.fullDesc}</p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500"
+                            >
+                                <CloseIcon />
+                            </button>
+                        </div>
+
+                        <div className="relative z-10 overflow-y-auto custom-scrollbar p-1 -m-1">
+                            {subModules.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {subModules.map((modId) => (
+                                        <SubModuleCard key={modId} moduleId={modId} content={content} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12 rounded-xl border border-white/20 dark:border-white/5 bg-white/5 dark:bg-slate-800/20 backdrop-blur-sm">
+                                    <div className="mb-4 inline-flex p-4 rounded-full bg-gradient-to-br from-white/50 to-white/10 dark:from-slate-700/50 dark:to-slate-800/30 shadow-inner text-slate-400 dark:text-slate-500">
+                                        <GlobeIcon />
+                                    </div>
+                                    <p className="text-slate-600 dark:text-slate-400 font-medium">{content?.ui?.no_modules}</p>
+                                    <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">{content?.ui?.check_later}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // End-to-end supply chain flow banner
+        const SC_STEP_META = [
+            { icon: ProcurementIcon, accent: 'emerald', ring: 'ring-emerald-500/40', bg: 'from-emerald-500/20 to-emerald-600/5', text: 'text-emerald-600 dark:text-emerald-400' },
+            { icon: FactoryIcon, accent: 'sky', ring: 'ring-sky-500/40', bg: 'from-sky-500/20 to-sky-600/5', text: 'text-sky-600 dark:text-sky-400' },
+            { icon: TruckIcon, accent: 'amber', ring: 'ring-brand-gold/50', bg: 'from-brand-gold/25 to-amber-600/5', text: 'text-brand-gold dark:text-amber-400' },
+            { icon: WarehouseIcon, accent: 'violet', ring: 'ring-violet-500/40', bg: 'from-violet-500/20 to-violet-600/5', text: 'text-violet-600 dark:text-violet-400' },
+            { icon: StoreIcon, accent: 'rose', ring: 'ring-rose-500/40', bg: 'from-rose-500/20 to-rose-600/5', text: 'text-rose-600 dark:text-rose-400' },
+            { icon: UsersIcon, accent: 'orange', ring: 'ring-orange-500/40', bg: 'from-orange-500/20 to-orange-600/5', text: 'text-orange-600 dark:text-orange-400' },
+        ];
+
+        const SC_CONNECTOR_COLORS = [
+            ['#10b981', '#0ea5e9'],
+            ['#0ea5e9', '#f59e0b'],
+            ['#f59e0b', '#8b5cf6'],
+            ['#8b5cf6', '#f43f5e'],
+            ['#f43f5e', '#f97316'],
+        ];
+
+        const SupplyChainFlow = ({ content }) => {
+            const steps = content.ui.sc_steps;
+            const [activeIdx, setActiveIdx] = useState(0);
+            const [paused, setPaused] = useState(false);
+            const [connectorGeom, setConnectorGeom] = useState(null);
+            const flowTrackRef = useRef(null);
+            const gridRef = useRef(null);
+
+            const measureConnectors = () => {
+                const track = flowTrackRef.current;
+                const grid = gridRef.current;
+                if (!track || !grid) return;
+                const icons = grid.querySelectorAll('[data-sc-icon]');
+                if (icons.length < 2) return;
+                const trackRect = track.getBoundingClientRect();
+                if (!trackRect.width) return;
+
+                const toPct = (px) => (px / trackRect.width) * 100;
+                const tailClear = 4;
+
+                const segments = [];
+                for (let i = 0; i < icons.length - 1; i++) {
+                    const a = icons[i].getBoundingClientRect();
+                    const b = icons[i + 1].getBoundingClientRect();
+                    const x1Px = (a.right - trackRect.left) + tailClear;
+                    const x2Px = (b.left - trackRect.left);
+                    const x1Pct = toPct(x1Px);
+                    const x2Pct = toPct(x2Px);
+                    segments.push({
+                        x1Pct,
+                        x2Pct,
+                        midPct: (x1Pct + x2Pct) / 2,
+                    });
+                }
+                setConnectorGeom(segments);
+            };
+
+            useEffect(() => {
+                if (paused) return undefined;
+                const timer = setInterval(() => {
+                    setActiveIdx(prev => (prev + 1) % steps.length);
+                }, 3800);
+                return () => clearInterval(timer);
+            }, [paused, steps.length]);
+
+            useEffect(() => {
+                const run = () => requestAnimationFrame(measureConnectors);
+                run();
+                window.addEventListener('resize', run);
+                const settle = setTimeout(run, 520);
+                const track = flowTrackRef.current;
+                let ro;
+                if (track && typeof ResizeObserver !== 'undefined') {
+                    ro = new ResizeObserver(run);
+                    ro.observe(track);
+                }
+                return () => {
+                    window.removeEventListener('resize', run);
+                    clearTimeout(settle);
+                    if (ro) ro.disconnect();
+                };
+            }, [activeIdx, steps.length]);
+
+            const getSegmentGeom = (i) => {
+                if (connectorGeom && connectorGeom[i]) return connectorGeom[i];
+                const x1Pct = 11.4 + i * 17.4;
+                const x2Pct = x1Pct + 10.6;
+                return { x1Pct, x2Pct, midPct: (x1Pct + x2Pct) / 2 };
+            };
+
+            const activeStep = steps[activeIdx];
+            const activeMeta = SC_STEP_META[activeIdx];
+
+            return (
+                <section
+                    className="relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm"
+                    aria-label={content.ui.sc_title}
+                    onMouseEnter={() => setPaused(true)}
+                    onMouseLeave={() => setPaused(false)}
+                >
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+                        <div className="absolute -top-8 left-1/4 w-64 h-32 bg-brand-gold/5 rounded-full blur-3xl" />
+                        <div className="absolute -top-6 right-1/4 w-48 h-24 bg-sky-500/5 rounded-full blur-3xl" />
+                    </div>
+
+                    <div className="w-full px-4 sm:px-5 md:px-6 py-4 md:py-5 relative">
+                        <div className="mb-4 md:mb-5">
+                            <div>
+                                <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-1">{content.ui.sc_eyebrow}</p>
+                                <h2 className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight">{content.ui.sc_title}</h2>
+                            </div>
+                        </div>
+
+                        <div className="relative sc-flow-scroll -mx-1 px-1 pt-1 pb-3">
+                            <div className="relative min-w-[920px] md:min-w-0" ref={flowTrackRef}>
+                                <div className="absolute inset-x-0 top-[34px] md:top-[38px] h-6 pointer-events-none z-[1]" aria-hidden="true">
+                                    {SC_CONNECTOR_COLORS.map((_, i) => {
+                                        const { x1Pct, x2Pct } = getSegmentGeom(i);
+                                        const widthPct = Math.max(x2Pct - x1Pct, 0);
+                                        const isPast = i < activeIdx;
+                                        const isActive = i === activeIdx;
+                                        const lit = isPast || isActive;
+                                        const stroke = lit ? `url(#sc-seg-grad-${i})` : 'rgba(148,163,184,0.42)';
+                                        const strokeWidth = isActive ? 2.5 : isPast ? 2 : 1.75;
+                                        const arrowFill = lit ? '#f59e0b' : 'rgba(148,163,184,0.5)';
+                                        const arrowClass = isActive ? 'sc-flow-arrow sc-flow-arrow-active' : 'sc-flow-arrow';
+                                        const lineStyle = isPast && !isActive ? { opacity: 0.75 } : undefined;
+
+                                        return (
+                                            <svg
+                                                key={i}
+                                                className="absolute top-0 h-6 overflow-visible"
+                                                style={{ left: `${x1Pct}%`, width: `${widthPct}%` }}
+                                                viewBox="0 0 100 24"
+                                                preserveAspectRatio="none"
+                                            >
+                                                <defs>
+                                                    {lit && (
+                                                        <linearGradient id={`sc-seg-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                                                            <stop offset="0%" stopColor={SC_CONNECTOR_COLORS[i][0]} />
+                                                            <stop offset="100%" stopColor={SC_CONNECTOR_COLORS[i][1]} />
+                                                        </linearGradient>
+                                                    )}
+                                                </defs>
+                                                <line x1="0" y1="12" x2="46" y2="12" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="butt" className={arrowClass} style={lineStyle} vectorEffect="non-scaling-stroke" />
+                                                <polygon points="46,8.5 54,12 46,15.5" fill={arrowFill} className={isActive ? 'sc-arrow-pulse' : undefined} />
+                                                <line x1="54" y1="12" x2="100" y2="12" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="butt" className={arrowClass} style={lineStyle} vectorEffect="non-scaling-stroke" />
+                                            </svg>
+                                        );
+                                    })}
+                                </div>
+
+                                <div ref={gridRef} className="relative z-10 grid grid-cols-6 gap-2 md:gap-3 min-h-[152px] md:min-h-[164px] items-start">
+                                    {steps.map((step, idx) => {
+                                        const meta = SC_STEP_META[idx];
+                                        const Icon = meta.icon;
+                                        const isActive = idx === activeIdx;
+                                        const isPast = idx < activeIdx;
+
+                                        return (
+                                            <button
+                                                key={step.id}
+                                                type="button"
+                                                onClick={() => setActiveIdx(idx)}
+                                                className={`group relative flex flex-col items-center text-center rounded-2xl p-2 md:p-3 pb-3 transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60 ${isActive ? 'opacity-100' : 'hover:opacity-100 opacity-90'}`}
+                                                aria-pressed={isActive}
+                                                aria-label={step.label}
+                                            >
+                                                {isActive && (
+                                                    <span className={`absolute inset-x-2 top-2 bottom-7 rounded-2xl sc-pulse-ring bg-gradient-to-br ${meta.bg} pointer-events-none`} />
+                                                )}
+
+                                                <div data-sc-icon className={`relative z-10 flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-2xl border bg-gradient-to-br shadow-sm transition-all duration-500 ${meta.bg} ${isActive ? `border-brand-gold/50 sc-node-active ${meta.ring} ring-2 scale-105` : isPast ? 'border-white/30 dark:border-white/10' : 'border-slate-200/80 dark:border-slate-700/80 group-hover:border-brand-gold/30 group-hover:scale-[1.02]'}`}>
+                                                    <span className={`${meta.text} transition-transform duration-500 ${isActive ? 'scale-110' : ''}`}>
+                                                        <Icon />
+                                                    </span>
+                                                </div>
+
+                                                <span className={`mt-2 text-[10px] md:text-xs font-bold uppercase tracking-wide transition-colors ${isActive ? 'text-brand-gold' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                    {step.label}
+                                                </span>
+                                                <span className={`mt-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border transition-colors ${isActive ? `${meta.text} border-current/20 bg-white/50 dark:bg-slate-900/50` : 'text-slate-400 border-slate-200/60 dark:border-slate-700/60'}`}>
+                                                    {step.tag}
+                                                </span>
+
+                                                <div className={`hidden lg:block mt-1.5 h-0.5 rounded-full transition-all duration-500 ${isActive ? 'w-8 bg-brand-gold' : 'w-0 bg-transparent'}`} />
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 md:mt-5 rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 backdrop-blur-sm px-4 py-3 md:px-5 md:py-4 flex gap-3 md:gap-4 items-start transition-all duration-500">
+                            <div className={`shrink-0 flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${activeMeta.bg} ${activeMeta.text} border border-white/20 dark:border-white/5`}>
+                                {React.createElement(activeMeta.icon)}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-2 mb-1">
+                                    <span className="text-xs md:text-sm font-bold text-slate-800 dark:text-slate-100">{activeStep.label}</span>
+                                    <span className={`text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${activeMeta.text} border-current/20`}>{activeStep.tag}</span>
+                                    <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500">{String(activeIdx + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
+                                </div>
+                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{activeStep.desc}</p>
+                            </div>
+                            <div className="hidden sm:flex shrink-0 items-center gap-1 self-center">
+                                {steps.map((_, idx) => (
+                                    <span
+                                        key={idx}
+                                        className={`h-1.5 rounded-full transition-all duration-500 ${idx === activeIdx ? 'w-5 bg-brand-gold' : idx < activeIdx ? 'w-1.5 bg-brand-gold/40' : 'w-1.5 bg-slate-300 dark:bg-slate-700'}`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Hero — Odoo-scale headline + INFORM authority + Zentio console visual
+        const HeroSection = ({ content, stats, onExplore, onWhy }) => (
+            <div className="opus-hero-glow relative overflow-hidden rounded-3xl border border-white/40 dark:border-white/10 bg-white/40 dark:bg-brand-obsidian/40 backdrop-blur-2xl ring-1 ring-white/20 dark:ring-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.15)]">
+                <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/12 rounded-full blur-3xl animate-blob pointer-events-none"></div>
+                <div className="absolute -bottom-24 right-10 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
+
+                <div className="relative z-10 grid lg:grid-cols-12 gap-8 lg:gap-6 items-center p-8 md:p-12 lg:p-14">
+                    <div className="lg:col-span-7">
+                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-6">
+                            {content.ui.header_title_1}{' '}
+                            <span className="opus-sheen">{content.ui.header_title_2}</span>
+                        </h1>
+                        <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl mb-8">
+                            {content.ui.header_desc}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <button type="button" onClick={onExplore} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-gold text-white text-sm font-bold shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all">
+                                {content.ui.cta_explore} <ArrowRightIcon />
+                            </button>
+                            <button type="button" onClick={onWhy} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold hover:border-brand-gold hover:text-brand-gold transition-colors">
+                                {content.ui.cta_why}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Console visual (Zentio-style product readout) */}
+                    <div className="lg:col-span-5">
+                        <div className="rounded-2xl border border-white/50 dark:border-white/10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-2xl overflow-hidden">
+                            <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200/70 dark:border-white/5 bg-white/50 dark:bg-slate-900/50">
+                                <span className="h-2.5 w-2.5 rounded-full bg-rose-400"></span>
+                                <span className="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+                                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                                <span className="ml-2 text-[10px] font-mono uppercase tracking-widest text-slate-400">{content.ui.system_terminal}</span>
+                            </div>
+                            <div className="p-5 grid grid-cols-2 gap-3">
+                                {stats.map((s, i) => (
+                                    <div key={i} className="rounded-xl border border-slate-200/70 dark:border-white/5 bg-slate-50/70 dark:bg-slate-800/40 p-3">
+                                        <div className="text-2xl font-black font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-br from-brand-gold to-brand-dark">{s.value}</div>
+                                        <div className="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mt-1">{s.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="px-5 pb-4 -mt-1">
+                                <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 border-t border-dashed border-slate-200 dark:border-slate-700 pt-3">
+                                    <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{content.ui.status_operational}</span>
+                                    <span>{content.ui.rights_reserved.split('•').pop().trim()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // Capability ribbon — scrolling marquee of every optimization name (real registry content)
+        const CapabilityRibbon = ({ content }) => {
+            const names = Object.keys(MODULE_STATIC_DATA).map(id => (content.registry && content.registry[id] && content.registry[id].name) || id);
+            const loop = names.concat(names);
+            return (
+                <div className="opus-marquee-wrap relative overflow-hidden border-y border-slate-200/70 dark:border-white/5 py-4">
+                    <div className="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-slate-50 dark:from-[#020617] to-transparent pointer-events-none"></div>
+                    <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-slate-50 dark:from-[#020617] to-transparent pointer-events-none"></div>
+                    <div className="flex w-max opus-marquee">
+                        {loop.map((name, i) => (
+                            <span key={i} className="flex items-center gap-3 px-5 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap">
+                                {name}
+                                <span className="h-1 w-1 rounded-full bg-brand-gold/60"></span>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Metrics band — Zentio "measurable impact" strip
+        const MetricsBand = ({ content, stats }) => (
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/5 bg-gradient-to-br from-white/70 to-white/40 dark:from-slate-900/60 dark:to-slate-900/20 backdrop-blur-xl ring-1 ring-white/20 dark:ring-white/5 p-8 md:p-10">
+                <div className="text-center max-w-2xl mx-auto mb-8">
+                    <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{content.ui.metrics_eyebrow}</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{content.ui.metrics_title}</h2>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-4">
+                    {stats.map((s, i) => (
+                        <div key={i} className={`text-center px-2 ${i !== 0 ? 'lg:border-l border-slate-200/70 dark:border-white/5' : ''}`}>
+                            <div className="text-4xl md:text-5xl font-black font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-br from-brand-gold to-brand-dark">{s.value}</div>
+                            <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mt-2">{s.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        // Journey strip — connected horizon timeline (INFORM/Zentio process narrative)
+        const JourneyStrip = ({ content, horizons, onNav }) => {
+            const [highlightIdx, setHighlightIdx] = useState(0);
+            const [paused, setPaused] = useState(false);
+
+            useEffect(() => {
+                if (paused) return undefined;
+                const timer = setInterval(() => {
+                    setHighlightIdx(prev => (prev + 1) % horizons.length);
+                }, 3800);
+                return () => clearInterval(timer);
+            }, [paused, horizons.length]);
+
+            return (
+                <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+                    <div className="max-w-2xl mb-8">
+                        <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{content.ui.journey_eyebrow}</p>
+                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-3">{content.ui.journey_title}</h2>
+                        <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed">{content.ui.journey_desc}</p>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {horizons.map((h, i) => {
+                            const isActive = i === highlightIdx;
+                            return (
+                                <button
+                                    key={h.id}
+                                    type="button"
+                                    onClick={() => {
+                                        setHighlightIdx(i);
+                                        onNav(h.id);
+                                    }}
+                                    className={`relative z-10 text-left rounded-2xl border p-5 bg-white/90 dark:bg-slate-900/70 backdrop-blur-md transition-all duration-500 hover:-translate-y-1 ${isActive ? 'border-brand-gold/50 ring-1 ring-brand-gold/20 shadow-lg' : 'border-slate-200/80 dark:border-white/5 hover:border-brand-gold/30'}`}
+                                    aria-pressed={isActive}
+                                >
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <span className={`flex h-9 w-9 items-center justify-center rounded-full font-mono font-bold text-sm shrink-0 transition-colors duration-500 ${isActive ? 'bg-brand-gold text-white' : 'bg-brand-gold/10 text-brand-gold'}`}>{i + 1}</span>
+                                        <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">{h.subtitle}</span>
+                                    </div>
+                                    <h3 className={`font-bold text-sm mb-1 transition-colors duration-500 ${isActive ? 'text-brand-gold dark:text-amber-400' : 'text-slate-900 dark:text-white'}`}>{h.title}</h3>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-gold/80">
+                                        {h.blocks.length} {content.ui.modules}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        // Sticky horizon nav — pins flush under header; About pill appears on scroll
+        const HorizonNav = ({ horizons, activeId, onNav, onAboutNav, aboutVisible, content }) => (
+            <div className="sticky top-0 z-30 -mx-4 sm:-mx-6 md:-mx-10 px-4 sm:px-6 md:px-10 py-2 mb-10 border-b border-slate-200/70 dark:border-white/5 bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-xl shadow-sm">
+                <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar">
+                    <span className="hidden md:flex items-center pl-3 pr-1 text-[10px] font-bold uppercase opus-eyebrow text-slate-400 shrink-0">{content.ui.platform_eyebrow}</span>
+                    {horizons.map(h => (
+                        <button
+                            key={h.id}
+                            type="button"
+                            onClick={() => onNav(h.id)}
+                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${activeId === h.id ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800'}`}
+                        >
+                            {h.title}
+                        </button>
+                    ))}
+                    {aboutVisible && (
+                        <button
+                            type="button"
+                            onClick={onAboutNav}
+                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all animate-fade-in ${activeId === 'about' ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800'}`}
+                        >
+                            {content.ui.about_vision}
+                        </button>
+                    )}
+                </div>
+            </div>
+        );
+
+        // HorizonSection — editorial feature row (sticky info + module grid). APS matrix preserved.
+        const HorizonSection = ({ horizon, content, onBlockClick, index }) => (
+            <section id={`horizon-${horizon.id}`} className="opus-scroll-target mb-16 md:mb-24 last:mb-8">
+                <div className="grid lg:grid-cols-12 gap-6 lg:gap-10">
+                    {/* Left editorial column */}
+                    <div className="lg:col-span-4">
+                        <div className="opus-sticky-info">
+                            <Reveal>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-gold/10 text-brand-gold font-mono font-black">{index + 1}</span>
+                                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">{horizon.subtitle}</span>
+                                </div>
+                                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">{horizon.title}</h2>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5">{horizon.definition}</p>
+                                <div className="h-1 w-16 rounded-full bg-gradient-to-r from-brand-gold to-brand-dark"></div>
+                            </Reveal>
+                        </div>
+                    </div>
+
+                    {/* Right module grid */}
+                    <div className="lg:col-span-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                            {horizon.blocks.map((block, idx) => (
+                                <Reveal key={idx} delay={idx * 80}>
+                                    <ModulaBlock block={block} content={content} onClick={onBlockClick} />
+                                </Reveal>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+
+
+        // --- MAIN APP ---
+
+        // About — INFORM editorial: sticky title rail + flowing narrative, Odoo-style "why" grid
+        const AboutSection = ({ content }) => (
+            <div id="about" className="opus-scroll-target mt-8 pt-16 border-t border-slate-200/70 dark:border-white/5 pb-8">
+                <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
+                    {/* Sticky brand rail */}
+                    <div className="lg:col-span-4">
+                        <div className="opus-sticky-info">
+                            <Reveal>
+                                <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-3">{content.ui.about_title}</p>
+                                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight">{content.ui.about_vision}</h2>
+                                {/* Brand motto — kept in English per DESIGN_SYSTEM.md */}
+                                <div className="rounded-2xl border border-brand-gold/20 bg-brand-gold/5 p-6 mb-6">
+                                    <p className="text-brand-gold font-bold italic text-lg leading-snug text-center">
+                                        <span className="block">“Optimizing today,</span>
+                                        <span className="block">Growing tomorrow.”</span>
+                                    </p>
+                                </div>
+                                <a href="https://operartis.vercel.app/terminal.html" className="block hover:opacity-80 transition-opacity">
+                                    <img src="./fulllogo_transparent_nobuffer.png" alt="Operartis" className="w-full max-w-[320px] object-contain" onError={(e) => e.target.style.display = 'none'} />
+                                </a>
+                            </Reveal>
+                        </div>
+                    </div>
+
+                    {/* Narrative */}
+                    <div className="lg:col-span-8 space-y-12">
+                        <Reveal delay={100}>
+                            <div>
+                                <h3 className="text-xs font-bold uppercase opus-eyebrow text-brand-gold mb-4">{content.ui.about_who}</h3>
+                                <div className="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                    {content.ui.about_who_text.map((text, i) => (
+                                        <p key={i} className={i === 0 ? 'text-base text-slate-800 dark:text-slate-200 font-medium' : ''}>{text}</p>
+                                    ))}
+                                </div>
+                            </div>
+                        </Reveal>
+
+                        <Reveal delay={150}>
+                            <div>
+                                <h3 className="text-xs font-bold uppercase opus-eyebrow text-brand-gold mb-4">{content.ui.about_what}</h3>
+                                <div className="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                    {content.ui.about_what_text.map((text, i) => (
+                                        <p key={i}>{text}</p>
+                                    ))}
+                                </div>
+                            </div>
+                        </Reveal>
+
+                        <Reveal delay={200}>
+                            <div>
+                                <h3 className="text-xs font-bold uppercase opus-eyebrow text-brand-gold mb-4">{content.ui.about_vision}</h3>
+                                <div className="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                    {content.ui.about_vision_text.map((text, i) => (
+                                        <p key={i}>{text}</p>
+                                    ))}
+                                </div>
+                            </div>
+                        </Reveal>
+
+                        {/* Why grid — Odoo "enterprise software done right" cells */}
+                        <Reveal delay={250}>
+                            <div>
+                                <h3 className="text-xs font-bold uppercase opus-eyebrow text-brand-gold mb-5">{content.ui.about_why}</h3>
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    {content.ui.about_why_items.map((item, i) => (
+                                        <div key={i} className="rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-900/50 p-5 hover:border-brand-gold/40 transition-colors">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-gold/10 text-brand-gold font-mono text-xs font-bold">{String(i + 1).padStart(2, '0')}</span>
+                                                <strong className="text-sm font-bold text-slate-900 dark:text-white">{item.title}</strong>
+                                            </div>
+                                            <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">{item.text}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </Reveal>
+                    </div>
+                </div>
+
+                {/* Invite CTA band */}
+                <Reveal delay={300}>
+                    <div className="mt-16 text-center rounded-3xl border border-dashed border-brand-gold/30 bg-gradient-to-br from-brand-gold/8 to-transparent px-6 py-12">
+                        <p className="text-slate-800 dark:text-slate-200 font-medium max-w-2xl mx-auto text-base md:text-lg leading-relaxed">{content.ui.invite_text}</p>
+                        <p className="text-brand-gold font-bold uppercase tracking-widest mt-5 text-xs">Let’s optimize today — so you can grow stronger tomorrow.</p>
+                    </div>
+                </Reveal>
+            </div>
+        );
+
+        const App = () => {
+            const [theme, setTheme] = useState(() => window.getOperartisTheme());
+            const [lang, setLang] = useState(() => window.getOperartisLang());
+            const [time, setTime] = useState(new Date());
+            const [selectedBlock, setSelectedBlock] = useState(null);
+            const [activeHorizon, setActiveHorizon] = useState(null);
+            const [aboutNavVisible, setAboutNavVisible] = useState(false);
+
+            // Derived Content
+            const content = TRANSLATIONS[lang] || TRANSLATIONS.en;
+
+            // Derived stats for hero console + metrics band
+            const stats = useMemo(() => {
+                const liveCount = Object.values(MODULE_STATIC_DATA).filter(m => m.status === 'live').length;
+                const totalModules = Object.keys(MODULE_STATIC_DATA).length;
+                const horizonCount = content.matrix.length;
+                const blockCount = content.matrix.reduce((n, h) => n + h.blocks.length, 0);
+                return [
+                    { value: liveCount, label: content.ui.stat_live },
+                    { value: horizonCount, label: content.ui.stat_horizons },
+                    { value: blockCount, label: content.ui.stat_blocks },
+                    { value: totalModules, label: content.ui.stat_engines },
+                ];
+            }, [content]);
+
+            const scrollToId = useCallback((id) => {
+                const el = document.getElementById(id);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, []);
+
+            const scrollToHorizon = useCallback((id) => {
+                setActiveHorizon(id);
+                scrollToId(`horizon-${id}`);
+            }, [scrollToId]);
+
+            const scrollToAbout = useCallback(() => {
+                setActiveHorizon('about');
+                scrollToId('about');
+            }, [scrollToId]);
+
+            useEffect(() => {
+                const applyTheme = () => {
+                    window.applyOperartisThemeClass(theme);
+                    window.persistOperartisTheme(theme);
+                };
+                applyTheme();
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                const handleSystemChange = () => { if (theme === 'system') applyTheme(); };
+                mediaQuery.addEventListener('change', handleSystemChange);
+                return () => mediaQuery.removeEventListener('change', handleSystemChange);
+            }, [theme]);
+
+            useEffect(() => {
+                const timer = setInterval(() => setTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            useEffect(() => {
+                window.persistOperartisLang(lang);
+            }, [lang]);
+
+            // Scroll-spy: horizons + About (Vision & Philosophy nav pill)
+            useEffect(() => {
+                const horizonSections = content.matrix
+                    .map(h => document.getElementById(`horizon-${h.id}`))
+                    .filter(Boolean);
+                const aboutSection = document.getElementById('about');
+
+                const aboutObserver = new IntersectionObserver(([entry]) => {
+                    setAboutNavVisible(entry.isIntersecting);
+                }, { threshold: 0, rootMargin: '-12% 0px -40% 0px' });
+
+                const activeObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (!entry.isIntersecting) return;
+                        if (entry.target.id === 'about') {
+                            setActiveHorizon('about');
+                        } else {
+                            setActiveHorizon(entry.target.id.replace('horizon-', ''));
+                        }
+                    });
+                }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+                if (aboutSection) aboutObserver.observe(aboutSection);
+                horizonSections.forEach(s => activeObserver.observe(s));
+                if (aboutSection) activeObserver.observe(aboutSection);
+
+                return () => {
+                    aboutObserver.disconnect();
+                    activeObserver.disconnect();
+                };
+            }, [content]);
+
+            const toggleTheme = () => {
+                if (theme === 'system') setTheme('light');
+                else if (theme === 'light') setTheme('dark');
+                else setTheme('system');
+            };
+
+            const toggleLang = () => {
+                setLang(prev => prev === 'vi' ? 'en' : prev === 'en' ? 'de' : 'vi');
+            };
+
+            const handleBlockClick = (block) => {
+                setSelectedBlock(block);
+            };
+
+            const handleCloseModal = () => {
+                setSelectedBlock(null);
+            };
+
+            return (
+                <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
+                    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+                        {/* Background effects removed for cleaner look */}
+                    </div>
+
+                    <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel z-10 shrink-0">
+                        <div className="max-w-7xl mx-auto w-full h-full px-4 sm:px-6 md:px-10 flex items-center justify-between">
+                        <div className="flex items-center gap-3 shrink-0 p-1.5 pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                            <a href="./terminal.html">
+                                <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer transition-transform hover:scale-110" onError={(e) => e.target.style.display = 'none'} />
+                            </a>
+                            <div className="flex flex-col">
+                                <span className="font-bold text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</span>
+                                <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase hidden hover:block xs:block">{content.ui.system_terminal}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 md:gap-6 shrink-0">
+                            <div className="flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs font-mono text-slate-500 dark:text-slate-400">
+                                    <ClockIcon />
+                                    <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+
+                                <span className="hidden sm:block w-px h-4 shrink-0 self-center bg-slate-200 dark:bg-slate-700/50" aria-hidden="true" />
+
+                                {/* Theme Toggle — default system; cycle: system → light → dark → system */}
+                                <div className="flex items-center px-1">
+                                    <button
+                                        onClick={toggleTheme}
+                                        className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors"
+                                        title={theme === 'light' ? 'Light mode — click for dark' : theme === 'dark' ? 'Dark mode — click for system' : 'System theme — follows OS — click for light'}
+                                    >
+                                        {theme === 'light' ? <SunIcon /> : theme === 'dark' ? <MoonIcon /> : <SystemIcon />}
+                                    </button>
+                                </div>
+
+                                <span className="w-px h-4 shrink-0 self-center bg-slate-200 dark:bg-slate-700/50" aria-hidden="true" />
+
+                                {/* Language Toggle */}
+                                <button onClick={toggleLang} className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors flex items-center gap-1 font-mono text-xs font-bold px-2">
+                                    <GlobeIcon />
+                                    <span>{lang.toUpperCase()}</span>
+                                </button>
+                            </div>
+
+                            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shadow-md cursor-pointer">
+                                <UserIcon />
+                            </div>
+                        </div>
+                        </div>
+                    </nav>
+
+                    <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
+                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">
+                            <Reveal>
+                                <HeroSection content={content} stats={stats} onExplore={() => scrollToId('platform')} onWhy={() => scrollToId('about')} />
+                            </Reveal>
+
+                            <div className="mt-10 md:mt-14">
+                                <CapabilityRibbon content={content} />
+                            </div>
+
+                            <div className="mt-14 md:mt-20">
+                                <Reveal><MetricsBand content={content} stats={stats} /></Reveal>
+                            </div>
+
+                            <div className="mt-16 md:mt-20">
+                                <Reveal delay={125}><SupplyChainFlow content={content} /></Reveal>
+                            </div>
+
+                            <div className="mt-16 md:mt-24">
+                                <Reveal><JourneyStrip content={content} horizons={content.matrix} onNav={scrollToHorizon} /></Reveal>
+                            </div>
+
+                            <div id="platform" className="opus-scroll-target mt-16 md:mt-24">
+                                <Reveal>
+                                    <div className="mb-8">
+                                        <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{content.ui.platform_eyebrow}</p>
+                                        <h2 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{content.ui.platform_title}</h2>
+                                    </div>
+                                </Reveal>
+                            </div>
+
+                            <HorizonNav
+                                horizons={content.matrix}
+                                activeId={activeHorizon}
+                                onNav={scrollToHorizon}
+                                onAboutNav={scrollToAbout}
+                                aboutVisible={aboutNavVisible}
+                                content={content}
+                            />
+
+                            <div>
+                                {content.matrix.map((horizon, index) => (
+                                    <HorizonSection
+                                        key={horizon.id}
+                                        horizon={horizon}
+                                        content={content}
+                                        onBlockClick={handleBlockClick}
+                                        index={index}
+                                    />
+                                ))}
+                            </div>
+
+                            <AboutSection content={content} />
+                        </div>
+                    </main>
+
+                    <footer className="py-4 border-t border-slate-200 dark:border-slate-800 z-10 shrink-0 bg-white/30 dark:bg-brand-obsidian/30 glass-panel">
+                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-2">
+                            <p className="text-[10px] text-slate-400">© {new Date().getFullYear()} Operartis Analytics. All rights reserved.</p>
+                            <div className="flex items-center gap-4 text-[10px] text-slate-500 font-mono">
+                                <span>{content.ui.rights_reserved}</span>
+                            </div>
+                        </div>
+                    </footer>
+
+                    <ModuleModal
+                        block={selectedBlock}
+                        content={content}
+                        isOpen={!!selectedBlock}
+                        onClose={handleCloseModal}
+                    />
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
