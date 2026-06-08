@@ -227,7 +227,8 @@
             transform: translateY(-4px);
         }
 
-        .horizon-pill {
+        .horizon-pill,
+        .page-scroll-target {
             scroll-margin-top: 5.5rem;
         }
 
@@ -519,6 +520,129 @@
             background: rgba(120, 53, 15, 0.4);
             border-color: rgba(245, 158, 11, 0.5);
         }
+
+        /* Analytics maturity section */
+        .aa-maturity-chart {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aa-maturity-axis-y {
+            display: inline-block;
+            transform: rotate(-90deg);
+            transform-origin: center center;
+            white-space: nowrap;
+        }
+
+        .aa-maturity-axis-y-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .aa-maturity-band {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .aa-maturity-band-info {
+            background: linear-gradient(135deg, rgba(148, 163, 184, 0.08), transparent 55%);
+        }
+
+        .aa-maturity-band-models {
+            background: linear-gradient(225deg, rgba(245, 158, 11, 0.1), transparent 50%);
+            clip-path: polygon(42% 0, 100% 0, 100% 100%, 28% 100%);
+        }
+
+        .aa-maturity-arrow-svg {
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .aa-maturity-arrow-line {
+            stroke-linecap: round;
+        }
+
+        .aa-bar {
+            transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, opacity 0.35s ease;
+        }
+
+        .aa-bar-active {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18), 0 12px 28px rgba(245, 158, 11, 0.15);
+        }
+
+        .aa-chevron {
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+        }
+
+        .aa-human-bar {
+            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+        }
+
+        .aa-flow-stage {
+            display: flex;
+            flex-direction: column;
+            height: 11.875rem;
+            overflow: hidden;
+            transition: border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .aa-flow-stage-label {
+            height: 1rem;
+            flex-shrink: 0;
+        }
+
+        .aa-flow-stage-title {
+            height: 2.25rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .aa-flow-stage-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .aa-flow-stage--muted .aa-flow-stage-title,
+        .aa-flow-stage--muted .aa-flow-stage-body {
+            opacity: 0.7;
+        }
+
+        .aa-flow-stage-bar-labels {
+            height: 2rem;
+            flex-shrink: 0;
+        }
+
+        .aa-flow-stage-active {
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.22);
+        }
+
+        .aa-flow-connector {
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .aa-flow-connector::after {
+                content: '→';
+                position: absolute;
+                right: -0.65rem;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.75rem;
+                color: rgba(148, 163, 184, 0.85);
+                pointer-events: none;
+            }
+
+            .aa-flow-connector:last-child::after {
+                display: none;
+            }
+        }
     </style>
 
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
@@ -533,7 +657,7 @@
     <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useLayoutEffect, useRef, useCallback } = React;
+        const { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } = React;
 
         const getMainScrollRoot = () => document.querySelector('main.flex-1.overflow-y-auto');
 
@@ -551,6 +675,19 @@
                 }
             }
             return activeId;
+        };
+
+        const buildPageNavItems = (ui, horizons) => [
+            { id: 'supply-chain', label: ui.nav_supply_chain },
+            { id: 'industry-40', label: ui.nav_industry_40 },
+            ...horizons.map(h => ({ id: h.id, label: h.title })),
+            { id: 'analytics', label: ui.nav_analytics },
+            { id: 'about', label: ui.about_vision },
+        ];
+
+        const getNavTargetId = (navId) => {
+            if (['supply-chain', 'industry-40', 'analytics', 'about'].includes(navId)) return navId;
+            return `horizon-${navId}`;
         };
 
         // --- ICONS ---
@@ -638,14 +775,57 @@
                         { title: "Quantitative & Data-Driven", text: "Our approaches rely on simulation, modeling and data analytics — not guesswork. This ensures improvements are measurable and repeatable." },
                         { title: "Tailored & Pragmatic Solutions", text: "We design APS systems that reflect your real-world constraints. What we build fits your operations — not the other way around." },
                         { title: "Affordability & Value", text: "We strive to provide our services at reasonable price levels, making high-quality optimization accessible to a broad range of enterprises." },
-                        { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." }
+                        { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." },
+                        { title: "Privacy Policy", text: "Your operational data stays protected. Operartis applies strict confidentiality, least-privilege access, and transparent handling — so responsible privacy becomes a trust advantage in every partnership." }
                     ],
                     invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
+                    analytics_eyebrow: "Analytics Maturity",
+                    analytics_title: "Four Levels of Analytics",
+                    analytics_subtitle: "Each step increases business value and problem complexity — shifting from retrospective information to forward-looking models that guide optimized action.",
+                    analytics_axis_value: "Business Value",
+                    analytics_axis_complexity: "Problem Complexity",
+                    analytics_band_information: "Information",
+                    analytics_band_models: "Models & Optimization",
+                    analytics_source_note: "Framework inspired by Gartner analytics maturity models",
+                    analytics_levels: [
+                        { id: 'descriptive', name: 'Descriptive', question: 'What happened?', desc: 'Summarize historical performance with dashboards, KPIs and standard reports.', focus: 'Visibility & record-keeping', band: 'information', operartis: 'Baseline visibility across ERP, inventory and production records.' },
+                        { id: 'diagnostic', name: 'Diagnostic', question: 'Why did it happen?', desc: 'Drill down, root-cause analysis and variance explanations across operations.', focus: 'Understanding drivers', band: 'information', operartis: 'ABC-XYZ segmentation, deviation analysis and bottleneck identification.' },
+                        { id: 'predictive', name: 'Predictive', question: 'What will happen?', desc: 'Forecast demand, capacity and risk using statistical and machine-learning models.', focus: 'Forward-looking insight', band: 'models', operartis: 'ML forecasting, simulation and multi-scenario planning engines.' },
+                        { id: 'prescriptive', name: 'Prescriptive', question: 'What should we do?', desc: 'Recommend optimized decisions — from guided decision support to automated planning.', focus: 'Optimized action', band: 'models', operartis: 'APS scheduling, VRP, lot-sizing and network optimization modules.' },
+                    ],
+                    analytics_pipeline_title: "From Data to Outcomes",
+                    analytics_pipeline_desc: "As analytics maturity rises, required human input tapers while models drive decisions closer to execution.",
+                    analytics_sources: ["Enterprise Systems", "IoT & Shopfloor", "External Data"],
+                    analytics_raw_data: "Raw Data",
+                    analytics_human_input: "Human Input",
+                    analytics_decision: "Decision",
+                    analytics_action: "Action",
+                    analytics_results: "Results",
+                    analytics_prescriptive_support: "Decision Support",
+                    analytics_prescriptive_auto: "Decision Automation",
+                    analytics_feedback: "Continuous Feedback & Learning",
+                    analytics_data_foundation: "Data Foundation",
+                    analytics_data_foundation_desc: "Every analytics journey starts with consolidated data from core systems, shopfloor signals and external context.",
+                    analytics_active_flow: "Analytics to Outcomes",
+                    analytics_active_flow_desc: "Follow one maturity level at a time — see how insight moves through human judgment into business results.",
+                    analytics_stage_analytics: "Analytics",
+                    analytics_human_vs_model: "Human vs Model Role",
+                    analytics_model_driven: "Model-driven",
+                    analytics_maturity_comparison: "Human Input Across Maturity",
+                    analytics_maturity_comparison_desc: "Higher maturity shifts effort from manual interpretation toward automated optimization.",
+                    analytics_prescriptive_paths: "Prescriptive paths",
+                    analytics_flow_bypassed: "Automated",
+                    analytics_operartis_title: "Where Operartis Creates Value",
+                    analytics_operartis_desc: "Operartis bridges diagnostic visibility with predictive and prescriptive APS — turning ERP and shop-floor data into optimized plans, simulations and decision support.",
+                    analytics_tap_hint: "Select a level to explore",
                     rights_reserved: "v2.0.0 Matrix UI • Latency: 24ms",
                     stat_horizons: "Planning Horizons",
                     stat_engines: "Optimization Engines",
                     matrix_eyebrow: "APS Planning Matrix",
                     matrix_heading: "Select a functional module block",
+                    nav_supply_chain: "Supply Chain",
+                    nav_industry_40: "Industry 4.0",
+                    nav_analytics: "Analytics Levels",
                     i4l_eyebrow: "Industry 4.0 Integration",
                     i4l_title: "ERP + MES Are Not Enough",
                     i4l_phase_gap_badge: "Without APS",
@@ -833,14 +1013,57 @@
                         { title: "Định Lượng & Dựa Trên Dữ liệu", text: "Phương pháp của chúng tôi dựa trên mô phỏng, mô hình hóa và phân tích dữ liệu, xây dựng thuật toán tối ưu hoá — không phỏng đoán. Điều này đảm bảo cải tiến có thể đo lường và lặp lại." },
                         { title: "Giải Pháp Thực Tế & Chuyên Biệt", text: "Chúng tôi thiết kế hệ thống APS đáp ứng đúng với điều kiện thực tế của doanh nghiệp. Những gì chúng tôi xây dựng phù hợp với vận hành thực tế — chứ không phải ngược lại." },
                         { title: "Chi Phí Hợp Lý & Giá Trị", text: "Chúng tôi nỗ lực cung cấp dịch vụ với mức giá hợp lý, giúp việc triển khai các phương pháp tối ưu hóa chất lượng cao tiếp cận được với nhiều doanh nghiệp." },
-                        { title: "Cam Kết Kết Quả", text: "Sứ mệnh của chúng tôi không chỉ là bàn giao hệ thống, mà là giúp bạn đạt được cải thiện thực sự về hiệu quả, tiết kiệm chi phí và sự bền bỉ trong vận hành." }
+                        { title: "Cam Kết Kết Quả", text: "Sứ mệnh của chúng tôi không chỉ là bàn giao hệ thống, mà là giúp bạn đạt được cải thiện thực sự về hiệu quả, tiết kiệm chi phí và sự bền bỉ trong vận hành." },
+                        { title: "Chính sách Bảo mật", text: "Dữ liệu vận hành của bạn được bảo vệ nghiêm ngặt. Operartis áp dụng bảo mật thông tin, quyền truy cập tối thiểu và xử lý minh bạch — biến quyền riêng tư thành lợi thế tin cậy trong mọi quan hệ đối tác." }
                     ],
                     invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
+                    analytics_eyebrow: "Trưởng thành Phân tích",
+                    analytics_title: "Bốn Cấp độ Phân tích Dữ liệu",
+                    analytics_subtitle: "Mỗi bước tăng giá trị kinh doanh và độ phức tạp bài toán — chuyển từ thông tin hồi cố sang mô hình hướng tới tối ưu hành động.",
+                    analytics_axis_value: "Giá trị Kinh doanh",
+                    analytics_axis_complexity: "Độ phức tạp Bài toán",
+                    analytics_band_information: "Thông tin",
+                    analytics_band_models: "Mô hình & Tối ưu",
+                    analytics_source_note: "Khung tham chiếu theo mô hình trưởng thành phân tích của Gartner",
+                    analytics_levels: [
+                        { id: 'descriptive', name: 'Mô tả', question: 'Chuyện gì đã xảy ra?', desc: 'Tổng hợp hiệu suất lịch sử qua dashboard, KPI và báo cáo chuẩn.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
+                        { id: 'diagnostic', name: 'Chẩn đoán', question: 'Vì sao nó xảy ra?', desc: 'Khoan sâu, phân tích nguyên nhân gốc và giải thích chênh lệch vận hành.', focus: 'Hiểu drivers', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
+                        { id: 'predictive', name: 'Dự báo', question: 'Điều gì sẽ xảy ra?', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Insight hướng tới tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
+                        { id: 'prescriptive', name: 'Khuyến nghị', question: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hành động tối ưu', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
+                    ],
+                    analytics_pipeline_title: "Từ Dữ liệu đến Kết quả",
+                    analytics_pipeline_desc: "Khi trưởng thành phân tích tăng, nhu cầu con người giảm dần trong khi mô hình dẫn quyết định gần hơn tới thực thi.",
+                    analytics_sources: ["Hệ thống Doanh nghiệp", "IoT & Shopfloor", "Dữ liệu Bên ngoài"],
+                    analytics_raw_data: "Dữ liệu Thô",
+                    analytics_human_input: "Đầu vào Con người",
+                    analytics_decision: "Quyết định",
+                    analytics_action: "Hành động",
+                    analytics_results: "Kết quả",
+                    analytics_prescriptive_support: "Hỗ trợ Quyết định",
+                    analytics_prescriptive_auto: "Tự động Quyết định",
+                    analytics_feedback: "Phản hồi & Học liên tục",
+                    analytics_data_foundation: "Nền tảng Dữ liệu",
+                    analytics_data_foundation_desc: "Mọi hành trình phân tích bắt đầu từ dữ liệu hợp nhất từ hệ thống lõi, tín hiệu shopfloor và bối cảnh bên ngoài.",
+                    analytics_active_flow: "Phân tích đến Kết quả",
+                    analytics_active_flow_desc: "Theo dõi từng cấp độ trưởng thành — xem insight đi qua phán đoán con người tới kết quả kinh doanh.",
+                    analytics_stage_analytics: "Phân tích",
+                    analytics_human_vs_model: "Vai trò Con người vs Mô hình",
+                    analytics_model_driven: "Do mô hình dẫn",
+                    analytics_maturity_comparison: "Đầu vào Con người theo Trưởng thành",
+                    analytics_maturity_comparison_desc: "Trưởng thành cao hơn chuyển nỗ lực từ diễn giải thủ công sang tối ưu tự động.",
+                    analytics_prescriptive_paths: "Hướng khuyến nghị",
+                    analytics_flow_bypassed: "Tự động",
+                    analytics_operartis_title: "Operartis Tạo Giá trị Ở Đâu",
+                    analytics_operartis_desc: "Operartis kết nối tầm nhìn chẩn đoán với APS dự báo và khuyến nghị — biến dữ liệu ERP và shop-floor thành kế hoạch tối ưu, mô phỏng và hỗ trợ quyết định.",
+                    analytics_tap_hint: "Chọn cấp độ để xem chi tiết",
                     rights_reserved: "v2.0.0 Giao diện Ma Trận • Độ trễ: 24ms",
                     stat_horizons: "Khung hoạch định",
                     stat_engines: "Công cụ tối ưu",
                     matrix_eyebrow: "Ma trận APS",
                     matrix_heading: "Chọn khối chức năng để truy cập công cụ",
+                    nav_supply_chain: "Chuỗi cung ứng",
+                    nav_industry_40: "Industry 4.0",
+                    nav_analytics: "Cấp phân tích",
                     i4l_eyebrow: "Tích hợp Industry 4.0",
                     i4l_title: "ERP + MES vẫn chưa đủ",
                     i4l_phase_gap_badge: "Không có APS",
@@ -1028,14 +1251,57 @@
                         { title: "Quantitativ & datengetrieben", text: "Unsere Ansätze basieren auf Simulation, Modellierung und Datenanalyse — nicht auf Vermutungen. So sind Verbesserungen messbar und wiederholbar." },
                         { title: "Maßgeschneiderte & pragmatische Lösungen", text: "Wir entwickeln APS-Systeme, die Ihre realen Rahmenbedingungen widerspiegeln. Was wir bauen, passt zu Ihren Abläufen — nicht umgekehrt." },
                         { title: "Erschwinglichkeit & Mehrwert", text: "Wir streben angemessene Preise an und machen hochwertige Optimierung für ein breites Spektrum von Unternehmen zugänglich." },
-                        { title: "Ergebnisorientierung", text: "Unsere Mission ist nicht nur die Lieferung eines Systems, sondern echte Verbesserungen in Effizienz, Kosteneinsparung und operativer Resilienz." }
+                        { title: "Ergebnisorientierung", text: "Unsere Mission ist nicht nur die Lieferung eines Systems, sondern echte Verbesserungen in Effizienz, Kosteneinsparung und operativer Resilienz." },
+                        { title: "Datenschutz", text: "Ihre Betriebsdaten bleiben geschützt. Operartis setzt auf strikte Vertraulichkeit, minimalen Zugriff und transparente Handhabung — verantwortungsvoller Datenschutz als Vertrauensvorteil in jeder Partnerschaft." }
                     ],
                     invite_text: "Wir laden Unternehmen ein, die ihre Abläufe transformieren, ihre Supply Chain optimieren und einen Wettbewerbsvorteil aufbauen wollen, mit Operartis zusammenzuarbeiten.",
+                    analytics_eyebrow: "Analytics-Reifegrad",
+                    analytics_title: "Vier Stufen der Analytics",
+                    analytics_subtitle: "Jede Stufe steigert den Geschäftsnutzen und die Problemkomplexität — vom rückblickenden Informationszugriff zu vorausschauenden Modellen für optimiertes Handeln.",
+                    analytics_axis_value: "Wirtschaftlicher Nutzen",
+                    analytics_axis_complexity: "Problemkomplexität",
+                    analytics_band_information: "Information",
+                    analytics_band_models: "Modelle & Optimierung",
+                    analytics_source_note: "Rahmenwerk inspiriert von Gartner Analytics-Reifegradmodellen",
+                    analytics_levels: [
+                        { id: 'descriptive', name: 'Deskriptiv', question: 'Was ist passiert?', desc: 'Historische Leistung mit Dashboards, KPIs und Standardberichten zusammenfassen.', focus: 'Transparenz & Dokumentation', band: 'information', operartis: 'Grundlegende Transparenz über ERP-, Bestands- und Produktionsdaten.' },
+                        { id: 'diagnostic', name: 'Diagnostisch', question: 'Warum ist es passiert?', desc: 'Drill-down, Ursachenanalyse und Abweichungserklärungen im Betrieb.', focus: 'Treiber verstehen', band: 'information', operartis: 'ABC-XYZ-Segmentierung, Abweichungsanalyse und Engpassidentifikation.' },
+                        { id: 'predictive', name: 'Prädiktiv', question: 'Was wird passieren?', desc: 'Nachfrage, Kapazität und Risiko mit statistischen und ML-Modellen prognostizieren.', focus: 'Vorausschauende Erkenntnis', band: 'models', operartis: 'ML-Prognose, Simulation und Multi-Szenario-Planungs-Engines.' },
+                        { id: 'prescriptive', name: 'Präskriptiv', question: 'Was sollten wir tun?', desc: 'Optimierte Entscheidungen empfehlen — von Entscheidungsunterstützung bis automatisierte Planung.', focus: 'Optimiertes Handeln', band: 'models', operartis: 'APS-Terminierung, VRP, Losgrößen- und Netzwerkoptimierungsmodule.' },
+                    ],
+                    analytics_pipeline_title: "Von Daten zu Ergebnissen",
+                    analytics_pipeline_desc: "Mit steigender Analytics-Reife nimmt der menschliche Aufwand ab, während Modelle Entscheidungen näher an die Ausführung bringen.",
+                    analytics_sources: ["Enterprise-Systeme", "IoT & Shopfloor", "Externe Daten"],
+                    analytics_raw_data: "Rohdaten",
+                    analytics_human_input: "Menschlicher Input",
+                    analytics_decision: "Entscheidung",
+                    analytics_action: "Aktion",
+                    analytics_results: "Ergebnisse",
+                    analytics_prescriptive_support: "Entscheidungsunterstützung",
+                    analytics_prescriptive_auto: "Entscheidungsautomatisierung",
+                    analytics_feedback: "Kontinuierliches Feedback & Lernen",
+                    analytics_data_foundation: "Datenfundament",
+                    analytics_data_foundation_desc: "Jede Analytics-Reise beginnt mit konsolidierten Daten aus Kernsystemen, Shopfloor-Signalen und externem Kontext.",
+                    analytics_active_flow: "Analytics zu Ergebnissen",
+                    analytics_active_flow_desc: "Verfolgen Sie eine Reifestufe — und sehen Sie, wie Erkenntnisse über menschliches Urteil zu Geschäftsergebnissen führen.",
+                    analytics_stage_analytics: "Analytics",
+                    analytics_human_vs_model: "Mensch vs. Modell",
+                    analytics_model_driven: "Modellgesteuert",
+                    analytics_maturity_comparison: "Menschlicher Input über Reifestufen",
+                    analytics_maturity_comparison_desc: "Höhere Reife verlagert den Aufwand von manueller Interpretation zu automatisierter Optimierung.",
+                    analytics_prescriptive_paths: "Präskriptive Pfade",
+                    analytics_flow_bypassed: "Automatisiert",
+                    analytics_operartis_title: "Wo Operartis Mehrwert schafft",
+                    analytics_operartis_desc: "Operartis verbindet diagnostische Transparenz mit prädiktiver und präskriptiver APS — und verwandelt ERP- und Shopfloor-Daten in optimierte Pläne, Simulationen und Entscheidungsunterstützung.",
+                    analytics_tap_hint: "Stufe auswählen",
                     rights_reserved: "v2.0.0 Matrix-UI • Latenz: 24ms",
                     stat_horizons: "Planungshorizonte",
                     stat_engines: "Optimierungs-Engines",
                     matrix_eyebrow: "APS-Planungsmatrix",
                     matrix_heading: "Funktionsmodul auswählen",
+                    nav_supply_chain: "Lieferkette",
+                    nav_industry_40: "Industry 4.0",
+                    nav_analytics: "Analytics-Stufen",
                     i4l_eyebrow: "Industry-4.0-Integration",
                     i4l_title: "ERP + MES reichen nicht aus",
                     i4l_phase_gap_badge: "Ohne APS",
@@ -1681,7 +1947,8 @@
 
             return (
                 <section
-                    className="relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm mb-16 md:mb-20"
+                    id="supply-chain"
+                    className="page-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm mb-16 md:mb-20"
                     aria-label={content.ui.sc_title}
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
@@ -1928,8 +2195,9 @@
 
             return (
                 <section
+                    id="industry-40"
                     ref={sectionRef}
-                    className="relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm mb-16 md:mb-20 overflow-hidden"
+                    className="page-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm mb-16 md:mb-20 overflow-hidden"
                     aria-label={ui.i4l_title}
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
@@ -2188,28 +2456,29 @@
             </div>
         );
 
-        const HorizonNav = ({ horizons, activeId, onNav, onAboutNav, aboutVisible, content, navRef }) => (
-            <div ref={navRef} data-horizon-nav className="sticky top-0 z-30 -mx-4 sm:-mx-6 md:-mx-10 px-4 sm:px-6 md:px-10 py-2 mb-10 bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200/70 dark:border-white/5 shadow-sm">
-                <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-0.5">
-                    {horizons.map(h => (
-                        <button
-                            key={h.id}
-                            type="button"
-                            onClick={() => onNav(h.id)}
-                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all duration-300 ${activeId === h.id ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
-                        >
-                            {h.title}
-                        </button>
-                    ))}
-                    {aboutVisible && (
-                        <button
-                            type="button"
-                            onClick={onAboutNav}
-                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all duration-300 ${activeId === 'about' ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
-                        >
-                            {content.ui.about_vision}
-                        </button>
-                    )}
+        const HorizonNav = ({ items, activeId, onNav, navRef, visible }) => (
+            <div
+                ref={navRef}
+                data-horizon-nav
+                aria-hidden={!visible}
+                className={`fixed left-0 right-0 z-30 transition-all duration-300 ${visible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-1 pointer-events-none invisible'}`}
+                style={{ top: '4rem' }}
+            >
+                <div className="bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200/70 dark:border-white/5 shadow-sm">
+                    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-2">
+                        <div className="flex justify-center gap-2 overflow-x-auto custom-scrollbar pb-0.5">
+                            {items.map(item => (
+                                <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => onNav(item.id)}
+                                    className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all duration-300 ${activeId === item.id ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -2217,8 +2486,379 @@
 
         // --- MAIN APP ---
 
+        const ANALYTICS_LEVEL_META = [
+            { barH: 38, humanW: 92, barGrad: 'from-slate-400/80 via-slate-500/60 to-slate-600/40', chevron: 'bg-slate-600/95 dark:bg-slate-500/85' },
+            { barH: 54, humanW: 76, barGrad: 'from-sky-400/80 via-sky-500/60 to-sky-600/40', chevron: 'bg-sky-600/95 dark:bg-sky-500/85' },
+            { barH: 72, humanW: 50, barGrad: 'from-violet-400/80 via-violet-500/60 to-violet-600/40', chevron: 'bg-violet-600/95 dark:bg-violet-500/85' },
+            { barH: 92, humanW: 22, barGrad: 'from-brand-gold via-amber-500 to-brand-dark', chevron: 'bg-gradient-to-r from-brand-gold to-amber-600' },
+        ];
+
+        const ANALYTICS_HUMAN_W = [92, 76, 50, 38];
+        const ANALYTICS_HUMAN_W_AUTO = 6;
+        const ANALYTICS_SOURCE_ICONS = [BoxIcon, FactoryIcon, GlobeIcon];
+
+        const AnalyticsMaturitySection = ({ content }) => {
+            const ui = content.ui;
+            const levels = ui.analytics_levels;
+            const [activeIdx, setActiveIdx] = useState(2);
+            const [prescriptiveMode, setPrescriptiveMode] = useState('support');
+            const chartRef = useRef(null);
+            const descriptiveBarRef = useRef(null);
+            const prescriptiveBarRef = useRef(null);
+            const [arrowLine, setArrowLine] = useState(null);
+
+            const updateMaturityArrow = useCallback(() => {
+                const chart = chartRef.current;
+                const tailBar = descriptiveBarRef.current;
+                const headBar = prescriptiveBarRef.current;
+                if (!chart || !tailBar || !headBar) return;
+
+                const chartRect = chart.getBoundingClientRect();
+                const tailRect = tailBar.getBoundingClientRect();
+                const headRect = headBar.getBoundingClientRect();
+                if (!chartRect.width || !chartRect.height) return;
+
+                const x1 = tailRect.right - chartRect.left;
+                const y1 = tailRect.top - chartRect.top;
+                const x2 = headRect.left - chartRect.left;
+                const y2 = headRect.top - chartRect.top;
+
+                setArrowLine({
+                    x1: (x1 / chartRect.width) * 100,
+                    y1: (y1 / chartRect.height) * 100,
+                    x2: (x2 / chartRect.width) * 100,
+                    y2: (y2 / chartRect.height) * 100,
+                });
+            }, []);
+
+            useLayoutEffect(() => {
+                updateMaturityArrow();
+                const chart = chartRef.current;
+                if (!chart) return undefined;
+
+                const ro = new ResizeObserver(() => updateMaturityArrow());
+                ro.observe(chart);
+                window.addEventListener('resize', updateMaturityArrow);
+
+                return () => {
+                    ro.disconnect();
+                    window.removeEventListener('resize', updateMaturityArrow);
+                };
+            }, [updateMaturityArrow, levels.length]);
+
+            const activeLevel = levels[activeIdx];
+            const activeMeta = ANALYTICS_LEVEL_META[activeIdx];
+            const isPrescriptive = activeIdx === 3;
+            const isAutoMode = isPrescriptive && prescriptiveMode === 'auto';
+            const humanW = isAutoMode ? ANALYTICS_HUMAN_W_AUTO : ANALYTICS_HUMAN_W[activeIdx];
+            const modelW = 100 - humanW;
+
+            const flowStages = [
+                {
+                    key: 'analytics',
+                    label: ui.analytics_stage_analytics,
+                    title: activeLevel.name,
+                    detail: activeLevel.question,
+                    accent: 'border-slate-300/80 dark:border-slate-600/70 bg-slate-50/80 dark:bg-slate-800/50',
+                    titleClass: activeIdx === 3 ? 'text-brand-gold' : 'text-slate-800 dark:text-slate-100',
+                },
+                {
+                    key: 'human',
+                    label: ui.analytics_human_input,
+                    title: `${humanW}%`,
+                    detail: isAutoMode ? ui.analytics_model_driven : ui.analytics_human_vs_model,
+                    accent: 'border-emerald-300/60 dark:border-emerald-600/40 bg-emerald-50/50 dark:bg-emerald-950/20',
+                    titleClass: 'text-emerald-700 dark:text-emerald-300',
+                    bar: true,
+                },
+                {
+                    key: 'decision',
+                    label: ui.analytics_decision,
+                    title: isAutoMode ? ui.analytics_flow_bypassed : ui.analytics_decision,
+                    detail: isAutoMode
+                        ? ui.analytics_prescriptive_auto
+                        : (isPrescriptive ? ui.analytics_prescriptive_support : ui.analytics_decision),
+                    accent: isAutoMode
+                        ? 'aa-flow-stage--muted border-slate-200/60 dark:border-slate-700/60 bg-slate-100/50 dark:bg-slate-800/30'
+                        : 'border-emerald-400/50 dark:border-emerald-500/35 bg-emerald-100/40 dark:bg-emerald-900/20',
+                    titleClass: isAutoMode ? 'text-slate-500 dark:text-slate-400' : 'text-emerald-800 dark:text-emerald-200',
+                },
+                {
+                    key: 'action',
+                    label: ui.analytics_action,
+                    title: ui.analytics_action,
+                    detail: activeLevel.focus,
+                    accent: 'border-amber-300/60 dark:border-amber-600/40 bg-amber-50/50 dark:bg-amber-950/20',
+                    titleClass: 'text-amber-800 dark:text-amber-200',
+                },
+                {
+                    key: 'results',
+                    label: ui.analytics_results,
+                    title: ui.analytics_results,
+                    detail: activeLevel.desc,
+                    accent: 'border-brand-gold/40 bg-brand-gold/8 dark:bg-brand-gold/12',
+                    titleClass: 'text-brand-gold',
+                },
+            ];
+
+            return (
+                <section
+                    id="analytics"
+                    className="page-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm mb-16 md:mb-20 overflow-hidden"
+                    aria-label={ui.analytics_title}
+                >
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+                        <div className="absolute -top-12 right-1/4 w-72 h-36 bg-violet-500/5 rounded-full blur-3xl" />
+                        <div className="absolute bottom-0 left-1/4 w-64 h-32 bg-brand-gold/6 rounded-full blur-3xl" />
+                    </div>
+
+                    <div className="w-full px-4 sm:px-5 md:px-6 py-5 md:py-6 relative">
+                        <div className="flex flex-wrap items-end justify-between gap-3 mb-6 md:mb-8">
+                            <div className="max-w-2xl">
+                                <p className="text-[10px] font-bold uppercase section-eyebrow text-brand-gold mb-1">{ui.analytics_eyebrow}</p>
+                                <h2 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight mb-2">{ui.analytics_title}</h2>
+                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{ui.analytics_subtitle}</p>
+                            </div>
+                            <p className="text-[9px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.analytics_source_note}</p>
+                        </div>
+
+                        {/* Maturity ladder — full width */}
+                        <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-4 md:p-6 mb-4 md:mb-5">
+                            <div className="flex items-stretch gap-1 md:gap-2 max-w-4xl mx-auto">
+                                <div className="aa-maturity-axis-y-wrap shrink-0 w-6 md:w-8 h-52 md:h-60">
+                                    <span className="aa-maturity-axis-y text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{ui.analytics_axis_value} ↑</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div ref={chartRef} className="aa-maturity-chart relative h-52 md:h-60 border-l border-b border-slate-300/70 dark:border-slate-600/70">
+                                        <div className="aa-maturity-band aa-maturity-band-info" aria-hidden="true" />
+                                        <div className="aa-maturity-band aa-maturity-band-models" aria-hidden="true" />
+                                        {arrowLine && (
+                                            <svg className="aa-maturity-arrow-svg absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                                                <defs>
+                                                    <linearGradient id="aa-maturity-arrow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                        <stop offset="0%" stopColor="#64748b" />
+                                                        <stop offset="50%" stopColor="#cbd5e1" />
+                                                        <stop offset="100%" stopColor="#fbbf24" />
+                                                    </linearGradient>
+                                                    <marker id="aa-maturity-arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                                                        <path d="M0,0 L8,4 L0,8 Z" fill="#fbbf24" />
+                                                    </marker>
+                                                </defs>
+                                                <line
+                                                    x1={arrowLine.x1}
+                                                    y1={arrowLine.y1}
+                                                    x2={arrowLine.x2}
+                                                    y2={arrowLine.y2}
+                                                    stroke="rgba(245, 158, 11, 0.22)"
+                                                    strokeWidth="5"
+                                                    strokeLinecap="round"
+                                                    vectorEffect="non-scaling-stroke"
+                                                />
+                                                <line
+                                                    className="aa-maturity-arrow-line"
+                                                    x1={arrowLine.x1}
+                                                    y1={arrowLine.y1}
+                                                    x2={arrowLine.x2}
+                                                    y2={arrowLine.y2}
+                                                    stroke="url(#aa-maturity-arrow-grad)"
+                                                    strokeWidth="2.5"
+                                                    markerEnd="url(#aa-maturity-arrowhead)"
+                                                    vectorEffect="non-scaling-stroke"
+                                                />
+                                            </svg>
+                                        )}
+                                        <div className="absolute top-3 left-[18%] z-[2] text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{ui.analytics_band_information}</div>
+                                        <div className="absolute top-3 right-4 z-[2] text-[8px] font-bold uppercase tracking-wider text-brand-gold">{ui.analytics_band_models}</div>
+                                        <div className="absolute inset-0 z-[2] grid grid-cols-4 items-stretch gap-2 sm:gap-3 px-3 sm:px-4 pb-1 pt-8">
+                                            {levels.map((level, i) => {
+                                                const meta = ANALYTICS_LEVEL_META[i];
+                                                return (
+                                                    <div
+                                                        key={level.id}
+                                                        className="flex h-full flex-col items-center justify-end w-full max-w-[5rem] mx-auto min-w-0 gap-2"
+                                                    >
+                                                        <div className="flex flex-1 w-full min-h-0 items-end">
+                                                            <div
+                                                                ref={i === 0 ? descriptiveBarRef : i === 3 ? prescriptiveBarRef : null}
+                                                                className={`aa-bar w-full rounded-t-lg bg-gradient-to-t ${meta.barGrad}`}
+                                                                style={{ height: `${meta.barH}%` }}
+                                                            />
+                                                        </div>
+                                                        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-center leading-tight w-full text-slate-600 dark:text-slate-400">{level.name}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                    <p className="text-center mt-2">
+                                        <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{ui.analytics_axis_complexity} →</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* From Data to Outcomes — split into readable sub-panels */}
+                        <div className="mb-8 md:mb-10 space-y-4 md:space-y-5">
+                            <div className="px-1">
+                                <h3 className="text-base md:text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_pipeline_title}</h3>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">{ui.analytics_pipeline_desc}</p>
+                            </div>
+
+                            {/* Sub-panel 1: Data foundation */}
+                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-5 md:p-6">
+                                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_data_foundation}</h4>
+                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5 max-w-2xl">{ui.analytics_data_foundation_desc}</p>
+                                <div className="grid sm:grid-cols-3 gap-3 md:gap-4">
+                                    {ui.analytics_sources.map((src, i) => {
+                                        const Icon = ANALYTICS_SOURCE_ICONS[i];
+                                        return (
+                                            <div key={i} className="rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white/70 dark:bg-slate-900/60 px-4 py-4 md:py-5 flex flex-col items-center text-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300">
+                                                    <Icon />
+                                                </div>
+                                                <span className="text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200 leading-snug">{src}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <div className="flex flex-col items-center gap-3 mt-6 pt-6 border-t border-dashed border-slate-200 dark:border-slate-700">
+                                    <span className="text-slate-400 text-lg" aria-hidden="true">↓</span>
+                                    <span className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide bg-sky-500/12 text-sky-800 dark:text-sky-200 border border-sky-500/25">{ui.analytics_raw_data}</span>
+                                </div>
+                            </div>
+
+                            {/* Sub-panel 2: Active analytics flow */}
+                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-5 md:p-6">
+                                <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+                                    <div>
+                                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_active_flow}</h4>
+                                        <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">{ui.analytics_active_flow_desc}</p>
+                                    </div>
+                                    <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border ${activeLevel.band === 'models' ? 'text-brand-gold bg-brand-gold/10 border-brand-gold/25' : 'text-slate-500 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'}`}>
+                                        {activeLevel.band === 'models' ? ui.analytics_band_models : ui.analytics_band_information}
+                                    </span>
+                                </div>
+
+                                <div className={`aa-chevron rounded-xl px-5 py-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${activeMeta.chevron}`}>
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-white/75 mb-1">{activeLevel.name}</p>
+                                        <p className="text-base md:text-lg font-bold text-white leading-snug">{activeLevel.question}</p>
+                                    </div>
+                                    {isPrescriptive && (
+                                        <div className="shrink-0 sm:text-right">
+                                            <div className="inline-flex rounded-xl border border-white/25 p-1 bg-black/15 backdrop-blur-sm">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPrescriptiveMode('support')}
+                                                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-colors ${prescriptiveMode === 'support' ? 'bg-white text-brand-gold shadow-sm' : 'text-white/75 hover:text-white'}`}
+                                                >
+                                                    {ui.analytics_prescriptive_support}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPrescriptiveMode('auto')}
+                                                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-colors ${prescriptiveMode === 'auto' ? 'bg-white text-brand-gold shadow-sm' : 'text-white/75 hover:text-white'}`}
+                                                >
+                                                    {ui.analytics_prescriptive_auto}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="grid md:grid-cols-5 gap-3 md:gap-4 items-stretch">
+                                    {flowStages.map((stage) => (
+                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector rounded-xl border p-4 md:p-5 ${stage.accent} aa-flow-stage-active`}>
+                                            <p className="aa-flow-stage-label text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 truncate">{stage.label}</p>
+                                            <p className={`aa-flow-stage-title text-sm md:text-base font-bold mb-2 leading-snug line-clamp-2 ${stage.titleClass}`}>{stage.title}</p>
+                                            <div className="aa-flow-stage-body">
+                                                {stage.bar ? (
+                                                    <div className="flex h-full flex-col">
+                                                        <div className="h-3 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden shrink-0">
+                                                            <div className="aa-human-bar h-full rounded-full bg-gradient-to-r from-emerald-400/70 to-emerald-500/50" style={{ width: `${humanW}%` }} />
+                                                        </div>
+                                                        <div className="aa-flow-stage-bar-labels mt-2 flex flex-col justify-center gap-0.5 overflow-hidden">
+                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-emerald-700 dark:text-emerald-300 truncate">{ui.analytics_human_input} {humanW}%</span>
+                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-violet-600 dark:text-violet-300 truncate">{ui.analytics_model_driven} {modelW}%</span>
+                                                        </div>
+                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mt-auto overflow-hidden">{stage.detail}</p>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Sub-panel 3: Maturity comparison */}
+                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-5 md:p-6">
+                                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_maturity_comparison}</h4>
+                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5 max-w-2xl">{ui.analytics_maturity_comparison_desc}</p>
+                                <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
+                                    {levels.map((level, i) => {
+                                        const isActive = activeIdx === i;
+                                        const hw = ANALYTICS_HUMAN_W[i];
+                                        return (
+                                            <button
+                                                key={level.id}
+                                                type="button"
+                                                onClick={() => setActiveIdx(i)}
+                                                className={`text-left rounded-xl border px-4 py-4 transition-all ${isActive ? 'border-brand-gold/45 bg-brand-gold/5 shadow-sm' : 'border-slate-200/70 dark:border-slate-700/80 bg-white/60 dark:bg-slate-900/50 hover:border-brand-gold/25'}`}
+                                            >
+                                                <p className={`text-xs font-bold uppercase tracking-wide mb-2 ${isActive ? 'text-brand-gold' : 'text-slate-700 dark:text-slate-200'}`}>{level.name}</p>
+                                                <div className="h-2.5 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden mb-2">
+                                                    <div className="aa-human-bar h-full rounded-full bg-gradient-to-r from-emerald-400/70 to-emerald-500/50" style={{ width: `${hw}%`, opacity: isActive ? 1 : 0.65 }} />
+                                                </div>
+                                                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{ui.analytics_human_input}: {hw}%</p>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Category detail cards */}
+                        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-8">
+                            {levels.map((level, i) => {
+                                const isActive = activeIdx === i;
+                                return (
+                                    <button
+                                        key={level.id}
+                                        type="button"
+                                        onClick={() => setActiveIdx(i)}
+                                        className={`text-left rounded-xl border px-4 py-4 md:py-5 transition-all duration-300 flex flex-col h-full ${isActive ? 'border-brand-gold/50 bg-brand-gold/5 dark:bg-brand-gold/10 shadow-md shadow-brand-gold/10 scale-[1.01]' : 'border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 hover:border-brand-gold/25'}`}
+                                    >
+                                        <div className="flex items-center justify-between gap-2 mb-3">
+                                            <span className="text-[10px] font-mono font-bold text-slate-400">{String(i + 1).padStart(2, '0')}</span>
+                                            <span className={`text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${level.band === 'models' ? 'text-brand-gold bg-brand-gold/10 border border-brand-gold/20' : 'text-slate-500 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700'}`}>
+                                                {level.band === 'models' ? ui.analytics_band_models : ui.analytics_band_information}
+                                            </span>
+                                        </div>
+                                        <h4 className={`text-sm md:text-base font-bold mb-1 ${isActive ? 'text-brand-gold' : 'text-slate-800 dark:text-slate-100'}`}>{level.name}</h4>
+                                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">{level.question}</p>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3 flex-1">{level.desc}</p>
+                                        <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">{level.focus}</p>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed border-t border-slate-200/60 dark:border-slate-700/60 pt-2 mt-1">
+                                            <span className="text-brand-gold font-semibold">Operartis · </span>{level.operartis}
+                                        </p>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div className="rounded-xl border border-brand-gold/30 bg-gradient-to-r from-brand-gold/8 via-transparent to-brand-gold/5 dark:from-brand-gold/12 px-5 py-4 md:px-6 md:py-5">
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-2">{ui.analytics_operartis_title}</h3>
+                            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{ui.analytics_operartis_desc}</p>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
         const AboutSection = ({ content }) => (
-            <div id="about" className="horizon-pill mt-8 pt-16 border-t border-slate-200/80 dark:border-slate-800 pb-8">
+            <div id="about" className="page-scroll-target horizon-pill mt-8 pt-16 border-t border-slate-200/80 dark:border-slate-800 pb-8">
                 <Reveal>
                     <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
                         <h2 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">{content.ui.about_title}</h2>
@@ -2270,7 +2910,7 @@
                     <h3 className="text-xs font-bold uppercase section-eyebrow text-brand-gold mb-6 text-center">{content.ui.about_why}</h3>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {content.ui.about_why_items.map((item, i) => (
-                            <div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 hover:border-brand-gold/40 transition-colors">
+                            <div key={i} className="h-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 hover:border-brand-gold/40 transition-colors">
                                 <strong className="block text-sm font-bold text-slate-900 dark:text-white mb-2">{item.title}</strong>
                                 <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">{item.text}</p>
                             </div>
@@ -2292,22 +2932,33 @@
             const [lang, setLang] = useState(() => window.getOperartisLang());
             const [time, setTime] = useState(new Date());
             const [selectedBlock, setSelectedBlock] = useState(null);
-            const [activeHorizon, setActiveHorizon] = useState('strategic');
-            const [aboutNavVisible, setAboutNavVisible] = useState(false);
+            const [activeNavId, setActiveNavId] = useState('supply-chain');
+            const [navVisible, setNavVisible] = useState(false);
             const horizonNavRef = useRef(null);
             const scrollLockRef = useRef(false);
             const scrollEndTimerRef = useRef(null);
+            const scrollAnimListenerRef = useRef(null);
 
             const content = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
-            const getAnchorOffset = useCallback(() => (horizonNavRef.current?.offsetHeight ?? 52) + 8, []);
+            const pageNavItems = useMemo(
+                () => buildPageNavItems(content.ui, content.matrix),
+                [content]
+            );
+
+            const getAnchorOffset = useCallback(() => {
+                if (!navVisible) return 8;
+                return (horizonNavRef.current?.offsetHeight ?? 52) + 8;
+            }, [navVisible]);
 
             const getSectionList = useCallback(() => {
-                const sections = content.matrix
-                    .map(h => ({ id: h.id, el: document.getElementById(`horizon-${h.id}`) }))
-                    .filter(s => s.el);
-                const aboutEl = document.getElementById('about');
-                if (aboutEl) sections.push({ id: 'about', el: aboutEl });
+                const sections = [
+                    { id: 'supply-chain', el: document.getElementById('supply-chain') },
+                    { id: 'industry-40', el: document.getElementById('industry-40') },
+                    ...content.matrix.map(h => ({ id: h.id, el: document.getElementById(`horizon-${h.id}`) })),
+                    { id: 'analytics', el: document.getElementById('analytics') },
+                    { id: 'about', el: document.getElementById('about') },
+                ].filter(s => s.el);
                 return sections;
             }, [content]);
 
@@ -2317,33 +2968,38 @@
                 const sections = getSectionList();
                 if (!scrollRoot || !sections.length) return;
 
-                const activeId = resolveActiveHorizonId(sections, scrollRoot, getAnchorOffset());
-                if (activeId) setActiveHorizon(activeId);
-
-                const aboutEl = document.getElementById('about');
-                if (aboutEl) {
-                    const aboutTop = getSectionTopInRoot(aboutEl, scrollRoot);
-                    setAboutNavVisible(scrollRoot.scrollTop + scrollRoot.clientHeight * 0.45 > aboutTop);
+                const scEl = document.getElementById('supply-chain');
+                if (scEl) {
+                    const scTop = getSectionTopInRoot(scEl, scrollRoot);
+                    setNavVisible(scrollRoot.scrollTop >= scTop - 24);
                 }
+
+                const activeId = resolveActiveHorizonId(sections, scrollRoot, getAnchorOffset());
+                if (activeId) setActiveNavId(activeId);
             }, [getSectionList, getAnchorOffset]);
 
-            const scrollToSectionById = useCallback((id) => {
+            const scrollToNavItem = useCallback((id) => {
                 const scrollRoot = getMainScrollRoot();
-                const targetId = id === 'about' ? 'about' : `horizon-${id}`;
-                const el = document.getElementById(targetId);
+                const el = document.getElementById(getNavTargetId(id));
                 if (!scrollRoot || !el) return;
 
                 scrollLockRef.current = true;
-                setActiveHorizon(id);
+                setActiveNavId(id);
 
                 const targetTop = getSectionTopInRoot(el, scrollRoot) - getAnchorOffset();
                 scrollRoot.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
 
                 if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
+                if (scrollAnimListenerRef.current) {
+                    scrollRoot.removeEventListener('scroll', scrollAnimListenerRef.current);
+                }
 
                 const finishScrollLock = () => {
                     scrollLockRef.current = false;
-                    scrollRoot.removeEventListener('scroll', onScrollWhileAnimating);
+                    if (scrollAnimListenerRef.current) {
+                        scrollRoot.removeEventListener('scroll', scrollAnimListenerRef.current);
+                        scrollAnimListenerRef.current = null;
+                    }
                     updateActiveFromScroll();
                 };
 
@@ -2352,12 +3008,13 @@
                     scrollEndTimerRef.current = setTimeout(finishScrollLock, 120);
                 };
 
+                scrollAnimListenerRef.current = onScrollWhileAnimating;
                 scrollRoot.addEventListener('scroll', onScrollWhileAnimating, { passive: true });
                 scrollEndTimerRef.current = setTimeout(finishScrollLock, 1000);
             }, [getAnchorOffset, updateActiveFromScroll]);
 
-            const scrollToHorizon = useCallback((id) => scrollToSectionById(id), [scrollToSectionById]);
-            const scrollToAbout = useCallback(() => scrollToSectionById('about'), [scrollToSectionById]);
+            const scrollToHorizon = useCallback((id) => scrollToNavItem(id), [scrollToNavItem]);
+            const scrollToAbout = useCallback(() => scrollToNavItem('about'), [scrollToNavItem]);
 
             useEffect(() => {
                 const applyTheme = () => {
@@ -2428,7 +3085,7 @@
                     </div>
 
                     <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel z-10 shrink-0">
-                        <div className="max-w-6xl mx-auto w-full h-full px-4 sm:px-6 md:px-10 flex items-center justify-between">
+                        <div className="max-w-7xl mx-auto w-full h-full px-4 sm:px-6 md:px-10 flex items-center justify-between">
                         <div className="flex items-center gap-3 shrink-0 p-1.5 pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                             <a href="./new_terminal.html">
                                 <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer transition-transform hover:scale-110" onError={(e) => e.target.style.display = 'none'} />
@@ -2476,7 +3133,15 @@
                     </nav>
 
                     <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
-                        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">
+                        <HorizonNav
+                            navRef={horizonNavRef}
+                            items={pageNavItems}
+                            activeId={activeNavId}
+                            onNav={scrollToNavItem}
+                            visible={navVisible}
+                        />
+
+                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">
                             <Reveal>
                                 <HeroSection content={content} horizons={content.matrix} onNav={scrollToHorizon} />
                             </Reveal>
@@ -2494,21 +3159,16 @@
                             </Reveal>
 
                             <Reveal delay={150}>
-                                <div className="mb-6">
-                                    <p className="text-[10px] font-bold uppercase section-eyebrow text-slate-400 dark:text-slate-500 mb-2">{content.ui.matrix_eyebrow}</p>
-                                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{content.ui.matrix_heading}</h2>
+                                <div className="page-scroll-target mb-8 md:mb-10 pt-8 md:pt-10 mt-8 md:mt-12 border-t border-slate-200/80 dark:border-slate-800">
+                                    <div className="relative overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-sm px-5 sm:px-6 md:px-8 py-5 md:py-6">
+                                        <div className="absolute -top-16 right-0 w-72 h-40 bg-brand-gold/8 rounded-full blur-3xl pointer-events-none" />
+                                        <div className="relative max-w-4xl">
+                                            <p className="text-xs sm:text-sm md:text-base font-bold uppercase section-eyebrow text-brand-gold mb-2 tracking-wider">{content.ui.matrix_eyebrow}</p>
+                                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">{content.ui.matrix_heading}</h2>
+                                        </div>
+                                    </div>
                                 </div>
                             </Reveal>
-
-                            <HorizonNav
-                                navRef={horizonNavRef}
-                                horizons={content.matrix}
-                                activeId={activeHorizon}
-                                onNav={scrollToHorizon}
-                                onAboutNav={scrollToAbout}
-                                aboutVisible={aboutNavVisible}
-                                content={content}
-                            />
 
                             <div>
                                 {content.matrix.map((horizon, index) => (
@@ -2522,12 +3182,18 @@
                                 ))}
                             </div>
 
+                            <Reveal delay={175}>
+                                <div className="horizon-pill pt-12 md:pt-16 mt-4 md:mt-8 border-t border-slate-200/80 dark:border-slate-800">
+                                    <AnalyticsMaturitySection content={content} />
+                                </div>
+                            </Reveal>
+
                             <AboutSection content={content} />
                         </div>
                     </main>
 
                     <footer className="py-4 border-t border-slate-200 dark:border-slate-800 z-10 shrink-0 bg-white/30 dark:bg-brand-obsidian/30 glass-panel">
-                        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-2">
+                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-2">
                             <p className="text-[10px] text-slate-400">© {new Date().getFullYear()} Operartis Analytics. All rights reserved.</p>
                             <div className="flex items-center gap-4 text-[10px] text-slate-500 font-mono">
                                 <span>{content.ui.rights_reserved}</span>
