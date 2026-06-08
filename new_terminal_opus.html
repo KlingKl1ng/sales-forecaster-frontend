@@ -307,7 +307,7 @@
 
         .sc-flow-scroll {
             overflow-x: auto;
-            overflow-y: hidden;
+            overflow-y: visible;
             scrollbar-gutter: stable;
         }
 
@@ -318,6 +318,237 @@
         .sc-flow-scroll::-webkit-scrollbar:vertical {
             width: 0;
             display: none;
+        }
+
+        .sc-flow-connector {
+            transition: left 0.35s ease, width 0.35s ease, top 0.35s ease;
+        }
+
+        .sc-flow-skip-path {
+            transition: d 0.35s ease;
+        }
+
+        /* ERP · APS · MES integration loop */
+        @keyframes i4l-gap-pulse {
+            0%, 100% { opacity: 0.45; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes i4l-aps-enter {
+            0% { opacity: 0; transform: scale(0.82); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes i4l-loop-glow {
+            0%, 100% { opacity: 0.55; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes i4l-flow-dash {
+            to { stroke-dashoffset: -24; }
+        }
+
+        @keyframes i4l-orbit {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -48; }
+        }
+
+        .i4l-gap-line {
+            stroke-dasharray: 10 7;
+            animation: i4l-gap-pulse 1.6s ease-in-out infinite;
+        }
+
+        .i4l-flow-arrow {
+            stroke-dasharray: 6 4;
+            animation: i4l-flow-dash 0.95s linear infinite;
+        }
+
+        .i4l-flow-arrow-2 { animation-delay: 0.32s; }
+        .i4l-flow-arrow-3 { animation-delay: 0.64s; }
+
+        .i4l-loop-bracket {
+            stroke-dasharray: 6 4;
+            animation: i4l-orbit 2.4s linear infinite;
+        }
+
+        @keyframes i4l-node-pop {
+            0% { opacity: 0; transform: scale(0.88); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes i4l-tag-rise {
+            0% { opacity: 0; transform: translate(-50%, calc(-50% + 6px)); }
+            100% { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        @keyframes i4l-break-blink {
+            0%, 100% { opacity: 0.85; }
+            50% { opacity: 0.35; }
+        }
+
+        .i4l-phase-layer {
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .i4l-phase-fade {
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .i4l-phase-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .i4l-phase-hidden .i4l-gap-line,
+        .i4l-phase-hidden .i4l-flow-arrow {
+            animation-play-state: paused;
+        }
+
+        .i4l-diagram-stage {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 480 / 320;
+            margin: 0 auto;
+        }
+
+        .i4l-diagram-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .i4l-node {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 124px;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .i4l-node-labels {
+            margin-top: 0.5rem;
+            min-height: 2.85rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .i4l-node-pop .i4l-node-icon {
+            animation: i4l-node-pop 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .i4l-node-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 4.25rem;
+            height: 4.25rem;
+            border-radius: 1.1rem;
+            border: 1.5px solid rgba(148, 163, 184, 0.4);
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.88));
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.1);
+            transition: border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
+        }
+
+        .dark .i4l-node-icon {
+            background: linear-gradient(160deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.92));
+            border-color: rgba(71, 85, 105, 0.75);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+        }
+
+        .i4l-node-icon-active {
+            border-color: rgba(245, 158, 11, 0.8);
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.14), 0 14px 32px rgba(245, 158, 11, 0.22);
+        }
+
+        .i4l-node-icon-ghost {
+            border-style: dashed;
+            border-width: 2px;
+            border-color: rgba(244, 63, 94, 0.5);
+            background: rgba(255, 241, 242, 0.4);
+            box-shadow: none;
+        }
+
+        .dark .i4l-node-icon-ghost {
+            background: rgba(76, 5, 25, 0.28);
+            border-color: rgba(251, 113, 133, 0.45);
+        }
+
+        .i4l-node-icon-aps {
+            width: 5rem;
+            height: 5rem;
+            border-radius: 1.4rem;
+        }
+
+        .i4l-node-icon-aps.i4l-node-icon-active {
+            background: linear-gradient(160deg, rgba(254, 243, 199, 0.95), rgba(255, 255, 255, 0.9));
+        }
+
+        .dark .i4l-node-icon-aps.i4l-node-icon-active {
+            background: linear-gradient(160deg, rgba(120, 53, 15, 0.45), rgba(15, 23, 42, 0.92));
+        }
+
+        .i4l-qmark {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 1.15rem;
+            height: 1.15rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 900;
+            color: #fff;
+            background: #f43f5e;
+            box-shadow: 0 2px 6px rgba(244, 63, 94, 0.5);
+            animation: i4l-break-blink 1.6s ease-in-out infinite;
+        }
+
+        .i4l-flow-tag {
+            position: absolute;
+            z-index: 3;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.22rem 0.6rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            background: rgba(255, 255, 255, 0.96);
+            color: #64748b;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+            animation: i4l-tag-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .dark .i4l-flow-tag {
+            background: rgba(15, 23, 42, 0.96);
+            border-color: rgba(51, 65, 85, 0.9);
+            color: #cbd5e1;
+        }
+
+        .i4l-flow-tag-gold {
+            color: #b45309;
+            border-color: rgba(245, 158, 11, 0.45);
+            background: rgba(255, 251, 235, 0.97);
+        }
+
+        .dark .i4l-flow-tag-gold {
+            color: #fbbf24;
+            background: rgba(120, 53, 15, 0.4);
+            border-color: rgba(245, 158, 11, 0.5);
         }
     </style>
 
@@ -333,7 +564,7 @@
     <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo, useCallback } = React;
+        const { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } = React;
 
         const getMainScrollRoot = () => document.querySelector('main.flex-1.overflow-y-auto');
 
@@ -456,6 +687,34 @@
                     platform_eyebrow: "The APS Platform",
                     platform_title: "Select a functional module block",
                     capabilities_label: "Optimization coverage",
+                    i4l_eyebrow: "Industry 4.0 Integration",
+                    i4l_title: "ERP + MES Are Not Enough",
+                    i4l_phase_gap_badge: "Without APS",
+                    i4l_phase_gap_title: "Records & Execution — Without Optimization",
+                    i4l_phase_gap_desc: "ERP captures business master data and MES executes shop-floor orders — but neither transforms raw information into optimized, finite-capacity plans. Decisions stay reactive, siloed, and suboptimal.",
+                    i4l_erp_label: "ERP",
+                    i4l_erp_full: "Enterprise Resource Planning",
+                    i4l_erp_role: "Orders, inventory, finance & master data",
+                    i4l_mes_label: "MES",
+                    i4l_mes_full: "Manufacturing Execution System",
+                    i4l_mes_role: "Real-time production tracking & execution",
+                    i4l_gap_label: "Planning Gap",
+                    i4l_gap_hint: "No optimization layer between business records and shop-floor execution",
+                    i4l_erp_cons: ["Static master plans & long cycles", "Limited simulation & what-if analysis", "Cannot resolve finite-capacity bottlenecks"],
+                    i4l_mes_cons: ["Executes whatever plan it receives", "No forward-looking optimization", "Cannot replan across the full network"],
+                    i4l_phase_aps_badge: "With APS",
+                    i4l_phase_aps_title: "Continuous Optimization Loop",
+                    i4l_phase_aps_desc: "APS ingests ERP input data, runs advanced planning & scheduling engines, and delivers optimized results to MES — while execution data flows back to ERP for closed-loop improvement.",
+                    i4l_aps_label: "APS",
+                    i4l_aps_full: "Advanced Planning & Scheduling",
+                    i4l_aps_role: "Optimizes across strategic, tactical & operational horizons",
+                    i4l_flow_input: "Input Data",
+                    i4l_flow_optimized: "Optimized Data",
+                    i4l_flow_recording: "Data Recording",
+                    i4l_loop_tagline: "Loop · Continuous Optimization",
+                    i4l_industry_tag: "Essential key for Industry 4.0",
+                    i4l_tap_hint: "Tap to switch",
+                    i4l_aps_pros: ["Finite-capacity scheduling & scenario planning", "Bridges ERP data with MES execution", "Closes the loop for measurable efficiency gains"],
                     sc_eyebrow: "End-to-End Supply Chain",
                     sc_title: "From Raw Materials to End Customer",
                     sc_live: "Live flow",
@@ -633,6 +892,34 @@
                     platform_eyebrow: "Nền Tảng APS",
                     platform_title: "Chọn một khối chức năng",
                     capabilities_label: "Phạm vi tối ưu hóa",
+                    i4l_eyebrow: "Tích hợp Industry 4.0",
+                    i4l_title: "ERP + MES vẫn chưa đủ",
+                    i4l_phase_gap_badge: "Không có APS",
+                    i4l_phase_gap_title: "Ghi nhận & Thực thi — Thiếu tối ưu hóa",
+                    i4l_phase_gap_desc: "ERP lưu trữ dữ liệu nghiệp vụ và MES thực thi lệnh sản xuất — nhưng không có lớp hoạch định thông minh biến dữ liệu thô thành kế hoạch tối ưu theo năng lực hữu hạn. Quyết định vẫn mang tính phản ứng, rời rạc và chưa tối ưu.",
+                    i4l_erp_label: "ERP",
+                    i4l_erp_full: "Enterprise Resource Planning",
+                    i4l_erp_role: "Đơn hàng, tồn kho, tài chính & dữ liệu gốc",
+                    i4l_mes_label: "MES",
+                    i4l_mes_full: "Manufacturing Execution System",
+                    i4l_mes_role: "Theo dõi & thực thi sản xuất thời gian thực",
+                    i4l_gap_label: "Khoảng trống hoạch định",
+                    i4l_gap_hint: "Không có lớp tối ưu giữa ghi nhận nghiệp vụ và thực thi xưởng",
+                    i4l_erp_cons: ["Kế hoạch tĩnh & chu kỳ hoạch định dài", "Mô phỏng & phân tích what-if hạn chế", "Không giải quyết nút thắt năng lực hữu hạn"],
+                    i4l_mes_cons: ["Chỉ thực thi kế hoạch nhận được", "Không tối ưu hóa hướng tới tương lai", "Không tái hoạch định toàn mạng lưới"],
+                    i4l_phase_aps_badge: "Có APS",
+                    i4l_phase_aps_title: "Vòng lặp tối ưu liên tục",
+                    i4l_phase_aps_desc: "APS tiếp nhận dữ liệu đầu vào từ ERP, chạy các engine hoạch định & lập lịch nâng cao, và gửi kết quả tối ưu cho MES — đồng thời dữ liệu thực thi phản hồi về ERP để cải tiến khép kín.",
+                    i4l_aps_label: "APS",
+                    i4l_aps_full: "Advanced Planning & Scheduling",
+                    i4l_aps_role: "Tối ưu trên các chân trời chiến lược, chiến thuật & vận hành",
+                    i4l_flow_input: "Dữ liệu đầu vào",
+                    i4l_flow_optimized: "Dữ liệu tối ưu",
+                    i4l_flow_recording: "Ghi nhận dữ liệu",
+                    i4l_loop_tagline: "Vòng lặp · Tối ưu liên tục",
+                    i4l_industry_tag: "Chìa khóa thiết yếu cho Industry 4.0",
+                    i4l_tap_hint: "Nhấn để chuyển",
+                    i4l_aps_pros: ["Lập lịch năng lực hữu hạn & kịch bản", "Kết nối dữ liệu ERP với thực thi MES", "Khép kín vòng lặp để cải thiện hiệu quả đo lường được"],
                     sc_eyebrow: "Chuỗi cung ứng toàn trình",
                     sc_title: "Từ nguyên vật liệu đến khách hàng cuối",
                     sc_live: "Luồng trực tiếp",
@@ -810,6 +1097,34 @@
                     platform_eyebrow: "Die APS-Plattform",
                     platform_title: "Funktionsmodul auswählen",
                     capabilities_label: "Optimierungsabdeckung",
+                    i4l_eyebrow: "Industry-4.0-Integration",
+                    i4l_title: "ERP + MES reichen nicht aus",
+                    i4l_phase_gap_badge: "Ohne APS",
+                    i4l_phase_gap_title: "Erfassung & Ausführung — ohne Optimierung",
+                    i4l_phase_gap_desc: "Das ERP erfasst Stammdaten und das MES führt Shopfloor-Aufträge aus — aber keine intelligente Planungsschicht verwandelt Rohdaten in optimierte, kapazitätsbegrenzte Pläne. Entscheidungen bleiben reaktiv, isoliert und suboptimal.",
+                    i4l_erp_label: "ERP",
+                    i4l_erp_full: "Enterprise Resource Planning",
+                    i4l_erp_role: "Aufträge, Bestände, Finanzen & Stammdaten",
+                    i4l_mes_label: "MES",
+                    i4l_mes_full: "Manufacturing Execution System",
+                    i4l_mes_role: "Echtzeit-Produktionsverfolgung & Ausführung",
+                    i4l_gap_label: "Planungslücke",
+                    i4l_gap_hint: "Keine Optimierungsschicht zwischen Geschäftsdaten und Shopfloor",
+                    i4l_erp_cons: ["Statische Pläne & lange Planungszyklen", "Begrenzte Simulation & What-if-Analysen", "Keine Auflösung endlicher Kapazitätsengpässe"],
+                    i4l_mes_cons: ["Führt nur erhaltene Pläne aus", "Keine vorausschauende Optimierung", "Keine Netzwerk-weite Umplanung"],
+                    i4l_phase_aps_badge: "Mit APS",
+                    i4l_phase_aps_title: "Kontinuierliche Optimierungsschleife",
+                    i4l_phase_aps_desc: "Das APS nimmt ERP-Eingangsdaten auf, führt fortgeschrittene Planungs- und Scheduling-Engines aus und liefert optimierte Ergebnisse ans MES — während Ausführungsdaten zurück ins ERP fließen.",
+                    i4l_aps_label: "APS",
+                    i4l_aps_full: "Advanced Planning & Scheduling",
+                    i4l_aps_role: "Optimiert über strategische, taktische & operative Horizonte",
+                    i4l_flow_input: "Eingangsdaten",
+                    i4l_flow_optimized: "Optimierte Daten",
+                    i4l_flow_recording: "Datenerfassung",
+                    i4l_loop_tagline: "Schleife · Kontinuierliche Optimierung",
+                    i4l_industry_tag: "Wesentlicher Schlüssel für Industry 4.0",
+                    i4l_tap_hint: "Tippen zum Wechseln",
+                    i4l_aps_pros: ["Kapazitätsbegrenzte Planung & Szenarien", "Verbindet ERP-Daten mit MES-Ausführung", "Schließt die Schleife für messbare Effizienz"],
                     sc_eyebrow: "End-to-End-Lieferkette",
                     sc_title: "Von Rohmaterial bis Endkunde",
                     sc_live: "Live-Fluss",
@@ -1211,6 +1526,100 @@
             ['#f43f5e', '#f97316'],
         ];
 
+        const SC_FLOW_ARROW_HALF = 4;
+        const SC_FLOW_ARROW_RISE = 3.5;
+
+        // Skip routes: Transportation → Retail / End Customers; Hubs & DCs → End Customers
+        const SC_SKIP_LINKS = [
+            { from: 2, to: 4, lane: 1 },
+            { from: 2, to: 5, lane: 2 },
+            { from: 3, to: 5, lane: 0, arrowT: 0.72 },
+        ];
+
+        const SCConnectorSegment = ({ seg, index, isPast, isActive }) => {
+            if (!seg || seg.width < 8) return null;
+            const lit = isPast || isActive;
+            const w = seg.width;
+            const mid = w / 2;
+            const ah = SC_FLOW_ARROW_HALF;
+            const stroke = lit ? `url(#sc-seg-grad-${index})` : 'rgba(148,163,184,0.55)';
+            const strokeWidth = isActive ? 2.5 : isPast ? 2 : 1.75;
+            const arrowFill = lit ? '#f59e0b' : 'rgba(148,163,184,0.55)';
+            const arrowClass = isActive ? 'sc-flow-arrow sc-flow-arrow-active' : 'sc-flow-arrow';
+            const lineStyle = isPast && !isActive ? { opacity: 0.75 } : undefined;
+            const lineEnd = Math.max(0, mid - ah);
+            const lineStart = Math.min(w, mid + ah);
+
+            return (
+                <svg
+                    className="sc-flow-connector absolute overflow-visible pointer-events-none"
+                    style={{ left: seg.left, top: seg.top, width: w, height: 24 }}
+                    viewBox={`0 0 ${w} 24`}
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                >
+                    <defs>
+                        {lit && (
+                            <linearGradient id={`sc-seg-grad-${index}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor={SC_CONNECTOR_COLORS[index][0]} />
+                                <stop offset="100%" stopColor={SC_CONNECTOR_COLORS[index][1]} />
+                            </linearGradient>
+                        )}
+                    </defs>
+                    <line x1="0" y1="12" x2={lineEnd} y2="12" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" className={arrowClass} style={lineStyle} vectorEffect="non-scaling-stroke" />
+                    <polygon points={`${mid - ah},${12 - SC_FLOW_ARROW_RISE} ${mid + ah},12 ${mid - ah},${12 + SC_FLOW_ARROW_RISE}`} fill={arrowFill} className={isActive ? 'sc-arrow-pulse' : undefined} />
+                    <line x1={lineStart} y1="12" x2={w} y2="12" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" className={arrowClass} style={lineStyle} vectorEffect="non-scaling-stroke" />
+                </svg>
+            );
+        };
+
+        const SCSkipRouteLayer = ({ skipRoutes, trackW, trackH }) => {
+            if (!skipRoutes?.length || !trackW || !trackH) return null;
+            const stroke = 'rgba(148,163,184,0.55)';
+            const strokeWidth = 1.75;
+            const arrowClass = 'sc-flow-arrow';
+
+            let viewMinY = 0;
+            skipRoutes.forEach((route) => {
+                viewMinY = Math.min(viewMinY, route.routeY - 10, route.y1, route.y2);
+            });
+            const viewHeight = trackH - viewMinY;
+
+            return (
+                <svg
+                    className="absolute left-0 pointer-events-none z-[4] overflow-visible"
+                    style={{ top: viewMinY, width: trackW, height: viewHeight }}
+                    width={trackW}
+                    height={viewHeight}
+                    viewBox={`0 ${viewMinY} ${trackW} ${viewHeight}`}
+                    aria-hidden="true"
+                >
+                    {skipRoutes.map((route, i) => {
+                        const { x1, y1, x2, y2, routeY, arrowT = 0.5 } = route;
+                        const arrowX = x1 + (x2 - x1) * arrowT;
+                        const ah = SC_FLOW_ARROW_HALF;
+                        const lineProps = {
+                            stroke,
+                            strokeWidth,
+                            strokeLinecap: 'round',
+                            className: arrowClass,
+                            vectorEffect: 'non-scaling-stroke',
+                        };
+
+                        return (
+                            <g key={i} className="sc-flow-skip-path">
+                                <line x1={x1} y1={y1} x2={x1} y2={routeY} {...lineProps} />
+                                <line x1={x1} y1={routeY} x2={arrowX - ah} y2={routeY} {...lineProps} />
+                                <polygon points={`${arrowX - ah},${routeY - SC_FLOW_ARROW_RISE} ${arrowX + ah},${routeY} ${arrowX - ah},${routeY + SC_FLOW_ARROW_RISE}`} fill={stroke} />
+                                <line x1={arrowX + ah} y1={routeY} x2={x2} y2={routeY} {...lineProps} />
+                                <line x1={x2} y1={routeY} x2={x2} y2={y2} {...lineProps} />
+                            </g>
+                        );
+                    })}
+                </svg>
+            );
+        };
+
         const SupplyChainFlow = ({ content }) => {
             const steps = content.ui.sc_steps;
             const [activeIdx, setActiveIdx] = useState(0);
@@ -1228,24 +1637,53 @@
                 const trackRect = track.getBoundingClientRect();
                 if (!trackRect.width) return;
 
-                const toPct = (px) => (px / trackRect.width) * 100;
-                const tailClear = 4;
+                const tailClear = 8;
+                const headClear = 8;
 
                 const segments = [];
                 for (let i = 0; i < icons.length - 1; i++) {
                     const a = icons[i].getBoundingClientRect();
                     const b = icons[i + 1].getBoundingClientRect();
                     const x1Px = (a.right - trackRect.left) + tailClear;
-                    const x2Px = (b.left - trackRect.left);
-                    const x1Pct = toPct(x1Px);
-                    const x2Pct = toPct(x2Px);
+                    const x2Px = (b.left - trackRect.left) - headClear;
+                    const width = Math.max(x2Px - x1Px, 0);
+                    if (width < 8) continue;
+                    const centerY = ((a.top + a.bottom) / 2 + (b.top + b.bottom) / 2) / 2;
                     segments.push({
-                        x1Pct,
-                        x2Pct,
-                        midPct: (x1Pct + x2Pct) / 2,
+                        left: x1Px,
+                        width,
+                        top: centerY - trackRect.top - 12,
                     });
                 }
-                setConnectorGeom(segments);
+
+                const skipRoutes = SC_SKIP_LINKS.map(({ from, to, lane, arrowT = 0.5 }) => {
+                    const a = icons[from]?.getBoundingClientRect();
+                    const b = icons[to]?.getBoundingClientRect();
+                    if (!a || !b) return null;
+
+                    const x1 = ((a.left + a.right) / 2) - trackRect.left;
+                    const y1 = a.top - trackRect.top;
+                    const x2 = ((b.left + b.right) / 2) - trackRect.left;
+                    const y2 = b.top - trackRect.top;
+
+                    let minIntermediateTop = Infinity;
+                    for (let i = from + 1; i < to; i++) {
+                        const ir = icons[i].getBoundingClientRect();
+                        minIntermediateTop = Math.min(minIntermediateTop, ir.top - trackRect.top);
+                    }
+
+                    const laneStep = 16;
+                    const routeY = minIntermediateTop - (10 + lane * laneStep);
+
+                    return { x1, y1, x2, y2, routeY, arrowT };
+                }).filter(Boolean);
+
+                setConnectorGeom({
+                    segments,
+                    skipRoutes,
+                    trackW: trackRect.width,
+                    trackH: track.offsetHeight,
+                });
             };
 
             useEffect(() => {
@@ -1256,30 +1694,34 @@
                 return () => clearInterval(timer);
             }, [paused, steps.length]);
 
+            useLayoutEffect(() => {
+                measureConnectors();
+            }, [activeIdx, steps.length]);
+
             useEffect(() => {
                 const run = () => requestAnimationFrame(measureConnectors);
                 run();
                 window.addEventListener('resize', run);
-                const settle = setTimeout(run, 520);
+                const settleTimers = [120, 320, 520].map(ms => setTimeout(run, ms));
                 const track = flowTrackRef.current;
+                const grid = gridRef.current;
                 let ro;
-                if (track && typeof ResizeObserver !== 'undefined') {
+                if (typeof ResizeObserver !== 'undefined') {
                     ro = new ResizeObserver(run);
-                    ro.observe(track);
+                    if (track) ro.observe(track);
+                    if (grid) ro.observe(grid);
                 }
                 return () => {
                     window.removeEventListener('resize', run);
-                    clearTimeout(settle);
+                    settleTimers.forEach(clearTimeout);
                     if (ro) ro.disconnect();
                 };
             }, [activeIdx, steps.length]);
 
-            const getSegmentGeom = (i) => {
-                if (connectorGeom && connectorGeom[i]) return connectorGeom[i];
-                const x1Pct = 11.4 + i * 17.4;
-                const x2Pct = x1Pct + 10.6;
-                return { x1Pct, x2Pct, midPct: (x1Pct + x2Pct) / 2 };
-            };
+            const connectorSegments = connectorGeom?.segments || [];
+            const skipRoutes = connectorGeom?.skipRoutes || [];
+            const trackW = connectorGeom?.trackW || 0;
+            const trackH = connectorGeom?.trackH || 0;
 
             const activeStep = steps[activeIdx];
             const activeMeta = SC_STEP_META[activeIdx];
@@ -1304,43 +1746,20 @@
                             </div>
                         </div>
 
-                        <div className="relative sc-flow-scroll -mx-1 px-1 pt-1 pb-3">
-                            <div className="relative min-w-[920px] md:min-w-0" ref={flowTrackRef}>
-                                <div className="absolute inset-x-0 top-[34px] md:top-[38px] h-6 pointer-events-none z-[1]" aria-hidden="true">
-                                    {SC_CONNECTOR_COLORS.map((_, i) => {
-                                        const { x1Pct, x2Pct } = getSegmentGeom(i);
-                                        const widthPct = Math.max(x2Pct - x1Pct, 0);
-                                        const isPast = i < activeIdx;
-                                        const isActive = i === activeIdx;
-                                        const lit = isPast || isActive;
-                                        const stroke = lit ? `url(#sc-seg-grad-${i})` : 'rgba(148,163,184,0.42)';
-                                        const strokeWidth = isActive ? 2.5 : isPast ? 2 : 1.75;
-                                        const arrowFill = lit ? '#f59e0b' : 'rgba(148,163,184,0.5)';
-                                        const arrowClass = isActive ? 'sc-flow-arrow sc-flow-arrow-active' : 'sc-flow-arrow';
-                                        const lineStyle = isPast && !isActive ? { opacity: 0.75 } : undefined;
+                        <div className="relative sc-flow-scroll -mx-1 px-1 pb-3">
+                            <div className="relative min-w-[920px] md:min-w-0 pt-12 md:pt-14 overflow-visible" ref={flowTrackRef}>
+                                <SCSkipRouteLayer skipRoutes={skipRoutes} trackW={trackW} trackH={trackH} />
 
-                                        return (
-                                            <svg
-                                                key={i}
-                                                className="absolute top-0 h-6 overflow-visible"
-                                                style={{ left: `${x1Pct}%`, width: `${widthPct}%` }}
-                                                viewBox="0 0 100 24"
-                                                preserveAspectRatio="none"
-                                            >
-                                                <defs>
-                                                    {lit && (
-                                                        <linearGradient id={`sc-seg-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                                                            <stop offset="0%" stopColor={SC_CONNECTOR_COLORS[i][0]} />
-                                                            <stop offset="100%" stopColor={SC_CONNECTOR_COLORS[i][1]} />
-                                                        </linearGradient>
-                                                    )}
-                                                </defs>
-                                                <line x1="0" y1="12" x2="46" y2="12" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="butt" className={arrowClass} style={lineStyle} vectorEffect="non-scaling-stroke" />
-                                                <polygon points="46,8.5 54,12 46,15.5" fill={arrowFill} className={isActive ? 'sc-arrow-pulse' : undefined} />
-                                                <line x1="54" y1="12" x2="100" y2="12" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="butt" className={arrowClass} style={lineStyle} vectorEffect="non-scaling-stroke" />
-                                            </svg>
-                                        );
-                                    })}
+                                <div className="absolute inset-0 pointer-events-none z-[5]" aria-hidden="true">
+                                    {connectorSegments.map((seg, i) => (
+                                        <SCConnectorSegment
+                                            key={i}
+                                            seg={seg}
+                                            index={i}
+                                            isPast={i < activeIdx}
+                                            isActive={i === activeIdx}
+                                        />
+                                    ))}
                                 </div>
 
                                 <div ref={gridRef} className="relative z-10 grid grid-cols-6 gap-2 md:gap-3 min-h-[152px] md:min-h-[164px] items-start">
@@ -1403,6 +1822,356 @@
                                         className={`h-1.5 rounded-full transition-all duration-500 ${idx === activeIdx ? 'w-5 bg-brand-gold' : idx < activeIdx ? 'w-1.5 bg-brand-gold/40' : 'w-1.5 bg-slate-300 dark:bg-slate-700'}`}
                                     />
                                 ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const I4L_LAYOUT = {
+            aps: { left: 50, top: 23, icon: ActivityIcon, tone: 'text-brand-gold', width: 124, iconSize: 80 },
+            erp: { left: 19, top: 68, icon: BoxIcon, tone: 'text-slate-600 dark:text-slate-300', width: 118, iconSize: 68 },
+            mes: { left: 81, top: 68, icon: FactoryIcon, tone: 'text-slate-600 dark:text-slate-300', width: 118, iconSize: 68 },
+        };
+
+        const I4L_VB = { w: 480, h: 320 };
+        const I4L_LABEL_H = 30;
+
+        const i4lIconBox = (nodeKey) => {
+            const n = I4L_LAYOUT[nodeKey];
+            const cx = (I4L_VB.w * n.left) / 100;
+            const cy = (I4L_VB.h * n.top) / 100;
+            const halfH = (n.iconSize + I4L_LABEL_H) / 2;
+            const top = cy - halfH;
+            const bottom = top + n.iconSize;
+            const left = cx - n.iconSize / 2;
+            const right = cx + n.iconSize / 2;
+            return { cx, cy, top, bottom, left, right };
+        };
+
+        const i4lMidTag = (x1, y1, x2, y2, offset, outwardRight, extraX = 0, extraY = 0) => {
+            const mx = (x1 + x2) / 2;
+            const my = (y1 + y2) / 2;
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const len = Math.hypot(dx, dy) || 1;
+            const nx = outwardRight ? dy / len : -dy / len;
+            const ny = outwardRight ? -dx / len : dx / len;
+            return {
+                left: `${((mx + nx * offset + extraX) / I4L_VB.w) * 100}%`,
+                top: `${((my + ny * offset + extraY) / I4L_VB.h) * 100}%`,
+            };
+        };
+
+        const i4lTrimEnd = (x1, y1, x2, y2, trim) => {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const len = Math.hypot(dx, dy) || 1;
+            return { x: x2 - (dx / len) * trim, y: y2 - (dy / len) * trim };
+        };
+
+        const I4L_PATHS = (() => {
+            const erp = i4lIconBox('erp');
+            const aps = i4lIconBox('aps');
+            const mes = i4lIconBox('mes');
+            const pad = 2;
+            const arrowGap = 6;
+            const erpApsStart = { x: erp.right - pad, y: erp.top + pad + 4 };
+            const erpApsEnd = { x: aps.left + pad + 4, y: aps.bottom - pad };
+            const apsMesStart = { x: aps.right - pad - 4, y: aps.bottom - pad };
+            const apsMesEnd = { x: mes.left + pad, y: mes.top + pad + 4 };
+            const apsMesEndTrimmed = i4lTrimEnd(apsMesStart.x, apsMesStart.y, apsMesEnd.x, apsMesEnd.y, arrowGap);
+            return {
+                gap: {
+                    erpToBreak: `M ${erp.right - pad} ${erp.top + pad + 4} L ${aps.left + 8} ${aps.bottom + 14}`,
+                    mesToBreak: `M ${mes.left + pad} ${mes.top + pad + 4} L ${aps.right - 8} ${aps.bottom + 14}`,
+                    breakLeft: { x: aps.left + 5, y: aps.bottom + 12 },
+                    breakRight: { x: aps.right - 5, y: aps.bottom + 12 },
+                    baseline: `M ${mes.left - 14} ${mes.bottom + pad - 6} Q ${I4L_VB.w / 2} ${erp.bottom + pad + 8} ${erp.right + 14} ${erp.bottom + pad - 6}`,
+                },
+                loop: {
+                    erpToAps: `M ${erp.right - pad} ${erp.top + pad + 4} L ${aps.left + pad + 4} ${aps.bottom - pad}`,
+                    apsToMes: `M ${apsMesStart.x} ${apsMesStart.y} L ${apsMesEndTrimmed.x} ${apsMesEndTrimmed.y}`,
+                    mesToErp: `M ${mes.left + pad + 6} ${mes.bottom - pad - 10} Q ${I4L_VB.w / 2} ${mes.bottom + pad + 8} ${erp.right - pad - 6} ${erp.bottom - pad - 10}`,
+                },
+                tags: {
+                    input: i4lMidTag(erpApsStart.x, erpApsStart.y, erpApsEnd.x, erpApsEnd.y, 46, true, -22, 10),
+                    optimized: i4lMidTag(apsMesStart.x, apsMesStart.y, apsMesEnd.x, apsMesEnd.y, 46, true, 22, 10),
+                    recording: { left: '50%', top: `${((mes.bottom + pad + 28) / I4L_VB.h) * 100}%` },
+                },
+            };
+        })();
+
+        const I4L_FLOW_TAGS = [
+            { left: I4L_PATHS.tags.input.left, top: I4L_PATHS.tags.input.top, key: 'i4l_flow_input', gold: true, apsOnly: true },
+            { left: I4L_PATHS.tags.optimized.left, top: I4L_PATHS.tags.optimized.top, key: 'i4l_flow_optimized', gold: true, apsOnly: true },
+            { left: I4L_PATHS.tags.recording.left, top: I4L_PATHS.tags.recording.top, key: 'i4l_flow_recording', gold: false },
+        ];
+
+        const I4LNodeCard = ({ nodeKey, ui, apsVisible, highlighted }) => {
+            const layout = I4L_LAYOUT[nodeKey];
+            const Icon = layout.icon;
+            const label = ui[`i4l_${nodeKey}_label`];
+            const full = ui[`i4l_${nodeKey}_full`];
+            const isAps = nodeKey === 'aps';
+            const isGhost = isAps && !apsVisible;
+
+            return (
+                <div
+                    className={`i4l-node pointer-events-none${isAps && apsVisible ? ' i4l-node-pop' : ''}`}
+                    style={{ left: `${layout.left}%`, top: `${layout.top}%`, width: layout.width || 118 }}
+                    aria-hidden="true"
+                >
+                    <div className={`i4l-node-icon ${isAps ? 'i4l-node-icon-aps' : ''} ${isGhost ? 'i4l-node-icon-ghost' : ''} ${highlighted && !isGhost ? 'i4l-node-icon-active' : ''}`}>
+                        <span className={isGhost ? 'text-rose-400/70' : layout.tone}><Icon /></span>
+                        {isGhost && <span className="i4l-qmark">?</span>}
+                    </div>
+                    <div className="i4l-node-labels">
+                        {isGhost ? (
+                            <>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400">{ui.i4l_gap_label}</span>
+                                <span className="mt-0.5 text-[9px] font-medium leading-tight px-1 invisible" aria-hidden="true">.</span>
+                            </>
+                        ) : (
+                            <>
+                                <span className={`text-[11px] font-black uppercase tracking-wide ${highlighted ? 'text-brand-gold' : 'text-slate-700 dark:text-slate-200'}`}>{label}</span>
+                                <span className="mt-0.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 leading-tight px-1">{full}</span>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const SystemIntegrationLoop = ({ content }) => {
+            const ui = content.ui;
+            const [phase, setPhase] = useState(0);
+            const [paused, setPaused] = useState(false);
+            const [started, setStarted] = useState(false);
+            const sectionRef = useRef(null);
+            const apsVisible = phase === 1;
+
+            useEffect(() => {
+                const el = sectionRef.current;
+                if (!el) return undefined;
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) {
+                        setStarted(true);
+                        observer.disconnect();
+                    }
+                }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
+                observer.observe(el);
+                return () => observer.disconnect();
+            }, []);
+
+            useEffect(() => {
+                if (!started || paused) return undefined;
+                const timer = setInterval(() => setPhase(p => (p + 1) % 2), 9500);
+                return () => clearInterval(timer);
+            }, [started, paused]);
+
+            const togglePhase = () => setPhase(p => (p + 1) % 2);
+
+            return (
+                <section
+                    ref={sectionRef}
+                    className="relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm overflow-hidden"
+                    aria-label={ui.i4l_title}
+                    onMouseEnter={() => setPaused(true)}
+                    onMouseLeave={() => setPaused(false)}
+                >
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+                        <div className="absolute -top-10 left-1/3 w-72 h-36 bg-brand-gold/6 rounded-full blur-3xl" />
+                        <div className="absolute bottom-0 right-1/4 w-56 h-28 bg-rose-500/5 rounded-full blur-3xl i4l-phase-fade" style={{ opacity: apsVisible ? 0 : 1 }} />
+                        <div className="absolute top-0 right-1/3 w-64 h-32 bg-emerald-500/5 rounded-full blur-3xl i4l-phase-fade" style={{ opacity: apsVisible ? 1 : 0 }} />
+                    </div>
+
+                    <div className="w-full px-4 sm:px-5 md:px-6 py-4 md:py-5 relative">
+                        <div className="flex flex-wrap items-end justify-between gap-3 mb-5 md:mb-6">
+                            <div>
+                                <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-1">{ui.i4l_eyebrow}</p>
+                                <h2 className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight">{ui.i4l_title}</h2>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {[0, 1].map(i => (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        onClick={() => setPhase(i)}
+                                        className={`h-1.5 rounded-full transition-all duration-500 ${phase === i ? 'w-6 bg-brand-gold' : 'w-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-brand-gold/40'}`}
+                                        aria-label={i === 0 ? ui.i4l_phase_gap_badge : ui.i4l_phase_aps_badge}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-6 md:gap-8 items-stretch">
+                            <div
+                                className="group relative rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm px-3 pt-5 pb-4 md:px-5 md:pt-6 md:pb-5 flex flex-col cursor-pointer transition-colors hover:border-brand-gold/30"
+                                onClick={togglePhase}
+                                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePhase(); } }}
+                                role="button"
+                                tabIndex={0}
+                                aria-label={apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className={`inline-flex items-center justify-center gap-1.5 min-w-[8.5rem] text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full transition-colors duration-500 ${apsVisible ? 'text-brand-gold bg-brand-gold/10 border border-brand-gold/25' : 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60'}`}>
+                                        <span className={`h-1.5 w-1.5 rounded-full ${apsVisible ? 'bg-brand-gold' : 'bg-rose-500'}`} />
+                                        {apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
+                                    </span>
+                                    <span className="text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">{ui.i4l_tap_hint}</span>
+                                </div>
+
+                                <div className="flex-1 flex items-center justify-center">
+                                    <div className="i4l-diagram-stage select-none">
+                                        <svg viewBox="0 0 480 320" className="i4l-diagram-svg" aria-hidden="true">
+                                            <defs>
+                                                <marker id="i4l-arrow-gold" viewBox="0 0 6 6" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+                                                    <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b" />
+                                                </marker>
+                                                <marker id="i4l-arrow-slate-start" viewBox="0 0 6 6" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+                                                    <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8" fillOpacity="0.55" />
+                                                </marker>
+                                                <marker id="i4l-arrow-slate-end" viewBox="0 0 6 6" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+                                                    <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8" fillOpacity="0.55" />
+                                                </marker>
+                                                <linearGradient id="i4l-gold-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stopColor="#f59e0b" />
+                                                    <stop offset="100%" stopColor="#d97706" />
+                                                </linearGradient>
+                                            </defs>
+
+                                            <g className={`i4l-phase-layer${apsVisible ? ' i4l-phase-hidden' : ''}`}>
+                                                <path d={I4L_PATHS.gap.erpToBreak} fill="none" stroke="#f43f5e" strokeOpacity="0.7" strokeWidth="1.8" className="i4l-gap-line" />
+                                                <path d={I4L_PATHS.gap.mesToBreak} fill="none" stroke="#f43f5e" strokeOpacity="0.7" strokeWidth="1.8" className="i4l-gap-line" />
+                                                <g stroke="#f43f5e" strokeOpacity="0.85" strokeWidth="1.8" strokeLinecap="round">
+                                                    <path d={`M ${I4L_PATHS.gap.breakLeft.x - 5} ${I4L_PATHS.gap.breakLeft.y} l 10 10 M ${I4L_PATHS.gap.breakLeft.x + 5} ${I4L_PATHS.gap.breakLeft.y} l -10 10`} />
+                                                    <path d={`M ${I4L_PATHS.gap.breakRight.x - 5} ${I4L_PATHS.gap.breakRight.y} l 10 10 M ${I4L_PATHS.gap.breakRight.x + 5} ${I4L_PATHS.gap.breakRight.y} l -10 10`} />
+                                                </g>
+                                                <path d={I4L_PATHS.gap.baseline} fill="none" stroke="#94a3b8" strokeOpacity="0.35" strokeWidth="1.4" strokeDasharray="5 6" markerStart="url(#i4l-arrow-slate-start)" markerEnd="url(#i4l-arrow-slate-end)" />
+                                            </g>
+
+                                            <g className={`i4l-phase-layer${apsVisible ? '' : ' i4l-phase-hidden'}`}>
+                                                <path d={I4L_PATHS.loop.erpToAps} fill="none" stroke="url(#i4l-gold-grad)" strokeWidth="2.3" markerEnd="url(#i4l-arrow-gold)" className="i4l-flow-arrow" />
+                                                <path d={I4L_PATHS.loop.apsToMes} fill="none" stroke="url(#i4l-gold-grad)" strokeWidth="2.3" markerEnd="url(#i4l-arrow-gold)" className="i4l-flow-arrow i4l-flow-arrow-2" />
+                                                <path d={I4L_PATHS.loop.mesToErp} fill="none" stroke="url(#i4l-gold-grad)" strokeWidth="2.3" markerEnd="url(#i4l-arrow-gold)" className="i4l-flow-arrow i4l-flow-arrow-3" />
+                                            </g>
+                                        </svg>
+
+                                        {I4L_FLOW_TAGS.filter(tag => apsVisible || !tag.apsOnly).map(tag => (
+                                            <span
+                                                key={tag.key}
+                                                className={`i4l-flow-tag i4l-phase-layer ${tag.gold ? 'i4l-flow-tag-gold' : ''}${apsVisible ? '' : ' i4l-phase-hidden'}`}
+                                                style={{ left: tag.left, top: tag.top }}
+                                            >
+                                                {ui[tag.key]}
+                                            </span>
+                                        ))}
+
+                                        <I4LNodeCard nodeKey="erp" ui={ui} apsVisible={apsVisible} highlighted={apsVisible} />
+                                        <I4LNodeCard nodeKey="mes" ui={ui} apsVisible={apsVisible} highlighted={apsVisible} />
+                                        <I4LNodeCard nodeKey="aps" ui={ui} apsVisible={apsVisible} highlighted={apsVisible} />
+                                    </div>
+                                </div>
+
+                                <div className="mt-3 pt-3 border-t border-slate-200/60 dark:border-slate-800/70 min-h-[3.25rem] relative flex items-center justify-center text-center">
+                                    <div className={`i4l-phase-layer absolute inset-x-0 top-3 flex flex-col items-center justify-center${apsVisible ? ' i4l-phase-hidden' : ''}`}>
+                                        <p className="text-[10px] font-medium text-rose-600/90 dark:text-rose-400/90 leading-snug max-w-[18rem]">{ui.i4l_gap_hint}</p>
+                                    </div>
+                                    <div className={`i4l-phase-layer absolute inset-x-0 top-3 flex flex-col items-center justify-center${apsVisible ? '' : ' i4l-phase-hidden'}`}>
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-brand-gold">{ui.i4l_loop_tagline}</p>
+                                        <p className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{ui.i4l_industry_tag}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-3 md:gap-4 h-full min-h-0">
+                                <div className={`relative shrink-0 rounded-xl border px-4 py-3 md:px-5 md:py-4 min-h-[9.5rem] md:min-h-[10rem] transition-colors duration-700 ${apsVisible ? 'border-brand-gold/40 bg-brand-gold/5 dark:bg-brand-gold/10' : 'border-rose-200/70 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-950/20'}`}>
+                                    <div className={`i4l-phase-layer${apsVisible ? ' i4l-phase-hidden' : ''}`}>
+                                        <span className="inline-flex text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 text-rose-600 dark:text-rose-400 bg-rose-100/80 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-800/60">
+                                            {ui.i4l_phase_gap_badge}
+                                        </span>
+                                        <h3 className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 mb-2 leading-snug">
+                                            {ui.i4l_phase_gap_title}
+                                        </h3>
+                                        <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                            {ui.i4l_phase_gap_desc}
+                                        </p>
+                                    </div>
+                                    <div className={`i4l-phase-layer absolute inset-0 px-4 py-3 md:px-5 md:py-4${apsVisible ? '' : ' i4l-phase-hidden'}`}>
+                                        <span className="inline-flex text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 text-brand-gold bg-brand-gold/10 border border-brand-gold/20">
+                                            {ui.i4l_phase_aps_badge}
+                                        </span>
+                                        <h3 className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 mb-2 leading-snug">
+                                            {ui.i4l_phase_aps_title}
+                                        </h3>
+                                        <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                            {ui.i4l_phase_aps_desc}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="relative flex-1 min-h-[17rem] md:min-h-[18rem]">
+                                    <div className={`i4l-phase-layer absolute inset-0${apsVisible ? ' i4l-phase-hidden' : ''}`}>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 h-full items-stretch">
+                                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 px-5 py-4 md:py-5 h-full flex flex-col">
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-500/10 text-slate-600 dark:text-slate-300"><BoxIcon /></span>
+                                                    <span className="text-sm md:text-base font-bold text-slate-700 dark:text-slate-200">{ui.i4l_erp_label}</span>
+                                                </div>
+                                                <ul className="flex-1 flex flex-col justify-center space-y-3">
+                                                    {ui.i4l_erp_cons.map((item, i) => (
+                                                        <li key={i} className="flex gap-2.5 text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                            <span className="text-rose-400 shrink-0 mt-0.5 text-sm font-bold">×</span>
+                                                            <span>{item}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 px-5 py-4 md:py-5 h-full flex flex-col">
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-500/10 text-slate-600 dark:text-slate-300"><FactoryIcon /></span>
+                                                    <span className="text-sm md:text-base font-bold text-slate-700 dark:text-slate-200">{ui.i4l_mes_label}</span>
+                                                </div>
+                                                <ul className="flex-1 flex flex-col justify-center space-y-3">
+                                                    {ui.i4l_mes_cons.map((item, i) => (
+                                                        <li key={i} className="flex gap-2.5 text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                            <span className="text-rose-400 shrink-0 mt-0.5 text-sm font-bold">×</span>
+                                                            <span>{item}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className={`i4l-phase-layer absolute inset-0${apsVisible ? '' : ' i4l-phase-hidden'}`}>
+                                        <div className="rounded-xl border border-brand-gold/30 bg-white/70 dark:bg-slate-900/60 px-5 py-4 md:py-5 h-full flex flex-col">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-gold/15 text-brand-gold sc-node-active"><ActivityIcon /></span>
+                                                <div>
+                                                    <span className="block text-sm md:text-base font-black text-brand-gold uppercase tracking-wide">{ui.i4l_aps_label}</span>
+                                                    <span className="block text-xs md:text-sm text-slate-500 dark:text-slate-400">{ui.i4l_aps_full}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 flex flex-col justify-center min-h-0">
+                                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">{ui.i4l_aps_role}</p>
+                                                <ul className="space-y-3">
+                                                    {ui.i4l_aps_pros.map((item, i) => (
+                                                        <li key={i} className="flex gap-2.5 text-xs md:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                                                            <span className="text-brand-gold shrink-0 mt-0.5 text-sm font-bold">✓</span>
+                                                            <span>{item}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                            <div className="pt-4 mt-4 border-t border-brand-gold/20 flex flex-col gap-1.5">
+                                                <span className="text-xs md:text-sm font-bold uppercase tracking-wider text-brand-gold">{ui.i4l_loop_tagline}</span>
+                                                <span className="text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300 underline decoration-brand-gold/40 underline-offset-2">{ui.i4l_industry_tag}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1933,6 +2702,9 @@
 
                             <div className="mt-16 md:mt-20">
                                 <Reveal delay={125}><SupplyChainFlow content={content} /></Reveal>
+                            </div>
+                            <div className="mt-16 md:mt-20">
+                                <Reveal delay={150}><SystemIntegrationLoop content={content} /></Reveal>
                             </div>
 
                             <div className="mt-16 md:mt-24">
