@@ -643,6 +643,263 @@
                 display: none;
             }
         }
+
+        /* OR analytics process cycle */
+        @keyframes or-cycle-dash {
+            to { stroke-dashoffset: -20; }
+        }
+
+        @keyframes or-node-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35); }
+            50% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+        }
+
+        @keyframes or-node-pop {
+            0% { transform: scale(0.88); opacity: 0.65; }
+            55% { transform: scale(1.06); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes or-node-enter {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            65% { opacity: 1; transform: translate(-50%, -50%) scale(1.07); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .or-node-enter {
+            animation: or-node-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .or-cycle-segment-hidden,
+        .or-cycle-node-dot-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .or-cycle-stage {
+            position: relative;
+            width: 100%;
+            max-width: 36rem;
+            margin-left: auto;
+            margin-right: auto;
+            aspect-ratio: 1;
+            padding: 1.25rem;
+            overflow: visible;
+        }
+
+        .or-cycle-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: visible;
+        }
+
+        .or-cycle-track {
+            fill: none;
+            stroke: rgba(148, 163, 184, 0.28);
+            stroke-width: 2.5;
+        }
+
+        .or-cycle-node-dot {
+            fill: rgba(148, 163, 184, 0.55);
+            transition: fill 0.35s ease, r 0.35s ease;
+        }
+
+        .dark .or-cycle-node-dot {
+            fill: rgba(100, 116, 139, 0.75);
+        }
+
+        .or-cycle-node-dot-active {
+            fill: #f59e0b;
+        }
+
+        .or-cycle-node-dot-past {
+            fill: rgba(245, 158, 11, 0.5);
+        }
+
+        .dark .or-cycle-track {
+            stroke: rgba(71, 85, 105, 0.65);
+        }
+
+        .or-cycle-segment {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke 0.4s ease, opacity 0.4s ease;
+        }
+
+        .or-cycle-segment-idle {
+            stroke: rgba(148, 163, 184, 0.22);
+        }
+
+        .dark .or-cycle-segment-idle {
+            stroke: rgba(71, 85, 105, 0.45);
+        }
+
+        .or-cycle-segment-active {
+            stroke: url(#or-gold-grad);
+            stroke-dasharray: 6 4;
+            animation: or-cycle-dash 1.1s linear infinite;
+        }
+
+        .or-cycle-segment-past {
+            stroke: rgba(245, 158, 11, 0.45);
+        }
+
+        .or-world-split {
+            stroke: rgba(148, 163, 184, 0.35);
+            stroke-width: 1.5;
+            stroke-dasharray: 6 5;
+        }
+
+        .dark .or-world-split {
+            stroke: rgba(100, 116, 139, 0.55);
+        }
+
+        .or-world-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            fill: rgba(100, 116, 139, 0.55);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .dark .or-world-label {
+            fill: rgba(148, 163, 184, 0.75);
+        }
+
+        .or-node {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            display: block;
+            width: 3.25rem;
+            height: 3.25rem;
+            padding: 0;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: transform 0.35s ease;
+        }
+
+        .or-node:hover {
+            transform: translate(-50%, -50%) scale(1.04);
+        }
+
+        .or-node-active {
+            transform: translate(-50%, -50%) scale(1.06);
+        }
+
+        .or-node-icon {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.25rem;
+            height: 3.25rem;
+            border-radius: 0.9rem;
+            border: 1.5px solid rgba(148, 163, 184, 0.45);
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.88));
+            color: #64748b;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+            transition: border-color 0.35s ease, background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .dark .or-node-icon {
+            background: linear-gradient(160deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.92));
+            border-color: rgba(71, 85, 105, 0.75);
+            color: #94a3b8;
+        }
+
+        .or-node-pop .or-node-icon {
+            animation: or-node-pop 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .or-node-icon-active {
+            border-color: rgba(245, 158, 11, 0.65);
+            background: linear-gradient(160deg, rgba(255, 251, 235, 0.98), rgba(254, 243, 199, 0.92));
+            color: #d97706;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.18), 0 10px 24px rgba(245, 158, 11, 0.2);
+            animation: or-node-pulse 2.2s ease-in-out infinite;
+        }
+
+        .dark .or-node-icon-active {
+            background: linear-gradient(160deg, rgba(120, 53, 15, 0.55), rgba(69, 26, 3, 0.65));
+            color: #fbbf24;
+        }
+
+        .or-node-icon-lit {
+            border-color: rgba(245, 158, 11, 0.48);
+            background: linear-gradient(160deg, rgba(255, 251, 235, 0.94), rgba(254, 243, 199, 0.88));
+            color: #d97706;
+            box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.14), 0 6px 18px rgba(245, 158, 11, 0.14);
+        }
+
+        .dark .or-node-icon-lit {
+            background: linear-gradient(160deg, rgba(120, 53, 15, 0.48), rgba(69, 26, 3, 0.58));
+            color: #fbbf24;
+        }
+
+        .or-node-lit .or-node-label {
+            color: #b45309;
+        }
+
+        .dark .or-node-lit .or-node-label {
+            color: #fbbf24;
+        }
+
+        .or-node-label {
+            position: absolute;
+            top: calc(100% + 0.3rem);
+            left: 50%;
+            transform: translateX(-50%);
+            width: max-content;
+            max-width: 5.5rem;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: capitalize;
+            color: #64748b;
+            line-height: 1.2;
+            text-align: center;
+            pointer-events: none;
+            transition: color 0.35s ease;
+        }
+
+        .dark .or-node-label {
+            color: #94a3b8;
+        }
+
+        .or-node-active .or-node-label {
+            color: #b45309;
+        }
+
+        .dark .or-node-active .or-node-label {
+            color: #fbbf24;
+        }
+
+        .or-detail-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 0.75rem;
+            border: 1.5px solid rgba(245, 158, 11, 0.35);
+            background: linear-gradient(160deg, rgba(255, 251, 235, 0.98), rgba(254, 243, 199, 0.9));
+            color: #d97706;
+            flex-shrink: 0;
+        }
+
+        .dark .or-detail-icon {
+            background: linear-gradient(160deg, rgba(120, 53, 15, 0.55), rgba(69, 26, 3, 0.65));
+            color: #fbbf24;
+        }
     </style>
 
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
@@ -682,11 +939,12 @@
             { id: 'industry-40', label: ui.nav_industry_40 },
             ...horizons.map(h => ({ id: h.id, label: h.title })),
             { id: 'analytics', label: ui.nav_analytics },
+            { id: 'or-process', label: ui.nav_or_process },
             { id: 'about', label: ui.about_vision },
         ];
 
         const getNavTargetId = (navId) => {
-            if (['supply-chain', 'industry-40', 'analytics', 'about'].includes(navId)) return navId;
+            if (['supply-chain', 'industry-40', 'analytics', 'or-process', 'about'].includes(navId)) return navId;
             return `horizon-${navId}`;
         };
 
@@ -729,6 +987,24 @@
         const ShortHaulIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle><line x1="2" y1="9" x2="12" y2="9"></line></svg>;
         const StoreIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9 12 2l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>;
         const ProcurementIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 16h6"></path><path d="M19 13v6"></path><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"></path><path d="M7.5 4.21 12 6.81l4.5-2.6"></path><path d="M3.29 7 12 12l8.71-5"></path><path d="M12 22V12"></path></svg>;
+        const TargetIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>;
+        const DatabaseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>;
+        const CpuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path><path d="M2 9h2"></path><path d="M2 15h2"></path><path d="M20 9h2"></path><path d="M20 15h2"></path></svg>;
+        const FlaskIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2v8.5L4.5 20a1 1 0 0 0 .9 1.5h13.2a1 1 0 0 0 .9-1.5L14 10.5V2"></path><path d="M8.5 2h7"></path></svg>;
+        const CheckCircleIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>;
+        const ShieldCheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>;
+        const RocketIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>;
+
+        const OR_PROCESS_ICONS = {
+            problem: TargetIcon,
+            data: DatabaseIcon,
+            model: MedianIcon,
+            algorithm: CpuIcon,
+            prototype: FlaskIcon,
+            solution: CheckCircleIcon,
+            plausibility: ShieldCheckIcon,
+            deployment: RocketIcon,
+        };
 
         // --- DATA & CONFIG ---
 
@@ -818,6 +1094,23 @@
                     analytics_operartis_title: "Where Operartis Creates Value",
                     analytics_operartis_desc: "Operartis bridges diagnostic visibility with predictive and prescriptive APS — turning ERP and shop-floor data into optimized plans, simulations and decision support.",
                     analytics_tap_hint: "Select a level to explore",
+                    or_process_eyebrow: "OR Analytics Process",
+                    or_process_title: "Build Your Own APS — Together With Operartis",
+                    or_process_subtitle: "Want to build your own APS system or optimized scenario-based solution with Operartis? Here is how we work together to reach your purpose.",
+                    or_process_model_world: "Model world",
+                    or_process_real_world: "Real world",
+                    or_process_tap_hint: "Click a step to explore",
+                    or_process_loop_label: "Iterative optimization cycle",
+                    or_process_steps: [
+                        { id: 'problem', label: 'Problem', desc: 'We frame your business challenge — capacity, cost, service level or network design — and define measurable objectives together.' },
+                        { id: 'data', label: 'Data', desc: 'We consolidate ERP, shop-floor and external data into a reliable foundation for modeling and validation.' },
+                        { id: 'model', label: 'Model', desc: 'We translate your operations into a mathematical model that reflects real constraints, flows and decision logic.' },
+                        { id: 'algorithm', label: 'Algorithm', desc: 'We select and implement optimization or simulation methods suited to your problem structure and scale.' },
+                        { id: 'prototype', label: 'Prototype', desc: 'We build a working prototype so planners can test scenarios before full-scale rollout.' },
+                        { id: 'solution', label: 'Solution', desc: 'We deliver optimized plans, schedules or network designs ready for operational use.' },
+                        { id: 'plausibility', label: 'Plausibility', desc: 'We validate outcomes with your teams — checking feasibility, assumptions and business sense against reality.' },
+                        { id: 'deployment', label: 'Deployment', desc: 'We integrate the solution into your APS landscape, train users and establish a continuous improvement loop.' },
+                    ],
                     rights_reserved: "v2.0.0 Matrix UI • Latency: 24ms",
                     stat_horizons: "Planning Horizons",
                     stat_engines: "Optimization Engines",
@@ -826,6 +1119,7 @@
                     nav_supply_chain: "Supply Chain",
                     nav_industry_40: "Industry 4.0",
                     nav_analytics: "Analytics Levels",
+                    nav_or_process: "OR Process",
                     i4l_eyebrow: "Industry 4.0 Integration",
                     i4l_title: "ERP + MES Are Not Enough",
                     i4l_phase_gap_badge: "Without APS",
@@ -1056,6 +1350,23 @@
                     analytics_operartis_title: "Operartis Tạo Giá trị Ở Đâu",
                     analytics_operartis_desc: "Operartis kết nối tầm nhìn chẩn đoán với APS dự báo và khuyến nghị — biến dữ liệu ERP và shop-floor thành kế hoạch tối ưu, mô phỏng và hỗ trợ quyết định.",
                     analytics_tap_hint: "Chọn cấp độ để xem chi tiết",
+                    or_process_eyebrow: "Quy trình Phân tích OR",
+                    or_process_title: "Xây dựng APS của riêng bạn — Cùng Operartis",
+                    or_process_subtitle: "Muốn xây dựng hệ thống APS hoặc giải pháp kịch bản tối ưu cùng Operartis? Đây là cách chúng tôi phối hợp để đạt mục tiêu của bạn.",
+                    or_process_model_world: "Thế giới mô hình",
+                    or_process_real_world: "Thế giới thực",
+                    or_process_tap_hint: "Nhấn vào bước để xem chi tiết",
+                    or_process_loop_label: "Vòng lặp tối ưu lặp lại",
+                    or_process_steps: [
+                        { id: 'problem', label: 'Bài toán', desc: 'Chúng tôi xác định thách thức kinh doanh — năng lực, chi phí, mức dịch vụ hay thiết kế mạng — và cùng đặt mục tiêu đo lường được.' },
+                        { id: 'data', label: 'Dữ liệu', desc: 'Chúng tôi hợp nhất dữ liệu ERP, shopfloor và nguồn bên ngoài thành nền tảng tin cậy cho mô hình hóa.' },
+                        { id: 'model', label: 'Mô hình', desc: 'Chúng tôi chuyển vận hành thực tế thành mô hình toán học phản ánh ràng buộc, luồng và logic quyết định.' },
+                        { id: 'algorithm', label: 'Thuật toán', desc: 'Chúng tôi chọn và triển khai phương pháp tối ưu hoặc mô phỏng phù hợp quy mô và cấu trúc bài toán.' },
+                        { id: 'prototype', label: 'Nguyên mẫu', desc: 'Chúng tôi xây dựng prototype để planner thử nghiệm kịch bản trước khi triển khai rộng.' },
+                        { id: 'solution', label: 'Giải pháp', desc: 'Chúng tôi bàn giao kế hoạch, lịch hoặc thiết kế mạng đã tối ưu, sẵn sàng vận hành.' },
+                        { id: 'plausibility', label: 'Hợp lý', desc: 'Chúng tôi xác thực kết quả với đội ngũ của bạn — kiểm tra tính khả thi và giả định so với thực tế.' },
+                        { id: 'deployment', label: 'Triển khai', desc: 'Chúng tôi tích hợp giải pháp vào hệ sinh thái APS, đào tạo người dùng và thiết lập vòng cải tiến liên tục.' },
+                    ],
                     rights_reserved: "v2.0.0 Giao diện Ma Trận • Độ trễ: 24ms",
                     stat_horizons: "Khung hoạch định",
                     stat_engines: "Công cụ tối ưu",
@@ -1064,6 +1375,7 @@
                     nav_supply_chain: "Chuỗi cung ứng",
                     nav_industry_40: "Industry 4.0",
                     nav_analytics: "Cấp phân tích",
+                    nav_or_process: "Quy trình OR",
                     i4l_eyebrow: "Tích hợp Industry 4.0",
                     i4l_title: "ERP + MES vẫn chưa đủ",
                     i4l_phase_gap_badge: "Không có APS",
@@ -1294,6 +1606,23 @@
                     analytics_operartis_title: "Wo Operartis Mehrwert schafft",
                     analytics_operartis_desc: "Operartis verbindet diagnostische Transparenz mit prädiktiver und präskriptiver APS — und verwandelt ERP- und Shopfloor-Daten in optimierte Pläne, Simulationen und Entscheidungsunterstützung.",
                     analytics_tap_hint: "Stufe auswählen",
+                    or_process_eyebrow: "OR-Analytics-Prozess",
+                    or_process_title: "Ihr eigenes APS — gemeinsam mit Operartis",
+                    or_process_subtitle: "Sie möchten Ihr eigenes APS-System oder eine optimierte szenariobasierte Lösung mit Operartis entwickeln? So arbeiten wir zusammen, um Ihr Ziel zu erreichen.",
+                    or_process_model_world: "Modellwelt",
+                    or_process_real_world: "Realwelt",
+                    or_process_tap_hint: "Schritt anklicken",
+                    or_process_loop_label: "Iterativer Optimierungszyklus",
+                    or_process_steps: [
+                        { id: 'problem', label: 'Problem', desc: 'Wir definieren Ihre geschäftliche Herausforderung — Kapazität, Kosten, Servicelevel oder Netzwerkdesign — und legen messbare Ziele fest.' },
+                        { id: 'data', label: 'Daten', desc: 'Wir konsolidieren ERP-, Shopfloor- und externe Daten als belastbare Grundlage für Modellierung und Validierung.' },
+                        { id: 'model', label: 'Modell', desc: 'Wir übersetzen Ihre Abläufe in ein mathematisches Modell mit realen Restriktionen, Flüssen und Entscheidungslogik.' },
+                        { id: 'algorithm', label: 'Algorithmus', desc: 'Wir wählen und implementieren Optimierungs- oder Simulationsmethoden passend zu Struktur und Größe Ihres Problems.' },
+                        { id: 'prototype', label: 'Prototyp', desc: 'Wir bauen einen funktionsfähigen Prototyp, damit Planer Szenarien vor dem Rollout testen können.' },
+                        { id: 'solution', label: 'Lösung', desc: 'Wir liefern optimierte Pläne, Termine oder Netzwerkdesigns für den operativen Einsatz.' },
+                        { id: 'plausibility', label: 'Plausibilität', desc: 'Wir validieren Ergebnisse mit Ihren Teams — Prüfung von Machbarkeit, Annahmen und betrieblicher Sinnhaftigkeit.' },
+                        { id: 'deployment', label: 'Deployment', desc: 'Wir integrieren die Lösung in Ihre APS-Landschaft, schulen Anwender und etablieren eine kontinuierliche Verbesserungsschleife.' },
+                    ],
                     rights_reserved: "v2.0.0 Matrix-UI • Latenz: 24ms",
                     stat_horizons: "Planungshorizonte",
                     stat_engines: "Optimierungs-Engines",
@@ -1302,6 +1631,7 @@
                     nav_supply_chain: "Lieferkette",
                     nav_industry_40: "Industry 4.0",
                     nav_analytics: "Analytics-Stufen",
+                    nav_or_process: "OR-Prozess",
                     i4l_eyebrow: "Industry-4.0-Integration",
                     i4l_title: "ERP + MES reichen nicht aus",
                     i4l_phase_gap_badge: "Ohne APS",
@@ -2497,6 +2827,275 @@
         const ANALYTICS_HUMAN_W_AUTO = 6;
         const ANALYTICS_SOURCE_ICONS = [BoxIcon, FactoryIcon, GlobeIcon];
 
+        const OR_PROCESS_ANGLES = [225, 270, 315, 0, 45, 90, 135, 180];
+        const OR_PROCESS_MODEL_IDS = new Set(['model', 'algorithm', 'prototype', 'solution']);
+        const OR_CYCLE_CFG = { vb: 440, cx: 220, cy: 220, r: 158 };
+        const OR_WORLD_DIVIDER_ANGLES = [292.5, 112.5];
+
+        const orCyclePoint = (angleDeg, cfg = OR_CYCLE_CFG, radius = cfg.r) => {
+            const rad = (angleDeg - 90) * (Math.PI / 180);
+            return {
+                x: cfg.cx + radius * Math.cos(rad),
+                y: cfg.cy + radius * Math.sin(rad),
+            };
+        };
+
+        const orWorldDividerEndpoints = (cfg = OR_CYCLE_CFG) => {
+            const extend = cfg.vb / 2 - 10;
+            return OR_WORLD_DIVIDER_ANGLES.map(a => orCyclePoint(a, cfg, extend));
+        };
+
+        const orCycleArcPath = (fromAngle, toAngle, cfg = OR_CYCLE_CFG) => {
+            const start = orCyclePoint(fromAngle, cfg);
+            const end = orCyclePoint(toAngle, cfg);
+            const delta = ((toAngle - fromAngle + 360) % 360) || 360;
+            const largeArc = delta > 180 ? 1 : 0;
+            return `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${cfg.r} ${cfg.r} 0 ${largeArc} 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)}`;
+        };
+
+        const orCycleNodePos = (angleDeg, cfg = OR_CYCLE_CFG) => {
+            const pt = orCyclePoint(angleDeg, cfg);
+            return {
+                left: (pt.x / cfg.vb) * 100,
+                top: (pt.y / cfg.vb) * 100,
+            };
+        };
+
+        const orWorldLabelPos = (half, cfg = OR_CYCLE_CFG) => {
+            const offset = (4 * cfg.r) / (3 * Math.PI);
+            const angle = half === 'model' ? 0 : 180;
+            const rad = (angle - 90) * (Math.PI / 180);
+            return {
+                x: cfg.cx + offset * Math.cos(rad),
+                y: cfg.cy + offset * Math.sin(rad),
+            };
+        };
+
+        const orSegmentVisible = (i, maxRevealedIdx, total) => (
+            i + 1 <= maxRevealedIdx || (i === total - 1 && maxRevealedIdx >= total - 1)
+        );
+
+        const orSegmentIsActive = (i, activeIdx, total) => {
+            const lastIdx = total - 1;
+            if (activeIdx === lastIdx) return i === lastIdx;
+            return (i + 1) === activeIdx;
+        };
+
+        const OrProcessNode = ({ step, isActive, isLit, isVisible, isEntering, pos, onSelect }) => {
+            if (!isVisible) return null;
+            const Icon = OR_PROCESS_ICONS[step.id] || BoxIcon;
+            return (
+                <button
+                    type="button"
+                    onClick={onSelect}
+                    className={`or-node ${isActive ? 'or-node-active' : ''} ${isLit ? 'or-node-lit' : ''} ${isEntering ? 'or-node-enter' : isActive ? 'or-node-pop' : ''}`}
+                    style={{ left: `${pos.left}%`, top: `${pos.top}%` }}
+                    aria-pressed={isActive}
+                    aria-label={step.label}
+                >
+                    <div className={`or-node-icon ${isActive ? 'or-node-icon-active' : isLit ? 'or-node-icon-lit' : ''}`}>
+                        <Icon />
+                    </div>
+                    <span className="or-node-label">{step.label}</span>
+                </button>
+            );
+        };
+
+        const OrProcessSection = ({ content }) => {
+            const ui = content.ui;
+            const steps = ui.or_process_steps;
+            const [activeIdx, setActiveIdx] = useState(0);
+            const [maxRevealedIdx, setMaxRevealedIdx] = useState(0);
+            const [enterIdx, setEnterIdx] = useState(null);
+            const [paused, setPaused] = useState(false);
+            const [started, setStarted] = useState(false);
+            const sectionRef = useRef(null);
+            const prevRevealedRef = useRef(0);
+            const activeIdxRef = useRef(0);
+
+            const selectStep = useCallback((idx) => {
+                setActiveIdx(idx);
+                setMaxRevealedIdx(prev => Math.max(prev, idx));
+            }, []);
+
+            const resetCycle = useCallback(() => {
+                setActiveIdx(0);
+                setMaxRevealedIdx(0);
+                setEnterIdx(null);
+                prevRevealedRef.current = 0;
+                activeIdxRef.current = 0;
+            }, []);
+
+            const advanceCycle = useCallback(() => {
+                const i = activeIdxRef.current;
+                if (i >= steps.length - 1) {
+                    resetCycle();
+                    return;
+                }
+                setActiveIdx(i + 1);
+            }, [steps.length, resetCycle]);
+
+            useEffect(() => {
+                activeIdxRef.current = activeIdx;
+            }, [activeIdx]);
+
+            useEffect(() => {
+                const el = sectionRef.current;
+                if (!el) return undefined;
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) {
+                        setStarted(true);
+                        observer.disconnect();
+                    }
+                }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+                observer.observe(el);
+                return () => observer.disconnect();
+            }, []);
+
+            useEffect(() => {
+                setMaxRevealedIdx(prev => Math.max(prev, activeIdx));
+            }, [activeIdx]);
+
+            useEffect(() => {
+                if (maxRevealedIdx > prevRevealedRef.current && maxRevealedIdx > 0) {
+                    setEnterIdx(maxRevealedIdx);
+                }
+                prevRevealedRef.current = maxRevealedIdx;
+            }, [maxRevealedIdx]);
+
+            useEffect(() => {
+                if (enterIdx === null) return undefined;
+                const timer = setTimeout(() => setEnterIdx(null), 700);
+                return () => clearTimeout(timer);
+            }, [enterIdx]);
+
+            useEffect(() => {
+                if (!started || paused || !steps.length) return undefined;
+                const timer = setInterval(advanceCycle, 4200);
+                return () => clearInterval(timer);
+            }, [started, paused, steps.length, advanceCycle]);
+
+            const activeStep = steps[activeIdx];
+            const ActiveIcon = OR_PROCESS_ICONS[activeStep.id] || BoxIcon;
+            const [worldDividerA, worldDividerB] = orWorldDividerEndpoints();
+
+            return (
+                <section
+                    id="or-process"
+                    ref={sectionRef}
+                    className="page-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm mb-16 md:mb-20"
+                    aria-label={ui.or_process_title}
+                    onMouseEnter={() => setPaused(true)}
+                    onMouseLeave={() => setPaused(false)}
+                >
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+                        <div className="absolute -top-12 left-1/4 w-72 h-36 bg-brand-gold/6 rounded-full blur-3xl" />
+                        <div className="absolute bottom-0 right-1/4 w-64 h-32 bg-sky-500/5 rounded-full blur-3xl" />
+                    </div>
+
+                    <div className="w-full px-4 sm:px-5 md:px-6 py-5 md:py-6 relative">
+                        <div className="mb-6 md:mb-8 max-w-3xl">
+                            <p className="text-[10px] font-bold uppercase section-eyebrow text-brand-gold mb-2">{ui.or_process_eyebrow}</p>
+                            <h2 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight mb-3">{ui.or_process_title}</h2>
+                            <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed">{ui.or_process_subtitle}</p>
+                        </div>
+
+                        <div className="grid lg:grid-cols-[1fr_1fr] gap-8 md:gap-10 items-center">
+                            <div className="or-cycle-stage select-none">
+                                <svg className="or-cycle-svg" viewBox={`0 0 ${OR_CYCLE_CFG.vb} ${OR_CYCLE_CFG.vb}`} aria-hidden="true">
+                                    <defs>
+                                        <linearGradient id="or-gold-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stopColor="#f59e0b" />
+                                            <stop offset="100%" stopColor="#d97706" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle className="or-cycle-track" cx={OR_CYCLE_CFG.cx} cy={OR_CYCLE_CFG.cy} r={OR_CYCLE_CFG.r} />
+                                    {OR_PROCESS_ANGLES.map((fromAngle, i) => {
+                                        const toAngle = OR_PROCESS_ANGLES[(i + 1) % OR_PROCESS_ANGLES.length];
+                                        const visible = orSegmentVisible(i, maxRevealedIdx, steps.length);
+                                        const isActive = visible && orSegmentIsActive(i, activeIdx, steps.length);
+                                        const isLit = visible && !isActive;
+                                        return (
+                                            <path
+                                                key={`seg-${i}`}
+                                                className={`or-cycle-segment ${visible ? '' : 'or-cycle-segment-hidden'} ${isActive ? 'or-cycle-segment-active' : isLit ? 'or-cycle-segment-past' : 'or-cycle-segment-idle'}`}
+                                                d={orCycleArcPath(fromAngle, toAngle)}
+                                            />
+                                        );
+                                    })}
+                                    {OR_PROCESS_ANGLES.map((angle, i) => {
+                                        const pt = orCyclePoint(angle);
+                                        const visible = i <= maxRevealedIdx;
+                                        const isActive = activeIdx === i;
+                                        const isLit = visible && !isActive;
+                                        return (
+                                            <circle
+                                                key={`dot-${i}`}
+                                                className={`or-cycle-node-dot ${visible ? '' : 'or-cycle-node-dot-hidden'} ${isActive ? 'or-cycle-node-dot-active' : isLit ? 'or-cycle-node-dot-past' : ''}`}
+                                                cx={pt.x}
+                                                cy={pt.y}
+                                                r={isActive ? 5 : isLit ? 4 : 3.5}
+                                            />
+                                        );
+                                    })}
+                                    <line
+                                        className="or-world-split"
+                                        x1={worldDividerA.x}
+                                        y1={worldDividerA.y}
+                                        x2={worldDividerB.x}
+                                        y2={worldDividerB.y}
+                                    />
+                                    <text className="or-world-label" x={orWorldLabelPos('model').x} y={orWorldLabelPos('model').y} textAnchor="middle" dominantBaseline="middle">{ui.or_process_model_world}</text>
+                                    <text className="or-world-label" x={orWorldLabelPos('real').x} y={orWorldLabelPos('real').y} textAnchor="middle" dominantBaseline="middle">{ui.or_process_real_world}</text>
+                                </svg>
+                                {steps.map((step, i) => (
+                                    <OrProcessNode
+                                        key={step.id}
+                                        step={step}
+                                        isActive={activeIdx === i}
+                                        isLit={i <= maxRevealedIdx}
+                                        isVisible={i <= maxRevealedIdx}
+                                        isEntering={enterIdx === i}
+                                        pos={orCycleNodePos(OR_PROCESS_ANGLES[i])}
+                                        onSelect={() => selectStep(i)}
+                                    />
+                                ))}
+                            </div>
+
+                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/55 dark:bg-slate-900/45 backdrop-blur-sm p-5 md:p-6">
+                                <div className="flex items-center justify-between gap-3 mb-4">
+                                    <span className="text-[10px] font-mono font-bold text-slate-400">{String(activeIdx + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
+                                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${OR_PROCESS_MODEL_IDS.has(activeStep.id) ? 'text-brand-gold bg-brand-gold/10 border-brand-gold/25' : 'text-slate-500 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'}`}>
+                                        {OR_PROCESS_MODEL_IDS.has(activeStep.id) ? ui.or_process_model_world : ui.or_process_real_world}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="or-detail-icon" aria-hidden="true">
+                                        <ActiveIcon />
+                                    </div>
+                                    <h3 className="text-lg md:text-xl font-bold text-brand-gold capitalize">{activeStep.label}</h3>
+                                </div>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5">{activeStep.desc}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{ui.or_process_loop_label}</p>
+                                <div className="flex flex-wrap gap-1.5 mt-3">
+                                    {steps.map((step, i) => (
+                                        <button
+                                            key={step.id}
+                                            type="button"
+                                            onClick={() => selectStep(i)}
+                                            className={`h-1.5 rounded-full transition-all duration-500 ${activeIdx === i ? 'w-6 bg-brand-gold' : i <= maxRevealedIdx ? 'w-2 bg-brand-gold/45' : 'w-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-brand-gold/40'}`}
+                                            aria-label={step.label}
+                                        />
+                                    ))}
+                                </div>
+                                <p className="text-[9px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-4">{ui.or_process_tap_hint}</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
         const AnalyticsMaturitySection = ({ content }) => {
             const ui = content.ui;
             const levels = ui.analytics_levels;
@@ -2957,6 +3556,7 @@
                     { id: 'industry-40', el: document.getElementById('industry-40') },
                     ...content.matrix.map(h => ({ id: h.id, el: document.getElementById(`horizon-${h.id}`) })),
                     { id: 'analytics', el: document.getElementById('analytics') },
+                    { id: 'or-process', el: document.getElementById('or-process') },
                     { id: 'about', el: document.getElementById('about') },
                 ].filter(s => s.el);
                 return sections;
@@ -3185,6 +3785,12 @@
                             <Reveal delay={175}>
                                 <div className="horizon-pill pt-12 md:pt-16 mt-4 md:mt-8 border-t border-slate-200/80 dark:border-slate-800">
                                     <AnalyticsMaturitySection content={content} />
+                                </div>
+                            </Reveal>
+
+                            <Reveal delay={200}>
+                                <div className="pt-12 md:pt-16 mt-4 md:mt-8 border-t border-slate-200/80 dark:border-slate-800">
+                                    <OrProcessSection content={content} />
                                 </div>
                             </Reveal>
 
