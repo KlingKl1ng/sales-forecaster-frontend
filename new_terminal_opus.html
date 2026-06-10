@@ -286,14 +286,6 @@
             letter-spacing: 0.24em;
         }
 
-        /* Module tile lift */
-        .opus-tile {
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.25s ease;
-        }
-        .opus-tile:hover {
-            transform: translateY(-6px);
-        }
-
         /* Sticky horizon info column on desktop — below pinned HorizonNav */
         @media (min-width: 1024px) {
             .opus-sticky-info { position: sticky; top: 3.5rem; }
@@ -1953,7 +1945,7 @@
             );
         };
 
-        // ModulaBlock — Opus app tile: editorial card w/ gold live-accent + Quick View (DS §5.5)
+        // ModulaBlock — glass app tile with Quick View overlay (matches terminal.html)
         const ModulaBlock = ({ block, content, onClick }) => {
             if (!block) return null;
 
@@ -1967,78 +1959,86 @@
             });
 
             const hasLiveModule = subModulesList.some(m => m.status === 'live');
-            const liveCount = subModulesList.filter(m => m.status === 'live').length;
 
             return (
                 <div
                     onClick={() => onClick(block)}
                     className={`
-                        opus-tile relative group flex h-full min-h-[150px] cursor-pointer overflow-hidden rounded-2xl
-                        border bg-white/90 dark:bg-slate-900/70 backdrop-blur-md
+                        relative group flex flex-col justify-between p-5 rounded-2xl border border-transparent
                         ${hasLiveModule
-                            ? 'border-brand-gold/30 ring-1 ring-brand-gold/10 shadow-[0_8px_32px_rgba(245,158,11,0.08)]'
-                            : 'border-slate-200/80 dark:border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.06)] hover:border-slate-300 dark:hover:border-white/10'}
-                        hover:shadow-[0_24px_48px_rgba(0,0,0,0.12)]
+                            ? 'bg-gradient-to-br from-brand-gold/5 to-brand-dark/10 shadow-[0_8px_32px_rgba(245,158,11,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-1 ring-brand-gold/20'
+                            : 'bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.15)] hover:from-white/30 hover:to-white/10 dark:hover:from-slate-800/50 dark:hover:to-slate-900/30 ring-1 ring-white/30 dark:ring-white/5'}
+                        backdrop-blur-xl cursor-pointer overflow-hidden
+                        transition-all duration-500 ease-out
+                        hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)]
+                        hover:-translate-y-2 hover:scale-[1.02]
+                        h-full min-h-[140px] appearance-3d
                     `}
                 >
-                    {/* Gold accent rail on live blocks */}
-                    <span className={`absolute left-0 top-0 h-full w-1 ${hasLiveModule ? 'bg-gradient-to-b from-brand-gold to-brand-dark' : 'bg-transparent group-hover:bg-slate-200 dark:group-hover:bg-slate-700'}`}></span>
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-duration-500"></div>
 
-                    {/* Quick View overlay (DS §5.5 — dark, slides up on hover) */}
-                    <div className="absolute inset-0 z-20 bg-white/98 dark:bg-slate-950/98 backdrop-blur-md p-5 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col translate-y-3 group-hover:translate-y-0">
-                        <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase opus-eyebrow border-b border-slate-100 dark:border-slate-800 pb-2 flex justify-between items-center">
-                            <span>{content?.ui?.quick_view}</span>
-                            <span className="text-[10px] bg-brand-gold/15 text-brand-gold px-2 py-0.5 rounded-full font-mono">{subModulesList.length}</span>
+                    <div className="absolute inset-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5
+                                    opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out
+                                    flex flex-col transform translate-y-4 group-hover:translate-y-0
+                                    ring-1 ring-slate-200/80 dark:ring-white/10">
+                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 pb-2 flex justify-between items-center">
+                            <span>{content?.ui?.quick_view || "Quick View"}</span>
+                            <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded">{subModulesList.length}</span>
                         </div>
-                        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
-                            {subModulesList.length > 0 ? subModulesList.map(mod => {
-                                const isLive = mod.status === 'live';
-                                return (
-                                    <div key={mod.id} className="flex items-center gap-2 text-xs py-0.5">
-                                        <div className={`${isLive ? 'text-brand-gold' : 'text-slate-400'} shrink-0 scale-[0.7]`}>{mod.icon}</div>
-                                        <span className={`truncate ${isLive ? 'font-semibold text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>{mod.name}</span>
-                                        {isLive && <span className="ml-auto text-[8px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-bold">LIVE</span>}
-                                    </div>
-                                );
-                            }) : (
-                                <p className="text-xs text-slate-500 italic">{content?.ui?.no_modules}</p>
+                        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2">
+                            {subModulesList.length > 0 ? (
+                                subModulesList.map(mod => {
+                                    const isLive = mod.status === 'live';
+                                    return (
+                                        <div key={mod.id} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+                                            <div className={`${isLive ? 'text-brand-gold' : 'text-slate-400 dark:text-slate-500'} shrink-0 scale-75 opacity-80`}>{mod.icon}</div>
+                                            <span className={`truncate ${isLive ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-500 dark:text-slate-400'}`}>{mod.name}</span>
+                                            {isLive && <span className="ml-auto text-[8px] bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-500 px-1 rounded font-bold">LIVE</span>}
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <p className="text-xs text-slate-500 dark:text-slate-500 italic">{content?.ui?.no_modules || "No modules"}</p>
                             )}
                         </div>
-                        <div className="mt-3 pt-2 text-[10px] font-bold text-brand-gold flex items-center justify-end gap-1 border-t border-slate-100 dark:border-slate-800">
-                            {content?.ui?.click_to_open} <ArrowRightIcon />
+                        <div className="mt-3 pt-2 text-[10px] font-bold text-brand-gold flex items-center justify-end border-t border-slate-200 dark:border-slate-800">
+                            {content?.ui?.click_to_open || "Open"} <ArrowRightIcon />
                         </div>
                     </div>
 
-                    {/* Default face */}
-                    <div className="relative z-10 p-5 pl-6 flex flex-col h-full w-full transition-all duration-300 group-hover:opacity-0">
-                        <div className="flex items-start justify-between gap-3 mb-4">
-                            <div className={`flex h-11 w-11 items-center justify-center rounded-xl shrink-0 ${hasLiveModule ? 'bg-brand-gold/15 text-brand-gold' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                    <div className="relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
+                        <div className="flex justify-between items-start mb-3">
+                            <div className={`p-2 rounded-md transition-colors ${hasLiveModule ? 'bg-brand-gold/20 text-brand-gold' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 group-hover:text-brand-gold'}`}>
                                 {block.icon || <SystemIcon />}
                             </div>
-                            {hasLiveModule ? (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide bg-emerald-500 text-white">
-                                    <span className="relative flex h-1.5 w-1.5 mr-1">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                            <div className="flex items-center gap-2">
+                                {subModulesList.length > 0 && (
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${hasLiveModule ? 'bg-brand-gold/20 text-brand-gold' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'}`}>
+                                        {subModulesList.length} {content?.ui?.modules || "Modules"}
                                     </span>
-                                    {content?.ui?.go_live}
-                                </span>
-                            ) : (
-                                <span className="text-[9px] font-mono font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
-                                    {subModulesList.length} {content?.ui?.modules}
-                                </span>
-                            )}
+                                )}
+                                {hasLiveModule && (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                        <span className="relative flex h-1.5 w-1.5 mr-1.5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                                        </span>
+                                        {content?.ui?.go_live || "GO-LIVE"}
+                                    </span>
+                                )}
+                            </div>
                         </div>
-                        <h3 className="font-bold text-slate-900 dark:text-white text-sm leading-snug mb-1.5 group-hover:text-brand-gold transition-colors">{block.name}</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 flex-1">{block.desc}</p>
-                        <div className="mt-4 flex items-center justify-between">
-                            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-brand-gold/80 group-hover:text-brand-gold">
-                                {content?.ui?.explore} <ArrowRightIcon />
-                            </span>
-                            {hasLiveModule && (
-                                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{liveCount}/{subModulesList.length}</span>
-                            )}
-                        </div>
+
+                        <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight mb-2 group-hover:text-brand-gold transition-colors">
+                            {block.name}
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                            {block.desc}
+                        </p>
+                    </div>
+
+                    <div className="relative z-10 mt-4 flex items-center text-[10px] font-bold text-slate-400 transition-opacity duration-300 group-hover:opacity-10 uppercase tracking-wider">
+                        {content?.ui?.explore || "Explore"} <ArrowRightIcon />
                     </div>
                 </div>
             );
@@ -2667,7 +2667,7 @@
                                         <span className={`h-1.5 w-1.5 rounded-full ${apsVisible ? 'bg-brand-gold' : 'bg-rose-500'}`} />
                                         {apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
                                     </span>
-                                    <span className="text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">{ui.i4l_tap_hint}</span>
+                                    <span className="text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.i4l_tap_hint}</span>
                                 </div>
 
                                 <div className="flex-1 flex items-center justify-center">
