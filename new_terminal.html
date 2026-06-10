@@ -3487,32 +3487,6 @@
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Sub-panel 3: Maturity comparison */}
-                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-5 md:p-6">
-                                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_maturity_comparison}</h4>
-                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5 max-w-2xl">{ui.analytics_maturity_comparison_desc}</p>
-                                <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
-                                    {levels.map((level, i) => {
-                                        const isActive = activeIdx === i;
-                                        const hw = ANALYTICS_HUMAN_W[i];
-                                        return (
-                                            <button
-                                                key={level.id}
-                                                type="button"
-                                                onClick={() => setActiveIdx(i)}
-                                                className={`text-left rounded-xl border px-4 py-4 transition-all ${isActive ? 'border-brand-gold/45 bg-brand-gold/5 shadow-sm' : 'border-slate-200/70 dark:border-slate-700/80 bg-white/60 dark:bg-slate-900/50 hover:border-brand-gold/25'}`}
-                                            >
-                                                <p className={`text-xs font-bold uppercase tracking-wide mb-2 ${isActive ? 'text-brand-gold' : 'text-slate-700 dark:text-slate-200'}`}>{level.name}</p>
-                                                <div className="h-2.5 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden mb-2">
-                                                    <div className="aa-human-bar h-full rounded-full bg-gradient-to-r from-emerald-400/70 to-emerald-500/50" style={{ width: `${hw}%`, opacity: isActive ? 1 : 0.65 }} />
-                                                </div>
-                                                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{ui.analytics_human_input}: {hw}%</p>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
                         </div>
 
                         {/* Category detail cards */}
