@@ -2449,7 +2449,7 @@
                             </div>
                         </div>
 
-                        <div className="mt-4 md:mt-5 rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 backdrop-blur-sm px-4 py-3 md:px-5 md:py-4 flex gap-3 md:gap-4 items-start transition-all duration-500">
+                        <div className="mt-4 md:mt-5 min-h-[4.8125rem] md:min-h-[5.5rem] rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 backdrop-blur-sm px-4 py-3 md:px-5 md:py-4 flex gap-3 md:gap-4 items-start transition-all duration-500">
                             <div className={`shrink-0 flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${activeMeta.bg} ${activeMeta.text} border border-white/20 dark:border-white/5`}>
                                 {React.createElement(activeMeta.icon)}
                             </div>
@@ -2459,7 +2459,7 @@
                                     <span className={`text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${activeMeta.text} border-current/20`}>{activeStep.tag}</span>
                                     <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500">{String(activeIdx + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
                                 </div>
-                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{activeStep.desc}</p>
+                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed min-h-[2.5rem] md:min-h-[3rem]">{activeStep.desc}</p>
                             </div>
                             <div className="hidden sm:flex shrink-0 items-center gap-1 self-center">
                                 {steps.map((_, idx) => (
@@ -2972,6 +2972,25 @@
         const HorizonNav = ({ items, activeId, onNav, navRef, visible }) => {
             const activeIndex = Math.max(0, items.findIndex(item => item.id === activeId));
             const sessionProgress = items.length > 0 ? ((activeIndex + 1) / items.length) * 100 : 0;
+            const scrollRef = useRef(null);
+            const hoverZoneRef = useRef(null);
+
+            useEffect(() => {
+                const zone = hoverZoneRef.current;
+                const el = scrollRef.current;
+                if (!zone || !el) return;
+
+                const onWheel = (e) => {
+                    if (el.scrollWidth <= el.clientWidth) return;
+                    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+                    if (e.deltaY === 0) return;
+                    e.preventDefault();
+                    el.scrollLeft += e.deltaY;
+                };
+
+                zone.addEventListener('wheel', onWheel, { passive: false });
+                return () => zone.removeEventListener('wheel', onWheel);
+            }, [items]);
 
             return (
                 <div
@@ -2982,18 +3001,20 @@
                     style={{ top: '4rem' }}
                 >
                     <div className="bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200/70 dark:border-white/5 shadow-sm">
-                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-2">
-                            <div className="flex justify-center gap-2 overflow-x-auto horizon-nav-scroll pb-1">
-                                {items.map(item => (
-                                    <button
-                                        key={item.id}
-                                        type="button"
-                                        onClick={() => onNav(item.id)}
-                                        className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all duration-300 ${activeId === item.id ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
-                                    >
-                                        {item.label}
-                                    </button>
-                                ))}
+                        <div ref={hoverZoneRef} className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-2">
+                            <div ref={scrollRef} className="overflow-x-auto horizon-nav-scroll pb-1 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10">
+                                <div className="flex gap-2 w-max mx-auto">
+                                    {items.map(item => (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => onNav(item.id)}
+                                            className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all duration-300 ${activeId === item.id ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/20' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                             <div className="horizon-nav-session-track mt-1.5" aria-hidden="true">
                                 <div className="horizon-nav-session-fill" style={{ width: `${sessionProgress}%` }} />
@@ -3131,7 +3152,6 @@
             const [activeIdx, setActiveIdx] = useState(0);
             const [maxRevealedIdx, setMaxRevealedIdx] = useState(0);
             const [enterIdx, setEnterIdx] = useState(null);
-            const [paused, setPaused] = useState(false);
             const [started, setStarted] = useState(false);
             const sectionRef = useRef(null);
             const prevRevealedRef = useRef(0);
@@ -3194,10 +3214,10 @@
             }, [enterIdx]);
 
             useEffect(() => {
-                if (!started || paused || !steps.length) return undefined;
+                if (!started || !steps.length) return undefined;
                 const timer = setInterval(advanceCycle, 4200);
                 return () => clearInterval(timer);
-            }, [started, paused, steps.length, advanceCycle]);
+            }, [started, steps.length, advanceCycle]);
 
             const activeStep = steps[activeIdx];
             const ActiveIcon = OR_PROCESS_ICONS[activeStep.id] || BoxIcon;
@@ -3209,8 +3229,6 @@
                     ref={sectionRef}
                     className="opus-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm mb-16 md:mb-20"
                     aria-label={ui.or_process_title}
-                    onMouseEnter={() => setPaused(true)}
-                    onMouseLeave={() => setPaused(false)}
                 >
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
                         <div className="absolute -top-12 left-1/4 w-72 h-36 bg-brand-gold/6 rounded-full blur-3xl" />
