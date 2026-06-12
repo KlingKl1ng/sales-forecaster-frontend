@@ -932,6 +932,14 @@
             transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
         }
 
+        .aa-human-bar-fill {
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        }
+
+        .dark .aa-human-bar-fill {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
         .aa-flow-stage {
             display: flex;
             flex-direction: column;
@@ -3668,6 +3676,8 @@
             const isAutoMode = isPrescriptive && prescriptiveMode === 'auto';
             const humanW = isAutoMode ? ANALYTICS_HUMAN_W_AUTO : ANALYTICS_HUMAN_W[activeIdx];
             const modelW = 100 - humanW;
+            const levelTitleClass = ANALYTICS_LEVEL_META[activeIdx].titleClass;
+            const flowCardAccent = 'border-amber-300/55 dark:border-amber-800/55 bg-white/55 dark:bg-slate-800/50';
 
             const flowStages = [
                 {
@@ -3675,16 +3685,16 @@
                     label: ui.analytics_stage_analytics,
                     title: activeLevel.name,
                     detail: activeLevel.question,
-                    accent: 'border-slate-300/80 dark:border-slate-600/70 bg-slate-50/80 dark:bg-slate-800/50',
-                    titleClass: ANALYTICS_LEVEL_META[activeIdx].titleClass,
+                    accent: flowCardAccent,
+                    titleClass: levelTitleClass,
                 },
                 {
                     key: 'human',
                     label: ui.analytics_human_input,
                     title: `${humanW}%`,
                     detail: isAutoMode ? ui.analytics_model_driven : ui.analytics_human_vs_model,
-                    accent: 'border-emerald-300/60 dark:border-emerald-600/40 bg-emerald-50/50 dark:bg-emerald-950/20',
-                    titleClass: 'text-emerald-700 dark:text-emerald-300',
+                    accent: flowCardAccent,
+                    titleClass: levelTitleClass,
                     bar: true,
                 },
                 {
@@ -3696,24 +3706,24 @@
                         : (isPrescriptive ? ui.analytics_prescriptive_support : ui.analytics_decision),
                     accent: isAutoMode
                         ? 'aa-flow-stage--muted border-slate-200/60 dark:border-slate-700/60 bg-slate-100/50 dark:bg-slate-800/30'
-                        : 'border-emerald-400/50 dark:border-emerald-500/35 bg-emerald-100/40 dark:bg-emerald-900/20',
-                    titleClass: isAutoMode ? 'text-slate-500 dark:text-slate-400' : 'text-emerald-800 dark:text-emerald-200',
+                        : flowCardAccent,
+                    titleClass: isAutoMode ? 'text-slate-500 dark:text-slate-400' : levelTitleClass,
                 },
                 {
                     key: 'action',
                     label: ui.analytics_action,
                     title: ui.analytics_action,
                     detail: activeLevel.focus,
-                    accent: 'border-amber-300/60 dark:border-amber-600/40 bg-amber-50/50 dark:bg-amber-950/20',
-                    titleClass: 'text-amber-800 dark:text-amber-200',
+                    accent: flowCardAccent,
+                    titleClass: levelTitleClass,
                 },
                 {
                     key: 'results',
                     label: ui.analytics_results,
                     title: ui.analytics_results,
                     detail: activeLevel.desc,
-                    accent: 'border-brand-gold/40 bg-brand-gold/8 dark:bg-brand-gold/12',
-                    titleClass: 'text-brand-gold',
+                    accent: flowCardAccent,
+                    titleClass: levelTitleClass,
                 },
             ];
 
@@ -3875,11 +3885,11 @@
                                                 {stage.bar ? (
                                                     <div className="flex h-full flex-col">
                                                         <div className="h-3 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden shrink-0">
-                                                            <div className="aa-human-bar h-full rounded-full bg-gradient-to-r from-emerald-400/70 to-emerald-500/50" style={{ width: `${humanW}%` }} />
+                                                            <div className="aa-human-bar aa-human-bar-fill h-full rounded-full" style={{ width: `${humanW}%` }} />
                                                         </div>
                                                         <div className="aa-flow-stage-bar-labels mt-2 flex flex-col justify-center gap-0.5 overflow-hidden">
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-emerald-700 dark:text-emerald-300 truncate">{ui.analytics_human_input} {humanW}%</span>
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-violet-600 dark:text-violet-300 truncate">{ui.analytics_model_driven} {modelW}%</span>
+                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 dark:text-amber-400 truncate">{ui.analytics_human_input} {humanW}%</span>
+                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-slate-500 dark:text-slate-400 truncate">{ui.analytics_model_driven} {modelW}%</span>
                                                         </div>
                                                         <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mt-auto overflow-hidden">{stage.detail}</p>
                                                     </div>
