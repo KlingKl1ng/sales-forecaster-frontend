@@ -157,7 +157,7 @@
         }
 
         .modal-content {
-            animation: modalContentSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards opacity;
+            animation: modalContentSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
         }
 
         /* Matrix Connector Lines (Optional/Advanced) */
@@ -201,11 +201,46 @@
         .animation-delay-4000 {
             animation-delay: 4s;
         }
+
+        .hero-liquid-glass {
+            background-image:
+                radial-gradient(ellipse 80% 60% at 50% -20%, rgba(245, 158, 11, 0.12), transparent),
+                radial-gradient(ellipse 50% 40% at 100% 0%, rgba(14, 165, 233, 0.06), transparent),
+                radial-gradient(ellipse 50% 50% at 0% 100%, rgba(245, 158, 11, 0.05), transparent),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(245, 158, 11, 0.05) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow:
+                0 8px 32px rgba(245, 158, 11, 0.1),
+                0 12px 40px rgba(15, 23, 42, 0.08),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+                inset 0 -1px 0 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .dark .hero-liquid-glass {
+            background-image:
+                radial-gradient(ellipse 80% 60% at 50% -20%, rgba(245, 158, 11, 0.08), transparent),
+                radial-gradient(ellipse 50% 40% at 100% 0%, rgba(56, 189, 248, 0.04), transparent),
+                radial-gradient(ellipse 50% 50% at 0% 100%, rgba(180, 83, 9, 0.06), transparent),
+                linear-gradient(135deg, rgba(245, 158, 11, 0.07) 0%, rgba(30, 41, 59, 0.45) 46%, rgba(15, 23, 42, 0.22) 100%);
+            box-shadow:
+                0 8px 32px rgba(245, 158, 11, 0.06),
+                0 12px 40px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+                inset 0 -1px 0 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .section-eyebrow {
+            letter-spacing: 0.2em;
+        }
+
+        .horizon-pill {
+            scroll-margin-top: 5.5rem;
+        }
     </style>
 
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
-    <script crossorigin
-        src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -266,6 +301,8 @@
                     header_title_1: "Advanced Planning &",
                     header_title_2: "Scheduling System",
                     header_desc: "Select a functional module block to access specific planning tools and optimization engines.",
+                    matrix_eyebrow: "APS Planning Matrix",
+                    matrix_heading: "Select a functional module block",
                     explore: "Explore",
                     quick_view: "Quick View",
                     modules: "Modules",
@@ -418,6 +455,8 @@
                     header_title_1: "Hệ Thống Hoạch Định &",
                     header_title_2: "Lập Kế Hoạch Nâng Cao",
                     header_desc: "Chọn một khối chức năng để trải nghiệm các công cụ, giải pháp tối ưu hóa chuyên sâu.",
+                    matrix_eyebrow: "Ma trận APS",
+                    matrix_heading: "Chọn khối chức năng để truy cập công cụ",
                     explore: "Khám Phá",
                     quick_view: "Xem Nhanh",
                     modules: "Mô-đun",
@@ -570,6 +609,8 @@
                     header_title_1: "Erweiterte Planungs- &",
                     header_title_2: "Terminierungssystem",
                     header_desc: "Wählen Sie ein Funktionsmodul, um auf spezifische Planungstools und Optimierungs-Engines zuzugreifen.",
+                    matrix_eyebrow: "APS-Planungsmatrix",
+                    matrix_heading: "Funktionsmodul auswählen",
                     explore: "Entdecken",
                     quick_view: "Schnellansicht",
                     modules: "Module",
@@ -833,7 +874,7 @@
                                         <div key={mod.id} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
                                             <div className={`${isLive ? 'text-brand-gold' : 'text-slate-400 dark:text-slate-500'} shrink-0 scale-75 opacity-80`}>{mod.icon}</div>
                                             <span className={`truncate ${isLive ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-500 dark:text-slate-400'}`}>{mod.name}</span>
-                                            {isLive && <span className="ml-auto text-[8px] bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-500 px-1 rounded font-bold">LIVE</span>}
+                                            {isLive && <span className="ml-auto text-[8px] bg-brand-gold/15 dark:bg-brand-gold/20 text-amber-700 dark:text-brand-gold px-1 rounded font-bold">LIVE</span>}
                                         </div>
                                     )
                                 })
@@ -859,7 +900,7 @@
                                     </span>
                                 )}
                                 {hasLiveModule && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-brand-gold to-brand-dark text-white shadow-lg shadow-brand-gold/25">
                                         <span className="relative flex h-1.5 w-1.5 mr-1.5">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
@@ -903,7 +944,7 @@
                         <div className={`p-2 rounded-lg ${isLive ? 'bg-brand-gold/10 text-brand-gold' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
                             {module.icon || <ActivityIcon />}
                         </div>
-                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${isLive ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' :
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${isLive ? 'bg-brand-gold/15 dark:bg-brand-gold/20 text-amber-700 dark:text-brand-gold' :
                             'bg-slate-200 dark:bg-slate-700 text-slate-500'
                             }`}>
                             {(module.status || 'unknown').toUpperCase()}
@@ -994,6 +1035,48 @@
             );
         };
 
+        // Hero — liquid glass panel with horizon quick-nav
+        const HeroSection = ({ content, horizons, onNav }) => (
+            <div className="hero-liquid-glass rounded-3xl border border-transparent ring-1 ring-brand-gold/15 dark:ring-white/10 p-8 md:p-12 lg:p-14 mb-10 md:mb-12 relative overflow-hidden">
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-brand-gold/8 via-transparent to-brand-dark/5 pointer-events-none" aria-hidden="true" />
+                <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-brand-gold/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+                <div className="relative z-10 max-w-3xl">
+                    <p className="text-[10px] font-bold uppercase section-eyebrow text-brand-gold mb-4">{content.ui.system_terminal}</p>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-5">
+                        {content.ui.header_title_1}{' '}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-amber-500 to-brand-dark">{content.ui.header_title_2}</span>
+                    </h1>
+                    <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mb-8">
+                        {content.ui.header_desc}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                        {horizons.map(h => (
+                            <button
+                                key={h.id}
+                                type="button"
+                                onClick={() => onNav(h.id)}
+                                className="
+                                    relative group px-4 py-2 rounded-full border border-transparent
+                                    backdrop-blur-xl overflow-hidden
+                                    bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10
+                                    shadow-[0_4px_20px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.15)]
+                                    ring-1 ring-white/30 dark:ring-white/5
+                                    text-xs font-bold uppercase tracking-wide
+                                    text-slate-600 dark:text-slate-300
+                                    transition-all duration-300 ease-out
+                                    hover:from-brand-gold/5 hover:to-brand-dark/10
+                                    hover:shadow-[0_8px_24px_rgba(245,158,11,0.12),inset_0_1px_0_0_rgba(255,255,255,0.2)]
+                                    hover:ring-brand-gold/25 hover:text-brand-gold
+                                "
+                            >
+                                <span className="relative z-10">{h.title}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+
         // HorizonRow Component
         const HorizonRow = ({ horizon, content, onBlockClick, isFirst, isLast }) => {
             const [showTooltip, setShowTooltip] = useState(false);
@@ -1001,7 +1084,7 @@
             const dotCenterY = 'calc(1rem + 8px)';
 
             return (
-                <div className="relative">
+                <div id={`horizon-${horizon.id}`} className="horizon-pill relative">
                 {/* Origin dot — first row only, on the trunk */}
                 {isFirst && (
                     <div
@@ -1098,96 +1181,69 @@
         // --- MAIN APP ---
 
         const AboutSection = ({ content }) => (
-            <div className="mt-16 border-t border-slate-200/60 dark:border-white/5 pt-10 pb-16">
+            <div id="about" className="horizon-pill mt-8 pt-16 border-t border-slate-200/80 dark:border-slate-800 pb-8">
                 <Reveal>
-                    <div className="flex items-center gap-3 mb-8">
-                        <span className="w-8 h-1 bg-brand-gold rounded-full"></span>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{content.ui.about_title}</h2>
+                    <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
+                        <h2 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">{content.ui.about_title}</h2>
+                        <p className="text-brand-gold font-bold italic text-lg">“Optimizing today, Growing tomorrow.”</p>
                     </div>
                 </Reveal>
 
-                <div className="grid md:grid-cols-2 gap-12 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-
-                    <div className="flex flex-col h-full justify-between gap-12">
-                        <Reveal delay={100}>
-                            <div>
-                                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
-                                    {content.ui.about_who}
-                                </h3>
-                                {content.ui.about_who_text.map((text, i) => (
-                                    <p key={i} className={`mb-4 ${i === 0 ? 'text-slate-800 dark:text-slate-300 font-medium' : ''}`}>
-                                        {text}
-                                    </p>
+                <div className="grid lg:grid-cols-2 gap-8 md:gap-12 mb-16">
+                    <Reveal delay={100}>
+                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/50 p-6 md:p-8 h-full">
+                            <h3 className="text-xs font-bold uppercase section-eyebrow text-brand-gold mb-4">{content.ui.about_who}</h3>
+                            {content.ui.about_who_text.map((text, i) => (
+                                <p key={i} className={`mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400 ${i === 0 ? 'text-slate-800 dark:text-slate-200 font-medium text-base' : ''}`}>{text}</p>
+                            ))}
+                        </div>
+                    </Reveal>
+                    <Reveal delay={150}>
+                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/50 p-6 md:p-8 h-full">
+                            <h3 className="text-xs font-bold uppercase section-eyebrow text-brand-gold mb-4">{content.ui.about_what}</h3>
+                            <div className="space-y-4">
+                                {content.ui.about_what_text.map((text, i) => (
+                                    <p key={i} className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{text}</p>
                                 ))}
                             </div>
-                        </Reveal>
-
-                        <Reveal delay={150}>
-                            <div className="w-full flex justify-center py-8 opacity-90">
-                                <a href="https://operartis.vercel.app/terminal.html" className="hover:opacity-80 transition-opacity">
-                                    <img
-                                        src="./fulllogo_transparent_nobuffer.png"
-                                        alt="Operartis Logo"
-                                        className="w-full max-w-[500px] object-contain"
-                                        onError={(e) => e.target.style.display = 'none'}
-                                    />
-                                </a>
-                            </div>
-                        </Reveal>
-
-                        <Reveal delay={200}>
-                            <div>
-                                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
-                                    {content.ui.about_what}
-                                </h3>
-                                <div className="space-y-4">
-                                    {content.ui.about_what_text.map((text, i) => (
-                                        <p key={i} className="leading-relaxed">{text}</p>
-                                    ))}
-                                </div>
-                            </div>
-                        </Reveal>
-                    </div>
-
-                    <div className="flex flex-col h-full justify-between gap-12">
-                        <Reveal delay={300}>
-                            <div>
-                                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
-                                    {content.ui.about_vision}
-                                </h3>
-                                {/* Brand Motto - Keeping in English as requested */}
-                                <div className="bg-slate-100 dark:bg-slate-900/50 p-6 rounded-lg border border-slate-200 dark:border-slate-800 mb-6 text-center shadow-inner">
-                                    <p className="text-brand-gold font-bold italic text-lg tracking-wide">“Optimizing today, Growing tomorrow.”</p>
-                                </div>
-                                {content.ui.about_vision_text.map((text, i) => (
-                                    <p key={i} className="mb-4">{text}</p>
-                                ))}
-                            </div>
-                        </Reveal>
-
-                        <Reveal delay={400}>
-                            <div>
-                                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-4">
-                                    {content.ui.about_why}
-                                </h3>
-                                <div className="space-y-6">
-                                    {content.ui.about_why_items.map((item, i) => (
-                                        <div key={i}>
-                                            <strong className="block text-xs uppercase tracking-wider mb-1 font-extrabold text-slate-900 dark:text-white drop-shadow-md">{item.title}</strong>
-                                            <p className="leading-relaxed">{item.text}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </Reveal>
-                    </div>
+                        </div>
+                    </Reveal>
                 </div>
 
-                <Reveal delay={800}>
-                    <div className="mt-16 pt-10 border-t border-dashed border-slate-200 dark:border-slate-800 text-center">
-                        <p className="text-slate-800 dark:text-slate-200 font-medium max-w-3xl mx-auto text-base">
-                            {content.ui.invite_text}
-                        </p>
+                <Reveal delay={200}>
+                    <div className="flex justify-center py-6 mb-12">
+                        <a href="./terminal.html" className="hover:opacity-90 transition-opacity">
+                            <img src="./fulllogo_transparent_nobuffer.png" alt="Operartis" className="max-w-[420px] w-full object-contain" onError={(e) => e.target.style.display = 'none'} />
+                        </a>
+                    </div>
+                </Reveal>
+
+                <Reveal delay={250}>
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/30 p-6 md:p-10 mb-12">
+                        <h3 className="text-xs font-bold uppercase section-eyebrow text-brand-gold mb-4 text-center">{content.ui.about_vision}</h3>
+                        <div className="max-w-3xl mx-auto space-y-4">
+                            {content.ui.about_vision_text.map((text, i) => (
+                                <p key={i} className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 text-center">{text}</p>
+                            ))}
+                        </div>
+                    </div>
+                </Reveal>
+
+                <Reveal delay={300}>
+                    <h3 className="text-xs font-bold uppercase section-eyebrow text-brand-gold mb-6 text-center">{content.ui.about_why}</h3>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {content.ui.about_why_items.map((item, i) => (
+                            <div key={i} className="h-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 hover:border-brand-gold/40 transition-colors">
+                                <strong className="block text-sm font-bold text-slate-900 dark:text-white mb-2">{item.title}</strong>
+                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">{item.text}</p>
+                            </div>
+                        ))}
+                    </div>
+                </Reveal>
+
+                <Reveal delay={400}>
+                    <div className="mt-16 text-center rounded-2xl border border-dashed border-brand-gold/30 bg-brand-gold/5 px-6 py-10">
+                        <p className="text-slate-800 dark:text-slate-200 font-medium max-w-2xl mx-auto text-sm md:text-base leading-relaxed">{content.ui.invite_text}</p>
                         <p className="text-brand-gold font-bold uppercase tracking-widest mt-4 text-xs">Let’s optimize today — so you can grow stronger tomorrow.</p>
                     </div>
                 </Reveal>
@@ -1242,14 +1298,20 @@
                 setSelectedBlock(null);
             };
 
+            const scrollToHorizon = (id) => {
+                const el = document.getElementById(`horizon-${id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
             return (
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
                     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                        {/* Background effects removed for cleaner look */}
+                        <div className="absolute -top-24 right-1/4 w-96 h-48 bg-brand-gold/5 rounded-full blur-3xl" />
+                        <div className="absolute bottom-0 left-1/4 w-80 h-40 bg-brand-gold/4 rounded-full blur-3xl" />
                     </div>
 
                     <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel z-10 shrink-0">
-                        <div className="max-w-7xl mx-auto w-full h-full px-4 sm:px-6 md:px-12 flex items-center justify-between">
+                        <div className="max-w-7xl mx-auto w-full h-full px-4 sm:px-6 md:px-10 flex items-center justify-between">
                         <div className="flex items-center gap-3 shrink-0 p-1.5 pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                             <a href="./terminal.html">
                                 <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer transition-transform hover:scale-110" onError={(e) => e.target.style.display = 'none'} />
@@ -1297,16 +1359,20 @@
                     </nav>
 
                     <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
-                        <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 md:p-12 flex flex-col flex-1">
+                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">
                             <Reveal>
-                                <div className="mb-12 text-center md:text-left">
-                                    <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
-                                        {TRANSLATIONS.en.ui.header_title_1} <br />
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark">{TRANSLATIONS.en.ui.header_title_2}</span>
-                                    </h1>
-                                    <p className="text-slate-500 dark:text-slate-400 max-w-xl text-sm md:text-base leading-relaxed mt-4">
-                                        {content.ui.header_desc}
-                                    </p>
+                                <HeroSection content={content} horizons={content.matrix} onNav={scrollToHorizon} />
+                            </Reveal>
+
+                            <Reveal delay={100}>
+                                <div className="mb-8 md:mb-10">
+                                    <div className="relative overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-sm px-5 sm:px-6 md:px-8 py-5 md:py-6">
+                                        <div className="absolute -top-16 right-0 w-72 h-40 bg-brand-gold/8 rounded-full blur-3xl pointer-events-none" />
+                                        <div className="relative max-w-4xl">
+                                            <p className="text-xs sm:text-sm md:text-base font-bold uppercase section-eyebrow text-brand-gold mb-2 tracking-wider">{content.ui.matrix_eyebrow}</p>
+                                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">{content.ui.matrix_heading}</h2>
+                                        </div>
+                                    </div>
                                 </div>
                             </Reveal>
 
@@ -1328,7 +1394,7 @@
                     </main>
 
                     <footer className="py-4 border-t border-slate-200 dark:border-slate-800 z-10 shrink-0 bg-white/30 dark:bg-brand-obsidian/30 glass-panel">
-                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-2">
+                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-2">
                             <p className="text-[10px] text-slate-400">© {new Date().getFullYear()} Operartis Analytics. All rights reserved.</p>
                             <div className="flex items-center gap-4 text-[10px] text-slate-500 font-mono">
                                 <span>{content.ui.rights_reserved}</span>
