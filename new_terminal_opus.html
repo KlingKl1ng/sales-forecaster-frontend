@@ -348,6 +348,79 @@
             animation: sc-node-glow 2.4s ease-in-out infinite;
         }
 
+        .sc-node-glass {
+            background-image:
+                linear-gradient(145deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.2) 52%, rgba(245, 158, 11, 0.05) 100%);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow:
+                0 4px 16px rgba(15, 23, 42, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.38);
+        }
+
+        .dark .sc-node-glass {
+            background-image:
+                linear-gradient(145deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.48) 52%, rgba(245, 158, 11, 0.07) 100%);
+            box-shadow:
+                0 4px 16px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.09);
+        }
+
+        .sc-node-glass-lit {
+            border-color: rgba(245, 158, 11, 0.22);
+            color: #d97706;
+        }
+
+        .dark .sc-node-glass-lit {
+            border-color: rgba(245, 158, 11, 0.28);
+            color: #fbbf24;
+        }
+
+        .sc-node-glass-active {
+            border-color: rgba(245, 158, 11, 0.48);
+            color: #d97706;
+            background-image:
+                linear-gradient(145deg, rgba(255, 251, 235, 0.92) 0%, rgba(254, 243, 199, 0.38) 48%, rgba(245, 158, 11, 0.14) 100%);
+            box-shadow:
+                0 0 0 1px rgba(245, 158, 11, 0.12),
+                0 8px 22px rgba(245, 158, 11, 0.14),
+                inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        }
+
+        .dark .sc-node-glass-active {
+            color: #fbbf24;
+            background-image:
+                linear-gradient(145deg, rgba(120, 53, 15, 0.5) 0%, rgba(69, 26, 3, 0.38) 48%, rgba(245, 158, 11, 0.12) 100%);
+            box-shadow:
+                0 0 0 1px rgba(245, 158, 11, 0.18),
+                0 8px 22px rgba(245, 158, 11, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .sc-pulse-ring-gold {
+            background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.2), transparent 72%);
+        }
+
+        .sc-detail-glass {
+            background-image:
+                radial-gradient(ellipse 70% 55% at 12% 0%, rgba(245, 158, 11, 0.1), transparent 58%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.14) 50%, rgba(245, 158, 11, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 6px 28px rgba(245, 158, 11, 0.07),
+                inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+
+        .dark .sc-detail-glass {
+            background-image:
+                radial-gradient(ellipse 70% 55% at 12% 0%, rgba(245, 158, 11, 0.08), transparent 58%),
+                linear-gradient(135deg, rgba(30, 41, 59, 0.58) 0%, rgba(15, 23, 42, 0.38) 50%, rgba(245, 158, 11, 0.06) 100%);
+            box-shadow:
+                0 6px 28px rgba(0, 0, 0, 0.32),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
         .sc-flow-scroll {
             overflow-x: auto;
             overflow-y: visible;
@@ -597,6 +670,7 @@
         .aa-maturity-chart {
             position: relative;
             overflow: hidden;
+            background: transparent;
         }
 
         .aa-maturity-axis-y {
@@ -614,23 +688,6 @@
             width: 100%;
         }
 
-        .aa-maturity-band {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            border-radius: 1rem;
-            overflow: hidden;
-        }
-
-        .aa-maturity-band-info {
-            background: linear-gradient(135deg, rgba(148, 163, 184, 0.08), transparent 55%);
-        }
-
-        .aa-maturity-band-models {
-            background: linear-gradient(225deg, rgba(245, 158, 11, 0.1), transparent 50%);
-            clip-path: polygon(42% 0, 100% 0, 100% 100%, 28% 100%);
-        }
-
         .aa-maturity-arrow-svg {
             pointer-events: none;
             z-index: 1;
@@ -641,16 +698,170 @@
         }
 
         .aa-bar {
-            transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, opacity 0.35s ease;
+            transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.35s ease, border-color 0.35s ease;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-bottom: 0;
+            box-shadow: none;
+        }
+
+        .aa-bar-flat-0 {
+            background-color: #fde68a;
+            border-color: #fcd34d;
+        }
+
+        .dark .aa-bar-flat-0 {
+            background-color: #b45309;
+            border-color: #d97706;
+        }
+
+        .aa-bar-flat-1 {
+            background-color: #fcd34d;
+            border-color: #fbbf24;
+        }
+
+        .dark .aa-bar-flat-1 {
+            background-color: #d97706;
+            border-color: #f59e0b;
+        }
+
+        .aa-band-label-info {
+            color: #fde68a;
+        }
+
+        .dark .aa-band-label-info {
+            color: #b45309;
+        }
+
+        .aa-bar-flat-2 {
+            background-color: #fbbf24;
+            border-color: #f59e0b;
+        }
+
+        .dark .aa-bar-flat-2 {
+            background-color: #f59e0b;
+            border-color: #d97706;
+        }
+
+        .aa-bar-flat-3 {
+            background-color: #f59e0b;
+            border-color: #d97706;
+        }
+
+        .dark .aa-bar-flat-3 {
+            background-color: #f59e0b;
+            border-color: #fbbf24;
         }
 
         .aa-bar-active {
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18), 0 12px 28px rgba(245, 158, 11, 0.15);
+            border-color: #d97706;
+            outline: 2px solid rgba(245, 158, 11, 0.35);
+            outline-offset: 1px;
         }
 
-        .aa-chevron {
-            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+        .aa-chevron-track {
+            display: flex;
+            width: 100%;
+            margin-bottom: 1.5rem;
         }
+
+        .aa-chevron-seg {
+            position: relative;
+            flex: 1 1 0;
+            min-width: 0;
+            margin-left: -10px;
+            padding: 0.75rem 0.85rem 0.75rem 1.35rem;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: filter 0.2s ease, opacity 0.2s ease, z-index 0s;
+            clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%, 11px 50%);
+            z-index: 1;
+        }
+
+        .aa-chevron-seg:first-child {
+            margin-left: 0;
+            padding-left: 0.85rem;
+            clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%);
+        }
+
+        .aa-chevron-seg:last-child {
+            padding-right: 0.85rem;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 11px 50%);
+        }
+
+        .aa-chevron-seg-inactive {
+            background-color: #e7e5e4;
+            color: #57534e;
+        }
+
+        .dark .aa-chevron-seg-inactive {
+            background-color: #334155;
+            color: #cbd5e1;
+        }
+
+        .aa-chevron-seg-inactive:hover {
+            filter: brightness(1.04);
+            z-index: 2;
+        }
+
+        .aa-chevron-seg-active {
+            z-index: 3;
+            filter: brightness(1.02);
+        }
+
+        .aa-chevron-seg:focus-visible {
+            outline: 2px solid rgba(245, 158, 11, 0.55);
+            outline-offset: 2px;
+        }
+
+        .aa-chevron-active-0 {
+            background: linear-gradient(90deg, #fde68a, #fcd34d);
+            color: #92400e;
+        }
+
+        .dark .aa-chevron-active-0 {
+            background: linear-gradient(90deg, #b45309, #d97706);
+            color: #fffbeb;
+        }
+
+        .aa-chevron-active-1 {
+            background: linear-gradient(90deg, #fcd34d, #fbbf24);
+            color: #92400e;
+        }
+
+        .dark .aa-chevron-active-1 {
+            background: linear-gradient(90deg, #d97706, #f59e0b);
+            color: #fffbeb;
+        }
+
+        .aa-chevron-active-2 {
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            color: #78350f;
+        }
+
+        .dark .aa-chevron-active-2 {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            color: #fffbeb;
+        }
+
+        .aa-chevron-active-3 {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            color: #fffbeb;
+        }
+
+        .dark .aa-chevron-active-3 {
+            background: linear-gradient(90deg, #f59e0b, #b45309);
+            color: #fffbeb;
+        }
+
+        .aa-level-title-0 { color: #b45309; }
+        .dark .aa-level-title-0 { color: #fcd34d; }
+        .aa-level-title-1 { color: #d97706; }
+        .dark .aa-level-title-1 { color: #fbbf24; }
+        .aa-level-title-2 { color: #f59e0b; }
+        .dark .aa-level-title-2 { color: #fbbf24; }
+        .aa-level-title-3 { color: #d97706; }
+        .dark .aa-level-title-3 { color: #f59e0b; }
 
         .aa-human-bar {
             transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
@@ -739,7 +950,7 @@
         }
 
         .or-node-enter {
-            animation: or-node-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: or-node-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .or-cycle-segment-hidden,
@@ -799,7 +1010,7 @@
             fill: none;
             stroke-width: 3;
             stroke-linecap: round;
-            transition: stroke 0.45s ease, opacity 0.55s ease;
+            transition: stroke 0.4s ease, opacity 0.4s ease;
         }
 
         .or-cycle-segment-idle {
@@ -818,6 +1029,11 @@
 
         .or-cycle-segment-past {
             stroke: rgba(245, 158, 11, 0.45);
+        }
+
+        .or-cycle-travel-dot {
+            filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.85));
+            pointer-events: none;
         }
 
         .or-world-split {
@@ -889,7 +1105,7 @@
         }
 
         .or-node-pop .or-node-icon {
-            animation: or-node-pop 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: or-node-pop 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .or-node-icon-active {
@@ -2154,22 +2370,13 @@
         };
 
         // End-to-end supply chain flow banner
-        const SC_STEP_META = [
-            { icon: ProcurementIcon, accent: 'emerald', ring: 'ring-emerald-500/40', bg: 'from-emerald-500/20 to-emerald-600/5', text: 'text-emerald-600 dark:text-emerald-400' },
-            { icon: FactoryIcon, accent: 'sky', ring: 'ring-sky-500/40', bg: 'from-sky-500/20 to-sky-600/5', text: 'text-sky-600 dark:text-sky-400' },
-            { icon: TruckIcon, accent: 'amber', ring: 'ring-brand-gold/50', bg: 'from-brand-gold/25 to-amber-600/5', text: 'text-brand-gold dark:text-amber-400' },
-            { icon: WarehouseIcon, accent: 'violet', ring: 'ring-violet-500/40', bg: 'from-violet-500/20 to-violet-600/5', text: 'text-violet-600 dark:text-violet-400' },
-            { icon: StoreIcon, accent: 'rose', ring: 'ring-rose-500/40', bg: 'from-rose-500/20 to-rose-600/5', text: 'text-rose-600 dark:text-rose-400' },
-            { icon: UsersIcon, accent: 'orange', ring: 'ring-orange-500/40', bg: 'from-orange-500/20 to-orange-600/5', text: 'text-orange-600 dark:text-orange-400' },
-        ];
+        const SC_STEP_ICONS = [ProcurementIcon, FactoryIcon, TruckIcon, WarehouseIcon, StoreIcon, UsersIcon];
 
-        const SC_CONNECTOR_COLORS = [
-            ['#10b981', '#0ea5e9'],
-            ['#0ea5e9', '#f59e0b'],
-            ['#f59e0b', '#8b5cf6'],
-            ['#8b5cf6', '#f43f5e'],
-            ['#f43f5e', '#f97316'],
-        ];
+        const scNodeGlassClass = (isActive, isPast) => {
+            if (isActive) return 'sc-node-glass sc-node-glass-active ring-1 ring-brand-gold/20';
+            if (isPast) return 'sc-node-glass sc-node-glass-lit border-slate-200/60 dark:border-white/10';
+            return 'sc-node-glass border-slate-200/75 dark:border-white/10 text-slate-500 dark:text-slate-400';
+        };
 
         const SC_FLOW_ARROW_HALF = 4;
         const SC_FLOW_ARROW_RISE = 3.5;
@@ -2206,8 +2413,8 @@
                     <defs>
                         {lit && (
                             <linearGradient id={`sc-seg-grad-${index}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor={SC_CONNECTOR_COLORS[index][0]} />
-                                <stop offset="100%" stopColor={SC_CONNECTOR_COLORS[index][1]} />
+                                <stop offset="0%" stopColor="#fbbf24" />
+                                <stop offset="100%" stopColor="#d97706" />
                             </linearGradient>
                         )}
                     </defs>
@@ -2369,7 +2576,7 @@
             const trackH = connectorGeom?.trackH || 0;
 
             const activeStep = steps[activeIdx];
-            const activeMeta = SC_STEP_META[activeIdx];
+            const ActiveStepIcon = SC_STEP_ICONS[activeIdx];
 
             return (
                 <section
@@ -2380,8 +2587,8 @@
                     onMouseLeave={() => setPaused(false)}
                 >
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
-                        <div className="absolute -top-8 left-1/4 w-64 h-32 bg-brand-gold/5 rounded-full blur-3xl" />
-                        <div className="absolute -top-6 right-1/4 w-48 h-24 bg-sky-500/5 rounded-full blur-3xl" />
+                        <div className="absolute -top-8 left-1/4 w-64 h-32 bg-brand-gold/6 rounded-full blur-3xl" />
+                        <div className="absolute -top-6 right-1/4 w-48 h-24 bg-amber-500/4 rounded-full blur-3xl" />
                     </div>
 
                     <div className="w-full px-4 sm:px-5 md:px-6 py-4 md:py-5 relative">
@@ -2410,8 +2617,7 @@
 
                                 <div ref={gridRef} className="relative z-10 grid grid-cols-6 gap-2 md:gap-3 min-h-[152px] md:min-h-[164px] items-start">
                                     {steps.map((step, idx) => {
-                                        const meta = SC_STEP_META[idx];
-                                        const Icon = meta.icon;
+                                        const Icon = SC_STEP_ICONS[idx];
                                         const isActive = idx === activeIdx;
                                         const isPast = idx < activeIdx;
 
@@ -2425,19 +2631,19 @@
                                                 aria-label={step.label}
                                             >
                                                 {isActive && (
-                                                    <span className={`absolute inset-x-2 top-2 bottom-7 rounded-2xl sc-pulse-ring bg-gradient-to-br ${meta.bg} pointer-events-none`} />
+                                                    <span className="absolute inset-x-2 top-2 bottom-7 rounded-2xl sc-pulse-ring sc-pulse-ring-gold pointer-events-none" />
                                                 )}
 
-                                                <div data-sc-icon className={`relative z-10 flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-2xl border bg-gradient-to-br shadow-sm transition-all duration-500 ${meta.bg} ${isActive ? `border-brand-gold/50 sc-node-active ${meta.ring} ring-2 scale-105` : isPast ? 'border-white/30 dark:border-white/10' : 'border-slate-200/80 dark:border-slate-700/80 group-hover:border-brand-gold/30 group-hover:scale-[1.02]'}`}>
-                                                    <span className={`${meta.text} transition-transform duration-500 ${isActive ? 'scale-110' : ''}`}>
+                                                <div data-sc-icon className={`relative z-10 flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-2xl border transition-all duration-500 ${scNodeGlassClass(isActive, isPast)} ${isActive ? 'sc-node-active scale-105' : 'group-hover:border-brand-gold/25 group-hover:scale-[1.02]'}`}>
+                                                    <span className={`transition-transform duration-500 ${isActive ? 'scale-110' : ''}`}>
                                                         <Icon />
                                                     </span>
                                                 </div>
 
-                                                <span className={`mt-2 text-[10px] md:text-xs font-bold uppercase tracking-wide transition-colors ${isActive ? 'text-brand-gold' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                <span className={`mt-2 text-[10px] md:text-xs font-bold uppercase tracking-wide transition-colors ${isActive ? 'text-brand-gold' : isPast ? 'text-amber-700/80 dark:text-amber-200/80' : 'text-slate-600 dark:text-slate-300'}`}>
                                                     {step.label}
                                                 </span>
-                                                <span className={`mt-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border transition-colors ${isActive ? `${meta.text} border-current/20 bg-white/50 dark:bg-slate-900/50` : 'text-slate-400 border-slate-200/60 dark:border-slate-700/60'}`}>
+                                                <span className={`mt-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border transition-colors ${isActive ? 'text-brand-gold border-brand-gold/25 bg-brand-gold/8' : isPast ? 'text-amber-700/70 dark:text-amber-200/70 border-brand-gold/15 bg-brand-gold/5' : 'text-slate-400 border-slate-200/60 dark:border-slate-700/60'}`}>
                                                     {step.tag}
                                                 </span>
 
@@ -2449,14 +2655,14 @@
                             </div>
                         </div>
 
-                        <div className="mt-4 md:mt-5 min-h-[4.8125rem] md:min-h-[5.5rem] rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 backdrop-blur-sm px-4 py-3 md:px-5 md:py-4 flex gap-3 md:gap-4 items-start transition-all duration-500">
-                            <div className={`shrink-0 flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${activeMeta.bg} ${activeMeta.text} border border-white/20 dark:border-white/5`}>
-                                {React.createElement(activeMeta.icon)}
+                        <div className="mt-4 md:mt-5 min-h-[4.8125rem] md:min-h-[5.5rem] rounded-xl border border-transparent ring-1 ring-brand-gold/15 dark:ring-white/10 sc-detail-glass px-4 py-3 md:px-5 md:py-4 flex gap-3 md:gap-4 items-start transition-all duration-500">
+                            <div className="shrink-0 flex h-9 w-9 items-center justify-center rounded-lg sc-node-glass sc-node-glass-active text-brand-gold">
+                                <ActiveStepIcon />
                             </div>
                             <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2 mb-1">
                                     <span className="text-xs md:text-sm font-bold text-slate-800 dark:text-slate-100">{activeStep.label}</span>
-                                    <span className={`text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${activeMeta.text} border-current/20`}>{activeStep.tag}</span>
+                                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border text-brand-gold border-brand-gold/25 bg-brand-gold/8">{activeStep.tag}</span>
                                     <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500">{String(activeIdx + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
                                 </div>
                                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed min-h-[2.5rem] md:min-h-[3rem]">{activeStep.desc}</p>
@@ -3072,10 +3278,10 @@
         // --- MAIN APP ---
 
         const ANALYTICS_LEVEL_META = [
-            { barH: 38, humanW: 92, barGrad: 'from-slate-400/80 via-slate-500/60 to-slate-600/40', chevron: 'bg-slate-600/95 dark:bg-slate-500/85' },
-            { barH: 54, humanW: 76, barGrad: 'from-sky-400/80 via-sky-500/60 to-sky-600/40', chevron: 'bg-sky-600/95 dark:bg-sky-500/85' },
-            { barH: 72, humanW: 50, barGrad: 'from-violet-400/80 via-violet-500/60 to-violet-600/40', chevron: 'bg-violet-600/95 dark:bg-violet-500/85' },
-            { barH: 92, humanW: 22, barGrad: 'from-brand-gold via-amber-500 to-brand-dark', chevron: 'bg-gradient-to-r from-brand-gold to-amber-600' },
+            { barH: 38, humanW: 92, barFlat: 'aa-bar-flat-0', chevronActive: 'aa-chevron-active-0', titleClass: 'aa-level-title-0' },
+            { barH: 54, humanW: 76, barFlat: 'aa-bar-flat-1', chevronActive: 'aa-chevron-active-1', titleClass: 'aa-level-title-1' },
+            { barH: 72, humanW: 50, barFlat: 'aa-bar-flat-2', chevronActive: 'aa-chevron-active-2', titleClass: 'aa-level-title-2' },
+            { barH: 92, humanW: 22, barFlat: 'aa-bar-flat-3', chevronActive: 'aa-chevron-active-3', titleClass: 'aa-level-title-3' },
         ];
 
         const ANALYTICS_HUMAN_W = [92, 76, 50, 38];
@@ -3130,20 +3336,22 @@
             i + 1 <= maxRevealedIdx || (i === total - 1 && maxRevealedIdx >= total - 1)
         );
 
-        const orSegmentIsActive = (i, activeIdx, total) => {
-            const lastIdx = total - 1;
-            if (activeIdx === lastIdx) return i === lastIdx;
-            return (i + 1) === activeIdx;
-        };
+        const orSegmentIsActive = (i, activeIdx, total) => (
+            i === ((activeIdx - 1 + total) % total)
+        );
 
-        const OrProcessNode = ({ step, isActive, isLit, isVisible, isEntering, pos, onSelect }) => {
+        const OR_STEP_DWELL_MS = 4200;
+        const OR_TRAVEL_MS = 700;
+        const OR_NODE_ANIM_MS = 700;
+
+        const OrProcessNode = ({ step, isActive, isLit, isVisible, isEntering, isPopping, pos, onSelect }) => {
             if (!isVisible) return null;
             const Icon = OR_PROCESS_ICONS[step.id] || BoxIcon;
             return (
                 <button
                     type="button"
                     onClick={onSelect}
-                    className={`or-node ${isActive ? 'or-node-active' : ''} ${isLit ? 'or-node-lit' : ''} ${isEntering ? 'or-node-enter' : isActive ? 'or-node-pop' : ''}`}
+                    className={`or-node ${isActive ? 'or-node-active' : ''} ${isLit ? 'or-node-lit' : ''} ${isEntering ? 'or-node-enter' : isPopping ? 'or-node-pop' : ''}`}
                     style={{ left: `${pos.left}%`, top: `${pos.top}%` }}
                     aria-pressed={isActive}
                     aria-label={step.label}
@@ -3162,10 +3370,15 @@
             const [activeIdx, setActiveIdx] = useState(0);
             const [maxRevealedIdx, setMaxRevealedIdx] = useState(0);
             const [enterIdx, setEnterIdx] = useState(null);
+            const [popIdx, setPopIdx] = useState(null);
+            const [travel, setTravel] = useState(null);
+            const [closePhase, setClosePhase] = useState(null);
             const [started, setStarted] = useState(false);
             const sectionRef = useRef(null);
             const prevRevealedRef = useRef(0);
             const activeIdxRef = useRef(0);
+            const prevActiveAnimRef = useRef(0);
+            const skipNextActiveAnimRef = useRef(true);
 
             const selectStep = useCallback((idx) => {
                 setActiveIdx(idx);
@@ -3176,18 +3389,22 @@
                 setActiveIdx(0);
                 setMaxRevealedIdx(0);
                 setEnterIdx(null);
+                setPopIdx(null);
+                setTravel(null);
+                setClosePhase(null);
                 prevRevealedRef.current = 0;
                 activeIdxRef.current = 0;
+                prevActiveAnimRef.current = 0;
             }, []);
 
             const advanceCycle = useCallback(() => {
                 const i = activeIdxRef.current;
-                if (i >= steps.length - 1) {
-                    resetCycle();
-                    return;
-                }
-                setActiveIdx(i + 1);
-            }, [steps.length, resetCycle]);
+                const lastIdx = steps.length - 1;
+                if (i >= lastIdx) return;
+                const next = i + 1;
+                setActiveIdx(next);
+                setMaxRevealedIdx(prev => Math.max(prev, next));
+            }, [steps.length]);
 
             useEffect(() => {
                 activeIdxRef.current = activeIdx;
@@ -3219,15 +3436,69 @@
 
             useEffect(() => {
                 if (enterIdx === null) return undefined;
-                const timer = setTimeout(() => setEnterIdx(null), 700);
+                const timer = setTimeout(() => setEnterIdx(null), OR_NODE_ANIM_MS);
                 return () => clearTimeout(timer);
             }, [enterIdx]);
 
             useEffect(() => {
-                if (!started || !steps.length) return undefined;
-                const timer = setInterval(advanceCycle, 4200);
+                if (skipNextActiveAnimRef.current) {
+                    skipNextActiveAnimRef.current = false;
+                    prevActiveAnimRef.current = activeIdx;
+                    return undefined;
+                }
+                const prev = prevActiveAnimRef.current;
+                if (prev === activeIdx) return undefined;
+                const nextKey = Date.now();
+                setPopIdx(activeIdx);
+                setTravel({ fromIdx: prev, toIdx: activeIdx, key: nextKey });
+                const lastIdx = steps.length - 1;
+                if (activeIdx === lastIdx && prev === lastIdx - 1) {
+                    setClosePhase('to-deployment');
+                }
+                prevActiveAnimRef.current = activeIdx;
+                return undefined;
+            }, [activeIdx, steps.length]);
+
+            useEffect(() => {
+                if (popIdx === null) return undefined;
+                const timer = setTimeout(() => setPopIdx(null), OR_NODE_ANIM_MS);
+                return () => clearTimeout(timer);
+            }, [popIdx]);
+
+            useEffect(() => {
+                if (!travel) return undefined;
+                const timer = setTimeout(() => setTravel(null), OR_TRAVEL_MS);
+                return () => clearTimeout(timer);
+            }, [travel]);
+
+            useEffect(() => {
+                if (closePhase !== 'to-deployment') return undefined;
+                const timer = setTimeout(() => {
+                    skipNextActiveAnimRef.current = true;
+                    setActiveIdx(0);
+                    activeIdxRef.current = 0;
+                    prevActiveAnimRef.current = 0;
+                    setPopIdx(0);
+                    setClosePhase('to-problem');
+                }, OR_STEP_DWELL_MS);
+                return () => clearTimeout(timer);
+            }, [closePhase]);
+
+            useEffect(() => {
+                if (closePhase !== 'to-problem') return undefined;
+                const timer = setTimeout(() => {
+                    resetCycle();
+                }, OR_STEP_DWELL_MS);
+                return () => clearTimeout(timer);
+            }, [closePhase, resetCycle]);
+
+            useEffect(() => {
+                if (!started || !steps.length || closePhase) return undefined;
+                const lastIdx = steps.length - 1;
+                if (activeIdxRef.current >= lastIdx) return undefined;
+                const timer = setInterval(advanceCycle, OR_STEP_DWELL_MS);
                 return () => clearInterval(timer);
-            }, [started, steps.length, advanceCycle]);
+            }, [started, steps.length, advanceCycle, closePhase, activeIdx]);
 
             const activeStep = steps[activeIdx];
             const ActiveIcon = OR_PROCESS_ICONS[activeStep.id] || BoxIcon;
@@ -3264,13 +3535,18 @@
                                     <circle className="or-cycle-track" cx={OR_CYCLE_CFG.cx} cy={OR_CYCLE_CFG.cy} r={OR_CYCLE_CFG.r} />
                                     {OR_PROCESS_ANGLES.map((fromAngle, i) => {
                                         const toAngle = OR_PROCESS_ANGLES[(i + 1) % OR_PROCESS_ANGLES.length];
+                                        const lastSegIdx = steps.length - 1;
                                         const visible = orSegmentVisible(i, maxRevealedIdx, steps.length);
-                                        const isActive = visible && orSegmentIsActive(i, activeIdx, steps.length);
-                                        const isLit = visible && !isActive;
+                                        let isActive = visible && orSegmentIsActive(i, activeIdx, steps.length);
+                                        let isPast = visible && !isActive;
+                                        if (closePhase === 'to-deployment' && i === lastSegIdx) {
+                                            isActive = false;
+                                            isPast = false;
+                                        }
                                         return (
                                             <path
                                                 key={`seg-${i}`}
-                                                className={`or-cycle-segment ${visible ? '' : 'or-cycle-segment-hidden'} ${isActive ? 'or-cycle-segment-active' : isLit ? 'or-cycle-segment-past' : 'or-cycle-segment-idle'}`}
+                                                className={`or-cycle-segment ${visible ? '' : 'or-cycle-segment-hidden'} ${isActive ? 'or-cycle-segment-active' : isPast ? 'or-cycle-segment-past' : 'or-cycle-segment-idle'}`}
                                                 d={orCycleArcPath(fromAngle, toAngle)}
                                             />
                                         );
@@ -3299,15 +3575,28 @@
                                     />
                                     <text className="or-world-label" x={orWorldLabelPos('model').x} y={orWorldLabelPos('model').y} textAnchor="middle" dominantBaseline="middle">{ui.or_process_model_world}</text>
                                     <text className="or-world-label" x={orWorldLabelPos('real').x} y={orWorldLabelPos('real').y} textAnchor="middle" dominantBaseline="middle">{ui.or_process_real_world}</text>
+                                    {travel && travel.fromIdx !== travel.toIdx && (
+                                        <circle key={travel.key} className="or-cycle-travel-dot" r="5" fill="#f59e0b">
+                                            <animateMotion
+                                                dur={`${OR_TRAVEL_MS}ms`}
+                                                fill="freeze"
+                                                calcMode="spline"
+                                                keyTimes="0;1"
+                                                keySplines="0.16 1 0.3 1"
+                                                path={orCycleArcPath(OR_PROCESS_ANGLES[travel.fromIdx], OR_PROCESS_ANGLES[travel.toIdx])}
+                                            />
+                                        </circle>
+                                    )}
                                 </svg>
                                 {steps.map((step, i) => (
                                     <OrProcessNode
                                         key={step.id}
                                         step={step}
-                                        isActive={activeIdx === i}
+                                        isActive={activeIdx === i && !(closePhase === 'to-deployment' && i === 0)}
                                         isLit={i <= maxRevealedIdx}
                                         isVisible={i <= maxRevealedIdx}
                                         isEntering={enterIdx === i}
+                                        isPopping={popIdx === i && !(closePhase === 'to-deployment' && i === 0)}
                                         pos={orCycleNodePos(OR_PROCESS_ANGLES[i])}
                                         onSelect={() => selectStep(i)}
                                     />
@@ -3398,7 +3687,6 @@
             }, [updateMaturityArrow, levels.length]);
 
             const activeLevel = levels[activeIdx];
-            const activeMeta = ANALYTICS_LEVEL_META[activeIdx];
             const isPrescriptive = activeIdx === 3;
             const isAutoMode = isPrescriptive && prescriptiveMode === 'auto';
             const humanW = isAutoMode ? ANALYTICS_HUMAN_W_AUTO : ANALYTICS_HUMAN_W[activeIdx];
@@ -3411,7 +3699,7 @@
                     title: activeLevel.name,
                     detail: activeLevel.question,
                     accent: 'border-slate-300/80 dark:border-slate-600/70 bg-slate-50/80 dark:bg-slate-800/50',
-                    titleClass: activeIdx === 3 ? 'text-brand-gold' : 'text-slate-800 dark:text-slate-100',
+                    titleClass: ANALYTICS_LEVEL_META[activeIdx].titleClass,
                 },
                 {
                     key: 'human',
@@ -3474,52 +3762,43 @@
                         </div>
 
                         {/* Maturity ladder — full width */}
-                        <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-4 md:p-6 mb-4 md:mb-5">
-                            <div className="flex items-stretch gap-1 md:gap-2 max-w-4xl mx-auto">
+                        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 md:p-6 mb-4 md:mb-5 flex justify-center">
+                            <div className="flex items-stretch gap-1 md:gap-2 w-full max-w-[34rem] sm:max-w-[36rem] md:max-w-[38rem]">
                                 <div className="aa-maturity-axis-y-wrap shrink-0 w-6 md:w-8 h-52 md:h-60">
                                     <span className="aa-maturity-axis-y text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{ui.analytics_axis_value} ↑</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <div ref={chartRef} className="aa-maturity-chart relative h-52 md:h-60 border-l border-b border-slate-300/70 dark:border-slate-600/70">
-                                        <div className="aa-maturity-band aa-maturity-band-info" aria-hidden="true" />
-                                        <div className="aa-maturity-band aa-maturity-band-models" aria-hidden="true" />
+                                    <div ref={chartRef} className="aa-maturity-chart relative h-52 md:h-60 border-l border-b border-slate-300 dark:border-slate-600">
                                         {arrowLine && (
                                             <svg className="aa-maturity-arrow-svg absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                                                 <defs>
-                                                    <linearGradient id="aa-maturity-arrow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                        <stop offset="0%" stopColor="#64748b" />
-                                                        <stop offset="50%" stopColor="#cbd5e1" />
-                                                        <stop offset="100%" stopColor="#fbbf24" />
-                                                    </linearGradient>
                                                     <marker id="aa-maturity-arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                                                        <path d="M0,0 L8,4 L0,8 Z" fill="#fbbf24" />
+                                                        <path d="M0,0 L8,4 L0,8 Z" fill="#f59e0b" />
                                                     </marker>
                                                 </defs>
-                                                <line
-                                                    x1={arrowLine.x1}
-                                                    y1={arrowLine.y1}
-                                                    x2={arrowLine.x2}
-                                                    y2={arrowLine.y2}
-                                                    stroke="rgba(245, 158, 11, 0.22)"
-                                                    strokeWidth="5"
-                                                    strokeLinecap="round"
-                                                    vectorEffect="non-scaling-stroke"
-                                                />
                                                 <line
                                                     className="aa-maturity-arrow-line"
                                                     x1={arrowLine.x1}
                                                     y1={arrowLine.y1}
                                                     x2={arrowLine.x2}
                                                     y2={arrowLine.y2}
-                                                    stroke="url(#aa-maturity-arrow-grad)"
-                                                    strokeWidth="2.5"
+                                                    stroke="#f59e0b"
+                                                    strokeWidth="2"
                                                     markerEnd="url(#aa-maturity-arrowhead)"
                                                     vectorEffect="non-scaling-stroke"
                                                 />
                                             </svg>
                                         )}
-                                        <div className="absolute top-3 left-[18%] z-[2] text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{ui.analytics_band_information}</div>
-                                        <div className="absolute top-3 right-4 z-[2] text-[8px] font-bold uppercase tracking-wider text-brand-gold">{ui.analytics_band_models}</div>
+                                        <div className="absolute top-3 left-0 right-0 z-[2] grid grid-cols-4 gap-2 sm:gap-3 px-3 sm:px-4 pointer-events-none">
+                                            <div className="relative h-4">
+                                                <span className="aa-band-label-info absolute right-0 top-0 translate-x-1/2 whitespace-nowrap text-[8px] font-bold uppercase tracking-wider">{ui.analytics_band_information}</span>
+                                            </div>
+                                            <div />
+                                            <div className="relative h-4">
+                                                <span className="absolute right-0 top-0 translate-x-1/2 whitespace-nowrap text-[8px] font-bold uppercase tracking-wider text-brand-gold">{ui.analytics_band_models}</span>
+                                            </div>
+                                            <div />
+                                        </div>
                                         <div className="absolute inset-0 z-[2] grid grid-cols-4 items-stretch gap-2 sm:gap-3 px-3 sm:px-4 pb-1 pt-8">
                                             {levels.map((level, i) => {
                                                 const meta = ANALYTICS_LEVEL_META[i];
@@ -3531,7 +3810,7 @@
                                                         <div className="flex flex-1 w-full min-h-0 items-end">
                                                             <div
                                                                 ref={i === 0 ? descriptiveBarRef : i === 3 ? prescriptiveBarRef : null}
-                                                                className={`aa-bar w-full rounded-t-lg bg-gradient-to-t ${meta.barGrad}`}
+                                                                className={`aa-bar w-full rounded-t-md ${meta.barFlat}`}
                                                                 style={{ height: `${meta.barH}%` }}
                                                             />
                                                         </div>
@@ -3590,31 +3869,24 @@
                                     </span>
                                 </div>
 
-                                <div className={`aa-chevron rounded-xl px-5 py-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${activeMeta.chevron}`}>
-                                    <div className="min-w-0">
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-white/75 mb-1">{activeLevel.name}</p>
-                                        <p className="text-base md:text-lg font-bold text-white leading-snug">{activeLevel.question}</p>
-                                    </div>
-                                    {isPrescriptive && (
-                                        <div className="shrink-0 sm:text-right">
-                                            <div className="inline-flex rounded-xl border border-white/25 p-1 bg-black/15 backdrop-blur-sm">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setPrescriptiveMode('support')}
-                                                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-colors ${prescriptiveMode === 'support' ? 'bg-white text-brand-gold shadow-sm' : 'text-white/75 hover:text-white'}`}
-                                                >
-                                                    {ui.analytics_prescriptive_support}
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setPrescriptiveMode('auto')}
-                                                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-colors ${prescriptiveMode === 'auto' ? 'bg-white text-brand-gold shadow-sm' : 'text-white/75 hover:text-white'}`}
-                                                >
-                                                    {ui.analytics_prescriptive_auto}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
+                                <div className="aa-chevron-track" role="tablist" aria-label={ui.analytics_tap_hint}>
+                                    {levels.map((level, i) => {
+                                        const meta = ANALYTICS_LEVEL_META[i];
+                                        const isLevelActive = activeIdx === i;
+                                        return (
+                                            <button
+                                                key={level.id}
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={isLevelActive}
+                                                onClick={() => setActiveIdx(i)}
+                                                className={`aa-chevron-seg ${isLevelActive ? `aa-chevron-seg-active ${meta.chevronActive}` : 'aa-chevron-seg-inactive'}`}
+                                            >
+                                                <p className={`text-[8px] sm:text-[9px] font-bold uppercase tracking-wider mb-0.5 truncate ${isLevelActive ? 'opacity-80' : 'opacity-80'}`}>{level.name}</p>
+                                                <p className="text-[10px] sm:text-xs md:text-sm font-bold leading-tight line-clamp-2">{level.question}</p>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
 
                                 <div className="grid md:grid-cols-5 gap-3 md:gap-4 items-stretch">
@@ -3634,6 +3906,26 @@
                                                         </div>
                                                         <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mt-auto overflow-hidden">{stage.detail}</p>
                                                     </div>
+                                                ) : stage.key === 'analytics' && isPrescriptive ? (
+                                                    <>
+                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
+                                                        <div className="mt-2 flex rounded-md border border-brand-gold/25 dark:border-brand-gold/20 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setPrescriptiveMode('support')}
+                                                                className={`flex-1 min-w-0 px-1 py-1 rounded text-[7px] sm:text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'support' ? 'bg-brand-gold text-white' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold'}`}
+                                                            >
+                                                                {ui.analytics_prescriptive_support}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setPrescriptiveMode('auto')}
+                                                                className={`flex-1 min-w-0 px-1 py-1 rounded text-[7px] sm:text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'auto' ? 'bg-brand-gold text-white' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold'}`}
+                                                            >
+                                                                {ui.analytics_prescriptive_auto}
+                                                            </button>
+                                                        </div>
+                                                    </>
                                                 ) : (
                                                     <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
                                                 )}
@@ -3642,35 +3934,6 @@
                                     ))}
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Category detail cards */}
-                        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-8">
-                            {levels.map((level, i) => {
-                                const isActive = activeIdx === i;
-                                return (
-                                    <button
-                                        key={level.id}
-                                        type="button"
-                                        onClick={() => setActiveIdx(i)}
-                                        className={`text-left rounded-xl border px-4 py-4 md:py-5 transition-all duration-300 flex flex-col h-full ${isActive ? 'border-brand-gold/50 bg-brand-gold/5 dark:bg-brand-gold/10 shadow-md shadow-brand-gold/10 scale-[1.01]' : 'border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 hover:border-brand-gold/25'}`}
-                                    >
-                                        <div className="flex items-center justify-between gap-2 mb-3">
-                                            <span className="text-[10px] font-mono font-bold text-slate-400">{String(i + 1).padStart(2, '0')}</span>
-                                            <span className={`text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${level.band === 'models' ? 'text-brand-gold bg-brand-gold/10 border border-brand-gold/20' : 'text-slate-500 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700'}`}>
-                                                {level.band === 'models' ? ui.analytics_band_models : ui.analytics_band_information}
-                                            </span>
-                                        </div>
-                                        <h4 className={`text-sm md:text-base font-bold mb-1 ${isActive ? 'text-brand-gold' : 'text-slate-800 dark:text-slate-100'}`}>{level.name}</h4>
-                                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">{level.question}</p>
-                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3 flex-1">{level.desc}</p>
-                                        <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">{level.focus}</p>
-                                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed border-t border-slate-200/60 dark:border-slate-700/60 pt-2 mt-1">
-                                            <span className="text-brand-gold font-semibold">Operartis · </span>{level.operartis}
-                                        </p>
-                                    </button>
-                                );
-                            })}
                         </div>
 
                         <div className="rounded-xl border border-brand-gold/30 bg-gradient-to-r from-brand-gold/8 via-transparent to-brand-gold/5 dark:from-brand-gold/12 px-5 py-4 md:px-6 md:py-5">
