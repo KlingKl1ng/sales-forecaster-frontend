@@ -286,6 +286,71 @@
             transform: rotate(180deg);
         }
 
+        .mobile-nav-panel {
+            max-height: calc(100dvh - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+            animation: mobileNavIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        }
+
+        @keyframes mobileNavIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .touch-open-card {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            .touch-open-card .quick-view-overlay {
+                display: none;
+            }
+
+            .touch-open-card .card-visible-content,
+            .touch-open-card .card-footer-cta {
+                opacity: 1 !important;
+                filter: none !important;
+            }
+
+            .touch-open-card:active {
+                transform: scale(0.99);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .horizon-pill,
+            .page-scroll-target {
+                scroll-margin-top: 4.75rem;
+            }
+
+            .reveal-hidden {
+                transform: translateY(18px);
+                filter: blur(2px);
+            }
+
+            .modal-content {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+
+            .sc-flow-scroll {
+                scroll-snap-type: x proximity;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .sc-flow-scroll button {
+                scroll-snap-align: center;
+            }
+        }
+
         /* Reveal Animation Base Classes */
         .reveal-base {
             transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
@@ -866,6 +931,50 @@
             border-color: rgba(245, 158, 11, 0.5);
         }
 
+        @media (max-width: 639px) {
+            .i4l-diagram-stage {
+                aspect-ratio: 480 / 350;
+            }
+
+            .i4l-node {
+                width: 5.5rem !important;
+            }
+
+            .i4l-node-icon {
+                width: 3.75rem;
+                height: 3.75rem;
+                border-radius: 1rem;
+            }
+
+            .i4l-node-icon-aps {
+                width: 4.25rem;
+                height: 4.25rem;
+            }
+
+            .i4l-node-labels {
+                min-height: 1.35rem;
+                margin-top: 0.38rem;
+            }
+
+            .i4l-node-labels span:last-child {
+                display: none;
+            }
+
+            .i4l-flow-tag {
+                font-size: 0.52rem;
+                letter-spacing: 0.035em;
+                padding: 0.18rem 0.45rem;
+            }
+
+            .i4l-flow-tag-recording {
+                top: 72% !important;
+                max-width: 9.5rem;
+                white-space: normal;
+                line-height: 1.15;
+                text-align: center;
+            }
+        }
+
         /* Analytics maturity section */
         .aa-maturity-chart {
             position: relative;
@@ -1101,26 +1210,27 @@
         .aa-flow-stage {
             display: flex;
             flex-direction: column;
-            height: 11.875rem;
-            overflow: hidden;
+            height: auto;
+            min-height: 0;
+            overflow: visible;
             transition: border-color 0.35s ease, box-shadow 0.35s ease;
         }
 
         .aa-flow-stage-label {
-            height: 1rem;
+            height: auto;
             flex-shrink: 0;
         }
 
         .aa-flow-stage-title {
-            height: 2.25rem;
+            height: auto;
             flex-shrink: 0;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .aa-flow-stage-body {
-            flex: 1 1 auto;
+            flex: 0 1 auto;
             min-height: 0;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .aa-flow-stage--muted .aa-flow-stage-title,
@@ -1129,7 +1239,7 @@
         }
 
         .aa-flow-stage-bar-labels {
-            height: 2rem;
+            height: auto;
             flex-shrink: 0;
         }
 
@@ -1141,7 +1251,56 @@
             position: relative;
         }
 
+        .aa-flow-stage-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.625rem;
+            align-items: stretch;
+        }
+
+        @media (min-width: 390px) and (max-width: 767px) {
+            .aa-flow-stage-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .aa-flow-stage-results {
+                grid-column: 1 / -1;
+            }
+        }
+
         @media (min-width: 768px) {
+            .aa-flow-stage-grid {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 1rem;
+            }
+
+            .aa-flow-stage-results {
+                grid-column: auto;
+            }
+
+            .aa-flow-stage {
+                height: 11.875rem;
+                overflow: hidden;
+            }
+
+            .aa-flow-stage-label {
+                height: 1rem;
+            }
+
+            .aa-flow-stage-title {
+                height: 2.25rem;
+                overflow: hidden;
+            }
+
+            .aa-flow-stage-body {
+                flex: 1 1 auto;
+                overflow: hidden;
+            }
+
+            .aa-flow-stage-bar-labels {
+                height: 2rem;
+            }
+
             .aa-flow-connector::after {
                 content: '→';
                 position: absolute;
@@ -1460,7 +1619,7 @@
 
 <body class="bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-100 transition-colors duration-500">
 
-    <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
+    <div id="root" class="h-[100dvh] w-screen overflow-hidden flex flex-col"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } = React;
@@ -1523,6 +1682,7 @@
         const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
         const CloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
+        const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>;
         const GlobeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>;
         // NEW ICONS
         const FactoryIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="17" y1="13" x2="17" y2="13.01"></line><line x1="7" y1="13" x2="7" y2="13.01"></line></svg>;
@@ -1577,7 +1737,7 @@
                     status_operational: "SYSTEM OPERATIONAL",
                     header_title_1: "Advanced Planning &",
                     header_title_2: "Scheduling System",
-                    header_desc: "Select a functional module block to access specific planning tools and optimization engines.",
+                    header_desc: "Turn ERP and shop-floor data into optimized plans — demand, capacity, inventory, and schedules — in one integrated APS platform.",
                     explore: "Explore",
                     quick_view: "Quick View",
                     modules: "Modules",
@@ -1625,10 +1785,10 @@
                     analytics_band_models: "Models & Optimization",
                     analytics_source_note: "Framework inspired by Gartner analytics maturity models",
                     analytics_levels: [
-                        { id: 'descriptive', name: 'Descriptive', question: 'What happened?', desc: 'Summarize historical performance with dashboards, KPIs and standard reports.', focus: 'Visibility & record-keeping', band: 'information', operartis: 'Baseline visibility across ERP, inventory and production records.' },
-                        { id: 'diagnostic', name: 'Diagnostic', question: 'Why did it happen?', desc: 'Drill down, root-cause analysis and variance explanations across operations.', focus: 'Understanding drivers', band: 'information', operartis: 'ABC-XYZ segmentation, deviation analysis and bottleneck identification.' },
-                        { id: 'predictive', name: 'Predictive', question: 'What will happen?', desc: 'Forecast demand, capacity and risk using statistical and machine-learning models.', focus: 'Forward-looking insight', band: 'models', operartis: 'ML forecasting, simulation and multi-scenario planning engines.' },
-                        { id: 'prescriptive', name: 'Prescriptive', question: 'What should we do?', desc: 'Recommend optimized decisions — from guided decision support to automated planning.', focus: 'Optimized action', band: 'models', operartis: 'APS scheduling, VRP, lot-sizing and network optimization modules.' },
+                        { id: 'descriptive', name: 'Descriptive', chartName: 'Desc.', question: 'What happened?', desc: 'Summarize historical performance with dashboards, KPIs and standard reports.', focus: 'Visibility & record-keeping', band: 'information', operartis: 'Baseline visibility across ERP, inventory and production records.' },
+                        { id: 'diagnostic', name: 'Diagnostic', chartName: 'Diag.', question: 'Why did it happen?', desc: 'Drill down, root-cause analysis and variance explanations across operations.', focus: 'Understanding drivers', band: 'information', operartis: 'ABC-XYZ segmentation, deviation analysis and bottleneck identification.' },
+                        { id: 'predictive', name: 'Predictive', chartName: 'Pred.', question: 'What will happen?', desc: 'Forecast demand, capacity and risk using statistical and machine-learning models.', focus: 'Forward-looking insight', band: 'models', operartis: 'ML forecasting, simulation and multi-scenario planning engines.' },
+                        { id: 'prescriptive', name: 'Prescriptive', chartName: 'Presc.', question: 'What should we do?', desc: 'Recommend optimized decisions — from guided decision support to automated planning.', focus: 'Optimized action', band: 'models', operartis: 'APS scheduling, VRP, lot-sizing and network optimization modules.' },
                     ],
                     analytics_pipeline_title: "From Data to Outcomes",
                     analytics_pipeline_desc: "As analytics maturity rises, required human input tapers while models drive decisions closer to execution.",
@@ -1837,7 +1997,7 @@
                     status_operational: "HỆ THỐNG HOẠT ĐỘNG",
                     header_title_1: "Hệ Thống Hoạch Định &",
                     header_title_2: "Lập Kế Hoạch Nâng Cao",
-                    header_desc: "Chọn một khối chức năng để trải nghiệm các công cụ, giải pháp tối ưu hóa chuyên sâu.",
+                    header_desc: "Biến dữ liệu ERP và shop-floor thành kế hoạch tối ưu — nhu cầu, năng lực, tồn kho và lịch sản xuất — trên một nền tảng APS tích hợp.",
                     explore: "Khám Phá",
                     quick_view: "Xem Nhanh",
                     modules: "Mô-đun",
@@ -1885,10 +2045,10 @@
                     analytics_band_models: "Mô hình & Tối ưu",
                     analytics_source_note: "Khung tham chiếu theo mô hình trưởng thành phân tích của Gartner",
                     analytics_levels: [
-                        { id: 'descriptive', name: 'Mô tả', question: 'Chuyện gì đã xảy ra?', desc: 'Tổng hợp hiệu suất lịch sử qua dashboard, KPI và báo cáo chuẩn.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
-                        { id: 'diagnostic', name: 'Chẩn đoán', question: 'Vì sao nó xảy ra?', desc: 'Khoan sâu, phân tích nguyên nhân gốc và giải thích chênh lệch vận hành.', focus: 'Hiểu drivers', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
-                        { id: 'predictive', name: 'Dự báo', question: 'Điều gì sẽ xảy ra?', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Insight hướng tới tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
-                        { id: 'prescriptive', name: 'Khuyến nghị', question: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hành động tối ưu', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
+                        { id: 'descriptive', name: 'Mô tả', chartName: 'Mô tả', question: 'Chuyện gì đã xảy ra?', desc: 'Tổng hợp hiệu suất lịch sử qua dashboard, KPI và báo cáo chuẩn.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
+                        { id: 'diagnostic', name: 'Chẩn đoán', chartName: 'Chẩn', question: 'Vì sao nó xảy ra?', desc: 'Khoan sâu, phân tích nguyên nhân gốc và giải thích chênh lệch vận hành.', focus: 'Hiểu drivers', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
+                        { id: 'predictive', name: 'Dự báo', chartName: 'Dự báo', question: 'Điều gì sẽ xảy ra?', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Insight hướng tới tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
+                        { id: 'prescriptive', name: 'Khuyến nghị', chartName: 'Tối ưu', question: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hành động tối ưu', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
                     ],
                     analytics_pipeline_title: "Từ Dữ liệu đến Kết quả",
                     analytics_pipeline_desc: "Khi trưởng thành phân tích tăng, nhu cầu con người giảm dần trong khi mô hình dẫn quyết định gần hơn tới thực thi.",
@@ -2097,7 +2257,7 @@
                     status_operational: "SYSTEM BETRIEBSBEREIT",
                     header_title_1: "Erweiterte Planungs- &",
                     header_title_2: "Terminierungssystem",
-                    header_desc: "Wählen Sie ein Funktionsmodul, um auf spezifische Planungstools und Optimierungs-Engines zuzugreifen.",
+                    header_desc: "Verwandeln Sie ERP- und Shopfloor-Daten in optimierte Pläne — Bedarf, Kapazität, Bestand und Terminierung — in einer integrierten APS-Plattform.",
                     explore: "Entdecken",
                     quick_view: "Schnellansicht",
                     modules: "Module",
@@ -2145,10 +2305,10 @@
                     analytics_band_models: "Modelle & Optimierung",
                     analytics_source_note: "Rahmenwerk inspiriert von Gartner Analytics-Reifegradmodellen",
                     analytics_levels: [
-                        { id: 'descriptive', name: 'Deskriptiv', question: 'Was ist passiert?', desc: 'Historische Leistung mit Dashboards, KPIs und Standardberichten zusammenfassen.', focus: 'Transparenz & Dokumentation', band: 'information', operartis: 'Grundlegende Transparenz über ERP-, Bestands- und Produktionsdaten.' },
-                        { id: 'diagnostic', name: 'Diagnostisch', question: 'Warum ist es passiert?', desc: 'Drill-down, Ursachenanalyse und Abweichungserklärungen im Betrieb.', focus: 'Treiber verstehen', band: 'information', operartis: 'ABC-XYZ-Segmentierung, Abweichungsanalyse und Engpassidentifikation.' },
-                        { id: 'predictive', name: 'Prädiktiv', question: 'Was wird passieren?', desc: 'Nachfrage, Kapazität und Risiko mit statistischen und ML-Modellen prognostizieren.', focus: 'Vorausschauende Erkenntnis', band: 'models', operartis: 'ML-Prognose, Simulation und Multi-Szenario-Planungs-Engines.' },
-                        { id: 'prescriptive', name: 'Präskriptiv', question: 'Was sollten wir tun?', desc: 'Optimierte Entscheidungen empfehlen — von Entscheidungsunterstützung bis automatisierte Planung.', focus: 'Optimiertes Handeln', band: 'models', operartis: 'APS-Terminierung, VRP, Losgrößen- und Netzwerkoptimierungsmodule.' },
+                        { id: 'descriptive', name: 'Deskriptiv', chartName: 'Deskr.', question: 'Was ist passiert?', desc: 'Historische Leistung mit Dashboards, KPIs und Standardberichten zusammenfassen.', focus: 'Transparenz & Dokumentation', band: 'information', operartis: 'Grundlegende Transparenz über ERP-, Bestands- und Produktionsdaten.' },
+                        { id: 'diagnostic', name: 'Diagnostisch', chartName: 'Diagn.', question: 'Warum ist es passiert?', desc: 'Drill-down, Ursachenanalyse und Abweichungserklärungen im Betrieb.', focus: 'Treiber verstehen', band: 'information', operartis: 'ABC-XYZ-Segmentierung, Abweichungsanalyse und Engpassidentifikation.' },
+                        { id: 'predictive', name: 'Prädiktiv', chartName: 'Präd.', question: 'Was wird passieren?', desc: 'Nachfrage, Kapazität und Risiko mit statistischen und ML-Modellen prognostizieren.', focus: 'Vorausschauende Erkenntnis', band: 'models', operartis: 'ML-Prognose, Simulation und Multi-Szenario-Planungs-Engines.' },
+                        { id: 'prescriptive', name: 'Präskriptiv', chartName: 'Präskr.', question: 'Was sollten wir tun?', desc: 'Optimierte Entscheidungen empfehlen — von Entscheidungsunterstützung bis automatisierte Planung.', focus: 'Optimiertes Handeln', band: 'models', operartis: 'APS-Terminierung, VRP, Losgrößen- und Netzwerkoptimierungsmodule.' },
                     ],
                     analytics_pipeline_title: "Von Daten zu Ergebnissen",
                     analytics_pipeline_desc: "Mit steigender Analytics-Reife nimmt der menschliche Aufwand ab, während Modelle Entscheidungen näher an die Ausführung bringen.",
@@ -2435,20 +2595,28 @@
             return (
                 <div
                     onClick={() => onClick(block)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onClick(block);
+                        }
+                    }}
+                    role="button"
+                    tabIndex={0}
                     className={`
                         relative group flex flex-col justify-between p-5 rounded-2xl border border-transparent
                         ${hasLiveModule
                             ? 'bg-gradient-to-br from-brand-gold/5 to-brand-dark/10 shadow-[0_8px_28px_rgba(245,158,11,0.24),0_2px_14px_rgba(180,83,9,0.14),inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[0_8px_32px_rgba(245,158,11,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-1 ring-brand-gold/20 hover:shadow-[0_18px_44px_rgba(245,158,11,0.34),0_6px_22px_rgba(180,83,9,0.2),inset_0_1px_0_0_rgba(255,255,255,0.55)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)]'
                             : 'bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.15)] hover:from-white/30 hover:to-white/10 dark:hover:from-slate-800/50 dark:hover:to-slate-900/30 ring-1 ring-white/30 dark:ring-white/5 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)]'}
-                        backdrop-blur-xl cursor-pointer overflow-hidden
+                        backdrop-blur-xl cursor-pointer overflow-hidden touch-open-card
                         transition-all duration-500 ease-out
-                        hover:-translate-y-2 hover:scale-[1.02]
-                        h-full min-h-[140px] appearance-3d
+                        hover:-translate-y-2 hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60
+                        h-full min-h-[132px] sm:min-h-[140px] appearance-3d
                     `}
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-duration-500"></div>
 
-                    <div className="absolute inset-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5
+                    <div className="quick-view-overlay absolute inset-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5
                                     opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out
                                     flex flex-col transform translate-y-4 group-hover:translate-y-0
                                     ring-1 ring-slate-200/80 dark:ring-white/10">
@@ -2477,7 +2645,7 @@
                         </div>
                     </div>
 
-                    <div className="relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
+                    <div className="card-visible-content relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
                         {hasLiveModule ? (
                             <>
                                 <div className="flex items-start justify-between gap-3 mb-3">
@@ -2532,7 +2700,7 @@
                         )}
                     </div>
 
-                    <div className={`relative z-10 mt-4 flex items-center text-[10px] font-bold transition-opacity duration-300 group-hover:opacity-10 uppercase tracking-wider ${hasLiveModule ? 'text-brand-dark dark:text-brand-gold gap-1.5' : 'text-slate-400'}`}>
+                    <div className={`card-footer-cta relative z-10 mt-4 flex items-center text-[10px] font-bold transition-opacity duration-300 group-hover:opacity-10 uppercase tracking-wider ${hasLiveModule ? 'text-brand-dark dark:text-brand-gold gap-1.5' : 'text-slate-400'}`}>
                         {content?.ui?.explore || "Explore"} <ArrowRightIcon />
                     </div>
                 </div>
@@ -2600,7 +2768,7 @@
             }, []);
 
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="module-modal-title">
                     <div
                         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm modal-backdrop"
                         onClick={onClose}
@@ -2608,19 +2776,20 @@
 
                     <div className="
                         relative w-full max-w-2xl bg-white dark:bg-[#0f172a] 
-                        rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 
-                        p-6 md:p-8 modal-content overflow-hidden flex flex-col max-h-[90vh]
+                        rounded-t-2xl sm:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 
+                        p-4 sm:p-6 md:p-8 modal-content overflow-hidden flex flex-col max-h-[calc(100dvh-0.75rem)] sm:max-h-[90vh]
                     ">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-gold/10 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
-                        <div className="flex justify-between items-start mb-6 relative z-10 shrink-0">
+                        <div className="flex justify-between items-start gap-4 mb-4 sm:mb-6 relative z-10 shrink-0">
                             <div>
-                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{block.name}</h3>
+                                <h3 id="module-modal-title" className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 leading-tight">{block.name}</h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400">{block.fullDesc}</p>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500"
+                                aria-label="Close"
+                                className="shrink-0 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500"
                             >
                                 <CloseIcon />
                             </button>
@@ -3167,12 +3336,12 @@
                                 tabIndex={0}
                                 aria-label={apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
                             >
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className={`inline-flex items-center justify-center gap-1.5 min-w-[8.5rem] text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full transition-colors duration-500 ${apsVisible ? 'text-brand-gold bg-brand-gold/10 border border-brand-gold/25' : 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60'}`}>
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                                    <span className={`inline-flex w-fit max-w-full items-center justify-center gap-1.5 text-[9px] font-black uppercase tracking-[0.12em] sm:tracking-widest px-2.5 py-1 rounded-full transition-colors duration-500 sm:min-w-[8.5rem] ${apsVisible ? 'text-brand-gold bg-brand-gold/10 border border-brand-gold/25' : 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60'}`}>
                                         <span className={`h-1.5 w-1.5 rounded-full ${apsVisible ? 'bg-brand-gold' : 'bg-rose-500'}`} />
                                         {apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
                                     </span>
-                                    <span className="text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.i4l_tap_hint}</span>
+                                    <span className="self-end sm:self-auto text-right text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.i4l_tap_hint}</span>
                                 </div>
 
                                 <div className="flex-1 flex items-center justify-center">
@@ -3214,7 +3383,7 @@
                                         {I4L_FLOW_TAGS.filter(tag => apsVisible || !tag.apsOnly).map(tag => (
                                             <span
                                                 key={tag.key}
-                                                className={`i4l-flow-tag i4l-phase-layer ${tag.gold ? 'i4l-flow-tag-gold' : ''}${apsVisible ? '' : ' i4l-phase-hidden'}`}
+                                                className={`i4l-flow-tag i4l-phase-layer ${tag.key === 'i4l_flow_recording' ? 'i4l-flow-tag-recording' : ''} ${tag.gold ? 'i4l-flow-tag-gold' : ''}${apsVisible ? '' : ' i4l-phase-hidden'}`}
                                                 style={{ left: tag.left, top: tag.top }}
                                             >
                                                 {ui[tag.key]}
@@ -3264,15 +3433,15 @@
                                     </div>
                                 </div>
 
-                                <div className="relative flex-1 min-h-[17rem] md:min-h-[18rem]">
-                                    <div className={`i4l-phase-layer absolute inset-0${apsVisible ? ' i4l-phase-hidden' : ''}`}>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 h-full items-stretch">
-                                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 px-5 py-4 md:py-5 h-full flex flex-col">
+                                <div className="relative flex-1 min-h-0 sm:min-h-[17rem] md:min-h-[18rem]">
+                                    <div className={`i4l-phase-layer ${apsVisible ? 'hidden sm:block sm:absolute sm:inset-0 i4l-phase-hidden' : 'relative sm:absolute sm:inset-0'}`}>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:h-full items-stretch">
+                                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 px-5 py-4 md:py-5 sm:h-full flex flex-col">
                                                 <div className="flex items-center gap-3 mb-4">
                                                     <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-500/10 text-slate-600 dark:text-slate-300"><BoxIcon /></span>
                                                     <span className="text-sm md:text-base font-bold text-slate-700 dark:text-slate-200">{ui.i4l_erp_label}</span>
                                                 </div>
-                                                <ul className="flex-1 flex flex-col justify-center space-y-3">
+                                                <ul className="sm:flex-1 flex flex-col sm:justify-center space-y-3">
                                                     {ui.i4l_erp_cons.map((item, i) => (
                                                         <li key={i} className="flex gap-2.5 text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                                                             <span className="text-rose-400 shrink-0 mt-0.5 text-sm font-bold">×</span>
@@ -3281,12 +3450,12 @@
                                                     ))}
                                                 </ul>
                                             </div>
-                                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 px-5 py-4 md:py-5 h-full flex flex-col">
+                                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/50 px-5 py-4 md:py-5 sm:h-full flex flex-col">
                                                 <div className="flex items-center gap-3 mb-4">
                                                     <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-500/10 text-slate-600 dark:text-slate-300"><FactoryIcon /></span>
                                                     <span className="text-sm md:text-base font-bold text-slate-700 dark:text-slate-200">{ui.i4l_mes_label}</span>
                                                 </div>
-                                                <ul className="flex-1 flex flex-col justify-center space-y-3">
+                                                <ul className="sm:flex-1 flex flex-col sm:justify-center space-y-3">
                                                     {ui.i4l_mes_cons.map((item, i) => (
                                                         <li key={i} className="flex gap-2.5 text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                                                             <span className="text-rose-400 shrink-0 mt-0.5 text-sm font-bold">×</span>
@@ -3297,8 +3466,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={`i4l-phase-layer absolute inset-0${apsVisible ? '' : ' i4l-phase-hidden'}`}>
-                                        <div className="rounded-xl border border-brand-gold/30 bg-white/70 dark:bg-slate-900/60 px-5 py-4 md:py-5 h-full flex flex-col">
+                                    <div className={`i4l-phase-layer ${apsVisible ? 'relative sm:absolute sm:inset-0' : 'hidden sm:block sm:absolute sm:inset-0 i4l-phase-hidden'}`}>
+                                        <div className="rounded-xl border border-brand-gold/30 bg-white/70 dark:bg-slate-900/60 px-5 py-4 md:py-5 sm:h-full flex flex-col">
                                             <div className="flex items-center gap-3 mb-4">
                                                 <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-gold/15 text-brand-gold sc-node-active"><ActivityIcon /></span>
                                                 <div>
@@ -3306,7 +3475,7 @@
                                                     <span className="block text-xs md:text-sm text-slate-500 dark:text-slate-400">{ui.i4l_aps_full}</span>
                                                 </div>
                                             </div>
-                                            <div className="flex-1 flex flex-col justify-center min-h-0">
+                                            <div className="sm:flex-1 flex flex-col sm:justify-center min-h-0">
                                                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">{ui.i4l_aps_role}</p>
                                                 <ul className="space-y-3">
                                                     {ui.i4l_aps_pros.map((item, i) => (
@@ -3504,31 +3673,31 @@
 
         // Odoo-style hero + horizon quick-nav
         const HeroSection = ({ content, horizons, onNav }) => (
-            <div className="hero-liquid-glass rounded-3xl border border-transparent ring-1 ring-brand-gold/15 dark:ring-white/10 p-8 md:p-12 lg:p-14 mb-12 md:mb-16 relative overflow-hidden">
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-brand-gold/8 via-transparent to-brand-dark/5 pointer-events-none" aria-hidden="true" />
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-white/12 via-transparent to-white/18 dark:from-slate-900/25 dark:to-white/6 pointer-events-none opacity-80" aria-hidden="true" />
-                <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-brand-gold/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+            <div className="hero-liquid-glass rounded-2xl sm:rounded-3xl border border-transparent ring-1 ring-brand-gold/15 dark:ring-white/10 p-5 sm:p-8 md:p-12 lg:p-14 mb-8 sm:mb-12 md:mb-16 relative overflow-hidden">
+                <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-brand-gold/8 via-transparent to-brand-dark/5 pointer-events-none" aria-hidden="true" />
+                <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-t from-white/12 via-transparent to-white/18 dark:from-slate-900/25 dark:to-white/6 pointer-events-none opacity-80" aria-hidden="true" />
+                <div className="absolute -top-8 -right-12 h-48 w-48 sm:top-0 sm:right-0 sm:h-72 sm:w-72 bg-gradient-to-bl from-brand-gold/10 to-transparent rounded-full blur-3xl pointer-events-none" />
                 <div className="relative z-10 max-w-3xl">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-5">
+                    <h1 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.08] sm:leading-[1.1] mb-4 sm:mb-5 break-words">
                         {content.ui.header_title_1}{' '}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-amber-500 to-brand-dark">{content.ui.header_title_2}</span>
                     </h1>
-                    <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mb-8">
+                    <p className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mb-6 sm:mb-8">
                         {content.ui.header_desc}
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
                         {horizons.map(h => (
                             <button
                                 key={h.id}
                                 type="button"
                                 onClick={() => onNav(h.id)}
                                 className="
-                                    relative group px-4 py-2 rounded-full border border-transparent
+                                    relative group min-h-10 px-3 sm:px-4 py-2 rounded-full border border-transparent
                                     backdrop-blur-xl overflow-hidden
                                     bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10
                                     shadow-[0_4px_20px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.15)]
                                     ring-1 ring-white/30 dark:ring-white/5
-                                    text-xs font-bold uppercase tracking-wide
+                                    text-[11px] sm:text-xs font-bold uppercase tracking-wide
                                     text-slate-600 dark:text-slate-300
                                     transition-all duration-300 ease-out
                                     hover:from-brand-gold/5 hover:to-brand-dark/10
@@ -3537,7 +3706,7 @@
                                 "
                             >
                                 <span className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-gold/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none" aria-hidden="true" />
-                                <span className="relative z-10">{h.title}</span>
+                                <span className="relative z-10 block leading-tight">{h.title}</span>
                             </button>
                         ))}
                     </div>
@@ -3687,6 +3856,113 @@
                     </div>
                     {apsMenu}
                 </div>
+            );
+        };
+
+        const MobileNavDrawer = ({ items, activeId, onNav, open, onClose, content }) => {
+            useEffect(() => {
+                if (!open) return undefined;
+                const previousOverflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+                const onKeyDown = (e) => {
+                    if (e.key === 'Escape') onClose();
+                };
+                const onResize = () => {
+                    if (window.innerWidth >= 1024) onClose();
+                };
+                window.addEventListener('keydown', onKeyDown);
+                window.addEventListener('resize', onResize);
+                return () => {
+                    document.body.style.overflow = previousOverflow;
+                    window.removeEventListener('keydown', onKeyDown);
+                    window.removeEventListener('resize', onResize);
+                };
+            }, [open, onClose]);
+
+            if (!open) return null;
+
+            const activate = (id) => {
+                onNav(id);
+                onClose();
+            };
+
+            const buttonClass = (isActive, nested = false) => `
+                w-full min-h-11 rounded-xl border px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wide
+                transition-colors flex items-center justify-between gap-3
+                ${nested ? 'pl-4' : ''}
+                ${isActive
+                    ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold'
+                    : 'border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-slate-600 dark:text-slate-300'}
+            `;
+
+            return ReactDOM.createPortal(
+                <div className="fixed inset-0 z-50 lg:hidden">
+                    <button
+                        type="button"
+                        className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm"
+                        aria-label="Close navigation"
+                        onClick={onClose}
+                    />
+                    <div className="mobile-nav-panel absolute inset-x-2 bottom-2 rounded-2xl border border-white/50 dark:border-white/10 bg-white/95 dark:bg-[#0f172a]/95 shadow-2xl backdrop-blur-xl overflow-hidden">
+                        <div className="flex items-center justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 px-4 py-3">
+                            <div className="min-w-0">
+                                <p className="font-black tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</p>
+                                <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{content.ui.system_terminal}</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                aria-label="Close navigation"
+                                className="shrink-0 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            >
+                                <CloseIcon />
+                            </button>
+                        </div>
+                        <div className="max-h-[min(34rem,calc(100dvh-7rem))] overflow-y-auto custom-scrollbar px-3 py-3">
+                            <div className="grid gap-2">
+                                {items.map(item => {
+                                    if (item.id === 'aps-group') {
+                                        const activeGroup = (item.children || []).some(child => child.id === activeId);
+                                        return (
+                                            <div key={item.id} className={`rounded-2xl border p-2 ${activeGroup ? 'border-brand-gold/35 bg-brand-gold/5' : 'border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/20'}`}>
+                                                <div className={`px-2 pb-2 text-[10px] font-black uppercase tracking-widest ${activeGroup ? 'text-brand-gold' : 'text-slate-500 dark:text-slate-400'}`}>
+                                                    {item.label}
+                                                </div>
+                                                <div className="grid gap-2">
+                                                    {(item.children || []).map(child => (
+                                                        <button
+                                                            key={child.id}
+                                                            type="button"
+                                                            onClick={() => activate(child.id)}
+                                                            className={buttonClass(activeId === child.id, true)}
+                                                        >
+                                                            <span>{child.label}</span>
+                                                            {activeId === child.id && <span className="h-1.5 w-1.5 rounded-full bg-brand-gold" aria-hidden="true" />}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+
+                                    const isActive = activeId === item.id;
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => activate(item.id)}
+                                            className={buttonClass(isActive)}
+                                        >
+                                            <span>{item.label}</span>
+                                            {isActive && <span className="h-1.5 w-1.5 rounded-full bg-brand-gold" aria-hidden="true" />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
             );
         };
 
@@ -4232,7 +4508,10 @@
                                                                 style={{ height: `${meta.barH}%` }}
                                                             />
                                                         </div>
-                                                        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-center leading-tight w-full text-slate-600 dark:text-slate-400">{level.name}</span>
+                                                        <span className="shrink-0 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.04em] sm:tracking-wide text-center leading-tight w-full text-slate-600 dark:text-slate-400" title={level.name}>
+                                                            <span className="sm:hidden">{level.chartName || level.name}</span>
+                                                            <span className="hidden sm:inline">{level.name}</span>
+                                                        </span>
                                                     </div>
                                                 );
                                             })}
@@ -4276,8 +4555,8 @@
                             </div>
 
                             {/* Sub-panel 2: Active analytics flow */}
-                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-5 md:p-6">
-                                <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-4 md:p-6">
+                                <div className="flex flex-wrap items-start justify-between gap-3 mb-4 md:mb-5">
                                     <div>
                                         <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_active_flow}</h4>
                                         <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">{ui.analytics_active_flow_desc}</p>
@@ -4307,14 +4586,14 @@
                                     })}
                                 </div>
 
-                                <div className="grid md:grid-cols-5 gap-3 md:gap-4 items-stretch">
+                                <div className="aa-flow-stage-grid">
                                     {flowStages.map((stage) => (
-                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector rounded-xl border p-4 md:p-5 ${stage.accent} aa-flow-stage-active`}>
-                                            <p className="aa-flow-stage-label text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 truncate">{stage.label}</p>
-                                            <p className={`aa-flow-stage-title text-sm md:text-base font-bold mb-2 leading-snug line-clamp-2 ${stage.titleClass}`}>{stage.title}</p>
+                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector ${stage.key === 'results' ? 'aa-flow-stage-results' : ''} rounded-xl border p-3 md:p-5 ${stage.accent} aa-flow-stage-active`}>
+                                            <p className="aa-flow-stage-label text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 md:mb-2 truncate">{stage.label}</p>
+                                            <p className={`aa-flow-stage-title text-sm md:text-base font-bold mb-1.5 md:mb-2 leading-snug line-clamp-2 ${stage.titleClass}`}>{stage.title}</p>
                                             <div className="aa-flow-stage-body">
                                                 {stage.bar ? (
-                                                    <div className="flex h-full flex-col">
+                                                    <div className="flex md:h-full flex-col">
                                                         <div className="h-3 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden shrink-0">
                                                             <div className="aa-human-bar aa-human-bar-fill h-full rounded-full" style={{ width: `${humanW}%` }} />
                                                         </div>
@@ -4322,7 +4601,7 @@
                                                             <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 dark:text-amber-400 truncate">{ui.analytics_human_input} {humanW}%</span>
                                                             <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-slate-500 dark:text-slate-400 truncate">{ui.analytics_model_driven} {modelW}%</span>
                                                         </div>
-                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mt-auto overflow-hidden">{stage.detail}</p>
+                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mt-2 md:mt-auto overflow-hidden">{stage.detail}</p>
                                                     </div>
                                                 ) : stage.key === 'analytics' && isPrescriptive ? (
                                                     <>
@@ -4438,6 +4717,7 @@
             const [lang, setLang] = useState(() => window.getOperartisLang());
             const [time, setTime] = useState(new Date());
             const [selectedBlock, setSelectedBlock] = useState(null);
+            const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [activeNavId, setActiveNavId] = useState('supply-chain');
             const headerNavRef = useRef(null);
             const scrollLockRef = useRef(false);
@@ -4580,28 +4860,44 @@
                 setSelectedBlock(null);
             };
 
+            const closeMobileNav = useCallback(() => {
+                setMobileNavOpen(false);
+            }, []);
+
             return (
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
                     <LandingCanvasBackground theme={theme} />
 
                     <nav className="relative z-20 h-16 overflow-visible border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel shrink-0">
-                        <div className="max-w-7xl mx-auto w-full h-full px-4 sm:px-6 md:px-10 flex items-center gap-2 md:gap-4 overflow-visible">
-                            <div className="flex items-center gap-3 shrink-0 p-1.5 pr-4 md:pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                        <div className="max-w-7xl mx-auto w-full h-full px-3 sm:px-6 md:px-10 flex items-center gap-2 md:gap-4 overflow-visible">
+                            <div className="flex items-center gap-2 sm:gap-3 shrink-0 p-1.5 pr-3 sm:pr-4 md:pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                                 <a href="./new_terminal.html">
                                     <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer transition-transform hover:scale-110" onError={(e) => e.target.style.display = 'none'} />
                                 </a>
                                 <div className="flex flex-col">
-                                    <span className="font-bold text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</span>
-                                    <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase hidden hover:block xs:block">{content.ui.system_terminal}</span>
+                                    <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</span>
+                                    <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase hidden sm:block">{content.ui.system_terminal}</span>
                                 </div>
                             </div>
 
-                            <HeaderNav
-                                navRef={headerNavRef}
-                                items={pageNavItems}
-                                activeId={activeNavId}
-                                onNav={scrollToNavItem}
-                            />
+                            <div className="hidden lg:block flex-1 min-w-0 overflow-visible">
+                                <HeaderNav
+                                    navRef={headerNavRef}
+                                    items={pageNavItems}
+                                    activeId={activeNavId}
+                                    onNav={scrollToNavItem}
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setMobileNavOpen(true)}
+                                aria-expanded={mobileNavOpen}
+                                aria-label="Open navigation"
+                                className="lg:hidden ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/25 to-white/5 dark:from-slate-800/40 dark:to-slate-900/20 text-slate-600 dark:text-slate-300 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-md"
+                            >
+                                <MenuIcon />
+                            </button>
 
                             <div className="flex items-center gap-1.5 md:gap-6 shrink-0">
                                 <div className="flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
@@ -4632,15 +4928,24 @@
                                     </button>
                                 </div>
 
-                                <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shadow-md cursor-pointer">
+                                <div className="hidden sm:flex h-8 w-8 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark items-center justify-center text-white shadow-md cursor-pointer">
                                     <UserIcon />
                                 </div>
                             </div>
                         </div>
                     </nav>
 
+                    <MobileNavDrawer
+                        items={pageNavItems}
+                        activeId={activeNavId}
+                        onNav={scrollToNavItem}
+                        open={mobileNavOpen}
+                        onClose={closeMobileNav}
+                        content={content}
+                    />
+
                     <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
-                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">
+                        <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 md:px-10 py-5 sm:py-8 md:py-12 flex flex-col flex-1">
                             <Reveal>
                                 <HeroSection content={content} horizons={content.matrix} onNav={scrollToHorizon} />
                             </Reveal>
