@@ -2863,8 +2863,6 @@
                                                 <span className={`mt-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border transition-colors ${isActive ? 'text-brand-gold border-brand-gold/25 bg-brand-gold/8' : isPast ? 'text-amber-700/70 dark:text-amber-200/70 border-brand-gold/15 bg-brand-gold/5' : 'text-slate-400 border-slate-200/60 dark:border-slate-700/60'}`}>
                                                     {step.tag}
                                                 </span>
-
-                                                <div className={`hidden lg:block mt-1.5 h-0.5 rounded-full transition-all duration-500 ${isActive ? 'w-8 bg-brand-gold' : 'w-0 bg-transparent'}`} />
                                             </button>
                                         );
                                     })}
@@ -4463,9 +4461,8 @@
                     </div>
                 </div>
 
-                {/* Invite CTA band */}
                 <Reveal delay={300}>
-                    <div className="mt-16 text-center rounded-3xl border border-dashed border-brand-gold/30 bg-gradient-to-br from-brand-gold/8 to-transparent px-6 py-12">
+                    <div className="mt-16 text-center rounded-2xl border border-brand-gold/20 bg-brand-gold/5 p-6 md:p-8">
                         <p className="text-slate-800 dark:text-slate-200 font-medium max-w-2xl mx-auto text-base md:text-lg leading-relaxed">{content.ui.invite_text}</p>
                         <p className="text-brand-gold font-bold uppercase tracking-widest mt-5 text-xs">Let’s optimize today — so you can grow stronger tomorrow.</p>
                     </div>
