@@ -1050,24 +1050,32 @@
             box-shadow: none;
         }
 
-        .aa-bar-flat-0 {
-            background-color: #fde68a;
-            border-color: #fcd34d;
+        .aa-bar-flat-0,
+        .aa-chevron-active-0 {
+            --aa-accent-bg: #fde68a;
+            --aa-accent-border: #fcd34d;
+            --aa-accent-fg: #92400e;
         }
 
-        .dark .aa-bar-flat-0 {
-            background-color: #b45309;
-            border-color: #d97706;
+        .dark .aa-bar-flat-0,
+        .dark .aa-chevron-active-0 {
+            --aa-accent-bg: #b45309;
+            --aa-accent-border: #d97706;
+            --aa-accent-fg: #fffbeb;
         }
 
-        .aa-bar-flat-1 {
-            background-color: #fcd34d;
-            border-color: #fbbf24;
+        .aa-bar-flat-1,
+        .aa-chevron-active-1 {
+            --aa-accent-bg: #fcd34d;
+            --aa-accent-border: #fbbf24;
+            --aa-accent-fg: #92400e;
         }
 
-        .dark .aa-bar-flat-1 {
-            background-color: #d97706;
-            border-color: #f59e0b;
+        .dark .aa-bar-flat-1,
+        .dark .aa-chevron-active-1 {
+            --aa-accent-bg: #d97706;
+            --aa-accent-border: #f59e0b;
+            --aa-accent-fg: #fffbeb;
         }
 
         .aa-band-label-info {
@@ -1078,24 +1086,48 @@
             color: #b45309;
         }
 
-        .aa-bar-flat-2 {
-            background-color: #fbbf24;
-            border-color: #f59e0b;
+        .aa-bar-flat-2,
+        .aa-chevron-active-2 {
+            --aa-accent-bg: #fbbf24;
+            --aa-accent-border: #f59e0b;
+            --aa-accent-fg: #78350f;
         }
 
-        .dark .aa-bar-flat-2 {
-            background-color: #f59e0b;
-            border-color: #d97706;
+        .dark .aa-bar-flat-2,
+        .dark .aa-chevron-active-2 {
+            --aa-accent-bg: #f59e0b;
+            --aa-accent-border: #d97706;
+            --aa-accent-fg: #fffbeb;
         }
 
+        .aa-bar-flat-3,
+        .aa-chevron-active-3 {
+            --aa-accent-bg: #f59e0b;
+            --aa-accent-border: #d97706;
+            --aa-accent-fg: #fffbeb;
+        }
+
+        .dark .aa-bar-flat-3,
+        .dark .aa-chevron-active-3 {
+            --aa-accent-bg: #f59e0b;
+            --aa-accent-border: #fbbf24;
+            --aa-accent-fg: #fffbeb;
+        }
+
+        .aa-bar-flat-0,
+        .aa-bar-flat-1,
+        .aa-bar-flat-2,
         .aa-bar-flat-3 {
-            background-color: #f59e0b;
-            border-color: #d97706;
+            background-color: var(--aa-accent-bg);
+            border-color: var(--aa-accent-border);
         }
 
-        .dark .aa-bar-flat-3 {
-            background-color: #f59e0b;
-            border-color: #fbbf24;
+        .aa-chevron-active-0,
+        .aa-chevron-active-1,
+        .aa-chevron-active-2,
+        .aa-chevron-active-3 {
+            background-color: var(--aa-accent-bg);
+            color: var(--aa-accent-fg);
         }
 
         .aa-bar-active {
@@ -1160,46 +1192,6 @@
             outline-offset: 2px;
         }
 
-        .aa-chevron-active-0 {
-            background: linear-gradient(90deg, #fde68a, #fcd34d);
-            color: #92400e;
-        }
-
-        .dark .aa-chevron-active-0 {
-            background: linear-gradient(90deg, #b45309, #d97706);
-            color: #fffbeb;
-        }
-
-        .aa-chevron-active-1 {
-            background: linear-gradient(90deg, #fcd34d, #fbbf24);
-            color: #92400e;
-        }
-
-        .dark .aa-chevron-active-1 {
-            background: linear-gradient(90deg, #d97706, #f59e0b);
-            color: #fffbeb;
-        }
-
-        .aa-chevron-active-2 {
-            background: linear-gradient(90deg, #fbbf24, #f59e0b);
-            color: #78350f;
-        }
-
-        .dark .aa-chevron-active-2 {
-            background: linear-gradient(90deg, #f59e0b, #d97706);
-            color: #fffbeb;
-        }
-
-        .aa-chevron-active-3 {
-            background: linear-gradient(90deg, #f59e0b, #d97706);
-            color: #fffbeb;
-        }
-
-        .dark .aa-chevron-active-3 {
-            background: linear-gradient(90deg, #f59e0b, #b45309);
-            color: #fffbeb;
-        }
-
         .aa-level-title-0 {
             color: #b45309;
         }
@@ -1245,27 +1237,71 @@
         }
 
         .aa-flow-stage {
+            position: relative;
             display: flex;
             flex-direction: column;
             height: auto;
             min-height: 0;
-            overflow: visible;
+            overflow: hidden;
             transition: border-color 0.35s ease, box-shadow 0.35s ease;
         }
 
-        .aa-flow-stage-label {
-            height: auto;
-            flex-shrink: 0;
+        .aa-flow-stage::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 3px;
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.85), rgba(245, 158, 11, 0.2));
+            opacity: 0.72;
+        }
+
+        .aa-flow-stage--muted::before {
+            background: linear-gradient(180deg, rgba(148, 163, 184, 0.65), rgba(148, 163, 184, 0.18));
+        }
+
+        .aa-flow-stage-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.55rem;
+            margin-bottom: 0.75rem;
+            min-width: 0;
         }
 
         .aa-flow-stage-title {
             height: auto;
-            flex-shrink: 0;
+            min-width: 0;
             overflow: visible;
+            line-height: 1.18;
+            overflow-wrap: break-word;
+            word-break: normal;
+            hyphens: none;
+        }
+
+        .aa-flow-stage-index {
+            display: inline-flex;
+            width: 1.6rem;
+            height: 1.6rem;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            background: rgba(255, 255, 255, 0.68);
+            color: #d97706;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+
+        .dark .aa-flow-stage-index {
+            border-color: rgba(245, 158, 11, 0.22);
+            background: rgba(15, 23, 42, 0.72);
+            color: #fbbf24;
         }
 
         .aa-flow-stage-body {
-            flex: 0 1 auto;
+            flex: 1 1 auto;
             min-height: 0;
             overflow: visible;
         }
@@ -1275,13 +1311,48 @@
             opacity: 0.7;
         }
 
+        .aa-flow-stage-detail {
+            overflow-wrap: anywhere;
+            hyphens: auto;
+        }
+
+        .aa-human-meter {
+            display: flex;
+            height: 0.62rem;
+            overflow: hidden;
+            border-radius: 9999px;
+            background: rgba(203, 213, 225, 0.68);
+        }
+
+        .dark .aa-human-meter {
+            background: rgba(51, 65, 85, 0.8);
+        }
+
+        .aa-human-meter-model {
+            flex: 1 1 auto;
+            background: rgba(148, 163, 184, 0.28);
+        }
+
         .aa-flow-stage-bar-labels {
             height: auto;
             flex-shrink: 0;
         }
 
+        .aa-prescriptive-toggle {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.125rem;
+        }
+
+        .aa-prescriptive-toggle-button {
+            min-width: 0;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            hyphens: auto;
+        }
+
         .aa-flow-stage-active {
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.22);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(245, 158, 11, 0.14);
         }
 
         .aa-flow-connector {
@@ -1295,20 +1366,25 @@
             align-items: stretch;
         }
 
-        @media (min-width: 390px) and (max-width: 767px) {
+        @media (min-width: 390px) and (max-width: 1023px) {
             .aa-flow-stage-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.75rem;
             }
 
             .aa-flow-stage-results {
                 grid-column: 1 / -1;
             }
+
+            .aa-flow-connector::after {
+                display: none;
+            }
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .aa-flow-stage-grid {
-                grid-template-columns: repeat(5, minmax(0, 1fr));
-                gap: 1rem;
+                grid-template-columns: 1.05fr 1.22fr 1fr 1fr 1.35fr;
+                gap: 0.875rem;
             }
 
             .aa-flow-stage-results {
@@ -1316,36 +1392,30 @@
             }
 
             .aa-flow-stage {
-                height: 11.875rem;
-                overflow: hidden;
-            }
-
-            .aa-flow-stage-label {
-                height: 1rem;
+                min-height: 8.5rem;
             }
 
             .aa-flow-stage-title {
-                height: 2.25rem;
-                overflow: hidden;
+                min-height: 0;
             }
 
             .aa-flow-stage-body {
                 flex: 1 1 auto;
-                overflow: hidden;
             }
 
             .aa-flow-stage-bar-labels {
-                height: 2rem;
+                min-height: 0;
             }
 
             .aa-flow-connector::after {
-                content: '→';
+                content: '';
                 position: absolute;
-                right: -0.65rem;
+                right: -0.88rem;
                 top: 50%;
                 transform: translateY(-50%);
-                font-size: 0.75rem;
-                color: rgba(148, 163, 184, 0.85);
+                width: 0.88rem;
+                height: 1px;
+                background: linear-gradient(90deg, rgba(245, 158, 11, 0.45), rgba(148, 163, 184, 0.35));
                 pointer-events: none;
             }
 
@@ -1831,12 +1901,16 @@
                     analytics_sources: ["Enterprise Systems", "IoT & Shopfloor", "External Data"],
                     analytics_raw_data: "Raw Data",
                     analytics_human_input: "Human Input",
+                    analytics_human_input_short: "Human",
                     analytics_decision: "Decision",
                     analytics_decision_type: "Decision Type",
                     analytics_action: "Action",
                     analytics_results: "Results",
+                    analytics_decision_types: ["Report review", "Root-cause review", "Forecast-guided", "Optimized recommendation"],
                     analytics_prescriptive_support: "Decision Support",
+                    analytics_prescriptive_support_short: "Support",
                     analytics_prescriptive_auto: "Decision Automation",
+                    analytics_prescriptive_auto_short: "Auto",
                     analytics_feedback: "Continuous Feedback & Learning",
                     analytics_data_foundation: "Data Foundation",
                     analytics_data_foundation_desc: "Every analytics journey starts with consolidated data from core systems, shopfloor signals and external context.",
@@ -1845,6 +1919,7 @@
                     analytics_stage_analytics: "Analytics",
                     analytics_human_vs_model: "Human vs Model",
                     analytics_model_driven: "Model-driven",
+                    analytics_model_driven_short: "Model",
                     analytics_maturity_comparison: "Human Input Across Maturity",
                     analytics_maturity_comparison_desc: "Higher maturity shifts effort from manual interpretation toward automated optimization.",
                     analytics_prescriptive_paths: "Prescriptive paths",
@@ -2092,12 +2167,16 @@
                     analytics_sources: ["Hệ thống Doanh nghiệp", "IoT & Shopfloor", "Dữ liệu Bên ngoài"],
                     analytics_raw_data: "Dữ liệu Thô",
                     analytics_human_input: "Đầu vào Con người",
+                    analytics_human_input_short: "Người",
                     analytics_decision: "Quyết định",
                     analytics_decision_type: "Loại quyết định",
                     analytics_action: "Hành động",
                     analytics_results: "Kết quả",
+                    analytics_decision_types: ["Xem báo cáo", "Rà soát nguyên nhân", "Theo dự báo", "Khuyến nghị tối ưu"],
                     analytics_prescriptive_support: "Hỗ trợ Quyết định",
+                    analytics_prescriptive_support_short: "Hỗ trợ",
                     analytics_prescriptive_auto: "Tự động Quyết định",
+                    analytics_prescriptive_auto_short: "Tự động",
                     analytics_feedback: "Phản hồi & Học liên tục",
                     analytics_data_foundation: "Nền tảng Dữ liệu",
                     analytics_data_foundation_desc: "Mọi hành trình phân tích bắt đầu từ dữ liệu hợp nhất từ hệ thống lõi, tín hiệu shopfloor và bối cảnh bên ngoài.",
@@ -2106,6 +2185,7 @@
                     analytics_stage_analytics: "Phân tích",
                     analytics_human_vs_model: "Con người vs Mô hình",
                     analytics_model_driven: "Do mô hình dẫn",
+                    analytics_model_driven_short: "Mô hình",
                     analytics_maturity_comparison: "Đầu vào Con người theo Trưởng thành",
                     analytics_maturity_comparison_desc: "Trưởng thành cao hơn chuyển nỗ lực từ diễn giải thủ công sang tối ưu tự động.",
                     analytics_prescriptive_paths: "Hướng khuyến nghị",
@@ -2353,12 +2433,16 @@
                     analytics_sources: ["Enterprise-Systeme", "IoT & Shopfloor", "Externe Daten"],
                     analytics_raw_data: "Rohdaten",
                     analytics_human_input: "Menschlicher Input",
+                    analytics_human_input_short: "Mensch",
                     analytics_decision: "Entscheidung",
                     analytics_decision_type: "Entscheidungstyp",
                     analytics_action: "Aktion",
                     analytics_results: "Ergebnisse",
+                    analytics_decision_types: ["Berichtsprüfung", "Ursachenprüfung", "Prognosegestützt", "Optimierte Empfehlung"],
                     analytics_prescriptive_support: "Entscheidungsunterstützung",
+                    analytics_prescriptive_support_short: "Assistenz",
                     analytics_prescriptive_auto: "Entscheidungsautomatisierung",
+                    analytics_prescriptive_auto_short: "Auto",
                     analytics_feedback: "Kontinuierliches Feedback & Lernen",
                     analytics_data_foundation: "Datenfundament",
                     analytics_data_foundation_desc: "Jede Analytics-Reise beginnt mit konsolidierten Daten aus Kernsystemen, Shopfloor-Signalen und externem Kontext.",
@@ -2367,6 +2451,7 @@
                     analytics_stage_analytics: "Analytics",
                     analytics_human_vs_model: "Mensch vs. Modell",
                     analytics_model_driven: "Modellgesteuert",
+                    analytics_model_driven_short: "Modell",
                     analytics_maturity_comparison: "Menschlicher Input über Reifestufen",
                     analytics_maturity_comparison_desc: "Höhere Reife verlagert den Aufwand von manueller Interpretation zu automatisierter Optimierung.",
                     analytics_prescriptive_paths: "Präskriptive Pfade",
@@ -4473,6 +4558,9 @@
             const modelW = 100 - humanW;
             const levelTitleClass = ANALYTICS_LEVEL_META[activeIdx].titleClass;
             const flowCardAccent = 'border-amber-300/55 dark:border-amber-800/55 bg-white/55 dark:bg-slate-800/50';
+            const decisionTypeDetail = isAutoMode
+                ? (ui.analytics_prescriptive_auto_short || ui.analytics_prescriptive_auto)
+                : ((ui.analytics_decision_types || [])[activeIdx] || activeLevel.focus);
 
             const flowStages = [
                 {
@@ -4494,11 +4582,9 @@
                 },
                 {
                     key: 'decision',
-                    label: ui.analytics_decision,
-                    title: isAutoMode ? ui.analytics_flow_bypassed : ui.analytics_decision_type,
-                    detail: isAutoMode
-                        ? ui.analytics_prescriptive_auto
-                        : (isPrescriptive ? ui.analytics_prescriptive_support : ui.analytics_decision),
+                    label: '',
+                    title: ui.analytics_decision_type,
+                    detail: decisionTypeDetail,
                     accent: isAutoMode
                         ? 'aa-flow-stage--muted border-slate-200/60 dark:border-slate-700/60 bg-slate-100/50 dark:bg-slate-800/30'
                         : flowCardAccent,
@@ -4506,7 +4592,7 @@
                 },
                 {
                     key: 'action',
-                    label: ui.analytics_action,
+                    label: '',
                     title: ui.analytics_action,
                     detail: activeLevel.focus,
                     accent: flowCardAccent,
@@ -4514,7 +4600,7 @@
                 },
                 {
                     key: 'results',
-                    label: ui.analytics_results,
+                    label: '',
                     title: ui.analytics_results,
                     detail: activeLevel.desc,
                     accent: flowCardAccent,
@@ -4644,14 +4730,9 @@
 
                             {/* Sub-panel 2: Active analytics flow */}
                             <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-4 md:p-6">
-                                <div className="flex flex-wrap items-start justify-between gap-3 mb-4 md:mb-5">
-                                    <div>
-                                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_active_flow}</h4>
-                                        <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">{ui.analytics_active_flow_desc}</p>
-                                    </div>
-                                    <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border ${activeLevel.band === 'models' ? 'text-brand-gold bg-brand-gold/10 border-brand-gold/25' : 'text-slate-500 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'}`}>
-                                        {activeLevel.band === 'models' ? ui.analytics_band_models : ui.analytics_band_information}
-                                    </span>
+                                <div className="mb-4 md:mb-5">
+                                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_active_flow}</h4>
+                                    <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">{ui.analytics_active_flow_desc}</p>
                                 </div>
 
                                 <div className="aa-chevron-track" role="tablist" aria-label={ui.analytics_tap_hint}>
@@ -4675,42 +4756,52 @@
                                 </div>
 
                                 <div className="aa-flow-stage-grid">
-                                    {flowStages.map((stage) => (
-                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector ${stage.key === 'results' ? 'aa-flow-stage-results' : ''} rounded-xl border p-3 md:p-5 ${stage.accent} aa-flow-stage-active`}>
-                                            <p className={`aa-flow-stage-title text-sm md:text-base font-bold mb-1.5 md:mb-2 leading-snug line-clamp-2 ${stage.titleClass}`}>{stage.title}</p>
+                                    {flowStages.map((stage, stageIndex) => (
+                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector ${stage.key === 'results' ? 'aa-flow-stage-results' : ''} rounded-lg border py-3 pl-4 pr-3 md:py-4 md:pl-5 md:pr-4 ${stage.accent} aa-flow-stage-active`}>
+                                            <div className="aa-flow-stage-head">
+                                                <div className="min-w-0">
+                                                    <p className={`aa-flow-stage-title text-sm lg:text-base font-bold ${stage.titleClass}`}>{stage.title}</p>
+                                                </div>
+                                                <span className="aa-flow-stage-index" aria-hidden="true">{String(stageIndex + 1).padStart(2, '0')}</span>
+                                            </div>
                                             <div className="aa-flow-stage-body">
                                                 {stage.bar ? (
-                                                    <div className="flex md:h-full flex-col">
-                                                        <div className="h-3 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden shrink-0">
-                                                            <div className="aa-human-bar aa-human-bar-fill h-full rounded-full" style={{ width: `${humanW}%` }} />
+                                                    <div className="flex h-full flex-col">
+                                                        <div className="aa-human-meter shrink-0" aria-hidden="true">
+                                                            <div className="aa-human-bar aa-human-bar-fill h-full" style={{ width: `${humanW}%` }} />
+                                                            <div className="aa-human-meter-model" />
                                                         </div>
-                                                        <div className="aa-flow-stage-bar-labels mt-2 flex flex-col justify-center gap-0.5 overflow-hidden">
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 dark:text-amber-400 truncate">{ui.analytics_human_input} {humanW}%</span>
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-slate-500 dark:text-slate-400 truncate">{ui.analytics_model_driven} {modelW}%</span>
+                                                        <div className="aa-flow-stage-bar-labels mt-2 grid grid-cols-2 gap-2 overflow-hidden">
+                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 dark:text-amber-400">{ui.analytics_human_input_short || ui.analytics_human_input} {humanW}%</span>
+                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-slate-500 dark:text-slate-400 text-right">{ui.analytics_model_driven_short || ui.analytics_model_driven} {modelW}%</span>
                                                         </div>
                                                     </div>
                                                 ) : stage.key === 'analytics' && isPrescriptive ? (
                                                     <>
-                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
-                                                        <div className="mt-2 flex rounded-md border border-brand-gold/25 dark:border-brand-gold/20 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
+                                                        <p className="aa-flow-stage-detail text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">{stage.detail}</p>
+                                                        <div className="aa-prescriptive-toggle mt-2 rounded-md border border-brand-gold/25 dark:border-brand-gold/20 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setPrescriptiveMode('support')}
-                                                                className={`flex-1 min-w-0 px-1 py-1 rounded text-[7px] sm:text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'support' ? 'bg-brand-gold text-white' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold'}`}
+                                                                aria-label={ui.analytics_prescriptive_support}
+                                                                title={ui.analytics_prescriptive_support}
+                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'support' ? 'bg-brand-gold text-white' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold'}`}
                                                             >
-                                                                {ui.analytics_prescriptive_support}
+                                                                {ui.analytics_prescriptive_support_short || ui.analytics_prescriptive_support}
                                                             </button>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setPrescriptiveMode('auto')}
-                                                                className={`flex-1 min-w-0 px-1 py-1 rounded text-[7px] sm:text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'auto' ? 'bg-brand-gold text-white' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold'}`}
+                                                                aria-label={ui.analytics_prescriptive_auto}
+                                                                title={ui.analytics_prescriptive_auto}
+                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'auto' ? 'bg-brand-gold text-white' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold'}`}
                                                             >
-                                                                {ui.analytics_prescriptive_auto}
+                                                                {ui.analytics_prescriptive_auto_short || ui.analytics_prescriptive_auto}
                                                             </button>
                                                         </div>
                                                     </>
                                                 ) : (
-                                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
+                                                    <p className="aa-flow-stage-detail text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 md:line-clamp-4">{stage.detail}</p>
                                                 )}
                                             </div>
                                         </div>
