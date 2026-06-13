@@ -1149,11 +1149,14 @@
         }
 
         .aa-flow-stage-label {
+            height: auto;
             flex-shrink: 0;
         }
 
         .aa-flow-stage-headline {
+            height: auto;
             flex-shrink: 0;
+            overflow: visible;
             overflow-wrap: anywhere;
         }
 
@@ -1169,6 +1172,11 @@
             opacity: 0.7;
         }
 
+        .aa-flow-stage-bar-labels {
+            height: auto;
+            flex-shrink: 0;
+        }
+
         .aa-flow-stage-active {
             box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.22);
         }
@@ -1178,16 +1186,15 @@
         }
 
         .aa-flow-stage-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.625rem;
+            align-items: stretch;
         }
 
-        @media (min-width: 640px) and (max-width: 1023px) {
+        @media (min-width: 390px) and (max-width: 767px) {
             .aa-flow-stage-grid {
-                display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 0.75rem;
             }
 
             .aa-flow-stage-results {
@@ -1195,42 +1202,48 @@
             }
         }
 
-        @media (min-width: 1024px) and (max-width: 1535px) {
+        @media (min-width: 768px) {
             .aa-flow-stage-grid {
-                display: flex;
-                flex-direction: row;
-                gap: 0.75rem;
-                overflow-x: auto;
-                scroll-snap-type: x proximity;
-                padding-bottom: 0.375rem;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: thin;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 1rem;
+            }
+
+            .aa-flow-stage-results {
+                grid-column: auto;
             }
 
             .aa-flow-stage {
-                flex: 0 0 min(42vw, 12.5rem);
-                scroll-snap-align: start;
+                height: 11.875rem;
+                overflow: hidden;
             }
-        }
 
-        @media (min-width: 1536px) {
-            .aa-flow-stage-grid {
-                display: grid;
-                grid-template-columns: repeat(5, minmax(0, 1fr));
-                gap: 1rem;
-                align-items: stretch;
+            .aa-flow-stage-label {
+                height: 1rem;
+            }
+
+            .aa-flow-stage-headline {
+                height: 2.25rem;
+                overflow: hidden;
+            }
+
+            .aa-flow-stage-body {
+                flex: 1 1 auto;
+                overflow: hidden;
+            }
+
+            .aa-flow-stage-bar-labels {
+                height: 2rem;
             }
 
             .aa-flow-connector::after {
                 content: '→';
                 position: absolute;
-                right: -0.6rem;
+                right: -0.65rem;
                 top: 50%;
                 transform: translateY(-50%);
                 font-size: 0.75rem;
                 color: rgba(148, 163, 184, 0.85);
                 pointer-events: none;
-                z-index: 1;
             }
 
             .aa-flow-connector:last-child::after {
@@ -1686,6 +1699,7 @@
                     analytics_raw_data: "Raw Data",
                     analytics_human_input: "Human Input",
                     analytics_decision: "Decision",
+                    analytics_decision_type: "Decision Type",
                     analytics_action: "Action",
                     analytics_results: "Results",
                     analytics_prescriptive_support: "Decision Support",
@@ -1696,7 +1710,7 @@
                     analytics_active_flow: "Analytics to Outcomes",
                     analytics_active_flow_desc: "Follow one maturity level at a time — see how insight moves through human judgment into business results.",
                     analytics_stage_analytics: "Analytics",
-                    analytics_human_vs_model: "Human vs Model Role",
+                    analytics_human_vs_model: "Human vs Model",
                     analytics_model_driven: "Model-driven",
                     analytics_maturity_comparison: "Human Input Across Maturity",
                     analytics_maturity_comparison_desc: "Higher maturity shifts effort from manual interpretation toward automated optimization.",
@@ -1956,6 +1970,7 @@
                     analytics_raw_data: "Dữ liệu Thô",
                     analytics_human_input: "Đầu vào Con người",
                     analytics_decision: "Quyết định",
+                    analytics_decision_type: "Loại quyết định",
                     analytics_action: "Hành động",
                     analytics_results: "Kết quả",
                     analytics_prescriptive_support: "Hỗ trợ Quyết định",
@@ -1966,7 +1981,7 @@
                     analytics_active_flow: "Phân tích đến Kết quả",
                     analytics_active_flow_desc: "Theo dõi từng cấp độ trưởng thành — xem insight đi qua phán đoán con người tới kết quả kinh doanh.",
                     analytics_stage_analytics: "Phân tích",
-                    analytics_human_vs_model: "Vai trò Con người vs Mô hình",
+                    analytics_human_vs_model: "Con người vs Mô hình",
                     analytics_model_driven: "Do mô hình dẫn",
                     analytics_maturity_comparison: "Đầu vào Con người theo Trưởng thành",
                     analytics_maturity_comparison_desc: "Trưởng thành cao hơn chuyển nỗ lực từ diễn giải thủ công sang tối ưu tự động.",
@@ -2226,6 +2241,7 @@
                     analytics_raw_data: "Rohdaten",
                     analytics_human_input: "Menschlicher Input",
                     analytics_decision: "Entscheidung",
+                    analytics_decision_type: "Entscheidungstyp",
                     analytics_action: "Aktion",
                     analytics_results: "Ergebnisse",
                     analytics_prescriptive_support: "Entscheidungsunterstützung",
@@ -4447,7 +4463,7 @@
                 {
                     key: 'human',
                     label: ui.analytics_human_input,
-                    headline: `${humanW}%`,
+                    headline: ui.analytics_human_vs_model,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
                     bar: true,
@@ -4455,7 +4471,7 @@
                 {
                     key: 'decision',
                     label: ui.analytics_decision,
-                    headline: isAutoMode ? ui.analytics_flow_bypassed : null,
+                    headline: isAutoMode ? ui.analytics_flow_bypassed : ui.analytics_decision_type,
                     detail: isAutoMode
                         ? ui.analytics_prescriptive_auto
                         : (isPrescriptive ? ui.analytics_prescriptive_support : activeLevel.question),
