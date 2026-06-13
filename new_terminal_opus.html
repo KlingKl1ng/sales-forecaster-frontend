@@ -969,6 +969,7 @@
         }
 
         .aa-bar-flat-0,
+        .aa-flow-accent-0,
         .aa-chevron-active-0 {
             --aa-accent-bg: #fde68a;
             --aa-accent-border: #fcd34d;
@@ -976,6 +977,7 @@
         }
 
         .dark .aa-bar-flat-0,
+        .dark .aa-flow-accent-0,
         .dark .aa-chevron-active-0 {
             --aa-accent-bg: #b45309;
             --aa-accent-border: #d97706;
@@ -983,6 +985,7 @@
         }
 
         .aa-bar-flat-1,
+        .aa-flow-accent-1,
         .aa-chevron-active-1 {
             --aa-accent-bg: #fcd34d;
             --aa-accent-border: #fbbf24;
@@ -990,6 +993,7 @@
         }
 
         .dark .aa-bar-flat-1,
+        .dark .aa-flow-accent-1,
         .dark .aa-chevron-active-1 {
             --aa-accent-bg: #d97706;
             --aa-accent-border: #f59e0b;
@@ -1005,6 +1009,7 @@
         }
 
         .aa-bar-flat-2,
+        .aa-flow-accent-2,
         .aa-chevron-active-2 {
             --aa-accent-bg: #fbbf24;
             --aa-accent-border: #f59e0b;
@@ -1012,6 +1017,7 @@
         }
 
         .dark .aa-bar-flat-2,
+        .dark .aa-flow-accent-2,
         .dark .aa-chevron-active-2 {
             --aa-accent-bg: #f59e0b;
             --aa-accent-border: #d97706;
@@ -1019,6 +1025,7 @@
         }
 
         .aa-bar-flat-3,
+        .aa-flow-accent-3,
         .aa-chevron-active-3 {
             --aa-accent-bg: #f59e0b;
             --aa-accent-border: #d97706;
@@ -1026,6 +1033,7 @@
         }
 
         .dark .aa-bar-flat-3,
+        .dark .aa-flow-accent-3,
         .dark .aa-chevron-active-3 {
             --aa-accent-bg: #f59e0b;
             --aa-accent-border: #fbbf24;
@@ -1171,6 +1179,24 @@
             overflow-wrap: break-word;
             word-break: normal;
             hyphens: none;
+        }
+
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage-title,
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage-title[class*='aa-level-title-'] {
+            color: var(--aa-accent-border);
+        }
+
+        .dark .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage-title,
+        .dark .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage-title[class*='aa-level-title-'] {
+            color: var(--aa-accent-bg);
+        }
+
+        .aa-flow-stage-grid .aa-flow-stage--muted .aa-flow-stage-title {
+            color: rgb(100 116 139);
+        }
+
+        .dark .aa-flow-stage-grid .aa-flow-stage--muted .aa-flow-stage-title {
+            color: rgb(148 163 184);
         }
 
         .aa-flow-stage-index {
@@ -4727,7 +4753,7 @@
                                     })}
                                 </div>
 
-                                <div className="aa-flow-stage-grid">
+                                <div className={`aa-flow-stage-grid aa-flow-accent-${activeIdx}`}>
                                     {flowStages.map((stage, stageIndex) => (
                                         <div key={stage.key} className={`aa-flow-stage aa-flow-connector ${stage.key === 'results' ? 'aa-flow-stage-results' : ''} rounded-lg border py-3 pl-4 pr-3 md:py-4 md:pl-5 md:pr-4 ${stage.accent} aa-flow-stage-active`}>
                                             <div className="aa-flow-stage-head">
