@@ -67,6 +67,43 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
+        .header-util-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem;
+            border-radius: 9999px;
+            color: rgb(100 116 139);
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .header-util-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .header-util-btn {
+            color: rgb(148 163 184);
+        }
+
+        .dark .header-util-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .header-util-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .header-util-icon svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
         /* Subtle Grid Animation */
         .bg-grid {
             background-size: 40px 40px;
@@ -311,6 +348,72 @@
 
         .header-nav-chevron-open {
             transform: rotate(180deg);
+        }
+
+        .mobile-nav-panel {
+            max-height: calc(100dvh - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+            animation: mobileNavIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        }
+
+        @keyframes mobileNavIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .touch-open-card {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            .touch-open-card .quick-view-overlay {
+                display: none;
+            }
+
+            .touch-open-card .card-visible-content,
+            .touch-open-card .card-footer-cta {
+                opacity: 1 !important;
+                filter: none !important;
+            }
+
+            .touch-open-card:active {
+                transform: scale(0.99);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .horizon-pill,
+            .page-scroll-target,
+            .opus-scroll-target {
+                scroll-margin-top: 4.75rem;
+            }
+
+            .reveal-hidden {
+                transform: translateY(18px);
+                filter: blur(2px);
+            }
+
+            .modal-content {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+
+            .sc-flow-scroll {
+                scroll-snap-type: x proximity;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .sc-flow-scroll button {
+                scroll-snap-align: center;
+            }
         }
 
         /* Reveal Animation Base Classes */
@@ -1039,36 +1142,31 @@
         .aa-flow-stage {
             display: flex;
             flex-direction: column;
-            height: 11.875rem;
-            overflow: hidden;
+            height: auto;
+            min-height: 0;
+            overflow: visible;
             transition: border-color 0.35s ease, box-shadow 0.35s ease;
         }
 
         .aa-flow-stage-label {
-            height: 1rem;
             flex-shrink: 0;
         }
 
-        .aa-flow-stage-title {
-            height: 2.25rem;
+        .aa-flow-stage-headline {
             flex-shrink: 0;
-            overflow: hidden;
+            overflow-wrap: anywhere;
         }
 
         .aa-flow-stage-body {
-            flex: 1 1 auto;
+            flex: 0 1 auto;
             min-height: 0;
-            overflow: hidden;
+            overflow: visible;
+            overflow-wrap: anywhere;
         }
 
-        .aa-flow-stage--muted .aa-flow-stage-title,
+        .aa-flow-stage--muted .aa-flow-stage-headline,
         .aa-flow-stage--muted .aa-flow-stage-body {
             opacity: 0.7;
-        }
-
-        .aa-flow-stage-bar-labels {
-            height: 2rem;
-            flex-shrink: 0;
         }
 
         .aa-flow-stage-active {
@@ -1079,16 +1177,60 @@
             position: relative;
         }
 
-        @media (min-width: 768px) {
+        .aa-flow-stage-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 640px) and (max-width: 1023px) {
+            .aa-flow-stage-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.75rem;
+            }
+
+            .aa-flow-stage-results {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (min-width: 1024px) and (max-width: 1535px) {
+            .aa-flow-stage-grid {
+                display: flex;
+                flex-direction: row;
+                gap: 0.75rem;
+                overflow-x: auto;
+                scroll-snap-type: x proximity;
+                padding-bottom: 0.375rem;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+
+            .aa-flow-stage {
+                flex: 0 0 min(42vw, 12.5rem);
+                scroll-snap-align: start;
+            }
+        }
+
+        @media (min-width: 1536px) {
+            .aa-flow-stage-grid {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 1rem;
+                align-items: stretch;
+            }
+
             .aa-flow-connector::after {
                 content: '→';
                 position: absolute;
-                right: -0.65rem;
+                right: -0.6rem;
                 top: 50%;
                 transform: translateY(-50%);
                 font-size: 0.75rem;
                 color: rgba(148, 163, 184, 0.85);
                 pointer-events: none;
+                z-index: 1;
             }
 
             .aa-flow-connector:last-child::after {
@@ -1427,10 +1569,10 @@
         const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>;
         const ArrowRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
         const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
-        const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
         const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
         const CloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
+        const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>;
         const GlobeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>;
         // NEW ICONS
         const FactoryIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="17" y1="13" x2="17" y2="13.01"></line><line x1="7" y1="13" x2="7" y2="13.01"></line></svg>;
@@ -2373,20 +2515,28 @@
             return (
                 <div
                     onClick={() => onClick(block)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onClick(block);
+                        }
+                    }}
+                    role="button"
+                    tabIndex={0}
                     className={`
                         relative group flex flex-col justify-between p-5 rounded-2xl border border-transparent
                         ${hasLiveModule
                             ? 'bg-gradient-to-br from-brand-gold/5 to-brand-dark/10 shadow-[0_8px_28px_rgba(245,158,11,0.24),0_2px_14px_rgba(180,83,9,0.14),inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[0_8px_32px_rgba(245,158,11,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-1 ring-brand-gold/20 hover:shadow-[0_18px_44px_rgba(245,158,11,0.34),0_6px_22px_rgba(180,83,9,0.2),inset_0_1px_0_0_rgba(255,255,255,0.55)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)]'
                             : 'bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.15)] hover:from-white/30 hover:to-white/10 dark:hover:from-slate-800/50 dark:hover:to-slate-900/30 ring-1 ring-white/30 dark:ring-white/5 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)]'}
-                        backdrop-blur-xl cursor-pointer overflow-hidden
+                        backdrop-blur-xl cursor-pointer overflow-hidden touch-open-card
                         transition-all duration-500 ease-out
-                        hover:-translate-y-2 hover:scale-[1.02]
-                        h-full min-h-[140px] appearance-3d
+                        hover:-translate-y-2 hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60
+                        h-full min-h-[132px] sm:min-h-[140px] appearance-3d
                     `}
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-duration-500"></div>
 
-                    <div className="absolute inset-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5
+                    <div className="quick-view-overlay absolute inset-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5
                                     opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out
                                     flex flex-col transform translate-y-4 group-hover:translate-y-0
                                     ring-1 ring-slate-200/80 dark:ring-white/10">
@@ -2415,7 +2565,7 @@
                         </div>
                     </div>
 
-                    <div className="relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
+                    <div className="card-visible-content relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
                         {hasLiveModule ? (
                             <>
                                 <div className="flex items-start justify-between gap-3 mb-3">
@@ -2470,7 +2620,7 @@
                         )}
                     </div>
 
-                    <div className={`relative z-10 mt-4 flex items-center text-[10px] font-bold transition-opacity duration-300 group-hover:opacity-10 uppercase tracking-wider ${hasLiveModule ? 'text-brand-dark dark:text-brand-gold gap-1.5' : 'text-slate-400'}`}>
+                    <div className={`card-footer-cta relative z-10 mt-4 flex items-center text-[10px] font-bold transition-opacity duration-300 group-hover:opacity-10 uppercase tracking-wider ${hasLiveModule ? 'text-brand-dark dark:text-brand-gold gap-1.5' : 'text-slate-400'}`}>
                         {content?.ui?.explore || "Explore"} <ArrowRightIcon />
                     </div>
                 </div>
@@ -3083,12 +3233,8 @@
                                 tabIndex={0}
                                 aria-label={apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
                             >
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className={`inline-flex items-center justify-center gap-1.5 min-w-[8.5rem] text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full transition-colors duration-500 ${apsVisible ? 'text-brand-gold bg-brand-gold/10 border border-brand-gold/25' : 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60'}`}>
-                                        <span className={`h-1.5 w-1.5 rounded-full ${apsVisible ? 'bg-brand-gold' : 'bg-rose-500'}`} />
-                                        {apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
-                                    </span>
-                                    <span className="text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.i4l_tap_hint}</span>
+                                <div className="flex justify-end mb-3">
+                                    <span className="text-right text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.i4l_tap_hint}</span>
                                 </div>
 
                                 <div className="flex-1 flex items-center justify-center">
@@ -3537,9 +3683,12 @@
             </svg>
         );
 
-        const HeaderNav = ({ items, activeId, onNav, navRef }) => {
+        const HeaderNav = ({ items, activeId, onNav, navRef, onCollapseChange }) => {
+            const slotRef = useRef(null);
+            const rulerRef = useRef(null);
             const scrollRef = useRef(null);
             const apsTriggerRef = useRef(null);
+            const [navFits, setNavFits] = useState(true);
             const apsChildIds = useMemo(() => {
                 const aps = items.find(i => i.id === 'aps-group');
                 return (aps?.children || []).map(c => c.id);
@@ -3548,6 +3697,37 @@
             const isApsChildActive = apsChildIds.includes(activeId);
             const [apsOpen, setApsOpen] = useState(false);
             const [menuRect, setMenuRect] = useState(null);
+
+            useEffect(() => {
+                if (navRef) navRef.current = slotRef.current;
+            }, [navRef]);
+
+            useEffect(() => {
+                const measure = () => {
+                    const slot = slotRef.current;
+                    const ruler = rulerRef.current;
+                    if (!slot || !ruler) return;
+                    const fits = ruler.scrollWidth <= slot.clientWidth + 2;
+                    setNavFits(prev => {
+                        if (prev !== fits) onCollapseChange?.(!fits);
+                        return fits;
+                    });
+                };
+
+                measure();
+                const ro = new ResizeObserver(measure);
+                if (slotRef.current) ro.observe(slotRef.current);
+                if (rulerRef.current) ro.observe(rulerRef.current);
+                window.addEventListener('resize', measure);
+                return () => {
+                    ro.disconnect();
+                    window.removeEventListener('resize', measure);
+                };
+            }, [items, onCollapseChange]);
+
+            useEffect(() => {
+                if (!navFits) setApsOpen(false);
+            }, [navFits]);
 
             const updateMenuRect = useCallback(() => {
                 const el = apsTriggerRef.current;
@@ -3585,6 +3765,7 @@
             }, [apsOpen]);
 
             useEffect(() => {
+                if (!navFits) return undefined;
                 const el = scrollRef.current;
                 if (!el) return;
                 const onWheel = (e) => {
@@ -3596,9 +3777,25 @@
                 };
                 el.addEventListener('wheel', onWheel, { passive: false });
                 return () => el.removeEventListener('wheel', onWheel);
-            }, [items]);
+            }, [items, navFits]);
 
             const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active ring-1 ring-brand-gold/20' : 'ring-1 ring-white/30 dark:ring-white/5'}`;
+
+            const renderRulerTabs = () => items.map(item => {
+                if (item.id === 'aps-group') {
+                    return (
+                        <span key={item.id} className={`${tabClass(false)} inline-flex items-center`} aria-hidden="true">
+                            {item.label}
+                            <ChevronDownIcon className="header-nav-chevron" />
+                        </span>
+                    );
+                }
+                return (
+                    <span key={item.id} className={tabClass(false)} aria-hidden="true">
+                        {item.label}
+                    </span>
+                );
+            });
 
             const apsMenu = apsOpen && menuRect && apsItem ? ReactDOM.createPortal(
                 <>
@@ -3634,45 +3831,154 @@
             ) : null;
 
             return (
-                <div ref={navRef} className="flex-1 min-w-0 overflow-visible">
-                    <div ref={scrollRef} className="overflow-x-auto overflow-y-visible horizon-nav-scroll">
-                        <div className="flex gap-1.5 items-center w-max mx-auto py-0.5 px-1">
-                            {items.map(item => {
-                                if (item.id === 'aps-group') {
-                                    const apsHighlighted = isApsChildActive || apsOpen;
-                                    return (
-                                        <div key={item.id} className="header-nav-aps-wrap">
-                                            <button
-                                                ref={apsTriggerRef}
-                                                type="button"
-                                                aria-expanded={apsOpen}
-                                                aria-haspopup="menu"
-                                                onClick={() => setApsOpen(open => !open)}
-                                                className={`${tabClass(apsHighlighted)} flex items-center`}
-                                            >
-                                                {item.label}
-                                                <ChevronDownIcon className={`header-nav-chevron ${apsOpen ? 'header-nav-chevron-open' : ''}`} />
-                                            </button>
-                                        </div>
-                                    );
-                                }
-
-                                const isActive = activeId === item.id;
-                                return (
-                                    <button
-                                        key={item.id}
-                                        type="button"
-                                        onClick={() => onNav(item.id)}
-                                        className={tabClass(isActive)}
-                                    >
-                                        {item.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                <div ref={slotRef} className="relative flex-1 min-w-0 overflow-hidden h-full flex items-center">
+                    <div
+                        ref={rulerRef}
+                        className="pointer-events-none absolute left-0 top-0 -z-10 flex gap-1.5 items-center w-max opacity-0"
+                        aria-hidden="true"
+                    >
+                        {renderRulerTabs()}
                     </div>
+                    {navFits && (
+                        <div ref={scrollRef} className="w-full overflow-hidden">
+                            <div className="flex gap-1.5 items-center w-max mx-auto py-0.5 px-1">
+                                {items.map(item => {
+                                    if (item.id === 'aps-group') {
+                                        const apsHighlighted = isApsChildActive || apsOpen;
+                                        return (
+                                            <div key={item.id} className="header-nav-aps-wrap">
+                                                <button
+                                                    ref={apsTriggerRef}
+                                                    type="button"
+                                                    aria-expanded={apsOpen}
+                                                    aria-haspopup="menu"
+                                                    onClick={() => setApsOpen(open => !open)}
+                                                    className={`${tabClass(apsHighlighted)} flex items-center`}
+                                                >
+                                                    {item.label}
+                                                    <ChevronDownIcon className={`header-nav-chevron ${apsOpen ? 'header-nav-chevron-open' : ''}`} />
+                                                </button>
+                                            </div>
+                                        );
+                                    }
+
+                                    const isActive = activeId === item.id;
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => onNav(item.id)}
+                                            className={tabClass(isActive)}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
                     {apsMenu}
                 </div>
+            );
+        };
+
+        const MobileNavDrawer = ({ items, activeId, onNav, open, onClose, content }) => {
+            useEffect(() => {
+                if (!open) return undefined;
+                const previousOverflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+                const onKeyDown = (e) => {
+                    if (e.key === 'Escape') onClose();
+                };
+                window.addEventListener('keydown', onKeyDown);
+                return () => {
+                    document.body.style.overflow = previousOverflow;
+                    window.removeEventListener('keydown', onKeyDown);
+                };
+            }, [open, onClose]);
+
+            if (!open) return null;
+
+            const activate = (id) => {
+                onNav(id);
+                onClose();
+            };
+
+            const buttonClass = (isActive, nested = false) => `
+                w-full min-h-11 rounded-xl border px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wide
+                transition-colors flex items-center gap-3
+                ${nested ? 'pl-4' : ''}
+                ${isActive
+                    ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold'
+                    : 'border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-slate-600 dark:text-slate-300'}
+            `;
+
+            return ReactDOM.createPortal(
+                <div className="fixed inset-0 z-50">
+                    <button
+                        type="button"
+                        className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm"
+                        aria-label="Close navigation"
+                        onClick={onClose}
+                    />
+                    <div className="mobile-nav-panel absolute inset-x-2 bottom-2 rounded-2xl border border-white/50 dark:border-white/10 bg-white/95 dark:bg-[#0f172a]/95 shadow-2xl backdrop-blur-xl overflow-hidden">
+                        <div className="flex items-center justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 px-4 py-3">
+                            <div className="min-w-0">
+                                <p className="font-black tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</p>
+                                <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{content.ui.system_terminal}</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                aria-label="Close navigation"
+                                className="shrink-0 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            >
+                                <CloseIcon />
+                            </button>
+                        </div>
+                        <div className="max-h-[min(34rem,calc(100dvh-7rem))] overflow-y-auto custom-scrollbar px-3 py-3">
+                            <div className="grid gap-2">
+                                {items.map(item => {
+                                    if (item.id === 'aps-group') {
+                                        const activeGroup = (item.children || []).some(child => child.id === activeId);
+                                        return (
+                                            <div key={item.id} className={`rounded-2xl border p-2 ${activeGroup ? 'border-brand-gold/35 bg-brand-gold/5' : 'border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/20'}`}>
+                                                <div className={`px-2 pb-2 text-[10px] font-black uppercase tracking-widest ${activeGroup ? 'text-brand-gold' : 'text-slate-500 dark:text-slate-400'}`}>
+                                                    {item.label}
+                                                </div>
+                                                <div className="grid gap-2">
+                                                    {(item.children || []).map(child => (
+                                                        <button
+                                                            key={child.id}
+                                                            type="button"
+                                                            onClick={() => activate(child.id)}
+                                                            className={buttonClass(activeId === child.id, true)}
+                                                        >
+                                                            <span>{child.label}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+
+                                    const isActive = activeId === item.id;
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => activate(item.id)}
+                                            className={buttonClass(isActive)}
+                                        >
+                                            <span>{item.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
             );
         };
 
@@ -4133,7 +4439,7 @@
                 {
                     key: 'analytics',
                     label: ui.analytics_stage_analytics,
-                    title: activeLevel.name,
+                    headline: activeLevel.name,
                     detail: activeLevel.question,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
@@ -4141,8 +4447,7 @@
                 {
                     key: 'human',
                     label: ui.analytics_human_input,
-                    title: `${humanW}%`,
-                    detail: isAutoMode ? ui.analytics_model_driven : ui.analytics_human_vs_model,
+                    headline: `${humanW}%`,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
                     bar: true,
@@ -4150,10 +4455,10 @@
                 {
                     key: 'decision',
                     label: ui.analytics_decision,
-                    title: isAutoMode ? ui.analytics_flow_bypassed : ui.analytics_decision,
+                    headline: isAutoMode ? ui.analytics_flow_bypassed : null,
                     detail: isAutoMode
                         ? ui.analytics_prescriptive_auto
-                        : (isPrescriptive ? ui.analytics_prescriptive_support : ui.analytics_decision),
+                        : (isPrescriptive ? ui.analytics_prescriptive_support : activeLevel.question),
                     accent: isAutoMode
                         ? 'aa-flow-stage--muted border-slate-200/60 dark:border-slate-700/60 bg-slate-100/50 dark:bg-slate-800/30'
                         : flowCardAccent,
@@ -4162,15 +4467,15 @@
                 {
                     key: 'action',
                     label: ui.analytics_action,
-                    title: ui.analytics_action,
-                    detail: activeLevel.focus,
+                    headline: activeLevel.focus,
+                    detail: null,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
                 },
                 {
                     key: 'results',
                     label: ui.analytics_results,
-                    title: ui.analytics_results,
+                    headline: null,
                     detail: activeLevel.desc,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
@@ -4295,8 +4600,8 @@
                             </div>
 
                             {/* Sub-panel 2: Active analytics flow */}
-                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-5 md:p-6">
-                                <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+                            <div className="rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm p-4 md:p-6">
+                                <div className="flex flex-wrap items-start justify-between gap-3 mb-4 md:mb-5">
                                     <div>
                                         <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{ui.analytics_active_flow}</h4>
                                         <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">{ui.analytics_active_flow_desc}</p>
@@ -4326,27 +4631,32 @@
                                     })}
                                 </div>
 
-                                <div className="grid md:grid-cols-5 gap-3 md:gap-4 items-stretch">
+                                <div className="aa-flow-stage-grid">
                                     {flowStages.map((stage) => (
-                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector rounded-xl border p-4 md:p-5 ${stage.accent} aa-flow-stage-active`}>
-                                            <p className="aa-flow-stage-label text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 truncate">{stage.label}</p>
-                                            <p className={`aa-flow-stage-title text-sm md:text-base font-bold mb-2 leading-snug line-clamp-2 ${stage.titleClass}`}>{stage.title}</p>
+                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector ${stage.key === 'results' ? 'aa-flow-stage-results' : ''} rounded-xl border p-3.5 md:p-4 ${stage.accent} aa-flow-stage-active`}>
+                                            <p className="aa-flow-stage-label text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 leading-snug">{stage.label}</p>
+                                            {stage.headline && (
+                                                <p className={`aa-flow-stage-headline text-sm md:text-base font-bold mb-2 leading-snug ${stage.titleClass}`}>{stage.headline}</p>
+                                            )}
                                             <div className="aa-flow-stage-body">
                                                 {stage.bar ? (
-                                                    <div className="flex h-full flex-col">
-                                                        <div className="h-3 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden shrink-0">
+                                                    <div className="flex flex-col">
+                                                        <div className="h-2.5 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden shrink-0">
                                                             <div className="aa-human-bar aa-human-bar-fill h-full rounded-full" style={{ width: `${humanW}%` }} />
                                                         </div>
-                                                        <div className="aa-flow-stage-bar-labels mt-2 flex flex-col justify-center gap-0.5 overflow-hidden">
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 dark:text-amber-400 truncate">{ui.analytics_human_input} {humanW}%</span>
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-slate-500 dark:text-slate-400 truncate">{ui.analytics_model_driven} {modelW}%</span>
+                                                        <div className="mt-2 space-y-1">
+                                                            <p className="text-[9px] font-semibold uppercase tracking-wide leading-snug text-amber-700 dark:text-amber-400">
+                                                                {ui.analytics_human_input} <span className="tabular-nums">{humanW}%</span>
+                                                            </p>
+                                                            <p className="text-[9px] font-semibold uppercase tracking-wide leading-snug text-slate-500 dark:text-slate-400">
+                                                                {ui.analytics_model_driven} <span className="tabular-nums">{modelW}%</span>
+                                                            </p>
                                                         </div>
-                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mt-auto overflow-hidden">{stage.detail}</p>
                                                     </div>
                                                 ) : stage.key === 'analytics' && isPrescriptive ? (
                                                     <>
-                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
-                                                        <div className="mt-2 flex rounded-md border border-brand-gold/25 dark:border-brand-gold/20 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
+                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{stage.detail}</p>
+                                                        <div className="mt-2.5 flex rounded-md border border-brand-gold/25 dark:border-brand-gold/20 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setPrescriptiveMode('support')}
@@ -4363,9 +4673,9 @@
                                                             </button>
                                                         </div>
                                                     </>
-                                                ) : (
-                                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
-                                                )}
+                                                ) : stage.detail ? (
+                                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{stage.detail}</p>
+                                                ) : null}
                                             </div>
                                         </div>
                                     ))}
@@ -4473,8 +4783,9 @@
         const App = () => {
             const [theme, setTheme] = useState(() => window.getOperartisTheme());
             const [lang, setLang] = useState(() => window.getOperartisLang());
-            const [time, setTime] = useState(new Date());
             const [selectedBlock, setSelectedBlock] = useState(null);
+            const [mobileNavOpen, setMobileNavOpen] = useState(false);
+            const [navCollapsed, setNavCollapsed] = useState(false);
             const [activeNavId, setActiveNavId] = useState('supply-chain');
             const headerNavRef = useRef(null);
             const scrollLockRef = useRef(false);
@@ -4595,11 +4906,6 @@
             }, [theme]);
 
             useEffect(() => {
-                const timer = setInterval(() => setTime(new Date()), 1000);
-                return () => clearInterval(timer);
-            }, []);
-
-            useEffect(() => {
                 window.persistOperartisLang(lang);
             }, [lang]);
 
@@ -4647,20 +4953,29 @@
                 setSelectedBlock(null);
             };
 
+            const closeMobileNav = useCallback(() => {
+                setMobileNavOpen(false);
+            }, []);
+
+            const handleNavCollapse = useCallback((collapsed) => {
+                setNavCollapsed(collapsed);
+            }, []);
+
+            useEffect(() => {
+                if (!navCollapsed) setMobileNavOpen(false);
+            }, [navCollapsed]);
+
             return (
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
                     <LandingCanvasBackground theme={theme} />
 
                     <nav className="relative z-20 shrink-0 overflow-visible border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel">
-                        <div className="max-w-7xl mx-auto w-full h-16 px-4 sm:px-6 md:px-10 flex items-center gap-2 md:gap-4 overflow-visible">
-                        <div className="flex items-center gap-3 shrink-0 p-1.5 pr-4 md:pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                        <div className="max-w-7xl mx-auto w-full h-16 px-3 sm:px-6 md:px-10 flex items-center gap-2 md:gap-4 overflow-visible">
+                        <div className="flex items-center gap-2 sm:gap-3 shrink-0 p-1.5 pr-3 sm:pr-4 md:pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                             <a href="./terminal.html">
                                 <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer transition-transform hover:scale-110" onError={(e) => e.target.style.display = 'none'} />
                             </a>
-                            <div className="flex flex-col">
-                                <span className="font-bold text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</span>
-                                <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase hidden hover:block xs:block">{content.ui.system_terminal}</span>
-                            </div>
+                            <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</span>
                         </div>
 
                         <HeaderNav
@@ -4668,33 +4983,41 @@
                             items={pageNavItems}
                             activeId={activeNavId}
                             onNav={scrollToNavItem}
+                            onCollapseChange={handleNavCollapse}
                         />
+
+                        {navCollapsed && (
+                            <div className="ml-auto shrink-0 flex items-center p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                                <button
+                                    type="button"
+                                    onClick={() => setMobileNavOpen(true)}
+                                    aria-expanded={mobileNavOpen}
+                                    aria-label="Open navigation"
+                                    className="header-util-btn"
+                                >
+                                    <span className="header-util-icon" aria-hidden="true"><MenuIcon /></span>
+                                </button>
+                            </div>
+                        )}
 
                         <div className="flex items-center gap-1.5 md:gap-6 shrink-0">
                             <div className="flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
-                                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs font-mono text-slate-500 dark:text-slate-400">
-                                    <ClockIcon />
-                                    <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                </div>
-
-                                <span className="hidden sm:block w-px h-4 shrink-0 self-center bg-slate-200 dark:bg-slate-700/50" aria-hidden="true" />
-
                                 {/* Theme Toggle — default system; cycle: system → light → dark → system */}
-                                <div className="flex items-center px-1">
-                                    <button
-                                        onClick={toggleTheme}
-                                        className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors"
-                                        title={theme === 'light' ? 'Light mode — click for dark' : theme === 'dark' ? 'Dark mode — click for system' : 'System theme — follows OS — click for light'}
-                                    >
+                                <button
+                                    onClick={toggleTheme}
+                                    className="header-util-btn"
+                                    title={theme === 'light' ? 'Light mode — click for dark' : theme === 'dark' ? 'Dark mode — click for system' : 'System theme — follows OS — click for light'}
+                                >
+                                    <span className="header-util-icon" aria-hidden="true">
                                         {theme === 'light' ? <SunIcon /> : theme === 'dark' ? <MoonIcon /> : <SystemIcon />}
-                                    </button>
-                                </div>
+                                    </span>
+                                </button>
 
                                 <span className="w-px h-4 shrink-0 self-center bg-slate-200 dark:bg-slate-700/50" aria-hidden="true" />
 
                                 {/* Language Toggle */}
-                                <button onClick={toggleLang} className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors flex items-center gap-1 font-mono text-xs font-bold px-2">
-                                    <GlobeIcon />
+                                <button onClick={toggleLang} className="header-util-btn gap-1 font-mono text-xs font-bold px-2">
+                                    <span className="header-util-icon" aria-hidden="true"><GlobeIcon /></span>
                                     <span>{lang.toUpperCase()}</span>
                                 </button>
                             </div>
@@ -4710,6 +5033,15 @@
                             </div>
                         </div>
                     </nav>
+
+                    <MobileNavDrawer
+                        items={pageNavItems}
+                        activeId={activeNavId}
+                        onNav={scrollToNavItem}
+                        open={mobileNavOpen}
+                        onClose={closeMobileNav}
+                        content={content}
+                    />
 
                     <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
                         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">

@@ -67,6 +67,43 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
+        .header-util-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem;
+            border-radius: 9999px;
+            color: rgb(100 116 139);
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .header-util-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .header-util-btn {
+            color: rgb(148 163 184);
+        }
+
+        .dark .header-util-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .header-util-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .header-util-icon svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
         /* Subtle Grid Animation */
         .bg-grid {
             background-size: 40px 40px;
@@ -1217,30 +1254,24 @@
         }
 
         .aa-flow-stage-label {
-            height: auto;
             flex-shrink: 0;
         }
 
-        .aa-flow-stage-title {
-            height: auto;
+        .aa-flow-stage-headline {
             flex-shrink: 0;
-            overflow: visible;
+            overflow-wrap: anywhere;
         }
 
         .aa-flow-stage-body {
             flex: 0 1 auto;
             min-height: 0;
             overflow: visible;
+            overflow-wrap: anywhere;
         }
 
-        .aa-flow-stage--muted .aa-flow-stage-title,
+        .aa-flow-stage--muted .aa-flow-stage-headline,
         .aa-flow-stage--muted .aa-flow-stage-body {
             opacity: 0.7;
-        }
-
-        .aa-flow-stage-bar-labels {
-            height: auto;
-            flex-shrink: 0;
         }
 
         .aa-flow-stage-active {
@@ -1252,15 +1283,16 @@
         }
 
         .aa-flow-stage-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr);
-            gap: 0.625rem;
-            align-items: stretch;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
-        @media (min-width: 390px) and (max-width: 767px) {
+        @media (min-width: 640px) and (max-width: 1023px) {
             .aa-flow-stage-grid {
+                display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.75rem;
             }
 
             .aa-flow-stage-results {
@@ -1268,48 +1300,42 @@
             }
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) and (max-width: 1535px) {
             .aa-flow-stage-grid {
-                grid-template-columns: repeat(5, minmax(0, 1fr));
-                gap: 1rem;
-            }
-
-            .aa-flow-stage-results {
-                grid-column: auto;
+                display: flex;
+                flex-direction: row;
+                gap: 0.75rem;
+                overflow-x: auto;
+                scroll-snap-type: x proximity;
+                padding-bottom: 0.375rem;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
             }
 
             .aa-flow-stage {
-                height: 11.875rem;
-                overflow: hidden;
+                flex: 0 0 min(42vw, 12.5rem);
+                scroll-snap-align: start;
             }
+        }
 
-            .aa-flow-stage-label {
-                height: 1rem;
-            }
-
-            .aa-flow-stage-title {
-                height: 2.25rem;
-                overflow: hidden;
-            }
-
-            .aa-flow-stage-body {
-                flex: 1 1 auto;
-                overflow: hidden;
-            }
-
-            .aa-flow-stage-bar-labels {
-                height: 2rem;
+        @media (min-width: 1536px) {
+            .aa-flow-stage-grid {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 1rem;
+                align-items: stretch;
             }
 
             .aa-flow-connector::after {
                 content: '→';
                 position: absolute;
-                right: -0.65rem;
+                right: -0.6rem;
                 top: 50%;
                 transform: translateY(-50%);
                 font-size: 0.75rem;
                 color: rgba(148, 163, 184, 0.85);
                 pointer-events: none;
+                z-index: 1;
             }
 
             .aa-flow-connector:last-child::after {
@@ -1678,7 +1704,6 @@
         const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>;
         const ArrowRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
         const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
-        const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
         const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
         const CloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
@@ -3336,12 +3361,8 @@
                                 tabIndex={0}
                                 aria-label={apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
                             >
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                    <span className={`inline-flex w-fit max-w-full items-center justify-center gap-1.5 text-[9px] font-black uppercase tracking-[0.12em] sm:tracking-widest px-2.5 py-1 rounded-full transition-colors duration-500 sm:min-w-[8.5rem] ${apsVisible ? 'text-brand-gold bg-brand-gold/10 border border-brand-gold/25' : 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60'}`}>
-                                        <span className={`h-1.5 w-1.5 rounded-full ${apsVisible ? 'bg-brand-gold' : 'bg-rose-500'}`} />
-                                        {apsVisible ? ui.i4l_phase_aps_badge : ui.i4l_phase_gap_badge}
-                                    </span>
-                                    <span className="self-end sm:self-auto text-right text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.i4l_tap_hint}</span>
+                                <div className="flex justify-end mb-3">
+                                    <span className="text-right text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.i4l_tap_hint}</span>
                                 </div>
 
                                 <div className="flex-1 flex items-center justify-center">
@@ -3720,9 +3741,12 @@
             </svg>
         );
 
-        const HeaderNav = ({ items, activeId, onNav, navRef }) => {
+        const HeaderNav = ({ items, activeId, onNav, navRef, onCollapseChange }) => {
+            const slotRef = useRef(null);
+            const rulerRef = useRef(null);
             const scrollRef = useRef(null);
             const apsTriggerRef = useRef(null);
+            const [navFits, setNavFits] = useState(true);
             const apsChildIds = useMemo(() => {
                 const aps = items.find(i => i.id === 'aps-group');
                 return (aps?.children || []).map(c => c.id);
@@ -3731,6 +3755,37 @@
             const isApsChildActive = apsChildIds.includes(activeId);
             const [apsOpen, setApsOpen] = useState(false);
             const [menuRect, setMenuRect] = useState(null);
+
+            useEffect(() => {
+                if (navRef) navRef.current = slotRef.current;
+            }, [navRef]);
+
+            useEffect(() => {
+                const measure = () => {
+                    const slot = slotRef.current;
+                    const ruler = rulerRef.current;
+                    if (!slot || !ruler) return;
+                    const fits = ruler.scrollWidth <= slot.clientWidth + 2;
+                    setNavFits(prev => {
+                        if (prev !== fits) onCollapseChange?.(!fits);
+                        return fits;
+                    });
+                };
+
+                measure();
+                const ro = new ResizeObserver(measure);
+                if (slotRef.current) ro.observe(slotRef.current);
+                if (rulerRef.current) ro.observe(rulerRef.current);
+                window.addEventListener('resize', measure);
+                return () => {
+                    ro.disconnect();
+                    window.removeEventListener('resize', measure);
+                };
+            }, [items, onCollapseChange]);
+
+            useEffect(() => {
+                if (!navFits) setApsOpen(false);
+            }, [navFits]);
 
             const updateMenuRect = useCallback(() => {
                 const el = apsTriggerRef.current;
@@ -3768,6 +3823,7 @@
             }, [apsOpen]);
 
             useEffect(() => {
+                if (!navFits) return undefined;
                 const el = scrollRef.current;
                 if (!el) return;
                 const onWheel = (e) => {
@@ -3779,9 +3835,25 @@
                 };
                 el.addEventListener('wheel', onWheel, { passive: false });
                 return () => el.removeEventListener('wheel', onWheel);
-            }, [items]);
+            }, [items, navFits]);
 
             const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active ring-1 ring-brand-gold/20' : 'ring-1 ring-white/30 dark:ring-white/5'}`;
+
+            const renderRulerTabs = () => items.map(item => {
+                if (item.id === 'aps-group') {
+                    return (
+                        <span key={item.id} className={`${tabClass(false)} inline-flex items-center`} aria-hidden="true">
+                            {item.label}
+                            <ChevronDownIcon className="header-nav-chevron" />
+                        </span>
+                    );
+                }
+                return (
+                    <span key={item.id} className={tabClass(false)} aria-hidden="true">
+                        {item.label}
+                    </span>
+                );
+            });
 
             const apsMenu = apsOpen && menuRect && apsItem ? ReactDOM.createPortal(
                 <>
@@ -3817,43 +3889,52 @@
             ) : null;
 
             return (
-                <div ref={navRef} className="flex-1 min-w-0 overflow-visible">
-                    <div ref={scrollRef} className="overflow-x-auto overflow-y-visible horizon-nav-scroll">
-                        <div className="flex gap-1.5 items-center w-max mx-auto py-0.5 px-1">
-                            {items.map(item => {
-                                if (item.id === 'aps-group') {
-                                    const apsHighlighted = isApsChildActive || apsOpen;
-                                    return (
-                                        <div key={item.id} className="header-nav-aps-wrap">
-                                            <button
-                                                ref={apsTriggerRef}
-                                                type="button"
-                                                aria-expanded={apsOpen}
-                                                aria-haspopup="menu"
-                                                onClick={() => setApsOpen(open => !open)}
-                                                className={`${tabClass(apsHighlighted)} flex items-center`}
-                                            >
-                                                {item.label}
-                                                <ChevronDownIcon className={`header-nav-chevron ${apsOpen ? 'header-nav-chevron-open' : ''}`} />
-                                            </button>
-                                        </div>
-                                    );
-                                }
-
-                                const isActive = activeId === item.id;
-                                return (
-                                    <button
-                                        key={item.id}
-                                        type="button"
-                                        onClick={() => onNav(item.id)}
-                                        className={tabClass(isActive)}
-                                    >
-                                        {item.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                <div ref={slotRef} className="relative flex-1 min-w-0 overflow-hidden h-full flex items-center">
+                    <div
+                        ref={rulerRef}
+                        className="pointer-events-none absolute left-0 top-0 -z-10 flex gap-1.5 items-center w-max opacity-0"
+                        aria-hidden="true"
+                    >
+                        {renderRulerTabs()}
                     </div>
+                    {navFits && (
+                        <div ref={scrollRef} className="w-full overflow-hidden">
+                            <div className="flex gap-1.5 items-center w-max mx-auto py-0.5 px-1">
+                                {items.map(item => {
+                                    if (item.id === 'aps-group') {
+                                        const apsHighlighted = isApsChildActive || apsOpen;
+                                        return (
+                                            <div key={item.id} className="header-nav-aps-wrap">
+                                                <button
+                                                    ref={apsTriggerRef}
+                                                    type="button"
+                                                    aria-expanded={apsOpen}
+                                                    aria-haspopup="menu"
+                                                    onClick={() => setApsOpen(open => !open)}
+                                                    className={`${tabClass(apsHighlighted)} flex items-center`}
+                                                >
+                                                    {item.label}
+                                                    <ChevronDownIcon className={`header-nav-chevron ${apsOpen ? 'header-nav-chevron-open' : ''}`} />
+                                                </button>
+                                            </div>
+                                        );
+                                    }
+
+                                    const isActive = activeId === item.id;
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => onNav(item.id)}
+                                            className={tabClass(isActive)}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
                     {apsMenu}
                 </div>
             );
@@ -3867,15 +3948,10 @@
                 const onKeyDown = (e) => {
                     if (e.key === 'Escape') onClose();
                 };
-                const onResize = () => {
-                    if (window.innerWidth >= 1024) onClose();
-                };
                 window.addEventListener('keydown', onKeyDown);
-                window.addEventListener('resize', onResize);
                 return () => {
                     document.body.style.overflow = previousOverflow;
                     window.removeEventListener('keydown', onKeyDown);
-                    window.removeEventListener('resize', onResize);
                 };
             }, [open, onClose]);
 
@@ -3888,7 +3964,7 @@
 
             const buttonClass = (isActive, nested = false) => `
                 w-full min-h-11 rounded-xl border px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wide
-                transition-colors flex items-center justify-between gap-3
+                transition-colors flex items-center gap-3
                 ${nested ? 'pl-4' : ''}
                 ${isActive
                     ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold'
@@ -3896,7 +3972,7 @@
             `;
 
             return ReactDOM.createPortal(
-                <div className="fixed inset-0 z-50 lg:hidden">
+                <div className="fixed inset-0 z-50">
                     <button
                         type="button"
                         className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm"
@@ -3937,7 +4013,6 @@
                                                             className={buttonClass(activeId === child.id, true)}
                                                         >
                                                             <span>{child.label}</span>
-                                                            {activeId === child.id && <span className="h-1.5 w-1.5 rounded-full bg-brand-gold" aria-hidden="true" />}
                                                         </button>
                                                     ))}
                                                 </div>
@@ -3954,7 +4029,6 @@
                                             className={buttonClass(isActive)}
                                         >
                                             <span>{item.label}</span>
-                                            {isActive && <span className="h-1.5 w-1.5 rounded-full bg-brand-gold" aria-hidden="true" />}
                                         </button>
                                     );
                                 })}
@@ -4390,7 +4464,7 @@
                 {
                     key: 'analytics',
                     label: ui.analytics_stage_analytics,
-                    title: activeLevel.name,
+                    headline: activeLevel.name,
                     detail: activeLevel.question,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
@@ -4398,8 +4472,7 @@
                 {
                     key: 'human',
                     label: ui.analytics_human_input,
-                    title: `${humanW}%`,
-                    detail: isAutoMode ? ui.analytics_model_driven : ui.analytics_human_vs_model,
+                    headline: `${humanW}%`,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
                     bar: true,
@@ -4407,10 +4480,10 @@
                 {
                     key: 'decision',
                     label: ui.analytics_decision,
-                    title: isAutoMode ? ui.analytics_flow_bypassed : ui.analytics_decision,
+                    headline: isAutoMode ? ui.analytics_flow_bypassed : null,
                     detail: isAutoMode
                         ? ui.analytics_prescriptive_auto
-                        : (isPrescriptive ? ui.analytics_prescriptive_support : ui.analytics_decision),
+                        : (isPrescriptive ? ui.analytics_prescriptive_support : activeLevel.question),
                     accent: isAutoMode
                         ? 'aa-flow-stage--muted border-slate-200/60 dark:border-slate-700/60 bg-slate-100/50 dark:bg-slate-800/30'
                         : flowCardAccent,
@@ -4419,15 +4492,15 @@
                 {
                     key: 'action',
                     label: ui.analytics_action,
-                    title: ui.analytics_action,
-                    detail: activeLevel.focus,
+                    headline: activeLevel.focus,
+                    detail: null,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
                 },
                 {
                     key: 'results',
                     label: ui.analytics_results,
-                    title: ui.analytics_results,
+                    headline: null,
                     detail: activeLevel.desc,
                     accent: flowCardAccent,
                     titleClass: levelTitleClass,
@@ -4588,25 +4661,30 @@
 
                                 <div className="aa-flow-stage-grid">
                                     {flowStages.map((stage) => (
-                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector ${stage.key === 'results' ? 'aa-flow-stage-results' : ''} rounded-xl border p-3 md:p-5 ${stage.accent} aa-flow-stage-active`}>
-                                            <p className="aa-flow-stage-label text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 md:mb-2 truncate">{stage.label}</p>
-                                            <p className={`aa-flow-stage-title text-sm md:text-base font-bold mb-1.5 md:mb-2 leading-snug line-clamp-2 ${stage.titleClass}`}>{stage.title}</p>
+                                        <div key={stage.key} className={`aa-flow-stage aa-flow-connector ${stage.key === 'results' ? 'aa-flow-stage-results' : ''} rounded-xl border p-3.5 md:p-4 ${stage.accent} aa-flow-stage-active`}>
+                                            <p className="aa-flow-stage-label text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 leading-snug">{stage.label}</p>
+                                            {stage.headline && (
+                                                <p className={`aa-flow-stage-headline text-sm md:text-base font-bold mb-2 leading-snug ${stage.titleClass}`}>{stage.headline}</p>
+                                            )}
                                             <div className="aa-flow-stage-body">
                                                 {stage.bar ? (
-                                                    <div className="flex md:h-full flex-col">
-                                                        <div className="h-3 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden shrink-0">
+                                                    <div className="flex flex-col">
+                                                        <div className="h-2.5 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden shrink-0">
                                                             <div className="aa-human-bar aa-human-bar-fill h-full rounded-full" style={{ width: `${humanW}%` }} />
                                                         </div>
-                                                        <div className="aa-flow-stage-bar-labels mt-2 flex flex-col justify-center gap-0.5 overflow-hidden">
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 dark:text-amber-400 truncate">{ui.analytics_human_input} {humanW}%</span>
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-slate-500 dark:text-slate-400 truncate">{ui.analytics_model_driven} {modelW}%</span>
+                                                        <div className="mt-2 space-y-1">
+                                                            <p className="text-[9px] font-semibold uppercase tracking-wide leading-snug text-amber-700 dark:text-amber-400">
+                                                                {ui.analytics_human_input} <span className="tabular-nums">{humanW}%</span>
+                                                            </p>
+                                                            <p className="text-[9px] font-semibold uppercase tracking-wide leading-snug text-slate-500 dark:text-slate-400">
+                                                                {ui.analytics_model_driven} <span className="tabular-nums">{modelW}%</span>
+                                                            </p>
                                                         </div>
-                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mt-2 md:mt-auto overflow-hidden">{stage.detail}</p>
                                                     </div>
                                                 ) : stage.key === 'analytics' && isPrescriptive ? (
                                                     <>
-                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
-                                                        <div className="mt-2 flex rounded-md border border-brand-gold/25 dark:border-brand-gold/20 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
+                                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{stage.detail}</p>
+                                                        <div className="mt-2.5 flex rounded-md border border-brand-gold/25 dark:border-brand-gold/20 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setPrescriptiveMode('support')}
@@ -4623,9 +4701,9 @@
                                                             </button>
                                                         </div>
                                                     </>
-                                                ) : (
-                                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 overflow-hidden">{stage.detail}</p>
-                                                )}
+                                                ) : stage.detail ? (
+                                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{stage.detail}</p>
+                                                ) : null}
                                             </div>
                                         </div>
                                     ))}
@@ -4715,9 +4793,9 @@
         const App = () => {
             const [theme, setTheme] = useState(() => window.getOperartisTheme());
             const [lang, setLang] = useState(() => window.getOperartisLang());
-            const [time, setTime] = useState(new Date());
             const [selectedBlock, setSelectedBlock] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
+            const [navCollapsed, setNavCollapsed] = useState(false);
             const [activeNavId, setActiveNavId] = useState('supply-chain');
             const headerNavRef = useRef(null);
             const scrollLockRef = useRef(false);
@@ -4808,11 +4886,6 @@
             }, [theme]);
 
             useEffect(() => {
-                const timer = setInterval(() => setTime(new Date()), 1000);
-                return () => clearInterval(timer);
-            }, []);
-
-            useEffect(() => {
                 window.persistOperartisLang(lang);
             }, [lang]);
 
@@ -4864,6 +4937,14 @@
                 setMobileNavOpen(false);
             }, []);
 
+            const handleNavCollapse = useCallback((collapsed) => {
+                setNavCollapsed(collapsed);
+            }, []);
+
+            useEffect(() => {
+                if (!navCollapsed) setMobileNavOpen(false);
+            }, [navCollapsed]);
+
             return (
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
                     <LandingCanvasBackground theme={theme} />
@@ -4874,56 +4955,49 @@
                                 <a href="./new_terminal.html">
                                     <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer transition-transform hover:scale-110" onError={(e) => e.target.style.display = 'none'} />
                                 </a>
-                                <div className="flex flex-col">
-                                    <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</span>
-                                    <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase hidden sm:block">{content.ui.system_terminal}</span>
+                                <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</span>
+                            </div>
+
+                            <HeaderNav
+                                navRef={headerNavRef}
+                                items={pageNavItems}
+                                activeId={activeNavId}
+                                onNav={scrollToNavItem}
+                                onCollapseChange={handleNavCollapse}
+                            />
+
+                            {navCollapsed && (
+                                <div className="ml-auto shrink-0 flex items-center p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                                    <button
+                                        type="button"
+                                        onClick={() => setMobileNavOpen(true)}
+                                        aria-expanded={mobileNavOpen}
+                                        aria-label="Open navigation"
+                                        className="header-util-btn"
+                                    >
+                                        <span className="header-util-icon" aria-hidden="true"><MenuIcon /></span>
+                                    </button>
                                 </div>
-                            </div>
-
-                            <div className="hidden lg:block flex-1 min-w-0 overflow-visible">
-                                <HeaderNav
-                                    navRef={headerNavRef}
-                                    items={pageNavItems}
-                                    activeId={activeNavId}
-                                    onNav={scrollToNavItem}
-                                />
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={() => setMobileNavOpen(true)}
-                                aria-expanded={mobileNavOpen}
-                                aria-label="Open navigation"
-                                className="lg:hidden ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/25 to-white/5 dark:from-slate-800/40 dark:to-slate-900/20 text-slate-600 dark:text-slate-300 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-md"
-                            >
-                                <MenuIcon />
-                            </button>
+                            )}
 
                             <div className="flex items-center gap-1.5 md:gap-6 shrink-0">
                                 <div className="flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
-                                    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs font-mono text-slate-500 dark:text-slate-400">
-                                        <ClockIcon />
-                                        <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                    </div>
-
-                                    <span className="hidden sm:block w-px h-4 shrink-0 self-center bg-slate-200 dark:bg-slate-700/50" aria-hidden="true" />
-
                                     {/* Theme Toggle — default system; cycle: system → light → dark → system */}
-                                    <div className="flex items-center px-1">
-                                        <button
-                                            onClick={toggleTheme}
-                                            className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors"
-                                            title={theme === 'light' ? 'Light mode — click for dark' : theme === 'dark' ? 'Dark mode — click for system' : 'System theme — follows OS — click for light'}
-                                        >
+                                    <button
+                                        onClick={toggleTheme}
+                                        className="header-util-btn"
+                                        title={theme === 'light' ? 'Light mode — click for dark' : theme === 'dark' ? 'Dark mode — click for system' : 'System theme — follows OS — click for light'}
+                                    >
+                                        <span className="header-util-icon" aria-hidden="true">
                                             {theme === 'light' ? <SunIcon /> : theme === 'dark' ? <MoonIcon /> : <SystemIcon />}
-                                        </button>
-                                    </div>
+                                        </span>
+                                    </button>
 
                                     <span className="w-px h-4 shrink-0 self-center bg-slate-200 dark:bg-slate-700/50" aria-hidden="true" />
 
                                     {/* Language Toggle */}
-                                    <button onClick={toggleLang} className="p-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors flex items-center gap-1 font-mono text-xs font-bold px-2">
-                                        <GlobeIcon />
+                                    <button onClick={toggleLang} className="header-util-btn gap-1 font-mono text-xs font-bold px-2">
+                                        <span className="header-util-icon" aria-hidden="true"><GlobeIcon /></span>
                                         <span>{lang.toUpperCase()}</span>
                                     </button>
                                 </div>
