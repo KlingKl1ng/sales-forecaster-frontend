@@ -114,6 +114,8 @@
         .horizon-nav-scroll {
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 transparent;
+            overflow-x: auto;
+            overflow-y: visible;
         }
 
         .horizon-nav-scroll::-webkit-scrollbar {
@@ -135,6 +137,153 @@
 
         .dark .horizon-nav-scroll::-webkit-scrollbar-thumb {
             background-color: #475569;
+        }
+
+        .header-nav-tab {
+            flex-shrink: 0;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid transparent;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            font-size: 0.625rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            color: #64748b;
+        }
+
+        .dark .header-nav-tab {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.35), rgba(15, 23, 42, 0.15));
+            color: #94a3b8;
+        }
+
+        .header-nav-tab:hover {
+            color: #d97706;
+        }
+
+        .dark .header-nav-tab:hover {
+            color: #fbbf24;
+        }
+
+        .header-nav-tab-active {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(180, 83, 9, 0.06));
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            color: #d97706;
+        }
+
+        .dark .header-nav-tab-active {
+            color: #fbbf24;
+        }
+
+        .header-nav-child {
+            width: 100%;
+            text-align: left;
+            font-size: 0.625rem;
+            padding: 0.45rem 0.65rem;
+            border-radius: 0.5rem;
+        }
+
+        .header-nav-aps-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .header-nav-aps-menu {
+            min-width: 11.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            padding: 0.35rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            box-shadow:
+                0 12px 32px rgba(15, 23, 42, 0.14),
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            animation: header-nav-menu-in 0.18s ease-out;
+        }
+
+        .header-nav-aps-menu-floating {
+            position: fixed;
+            z-index: 60;
+        }
+
+        .header-nav-aps-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 55;
+            background: rgba(2, 6, 23, 0.18);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            animation: header-nav-backdrop-in 0.15s ease-out;
+        }
+
+        .dark .header-nav-aps-backdrop {
+            background: rgba(2, 6, 23, 0.42);
+        }
+
+        @keyframes header-nav-backdrop-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .header-nav-aps-menu-head {
+            padding: 0.35rem 0.65rem 0.25rem;
+            font-size: 0.5625rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #b45309;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+            margin-bottom: 0.15rem;
+        }
+
+        .dark .header-nav-aps-menu-head {
+            color: #fbbf24;
+        }
+
+        .dark .header-nav-aps-menu {
+            background: rgba(15, 23, 42, 0.96);
+            border-color: rgba(245, 158, 11, 0.2);
+            box-shadow:
+                0 12px 32px rgba(0, 0, 0, 0.45),
+                0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+        }
+
+        @keyframes header-nav-menu-in {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .header-nav-aps-menu {
+                animation: none;
+            }
+        }
+
+        .header-nav-chevron {
+            display: inline-block;
+            margin-left: 0.2rem;
+            opacity: 0.65;
+            transition: transform 0.2s ease;
+        }
+
+        .header-nav-chevron-open {
+            transform: rotate(180deg);
         }
 
         /* Reveal Animation Base Classes */
@@ -1334,14 +1483,26 @@
             return activeId;
         };
 
-        const buildPageNavItems = (ui, horizons) => [
-            { id: 'supply-chain', label: ui.nav_supply_chain },
-            { id: 'industry-40', label: ui.nav_industry_40 },
-            ...horizons.map(h => ({ id: h.id, label: h.title })),
-            { id: 'analytics', label: ui.nav_analytics },
-            { id: 'or-process', label: ui.nav_or_process },
-            { id: 'about', label: ui.about_vision },
-        ];
+        const APS_HORIZON_IDS = ['strategic', 'tactical', 'operational', 'cross'];
+
+        const buildPageNavItems = (ui, horizons) => {
+            const apsChildren = horizons
+                .filter(h => APS_HORIZON_IDS.includes(h.id))
+                .map(h => ({ id: h.id, label: h.title }));
+            const otherHorizons = horizons
+                .filter(h => !APS_HORIZON_IDS.includes(h.id))
+                .map(h => ({ id: h.id, label: h.title }));
+
+            return [
+                { id: 'supply-chain', label: ui.nav_supply_chain },
+                { id: 'industry-40', label: ui.nav_industry_40 },
+                { id: 'aps-group', label: ui.nav_aps, children: apsChildren },
+                ...otherHorizons,
+                { id: 'analytics', label: ui.nav_analytics },
+                { id: 'or-process', label: ui.nav_or_process },
+                { id: 'about', label: ui.about_vision },
+            ];
+        };
 
         const getNavTargetId = (navId) => {
             if (['supply-chain', 'industry-40', 'analytics', 'or-process', 'about'].includes(navId)) return navId;
@@ -1518,6 +1679,7 @@
                     matrix_heading: "Select a functional module block",
                     nav_supply_chain: "Supply Chain",
                     nav_industry_40: "Industry 4.0",
+                    nav_aps: "APS",
                     nav_analytics: "Analytics Levels",
                     nav_or_process: "OR Process",
                     i4l_eyebrow: "Industry 4.0 Integration",
@@ -1774,6 +1936,7 @@
                     matrix_heading: "Chọn khối chức năng để truy cập công cụ",
                     nav_supply_chain: "Chuỗi cung ứng",
                     nav_industry_40: "Industry 4.0",
+                    nav_aps: "APS",
                     nav_analytics: "Cấp phân tích",
                     nav_or_process: "Quy trình OR",
                     i4l_eyebrow: "Tích hợp Industry 4.0",
@@ -2030,6 +2193,7 @@
                     matrix_heading: "Funktionsmodul auswählen",
                     nav_supply_chain: "Lieferkette",
                     nav_industry_40: "Industry 4.0",
+                    nav_aps: "APS",
                     nav_analytics: "Analytics-Stufen",
                     nav_or_process: "OR-Prozess",
                     i4l_eyebrow: "Industry-4.0-Integration",
@@ -2257,6 +2421,7 @@
             });
 
             const hasLiveModule = subModulesList.some(m => m.status === 'live');
+            const liveModules = subModulesList.filter(m => m.status === 'live');
 
             return (
                 <div
@@ -2305,37 +2470,61 @@
                     </div>
 
                     <div className="relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
-                        <div className="flex justify-between items-start mb-3">
-                            <div className={`p-2 rounded-md transition-colors ${hasLiveModule ? 'bg-brand-gold/20 text-brand-gold' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 group-hover:text-brand-gold'}`}>
-                                {block.icon || <SystemIcon />}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {subModulesList.length > 0 && (
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${hasLiveModule ? 'bg-brand-gold/20 text-brand-gold' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'}`}>
-                                        {subModulesList.length} {content?.ui?.modules || "Modules"}
-                                    </span>
-                                )}
-                                {hasLiveModule && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
-                                        <span className="relative flex h-1.5 w-1.5 mr-1.5">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                        {hasLiveModule ? (
+                            <>
+                                <div className="flex items-start justify-between gap-3 mb-3">
+                                    <div className="p-2.5 rounded-xl bg-brand-gold/30 text-brand-dark dark:bg-brand-gold/20 dark:text-brand-gold ring-2 ring-brand-gold/40 dark:ring-brand-gold/25 shadow-sm [&_svg]:w-5 [&_svg]:h-5">
+                                        {block.icon || <SystemIcon />}
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-md shadow-emerald-600/25">
+                                            <span className="relative flex h-2 w-2 mr-2">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                                            </span>
+                                            {content?.ui?.go_live || "GO-LIVE"}
                                         </span>
-                                        {content?.ui?.go_live || "GO-LIVE"}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
+                                        {subModulesList.length > 0 && (
+                                            <span className="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-white/80 dark:bg-brand-gold/20 text-brand-dark dark:text-brand-gold border border-brand-gold/30 dark:border-transparent">
+                                                {liveModules.length}/{subModulesList.length} {content?.ui?.modules || "Modules"}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
 
-                        <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight mb-2 group-hover:text-brand-gold transition-colors">
-                            {block.name}
-                        </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                            {block.desc}
-                        </p>
+                                <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100 leading-tight mb-1.5 group-hover:text-brand-gold transition-colors tracking-tight">
+                                    {block.name}
+                                </h3>
+                                <p className="text-xs text-slate-700 dark:text-slate-400 font-medium leading-relaxed line-clamp-2">
+                                    {block.desc}
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex justify-between items-start mb-3">
+                                    <div className="p-2 rounded-md transition-colors bg-slate-100 dark:bg-slate-700/50 text-slate-400 group-hover:text-brand-gold">
+                                        {block.icon || <SystemIcon />}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {subModulesList.length > 0 && (
+                                            <span className="text-[10px] px-2 py-0.5 rounded-full font-mono bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300">
+                                                {subModulesList.length} {content?.ui?.modules || "Modules"}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight mb-2 group-hover:text-brand-gold transition-colors">
+                                    {block.name}
+                                </h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                                    {block.desc}
+                                </p>
+                            </>
+                        )}
                     </div>
 
-                    <div className="relative z-10 mt-4 flex items-center text-[10px] font-bold text-slate-400 transition-opacity duration-300 group-hover:opacity-10 uppercase tracking-wider">
+                    <div className={`relative z-10 mt-4 flex items-center text-[10px] font-bold transition-opacity duration-300 group-hover:opacity-10 uppercase tracking-wider ${hasLiveModule ? 'text-brand-dark dark:text-brand-gold gap-1.5' : 'text-slate-400'}`}>
                         {content?.ui?.explore || "Explore"} <ArrowRightIcon />
                     </div>
                 </div>
@@ -3350,15 +3539,62 @@
             </div>
         );
 
-        const HorizonNav = ({ items, activeId, onNav, navRef, visible }) => {
+        const ChevronDownIcon = ({ className = '' }) => (
+            <svg className={className} xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9" />
+            </svg>
+        );
+
+        const HeaderNav = ({ items, activeId, onNav, navRef }) => {
             const scrollRef = useRef(null);
-            const hoverZoneRef = useRef(null);
+            const apsTriggerRef = useRef(null);
+            const apsChildIds = useMemo(() => {
+                const aps = items.find(i => i.id === 'aps-group');
+                return (aps?.children || []).map(c => c.id);
+            }, [items]);
+            const apsItem = useMemo(() => items.find(i => i.id === 'aps-group'), [items]);
+            const isApsChildActive = apsChildIds.includes(activeId);
+            const [apsOpen, setApsOpen] = useState(false);
+            const [menuRect, setMenuRect] = useState(null);
+
+            const updateMenuRect = useCallback(() => {
+                const el = apsTriggerRef.current;
+                if (!el) return;
+                const r = el.getBoundingClientRect();
+                setMenuRect({
+                    top: r.bottom + 8,
+                    left: r.left,
+                    minWidth: Math.max(r.width, 192),
+                });
+            }, []);
 
             useEffect(() => {
-                const zone = hoverZoneRef.current;
-                const el = scrollRef.current;
-                if (!zone || !el) return;
+                if (!apsOpen) {
+                    setMenuRect(null);
+                    return undefined;
+                }
+                updateMenuRect();
+                const onLayout = () => updateMenuRect();
+                window.addEventListener('resize', onLayout);
+                window.addEventListener('scroll', onLayout, true);
+                return () => {
+                    window.removeEventListener('resize', onLayout);
+                    window.removeEventListener('scroll', onLayout, true);
+                };
+            }, [apsOpen, updateMenuRect]);
 
+            useEffect(() => {
+                if (!apsOpen) return undefined;
+                const onKeyDown = (e) => {
+                    if (e.key === 'Escape') setApsOpen(false);
+                };
+                window.addEventListener('keydown', onKeyDown);
+                return () => window.removeEventListener('keydown', onKeyDown);
+            }, [apsOpen]);
+
+            useEffect(() => {
+                const el = scrollRef.current;
+                if (!el) return;
                 const onWheel = (e) => {
                     if (el.scrollWidth <= el.clientWidth) return;
                     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
@@ -3366,47 +3602,84 @@
                     e.preventDefault();
                     el.scrollLeft += e.deltaY;
                 };
-
-                zone.addEventListener('wheel', onWheel, { passive: false });
-                return () => zone.removeEventListener('wheel', onWheel);
+                el.addEventListener('wheel', onWheel, { passive: false });
+                return () => el.removeEventListener('wheel', onWheel);
             }, [items]);
 
+            const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active ring-1 ring-brand-gold/20' : 'ring-1 ring-white/30 dark:ring-white/5'}`;
+
+            const apsMenu = apsOpen && menuRect && apsItem ? ReactDOM.createPortal(
+                <>
+                    <button
+                        type="button"
+                        className="header-nav-aps-backdrop"
+                        aria-label="Close APS menu"
+                        onClick={() => setApsOpen(false)}
+                    />
+                    <div
+                        className="header-nav-aps-menu header-nav-aps-menu-floating"
+                        role="menu"
+                        style={{ top: `${menuRect.top}px`, left: `${menuRect.left}px`, minWidth: `${menuRect.minWidth}px` }}
+                    >
+                        <div className="header-nav-aps-menu-head">{apsItem.label}</div>
+                        {apsItem.children.map(child => (
+                            <button
+                                key={child.id}
+                                type="button"
+                                role="menuitem"
+                                onClick={() => {
+                                    onNav(child.id);
+                                    setApsOpen(false);
+                                }}
+                                className={`${tabClass(activeId === child.id)} header-nav-child`}
+                            >
+                                {child.label}
+                            </button>
+                        ))}
+                    </div>
+                </>,
+                document.body
+            ) : null;
+
             return (
-                <div
-                    ref={navRef}
-                    data-horizon-nav
-                    aria-hidden={!visible}
-                    className={`fixed left-0 right-0 z-30 transition-all duration-300 ${visible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-1 pointer-events-none invisible'}`}
-                    style={{ top: '4rem' }}
-                >
-                    <div className="bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200/70 dark:border-white/5 shadow-sm">
-                        <div ref={hoverZoneRef} className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-2">
-                            <div ref={scrollRef} className="overflow-x-auto horizon-nav-scroll pb-0.5 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10">
-                                <div className="flex gap-2 w-max mx-auto py-1">
-                                    {items.map(item => {
-                                        const isActive = activeId === item.id;
-                                        return (
+                <div ref={navRef} className="flex-1 min-w-0 overflow-visible">
+                    <div ref={scrollRef} className="overflow-x-auto overflow-y-visible horizon-nav-scroll">
+                        <div className="flex gap-1.5 items-center w-max mx-auto py-0.5 px-1">
+                            {items.map(item => {
+                                if (item.id === 'aps-group') {
+                                    const apsHighlighted = isApsChildActive || apsOpen;
+                                    return (
+                                        <div key={item.id} className="header-nav-aps-wrap">
                                             <button
-                                                key={item.id}
+                                                ref={apsTriggerRef}
                                                 type="button"
-                                                onClick={() => onNav(item.id)}
-                                                className={`
-                                                    shrink-0 px-4 py-2 rounded-2xl border border-transparent
-                                                    backdrop-blur-xl cursor-pointer
-                                                    text-xs font-bold uppercase tracking-wide
-                                                    ${isActive
-                                                        ? 'bg-gradient-to-br from-brand-gold/5 to-brand-dark/10 shadow-[0_8px_32px_rgba(245,158,11,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-1 ring-brand-gold/20 text-brand-gold'
-                                                        : 'bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.15)] ring-1 ring-white/30 dark:ring-white/5 text-slate-500 dark:text-slate-400'}
-                                                `}
+                                                aria-expanded={apsOpen}
+                                                aria-haspopup="menu"
+                                                onClick={() => setApsOpen(open => !open)}
+                                                className={`${tabClass(apsHighlighted)} flex items-center`}
                                             >
                                                 {item.label}
+                                                <ChevronDownIcon className={`header-nav-chevron ${apsOpen ? 'header-nav-chevron-open' : ''}`} />
                                             </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                const isActive = activeId === item.id;
+                                return (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => onNav(item.id)}
+                                        className={tabClass(isActive)}
+                                    >
+                                        {item.label}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
+                    {apsMenu}
                 </div>
             );
         };
@@ -4160,8 +4433,7 @@
             const [time, setTime] = useState(new Date());
             const [selectedBlock, setSelectedBlock] = useState(null);
             const [activeNavId, setActiveNavId] = useState('supply-chain');
-            const [navVisible, setNavVisible] = useState(false);
-            const horizonNavRef = useRef(null);
+            const headerNavRef = useRef(null);
             const scrollLockRef = useRef(false);
             const scrollEndTimerRef = useRef(null);
             const scrollAnimListenerRef = useRef(null);
@@ -4174,9 +4446,8 @@
             );
 
             const getAnchorOffset = useCallback(() => {
-                if (!navVisible) return 8;
-                return (horizonNavRef.current?.offsetHeight ?? 52) + 8;
-            }, [navVisible]);
+                return (headerNavRef.current?.closest('nav')?.offsetHeight ?? 64) + 8;
+            }, []);
 
             const getSectionList = useCallback(() => {
                 const sections = [
@@ -4195,12 +4466,6 @@
                 const scrollRoot = getMainScrollRoot();
                 const sections = getSectionList();
                 if (!scrollRoot || !sections.length) return;
-
-                const scEl = document.getElementById('supply-chain');
-                if (scEl) {
-                    const scTop = getSectionTopInRoot(scEl, scrollRoot);
-                    setNavVisible(scrollRoot.scrollTop >= scTop - 24);
-                }
 
                 const activeId = resolveActiveHorizonId(sections, scrollRoot, getAnchorOffset());
                 if (activeId) setActiveNavId(activeId);
@@ -4274,9 +4539,12 @@
                 scrollRoot.addEventListener('scroll', onScroll, { passive: true });
 
                 let navObserver;
-                if (typeof ResizeObserver !== 'undefined' && horizonNavRef.current) {
-                    navObserver = new ResizeObserver(() => requestAnimationFrame(updateActiveFromScroll));
-                    navObserver.observe(horizonNavRef.current);
+                if (typeof ResizeObserver !== 'undefined' && headerNavRef.current) {
+                    const navEl = headerNavRef.current.closest('nav');
+                    if (navEl) {
+                        navObserver = new ResizeObserver(() => requestAnimationFrame(updateActiveFromScroll));
+                        navObserver.observe(navEl);
+                    }
                 }
 
                 requestAnimationFrame(updateActiveFromScroll);
@@ -4310,9 +4578,9 @@
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
                     <LandingCanvasBackground theme={theme} />
 
-                    <nav className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel z-10 shrink-0">
-                        <div className="max-w-7xl mx-auto w-full h-full px-4 sm:px-6 md:px-10 flex items-center justify-between">
-                            <div className="flex items-center gap-3 shrink-0 p-1.5 pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                    <nav className="relative z-20 h-16 overflow-visible border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-obsidian/50 glass-panel shrink-0">
+                        <div className="max-w-7xl mx-auto w-full h-full px-4 sm:px-6 md:px-10 flex items-center gap-2 md:gap-4 overflow-visible">
+                            <div className="flex items-center gap-3 shrink-0 p-1.5 pr-4 md:pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                                 <a href="./new_terminal.html">
                                     <img src="./icononly_transparent_nobuffer.png" className="h-8 w-8 md:h-10 md:w-10 object-contain cursor-pointer transition-transform hover:scale-110" onError={(e) => e.target.style.display = 'none'} />
                                 </a>
@@ -4321,6 +4589,13 @@
                                     <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-widest uppercase hidden hover:block xs:block">{content.ui.system_terminal}</span>
                                 </div>
                             </div>
+
+                            <HeaderNav
+                                navRef={headerNavRef}
+                                items={pageNavItems}
+                                activeId={activeNavId}
+                                onNav={scrollToNavItem}
+                            />
 
                             <div className="flex items-center gap-1.5 md:gap-6 shrink-0">
                                 <div className="flex items-center gap-1 p-1 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
@@ -4359,14 +4634,6 @@
                     </nav>
 
                     <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
-                        <HorizonNav
-                            navRef={horizonNavRef}
-                            items={pageNavItems}
-                            activeId={activeNavId}
-                            onNav={scrollToNavItem}
-                            visible={navVisible}
-                        />
-
                         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">
                             <Reveal>
                                 <HeroSection content={content} horizons={content.matrix} onNav={scrollToHorizon} />
