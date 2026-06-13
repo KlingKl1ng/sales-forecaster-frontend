@@ -1500,7 +1500,7 @@
                 ...otherHorizons,
                 { id: 'analytics', label: ui.nav_analytics },
                 { id: 'or-process', label: ui.nav_or_process },
-                { id: 'about', label: ui.about_vision },
+                { id: 'about', label: ui.nav_about },
             ];
         };
 
@@ -1672,7 +1672,9 @@
                         { id: 'plausibility', label: 'Plausibility', desc: 'We validate outcomes with your teams — checking feasibility, assumptions and business sense against reality.' },
                         { id: 'deployment', label: 'Deployment', desc: 'We integrate the solution into your APS landscape, train users and establish a continuous improvement loop.' },
                     ],
-                    rights_reserved: "v2.0.0 Matrix UI • Latency: 24ms",
+                    footer_privacy: "Privacy Policy",
+                    footer_imprint: "Imprint",
+                    footer_terms: "Terms of Services",
                     stat_horizons: "Planning Horizons",
                     stat_engines: "Optimization Engines",
                     matrix_eyebrow: "APS Planning Matrix",
@@ -1682,6 +1684,7 @@
                     nav_aps: "APS",
                     nav_analytics: "Analytics Levels",
                     nav_or_process: "OR Process",
+                    nav_about: "About Us",
                     i4l_eyebrow: "Industry 4.0 Integration",
                     i4l_title: "ERP + MES Are Not Enough",
                     i4l_phase_gap_badge: "Without APS",
@@ -1929,7 +1932,9 @@
                         { id: 'plausibility', label: 'Hợp lý', desc: 'Chúng tôi xác thực kết quả với đội ngũ của bạn — kiểm tra tính khả thi và giả định so với thực tế.' },
                         { id: 'deployment', label: 'Triển khai', desc: 'Chúng tôi tích hợp giải pháp vào hệ sinh thái APS, đào tạo người dùng và thiết lập vòng cải tiến liên tục.' },
                     ],
-                    rights_reserved: "v2.0.0 Giao diện Ma Trận • Độ trễ: 24ms",
+                    footer_privacy: "Chính sách bảo mật",
+                    footer_imprint: "Thông tin pháp lý",
+                    footer_terms: "Điều khoản dịch vụ",
                     stat_horizons: "Khung hoạch định",
                     stat_engines: "Công cụ tối ưu",
                     matrix_eyebrow: "Ma trận APS",
@@ -1939,6 +1944,7 @@
                     nav_aps: "APS",
                     nav_analytics: "Cấp phân tích",
                     nav_or_process: "Quy trình OR",
+                    nav_about: "Về chúng tôi",
                     i4l_eyebrow: "Tích hợp Industry 4.0",
                     i4l_title: "ERP + MES vẫn chưa đủ",
                     i4l_phase_gap_badge: "Không có APS",
@@ -2186,7 +2192,9 @@
                         { id: 'plausibility', label: 'Plausibilität', desc: 'Wir validieren Ergebnisse mit Ihren Teams — Prüfung von Machbarkeit, Annahmen und betrieblicher Sinnhaftigkeit.' },
                         { id: 'deployment', label: 'Deployment', desc: 'Wir integrieren die Lösung in Ihre APS-Landschaft, schulen Anwender und etablieren eine kontinuierliche Verbesserungsschleife.' },
                     ],
-                    rights_reserved: "v2.0.0 Matrix-UI • Latenz: 24ms",
+                    footer_privacy: "Datenschutz",
+                    footer_imprint: "Impressum",
+                    footer_terms: "Nutzungsbedingungen",
                     stat_horizons: "Planungshorizonte",
                     stat_engines: "Optimierungs-Engines",
                     matrix_eyebrow: "APS-Planungsmatrix",
@@ -2196,6 +2204,7 @@
                     nav_aps: "APS",
                     nav_analytics: "Analytics-Stufen",
                     nav_or_process: "OR-Prozess",
+                    nav_about: "Über uns",
                     i4l_eyebrow: "Industry-4.0-Integration",
                     i4l_title: "ERP + MES reichen nicht aus",
                     i4l_phase_gap_badge: "Ohne APS",
@@ -4693,8 +4702,12 @@
                     <footer className="py-4 border-t border-slate-200 dark:border-slate-800 z-10 shrink-0 bg-white/30 dark:bg-brand-obsidian/30 glass-panel">
                         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-2">
                             <p className="text-[10px] text-slate-400">© {new Date().getFullYear()} Operartis Analytics. All rights reserved.</p>
-                            <div className="flex items-center gap-4 text-[10px] text-slate-500 font-mono">
-                                <span>{content.ui.rights_reserved}</span>
+                            <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                                <a href="#about" className="hover:text-brand-gold transition-colors">{content.ui.footer_privacy}</a>
+                                <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">|</span>
+                                <a href="#" className="hover:text-brand-gold transition-colors">{content.ui.footer_imprint}</a>
+                                <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">|</span>
+                                <a href="#" className="hover:text-brand-gold transition-colors">{content.ui.footer_terms}</a>
                             </div>
                         </div>
                     </footer>
