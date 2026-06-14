@@ -564,7 +564,58 @@
         }
         .opus-marquee {
             animation: opusMarquee 38s linear infinite;
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
         }
+
+        .opus-marquee-wrap {
+            background: transparent;
+            backdrop-filter: blur(10px) saturate(1.04);
+            -webkit-backdrop-filter: blur(10px) saturate(1.04);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .opus-marquee-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background: linear-gradient(105deg, rgba(255, 255, 255, 0.08), transparent 38%, rgba(255, 255, 255, 0.025) 78%, transparent);
+            pointer-events: none;
+        }
+
+        .dark .opus-marquee-wrap {
+            background: transparent;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.045),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.01);
+        }
+
+        .dark .opus-marquee-wrap::before {
+            background: linear-gradient(105deg, rgba(255, 255, 255, 0.018), transparent 40%, rgba(255, 255, 255, 0.01) 78%, transparent);
+        }
+
+        .opus-marquee-fade-left,
+        .opus-marquee-fade-right {
+            display: none;
+        }
+
+        .opus-marquee-chip {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            opacity: 0.82;
+        }
+
+        .dark .opus-marquee-chip {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            opacity: 0.78;
+        }
+
         .opus-marquee-wrap:hover .opus-marquee {
             animation-play-state: paused;
         }
@@ -3725,14 +3776,14 @@
             const names = Object.keys(MODULE_STATIC_DATA).map(id => (content.registry && content.registry[id] && content.registry[id].name) || id);
             const loop = names.concat(names);
             return (
-                <div className="opus-marquee-wrap relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/5 ring-1 ring-white/20 dark:ring-white/5 py-4">
-                    <div className="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-slate-50 dark:from-[#020617] to-transparent pointer-events-none"></div>
-                    <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-slate-50 dark:from-[#020617] to-transparent pointer-events-none"></div>
-                    <div className="flex w-max opus-marquee">
+                <div className="opus-marquee-wrap relative overflow-hidden rounded-3xl border border-white/35 dark:border-white/[0.06] ring-1 ring-white/15 dark:ring-white/[0.04] px-2 py-2">
+                    <div className="opus-marquee-fade-left"></div>
+                    <div className="opus-marquee-fade-right"></div>
+                    <div className="relative z-[1] flex w-max gap-2 opus-marquee">
                         {loop.map((name, i) => (
-                            <span key={i} className="flex items-center gap-3 px-5 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap">
+                            <span key={i} className="opus-marquee-chip flex items-center gap-3 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-500/85 dark:text-slate-400/80 whitespace-nowrap">
                                 {name}
-                                <span className="h-1 w-1 rounded-full bg-brand-gold/60"></span>
+                                <span className="h-1 w-1 rounded-full bg-brand-gold/70"></span>
                             </span>
                         ))}
                     </div>
