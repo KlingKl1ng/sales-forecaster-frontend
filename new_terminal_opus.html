@@ -557,6 +557,56 @@
             pointer-events: none;
         }
 
+        @keyframes heroPipelinePulse {
+            0%, 100% {
+                transform: translateY(0);
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                    0 0 0 rgba(245, 158, 11, 0);
+            }
+
+            50% {
+                transform: translateY(-1px);
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+                    0 0 20px rgba(245, 158, 11, 0.22);
+            }
+        }
+
+        @keyframes heroConsoleCursor {
+            0%, 45% { opacity: 1; }
+            46%, 100% { opacity: 0; }
+        }
+
+        .hero-aps-pipeline-step {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-aps-pipeline-step::before {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 56%, rgba(245, 158, 11, 0.04));
+            pointer-events: none;
+        }
+
+        .hero-aps-pipeline-step-active {
+            animation: heroPipelinePulse 1.8s ease-in-out infinite;
+        }
+
+        .hero-console-cursor {
+            animation: heroConsoleCursor 1s steps(1) infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-aps-pipeline-step-active,
+            .hero-console-cursor {
+                animation: none;
+            }
+        }
+
         /* Marquee capability ribbon */
         @keyframes opusMarquee {
             0% { transform: translateX(0); }
@@ -641,6 +691,74 @@
 
         .opus-marquee-wrap:hover .opus-marquee {
             animation-play-state: paused;
+        }
+
+        .opus-metrics-glass {
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            backdrop-filter: blur(18px) saturate(1.06);
+            -webkit-backdrop-filter: blur(18px) saturate(1.06);
+            box-shadow:
+                0 14px 34px rgba(15, 23, 42, 0.035),
+                inset 0 1px 0 rgba(255, 255, 255, 0.28),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .opus-metrics-glass::before {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background:
+                radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.16), transparent 62%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.025) 54%, rgba(245, 158, 11, 0.018));
+            pointer-events: none;
+        }
+
+        .dark .opus-metrics-glass {
+            background: transparent;
+            box-shadow:
+                0 14px 34px rgba(0, 0, 0, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.055),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.012);
+        }
+
+        .dark .opus-metrics-glass::before {
+            background:
+                radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.028), transparent 64%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.008) 56%, rgba(245, 158, 11, 0.012));
+        }
+
+        .opus-metrics-stat {
+            position: relative;
+        }
+
+        .opus-metrics-stat::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 2px;
+            background:
+                linear-gradient(to bottom, transparent, rgba(148, 163, 184, 0.34) 18%, rgba(245, 158, 11, 0.18) 50%, rgba(148, 163, 184, 0.34) 82%, transparent);
+            box-shadow:
+                0 0 14px rgba(245, 158, 11, 0.08),
+                1px 0 0 rgba(255, 255, 255, 0.16);
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .opus-metrics-stat:not(:first-child)::before {
+                display: block;
+            }
+        }
+
+        .dark .opus-metrics-stat::before {
+            background:
+                linear-gradient(to bottom, transparent, rgba(148, 163, 184, 0.16) 18%, rgba(245, 158, 11, 0.26) 50%, rgba(148, 163, 184, 0.16) 82%, transparent);
+            box-shadow:
+                0 0 18px rgba(245, 158, 11, 0.14),
+                1px 0 0 rgba(255, 255, 255, 0.06);
         }
 
         /* Supply chain flow diagram */
@@ -1742,7 +1860,7 @@
         };
 
         const getNavTargetId = (navId) => {
-            if (['supply-chain', 'industry-40', 'analytics', 'or-process', 'about'].includes(navId)) return navId;
+            if (['supply-chain', 'industry-40', 'analytics', 'or-process', 'about', 'matrix-fit'].includes(navId)) return navId;
             return `horizon-${navId}`;
         };
 
@@ -1812,6 +1930,18 @@
                 ui: {
                     system_terminal: "System Terminal",
                     status_operational: "SYSTEM OPERATIONAL",
+                    hero_pipeline_label: "Live APS pipeline",
+                    hero_pipeline_status: "Constraint cycle running",
+                    hero_pipeline_steps: ["ERP Data", "Demand", "Capacity", "Inventory", "Schedule", "Optimized Plan"],
+                    hero_console_label: "Optimization Console",
+                    hero_console_events: [
+                        "ingest ERP + shop-floor signals",
+                        "forecast demand variance",
+                        "check finite capacity",
+                        "balance inventory policy",
+                        "solve schedule scenario",
+                        "publish plan to execution"
+                    ],
                     header_title_1: "Advanced Planning &",
                     header_title_2: "Scheduling System",
                     header_desc: "Turn ERP and shop-floor data into optimized plans — demand, capacity, inventory, and schedules — in one integrated APS platform.",
@@ -2088,6 +2218,18 @@
                 ui: {
                     system_terminal: "Bảng Điều Hành Hệ Thống",
                     status_operational: "HỆ THỐNG HOẠT ĐỘNG",
+                    hero_pipeline_label: "Luồng APS trực tiếp",
+                    hero_pipeline_status: "Đang chạy chu kỳ ràng buộc",
+                    hero_pipeline_steps: ["Dữ liệu ERP", "Nhu cầu", "Năng lực", "Tồn kho", "Lịch", "Kế hoạch tối ưu"],
+                    hero_console_label: "Bảng tối ưu",
+                    hero_console_events: [
+                        "nạp tín hiệu ERP + shop-floor",
+                        "dự báo biến động nhu cầu",
+                        "kiểm tra năng lực hữu hạn",
+                        "cân bằng chính sách tồn kho",
+                        "giải kịch bản lập lịch",
+                        "gửi kế hoạch tới thực thi"
+                    ],
                     header_title_1: "Hệ Thống Hoạch Định &",
                     header_title_2: "Lập Kế Hoạch Nâng Cao",
                     header_desc: "Biến dữ liệu ERP và shop-floor thành kế hoạch tối ưu — nhu cầu, năng lực, tồn kho và lịch sản xuất — trên một nền tảng APS tích hợp.",
@@ -2364,6 +2506,18 @@
                 ui: {
                     system_terminal: "Systemterminal",
                     status_operational: "SYSTEM BETRIEBSBEREIT",
+                    hero_pipeline_label: "Live-APS-Pipeline",
+                    hero_pipeline_status: "Restriktionszyklus aktiv",
+                    hero_pipeline_steps: ["ERP-Daten", "Bedarf", "Kapazität", "Bestand", "Terminplan", "Optimaler Plan"],
+                    hero_console_label: "Optimierungskonsole",
+                    hero_console_events: [
+                        "ERP- und Shopfloor-Signale laden",
+                        "Bedarfsabweichung prognostizieren",
+                        "endliche Kapazität prüfen",
+                        "Bestandspolitik ausgleichen",
+                        "Terminierungsszenario lösen",
+                        "Plan an Ausführung senden"
+                    ],
                     header_title_1: "Erweiterte Planungs- &",
                     header_title_2: "Terminierungssystem",
                     header_desc: "Verwandeln Sie ERP- und Shopfloor-Daten in optimierte Pläne — Bedarf, Kapazität, Bestand und Terminierung — in einer integrierten APS-Plattform.",
@@ -3741,58 +3895,127 @@
             return <canvas ref={canvasRef} className="landing-canvas-bg" aria-hidden="true" />;
         };
 
-        // Hero — Odoo-scale headline + INFORM authority + Zentio console visual
-        const HeroSection = ({ content, stats, onExplore, onWhy }) => (
-            <div className="opus-hero-glow relative overflow-hidden rounded-3xl border border-white/40 dark:border-white/10 bg-white/40 dark:bg-brand-obsidian/40 backdrop-blur-2xl ring-1 ring-white/20 dark:ring-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.15)]">
-                <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/12 rounded-full blur-3xl animate-blob pointer-events-none"></div>
-                <div className="absolute -bottom-24 right-10 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
+        // Hero — Odoo-scale headline + active APS pipeline/console visual
+        const HeroSection = ({ content, onExplore, onWhy }) => {
+            const pipelineSteps = content.ui.hero_pipeline_steps || [];
+            const consoleEvents = content.ui.hero_console_events || [];
+            const [activeFlowIdx, setActiveFlowIdx] = useState(0);
 
-                <div className="relative z-10 grid lg:grid-cols-12 gap-8 lg:gap-6 items-center p-8 md:p-12 lg:p-14">
-                    <div className="lg:col-span-7">
-                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-6">
-                            {content.ui.header_title_1}{' '}
-                            <span className="opus-sheen">{content.ui.header_title_2}</span>
-                        </h1>
-                        <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl mb-8">
-                            {content.ui.header_desc}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-3">
-                            <button type="button" onClick={onExplore} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-gold text-white text-sm font-bold shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all">
-                                {content.ui.cta_explore} <ArrowRightIcon />
-                            </button>
-                            <button type="button" onClick={onWhy} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold hover:border-brand-gold hover:text-brand-gold transition-colors">
-                                {content.ui.cta_why}
-                            </button>
+            useEffect(() => {
+                if (!pipelineSteps.length) return undefined;
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (prefersReducedMotion) return undefined;
+                const timer = setInterval(() => {
+                    setActiveFlowIdx(prev => (prev + 1) % pipelineSteps.length);
+                }, 1550);
+                return () => clearInterval(timer);
+            }, [pipelineSteps.length]);
+
+            const flowProgress = pipelineSteps.length > 1
+                ? ((activeFlowIdx + 1) / pipelineSteps.length) * 100
+                : 0;
+            const visibleEvents = consoleEvents.length
+                ? [0, 1, 2].map(offset => consoleEvents[(activeFlowIdx + offset) % consoleEvents.length])
+                : [];
+
+            return (
+                <div className="opus-hero-glow relative overflow-hidden rounded-3xl border border-white/40 dark:border-white/10 bg-white/40 dark:bg-brand-obsidian/40 backdrop-blur-2xl ring-1 ring-white/20 dark:ring-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.15)]">
+                    <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/12 rounded-full blur-3xl animate-blob pointer-events-none"></div>
+                    <div className="absolute -bottom-24 right-10 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
+
+                    <div className="relative z-10 grid lg:grid-cols-12 gap-8 lg:gap-6 items-center p-8 md:p-12 lg:p-14">
+                        <div className="lg:col-span-7">
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-6">
+                                {content.ui.header_title_1}{' '}
+                                <span className="opus-sheen">{content.ui.header_title_2}</span>
+                            </h1>
+                            <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl mb-8">
+                                {content.ui.header_desc}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <button type="button" onClick={onExplore} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-gold text-white text-sm font-bold shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all">
+                                    {content.ui.cta_explore} <ArrowRightIcon />
+                                </button>
+                                <button type="button" onClick={onWhy} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold hover:border-brand-gold hover:text-brand-gold transition-colors">
+                                    {content.ui.cta_why}
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Console visual (Zentio-style product readout) */}
-                    <div className="lg:col-span-5">
-                        <div className="rounded-2xl border border-white/50 dark:border-white/10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-2xl overflow-hidden">
-                            <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200/70 dark:border-white/5 bg-white/50 dark:bg-slate-900/50">
-                                <span className="h-2.5 w-2.5 rounded-full bg-rose-400"></span>
-                                <span className="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
-                                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
-                                <span className="ml-2 text-[10px] font-mono uppercase tracking-widest text-slate-400">{content.ui.system_terminal}</span>
-                            </div>
-                            <div className="p-5 grid grid-cols-2 gap-3">
-                                {stats.map((s, i) => (
-                                    <div key={i} className="rounded-xl border border-slate-200/70 dark:border-white/5 bg-slate-50/70 dark:bg-slate-800/40 p-3">
-                                        <div className="text-2xl font-black font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-br from-brand-gold to-brand-dark">{s.value}</div>
-                                        <div className="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mt-1">{s.label}</div>
+                        {/* Live APS terminal visual */}
+                        <div className="lg:col-span-5">
+                            <div className="rounded-2xl border border-white/50 dark:border-white/10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-2xl overflow-hidden">
+                                <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200/70 dark:border-white/5 bg-white/50 dark:bg-slate-900/50">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-rose-400"></span>
+                                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+                                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                                    <span className="ml-2 text-[10px] font-mono uppercase tracking-widest text-slate-400">{content.ui.system_terminal}</span>
+                                </div>
+
+                                <div className="p-5 space-y-4">
+                                    <div>
+                                        <div className="flex items-center justify-between gap-3 mb-3">
+                                            <span className="min-w-0 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 truncate">{content.ui.hero_pipeline_label}</span>
+                                            <span className="inline-flex min-w-0 max-w-[62%] items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-1 text-[9px] font-mono uppercase tracking-wider text-emerald-500 dark:text-emerald-300">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                                <span className="truncate">{content.ui.hero_pipeline_status}</span>
+                                            </span>
+                                        </div>
+                                        <div className="mb-3 h-1 rounded-full bg-slate-200/70 dark:bg-slate-800 overflow-hidden">
+                                            <div
+                                                className="h-full rounded-full bg-gradient-to-r from-brand-gold via-amber-400 to-brand-dark transition-[width] duration-700 ease-out"
+                                                style={{ width: `${flowProgress}%` }}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {pipelineSteps.map((step, i) => {
+                                                const isActive = i === activeFlowIdx;
+                                                const isDone = i < activeFlowIdx;
+                                                return (
+                                                    <div
+                                                        key={step}
+                                                        className={`hero-aps-pipeline-step rounded-xl border px-2.5 py-2 min-h-[3.6rem] transition-colors duration-500 ${isActive ? 'hero-aps-pipeline-step-active border-brand-gold/60 bg-brand-gold/10 text-brand-gold' : isDone ? 'border-brand-gold/25 bg-brand-gold/5 text-slate-700 dark:text-slate-200' : 'border-slate-200/70 dark:border-white/5 bg-slate-50/60 dark:bg-slate-800/35 text-slate-500 dark:text-slate-400'}`}
+                                                    >
+                                                        <div className="relative z-[1] flex items-center justify-between gap-2 mb-1">
+                                                            <span className="text-[9px] font-mono font-bold tabular-nums opacity-70">{String(i + 1).padStart(2, '0')}</span>
+                                                            <span className={`h-1.5 w-1.5 rounded-full ${isActive ? 'bg-brand-gold' : isDone ? 'bg-emerald-400' : 'bg-slate-300 dark:bg-slate-600'}`}></span>
+                                                        </div>
+                                                        <div className="relative z-[1] text-[10px] font-bold uppercase tracking-wide leading-snug">{step}</div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
-                            <div className="px-5 pb-4 -mt-1">
-                                <div className="flex items-center text-[10px] font-mono text-slate-400 border-t border-dashed border-slate-200 dark:border-slate-700 pt-3">
-                                    <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{content.ui.status_operational}</span>
+
+                                    <div className="rounded-xl border border-slate-200/70 dark:border-white/5 bg-slate-950/[0.03] dark:bg-slate-950/35 p-3">
+                                        <div className="flex items-center justify-between gap-3 mb-2">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{content.ui.hero_console_label}</span>
+                                            <span className="text-[9px] font-mono text-brand-gold">APS::{String(activeFlowIdx + 1).padStart(2, '0')}</span>
+                                        </div>
+                                        <div className="space-y-1.5 font-mono text-[10px] leading-relaxed">
+                                            {visibleEvents.map((event, i) => {
+                                                const isActive = i === 0;
+                                                return (
+                                                    <div key={`${event}-${i}`} className={`flex items-center gap-2 min-w-0 ${isActive ? 'text-slate-700 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500'}`}>
+                                                        <span className={isActive ? 'text-brand-gold' : 'text-slate-300 dark:text-slate-600'}>{isActive ? '>' : '$'}</span>
+                                                        <span className="truncate">{event}</span>
+                                                        {isActive && <span className="hero-console-cursor h-3 w-1 bg-brand-gold shrink-0"></span>}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center text-[10px] font-mono text-slate-400 border-t border-dashed border-slate-200 dark:border-slate-700 pt-3">
+                                        <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{content.ui.status_operational}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        );
+            );
+        };
 
         // Capability ribbon — scrolling marquee of every optimization name (real registry content)
         const CapabilityRibbon = ({ content }) => {
@@ -3815,14 +4038,14 @@
 
         // Metrics band — Zentio "measurable impact" strip
         const MetricsBand = ({ content, stats }) => (
-            <div className="rounded-3xl border border-slate-200/80 dark:border-white/5 bg-gradient-to-br from-white/70 to-white/40 dark:from-slate-900/60 dark:to-slate-900/20 backdrop-blur-xl ring-1 ring-white/20 dark:ring-white/5 p-8 md:p-10">
-                <div className="text-center max-w-2xl mx-auto mb-8">
+            <div className="opus-metrics-glass rounded-3xl border border-white/35 dark:border-white/[0.06] ring-1 ring-white/15 dark:ring-white/[0.04] p-8 md:p-10">
+                <div className="relative z-[1] text-center max-w-2xl mx-auto mb-8">
                     <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{content.ui.metrics_eyebrow}</p>
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{content.ui.metrics_title}</h2>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-4">
+                <div className="relative z-[1] grid grid-cols-2 lg:grid-cols-4 gap-y-8 md:gap-y-6">
                     {stats.map((s, i) => (
-                        <div key={i} className={`text-center px-2 ${i !== 0 ? 'lg:border-l border-slate-200/70 dark:border-white/5' : ''}`}>
+                        <div key={i} className="opus-metrics-stat text-center px-2">
                             <div className="text-4xl md:text-5xl font-black font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-br from-brand-gold to-brand-dark">{s.value}</div>
                             <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mt-2">{s.label}</div>
                         </div>
@@ -5250,7 +5473,7 @@
                     <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
                         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">
                             <Reveal>
-                                <HeroSection content={content} stats={stats} onExplore={() => scrollToId('platform')} onWhy={() => scrollToId('about')} />
+                                <HeroSection content={content} onExplore={() => scrollToId('matrix-fit')} onWhy={() => scrollToId('about')} />
                             </Reveal>
 
                             <div className="mt-10 md:mt-14">
@@ -5268,7 +5491,7 @@
                                 <Reveal delay={150}><SystemIntegrationLoop content={content} /></Reveal>
                             </div>
 
-                            <div className="mt-16 md:mt-24">
+                            <div id="matrix-fit" className="opus-scroll-target mt-16 md:mt-24">
                                 <Reveal><JourneyStrip content={content} horizons={content.matrix} onNav={scrollToHorizon} /></Reveal>
                             </div>
 
