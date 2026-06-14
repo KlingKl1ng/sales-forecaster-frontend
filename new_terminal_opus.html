@@ -697,9 +697,11 @@
             position: relative;
             overflow: hidden;
             background: transparent;
+            border-color: rgba(148, 163, 184, 0.26);
             backdrop-filter: blur(18px) saturate(1.06);
             -webkit-backdrop-filter: blur(18px) saturate(1.06);
             box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.18),
                 0 14px 34px rgba(15, 23, 42, 0.035),
                 inset 0 1px 0 rgba(255, 255, 255, 0.28),
                 inset 0 -1px 0 rgba(255, 255, 255, 0.05);
@@ -716,9 +718,27 @@
             pointer-events: none;
         }
 
+        .opus-metrics-glass::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(245, 158, 11, 0.32) 38%, rgba(14, 165, 233, 0.16) 66%, rgba(15, 23, 42, 0.16));
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
         .dark .opus-metrics-glass {
             background: transparent;
+            border-color: rgba(245, 158, 11, 0.2);
             box-shadow:
+                0 0 0 1px rgba(245, 158, 11, 0.12),
                 0 14px 34px rgba(0, 0, 0, 0.18),
                 inset 0 1px 0 rgba(255, 255, 255, 0.055),
                 inset 0 -1px 0 rgba(255, 255, 255, 0.012);
@@ -728,6 +748,11 @@
             background:
                 radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.028), transparent 64%),
                 linear-gradient(135deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.008) 56%, rgba(245, 158, 11, 0.012));
+        }
+
+        .dark .opus-metrics-glass::after {
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(245, 158, 11, 0.48) 40%, rgba(56, 189, 248, 0.14) 70%, rgba(255, 255, 255, 0.1));
         }
 
         .opus-metrics-stat {
