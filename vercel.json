@@ -1,9 +1,8 @@
 {
-  "redirects": [
+  "rewrites": [
     { 
       "source": "/", 
-      "destination": "/terminal.html", 
-      "permanent": false 
+      "destination": "/waiting_page.html"
     }
   ]
 }
