@@ -1236,7 +1236,21 @@
                 display: none;
             }
 
-            .i4l-node-labels > span:first-child {
+            .i4l-node.i4l-node-aps {
+                width: 6.25rem !important;
+            }
+
+            .i4l-gap-label {
+                display: block;
+                width: 100%;
+                text-align: center;
+                line-height: 1.15;
+                letter-spacing: 0.02em;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            .i4l-node-labels > span:first-child:not(.i4l-gap-label) {
                 font-size: 0.58rem;
                 letter-spacing: 0.04em;
             }
@@ -2273,6 +2287,7 @@
                     i4l_mes_full: "Manufacturing Execution System",
                     i4l_mes_role: "Real-time production tracking & execution",
                     i4l_gap_label: "Planning Gap",
+                    i4l_gap_label_short: "Planning Gap",
                     i4l_gap_hint: "No optimization layer between business records and shop-floor execution",
                     i4l_erp_cons: ["Static master plans & long cycles", "Limited simulation & what-if analysis", "Cannot resolve finite-capacity bottlenecks"],
                     i4l_mes_cons: ["Executes whatever plan it receives", "No forward-looking optimization", "Cannot replan across the full network"],
@@ -2540,6 +2555,7 @@
                     i4l_mes_full: "Manufacturing Execution System",
                     i4l_mes_role: "Theo dõi & thực thi sản xuất thời gian thực",
                     i4l_gap_label: "Khoảng trống hoạch định",
+                    i4l_gap_label_short: "Khoảng trống",
                     i4l_gap_hint: "Không có lớp tối ưu giữa ghi nhận nghiệp vụ và thực thi xưởng",
                     i4l_erp_cons: ["Kế hoạch tĩnh & chu kỳ hoạch định dài", "Mô phỏng & phân tích what-if hạn chế", "Không giải quyết nút thắt năng lực hữu hạn"],
                     i4l_mes_cons: ["Chỉ thực thi kế hoạch nhận được", "Không tối ưu hóa hướng tới tương lai", "Không tái hoạch định toàn mạng lưới"],
@@ -2807,6 +2823,7 @@
                     i4l_mes_full: "Manufacturing Execution System",
                     i4l_mes_role: "Echtzeit-Produktionsverfolgung & Ausführung",
                     i4l_gap_label: "Planungslücke",
+                    i4l_gap_label_short: "Lücke",
                     i4l_gap_hint: "Keine Optimierungsschicht zwischen Geschäftsdaten und Shopfloor",
                     i4l_erp_cons: ["Statische Pläne & lange Planungszyklen", "Begrenzte Simulation & What-if-Analysen", "Keine Auflösung endlicher Kapazitätsengpässe"],
                     i4l_mes_cons: ["Führt nur erhaltene Pläne aus", "Keine vorausschauende Optimierung", "Keine Netzwerk-weite Umplanung"],
@@ -3746,7 +3763,7 @@
 
             return (
                 <div
-                    className={`i4l-node pointer-events-none${isAps && apsVisible ? ' i4l-node-pop' : ''}`}
+                    className={`i4l-node pointer-events-none${isAps ? ' i4l-node-aps' : ''}${isAps && apsVisible ? ' i4l-node-pop' : ''}`}
                     style={{ left: `${layout.left}%`, top: `${layout.top}%` }}
                     aria-hidden="true"
                 >
@@ -3757,7 +3774,10 @@
                     <div className="i4l-node-labels">
                         {isGhost ? (
                             <>
-                                <span className="text-[9px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400">{ui.i4l_gap_label}</span>
+                                <span className="i4l-gap-label text-[9px] md:text-[9px] font-black uppercase text-rose-600 dark:text-rose-400">
+                                    <span className="md:hidden">{ui.i4l_gap_label_short || ui.i4l_gap_label}</span>
+                                    <span className="hidden md:inline tracking-widest">{ui.i4l_gap_label}</span>
+                                </span>
                                 <span className="mt-0.5 text-[9px] font-medium leading-tight px-1 invisible" aria-hidden="true">.</span>
                             </>
                         ) : (
@@ -4491,8 +4511,7 @@
                     <div className="mobile-nav-panel absolute inset-x-2 bottom-2 rounded-2xl border border-white/50 dark:border-white/10 bg-white/95 dark:bg-[#0f172a]/95 shadow-2xl backdrop-blur-xl overflow-hidden">
                         <div className="flex items-center justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 px-4 py-3">
                             <div className="min-w-0">
-                                <p className="font-black tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</p>
-                                <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{content.ui.system_terminal}</p>
+                                <p className="font-black tracking-tight text-brand-gold leading-none">OPERARTIS</p>
                             </div>
                             <button
                                 type="button"
