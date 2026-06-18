@@ -1,17 +1,35 @@
 (function () {
     var VALID = { en: 1, vi: 1, de: 1 };
 
+    function readStorage(key) {
+        try {
+            return window.localStorage && window.localStorage.getItem(key);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function writeStorage(key, value) {
+        try {
+            if (window.localStorage) window.localStorage.setItem(key, value);
+        } catch (e) { }
+    }
+
+    function removeStorage(key) {
+        try {
+            if (window.localStorage) window.localStorage.removeItem(key);
+        } catch (e) { }
+    }
+
     window.getOperartisLang = function () {
-        var lang = localStorage.getItem('lang');
+        var lang = readStorage('lang');
         if (VALID[lang]) return lang;
 
-        var legacy = localStorage.getItem('preferredLang') || localStorage.getItem('inv-lang');
+        var legacy = readStorage('preferredLang') || readStorage('inv-lang');
         if (VALID[legacy]) {
-            localStorage.setItem('lang', legacy);
-            try {
-                localStorage.removeItem('preferredLang');
-                localStorage.removeItem('inv-lang');
-            } catch (e) { }
+            writeStorage('lang', legacy);
+            removeStorage('preferredLang');
+            removeStorage('inv-lang');
             return legacy;
         }
 
@@ -19,6 +37,6 @@
     };
 
     window.persistOperartisLang = function (lang) {
-        if (VALID[lang]) localStorage.setItem('lang', lang);
+        if (VALID[lang]) writeStorage('lang', lang);
     };
 })();
