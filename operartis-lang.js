@@ -1,5 +1,5 @@
 (function () {
-    var VALID = { en: 1, vi: 1, de: 1 };
+    var VALID = { en: 1, vi: 1 };
 
     function readStorage(key) {
         try {

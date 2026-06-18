@@ -1958,9 +1958,7 @@
             en: {
                 ui: {
                     system_terminal: "System Terminal",
-                    status_operational: "SYSTEM OPERATIONAL",
                     hero_pipeline_label: "Live APS pipeline",
-                    hero_pipeline_status: "Constraint cycle running",
                     hero_pipeline_steps: ["ERP Data", "Demand", "Capacity", "Inventory", "Schedule", "Optimized Plan"],
                     hero_console_label: "Optimization Console",
                     hero_console_events: [
@@ -2246,9 +2244,7 @@
             vi: {
                 ui: {
                     system_terminal: "Bảng Điều Hành Hệ Thống",
-                    status_operational: "HỆ THỐNG HOẠT ĐỘNG",
                     hero_pipeline_label: "Luồng APS trực tiếp",
-                    hero_pipeline_status: "Đang chạy chu kỳ ràng buộc",
                     hero_pipeline_steps: ["Dữ liệu ERP", "Nhu cầu", "Năng lực", "Tồn kho", "Lịch", "Kế hoạch tối ưu"],
                     hero_console_label: "Bảng tối ưu",
                     hero_console_events: [
@@ -2534,9 +2530,7 @@
             de: {
                 ui: {
                     system_terminal: "Systemterminal",
-                    status_operational: "SYSTEM BETRIEBSBEREIT",
                     hero_pipeline_label: "Live-APS-Pipeline",
-                    hero_pipeline_status: "Restriktionszyklus aktiv",
                     hero_pipeline_steps: ["ERP-Daten", "Bedarf", "Kapazität", "Bestand", "Terminplan", "Optimaler Plan"],
                     hero_console_label: "Optimierungskonsole",
                     hero_console_events: [
@@ -3983,12 +3977,8 @@
 
                                 <div className="p-5 space-y-4">
                                     <div>
-                                        <div className="flex items-center justify-between gap-3 mb-3">
+                                        <div className="flex items-center mb-3">
                                             <span className="min-w-0 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 truncate">{content.ui.hero_pipeline_label}</span>
-                                            <span className="inline-flex min-w-0 max-w-[62%] items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-1 text-[9px] font-mono uppercase tracking-wider text-emerald-500 dark:text-emerald-300">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                                <span className="truncate">{content.ui.hero_pipeline_status}</span>
-                                            </span>
                                         </div>
                                         <div className="mb-3 h-1 rounded-full bg-slate-200/70 dark:bg-slate-800 overflow-hidden">
                                             <div
@@ -4033,10 +4023,6 @@
                                                 );
                                             })}
                                         </div>
-                                    </div>
-
-                                    <div className="flex items-center text-[10px] font-mono text-slate-400 border-t border-dashed border-slate-200 dark:border-slate-700 pt-3">
-                                        <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{content.ui.status_operational}</span>
                                     </div>
                                 </div>
                             </div>
@@ -5398,7 +5384,7 @@
             };
 
             const toggleLang = () => {
-                setLang(prev => prev === 'vi' ? 'en' : prev === 'en' ? 'de' : 'vi');
+                setLang(prev => prev === 'vi' ? 'en' : 'vi');
             };
 
             const handleBlockClick = (block) => {
