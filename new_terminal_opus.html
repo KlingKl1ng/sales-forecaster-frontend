@@ -439,12 +439,7 @@
             }
 
             .sc-flow-scroll {
-                scroll-snap-type: x proximity;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .sc-flow-scroll button {
-                scroll-snap-align: center;
+                overflow-x: visible;
             }
         }
 
@@ -941,6 +936,13 @@
             scrollbar-gutter: stable;
         }
 
+        @media (max-width: 767px) {
+            .sc-flow-scroll {
+                overflow-x: visible;
+                overflow-y: visible;
+            }
+        }
+
         .sc-flow-scroll::-webkit-scrollbar {
             height: 4px;
         }
@@ -1189,7 +1191,60 @@
             background: rgba(120, 53, 15, 0.4);
             border-color: rgba(245, 158, 11, 0.5);
         }
-        /* Analytics Evolvement section */
+
+        @media (max-width: 639px) {
+            .i4l-diagram-stage {
+                width: 100%;
+                max-width: 100%;
+                aspect-ratio: 480 / 360;
+                overflow: hidden;
+            }
+
+            .i4l-node {
+                width: 4.75rem !important;
+            }
+
+            .i4l-node-icon {
+                width: 3.5rem;
+                height: 3.5rem;
+                border-radius: 0.9rem;
+            }
+
+            .i4l-node-icon-aps {
+                width: 4rem;
+                height: 4rem;
+                border-radius: 1.1rem;
+            }
+
+            .i4l-node-labels {
+                min-height: 1.35rem;
+                margin-top: 0.35rem;
+            }
+
+            .i4l-node-labels span:last-child {
+                display: none;
+            }
+
+            .i4l-node-labels > span:first-child {
+                font-size: 0.58rem;
+                letter-spacing: 0.04em;
+            }
+
+            .i4l-flow-tag {
+                font-size: 0.5rem;
+                letter-spacing: 0.03em;
+                padding: 0.16rem 0.4rem;
+                max-width: 42vw;
+                white-space: normal;
+                line-height: 1.1;
+                text-align: center;
+            }
+
+            .i4l-flow-tag-recording {
+                top: 72% !important;
+                max-width: 9rem;
+            }
+        }
         .aa-maturity-chart {
             position: relative;
             overflow: hidden;
@@ -1218,6 +1273,22 @@
 
         .aa-maturity-arrow-line {
             stroke-linecap: round;
+        }
+
+        .aa-maturity-bar-label {
+            display: block;
+            width: 100%;
+            text-align: center;
+            line-height: 1.15;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 767px) {
+            .aa-maturity-bar-label {
+                font-size: 0.5rem;
+                letter-spacing: 0.02em;
+                padding: 0 1px;
+            }
         }
 
         .aa-bar {
@@ -1260,7 +1331,7 @@
         }
 
         .aa-band-label-info {
-            color: #fde68a;
+            color: #d97706;
         }
 
         .dark .aa-band-label-info {
@@ -2068,10 +2139,10 @@
                     analytics_band_models: "Models & Optimization",
                     analytics_source_note: "Framework inspired by Gartner Analytics Evolvement models",
                     analytics_levels: [
-                        { id: 'descriptive', name: 'Descriptive', question: 'What happened?', desc: 'Summarize historical performance with dashboards, KPIs and standard reports.', focus: 'Visibility & record-keeping', band: 'information', operartis: 'Baseline visibility across ERP, inventory and production records.' },
-                        { id: 'diagnostic', name: 'Diagnostic', question: 'Why did it happen?', desc: 'Drill down, root-cause analysis and variance explanations across operations.', focus: 'Understanding drivers', band: 'information', operartis: 'ABC-XYZ segmentation, deviation analysis and bottleneck identification.' },
-                        { id: 'predictive', name: 'Predictive', question: 'What will happen?', desc: 'Forecast demand, capacity and risk using statistical and machine-learning models.', focus: 'Forward-looking insight', band: 'models', operartis: 'ML forecasting, simulation and multi-scenario planning engines.' },
-                        { id: 'prescriptive', name: 'Prescriptive', question: 'What should we do?', desc: 'Recommend optimized decisions — from guided decision support to automated planning.', focus: 'Optimized action', band: 'models', operartis: 'APS scheduling, VRP, lot-sizing and network optimization modules.' },
+                        { id: 'descriptive', name: 'Descriptive', chartName: 'Desc.', question: 'What happened?', desc: 'Summarize historical performance with dashboards, KPIs and standard reports.', focus: 'Visibility & record-keeping', band: 'information', operartis: 'Baseline visibility across ERP, inventory and production records.' },
+                        { id: 'diagnostic', name: 'Diagnostic', chartName: 'Diag.', question: 'Why did it happen?', desc: 'Drill down, root-cause analysis and variance explanations across operations.', focus: 'Understanding drivers', band: 'information', operartis: 'ABC-XYZ segmentation, deviation analysis and bottleneck identification.' },
+                        { id: 'predictive', name: 'Predictive', chartName: 'Pred.', question: 'What will happen?', desc: 'Forecast demand, capacity and risk using statistical and machine-learning models.', focus: 'Forward-looking insight', band: 'models', operartis: 'ML forecasting, simulation and multi-scenario planning engines.' },
+                        { id: 'prescriptive', name: 'Prescriptive', chartName: 'Presc.', question: 'What should we do?', desc: 'Recommend optimized decisions — from guided decision support to automated planning.', focus: 'Optimized action', band: 'models', operartis: 'APS scheduling, VRP, lot-sizing and network optimization modules.' },
                     ],
                     analytics_pipeline_title: "From Data to Outcomes",
                     analytics_pipeline_desc: "As Analytics Evolvement rises, required human input tapers while models drive decisions closer to execution.",
@@ -2110,7 +2181,7 @@
                     or_process_model_world: "Model world",
                     or_process_real_world: "Real world",
                     or_process_tap_hint: "Click a step to explore",
-                    or_process_loop_label: "Iterative optimization cycle",
+                    or_process_loop_label: "APS - Iterative cycle",
                     or_process_steps: [
                         { id: 'problem', label: 'Problem', desc: 'Framing your business challenge — capacity, cost, service level or network design — and define measurable objectives together.' },
                         { id: 'data', label: 'Data', desc: 'Consolidating ERP, MES and external data into a reliable foundation for modeling and validation.' },
@@ -2355,10 +2426,10 @@
                     analytics_band_models: "Mô hình & Tối ưu",
                     analytics_source_note: "Khung tham chiếu theo mô hình Sự phát triển của Phân tích dữ liệu của Gartner",
                     analytics_levels: [
-                        { id: 'descriptive', name: 'Mô tả', question: 'Chuyện gì đã xảy ra?', desc: 'Nắm bắt lịch sử hiệu suất công việc, KPI và các báo cáo được chuẩn hoá.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
-                        { id: 'diagnostic', name: 'Chẩn đoán', question: 'Vì sao nó xảy ra?', desc: 'Đi sâu chi tiết, phân tích nguyên nhân gốc rễ và giải thích sự khác nhau.', focus: 'Hiểu nguyên nhân', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
-                        { id: 'predictive', name: 'Dự báo', question: 'Điều gì sẽ xảy ra?', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Dự báo tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
-                        { id: 'prescriptive', name: 'Đề xuất', question: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hỗ trợ đưa ra quyết định', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
+                        { id: 'descriptive', name: 'Mô tả', chartName: 'Mô tả', question: 'Chuyện gì đã xảy ra?', desc: 'Nắm bắt lịch sử hiệu suất công việc, KPI và các báo cáo được chuẩn hoá.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
+                        { id: 'diagnostic', name: 'Chẩn đoán', chartName: 'C.Đoán', question: 'Vì sao nó xảy ra?', desc: 'Đi sâu chi tiết, phân tích nguyên nhân gốc rễ và giải thích sự khác nhau.', focus: 'Hiểu nguyên nhân', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
+                        { id: 'predictive', name: 'Dự báo', chartName: 'Dự báo', question: 'Điều gì sẽ xảy ra?', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Dự báo tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
+                        { id: 'prescriptive', name: 'Đề xuất', chartName: 'Đề xuất', question: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hỗ trợ đưa ra quyết định', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
                     ],
                     analytics_pipeline_title: "Từ Dữ liệu đến Kết quả",
                     analytics_pipeline_desc: "Khi Sự phát triển của Phân tích dữ liệu tăng, sự can thiệp bởi con người giảm dần trong khi mô hình hỗ trợ quyết định tăng lên.",
@@ -2397,7 +2468,7 @@
                     or_process_model_world: "Thế giới mô hình",
                     or_process_real_world: "Thế giới thực",
                     or_process_tap_hint: "Nhấn vào bước để xem chi tiết",
-                    or_process_loop_label: "Vòng lặp tối ưu lặp lại",
+                    or_process_loop_label: "Vòng lặp triển khai APS",
                     or_process_steps: [
                         { id: 'problem', label: 'Vấn đề', desc: 'Xác định vấn đề — năng lực sản xuất, chi phí sản xuất, mức dịch vụ hay thiết kế mạng lưới cung ứng — và đặt mục tiêu đo lường.' },
                         { id: 'data', label: 'Dữ liệu', desc: 'Củng cố dữ liệu ERP, MES và nguồn bên ngoài thành nền tảng dữ liệu cần thiết cho bước mô hình hóa.' },
@@ -2642,10 +2713,10 @@
                     analytics_band_models: "Modelle & Optimierung",
                     analytics_source_note: "Rahmenwerk inspiriert von Gartner Analytics-Reifegradmodellen",
                     analytics_levels: [
-                        { id: 'descriptive', name: 'Deskriptiv', question: 'Was ist passiert?', desc: 'Historische Leistung mit Dashboards, KPIs und Standardberichten zusammenfassen.', focus: 'Transparenz & Dokumentation', band: 'information', operartis: 'Grundlegende Transparenz über ERP-, Bestands- und Produktionsdaten.' },
-                        { id: 'diagnostic', name: 'Diagnostisch', question: 'Warum ist es passiert?', desc: 'Drill-down, Ursachenanalyse und Abweichungserklärungen im Betrieb.', focus: 'Treiber verstehen', band: 'information', operartis: 'ABC-XYZ-Segmentierung, Abweichungsanalyse und Engpassidentifikation.' },
-                        { id: 'predictive', name: 'Prädiktiv', question: 'Was wird passieren?', desc: 'Nachfrage, Kapazität und Risiko mit statistischen und ML-Modellen prognostizieren.', focus: 'Vorausschauende Erkenntnis', band: 'models', operartis: 'ML-Prognose, Simulation und Multi-Szenario-Planungs-Engines.' },
-                        { id: 'prescriptive', name: 'Präskriptiv', question: 'Was sollten wir tun?', desc: 'Optimierte Entscheidungen empfehlen — von Entscheidungsunterstützung bis automatisierte Planung.', focus: 'Optimiertes Handeln', band: 'models', operartis: 'APS-Terminierung, VRP, Losgrößen- und Netzwerkoptimierungsmodule.' },
+                        { id: 'descriptive', name: 'Deskriptiv', chartName: 'Deskr.', question: 'Was ist passiert?', desc: 'Historische Leistung mit Dashboards, KPIs und Standardberichten zusammenfassen.', focus: 'Transparenz & Dokumentation', band: 'information', operartis: 'Grundlegende Transparenz über ERP-, Bestands- und Produktionsdaten.' },
+                        { id: 'diagnostic', name: 'Diagnostisch', chartName: 'Diagn.', question: 'Warum ist es passiert?', desc: 'Drill-down, Ursachenanalyse und Abweichungserklärungen im Betrieb.', focus: 'Treiber verstehen', band: 'information', operartis: 'ABC-XYZ-Segmentierung, Abweichungsanalyse und Engpassidentifikation.' },
+                        { id: 'predictive', name: 'Prädiktiv', chartName: 'Präd.', question: 'Was wird passieren?', desc: 'Nachfrage, Kapazität und Risiko mit statistischen und ML-Modellen prognostizieren.', focus: 'Vorausschauende Erkenntnis', band: 'models', operartis: 'ML-Prognose, Simulation und Multi-Szenario-Planungs-Engines.' },
+                        { id: 'prescriptive', name: 'Präskriptiv', chartName: 'Präskr.', question: 'Was sollten wir tun?', desc: 'Optimierte Entscheidungen empfehlen — von Entscheidungsunterstützung bis automatisierte Planung.', focus: 'Optimiertes Handeln', band: 'models', operartis: 'APS-Terminierung, VRP, Losgrößen- und Netzwerkoptimierungsmodule.' },
                     ],
                     analytics_pipeline_title: "Von Daten zu Ergebnissen",
                     analytics_pipeline_desc: "Mit steigender Analytics-Reife nimmt der menschliche Aufwand ab, während Modelle Entscheidungen näher an die Ausführung bringen.",
@@ -3473,23 +3544,25 @@
                         </div>
 
                         <div className="relative sc-flow-scroll -mx-1 px-1 pb-3">
-                            <div className="relative min-w-[920px] md:min-w-0 pt-12 md:pt-14 pb-14 md:pb-16 overflow-visible" ref={flowTrackRef}>
-                                <SCSkipRouteLayer skipRoutes={skipRoutes} trackW={trackW} trackH={trackH} />
-                                <SCDemandLoopLayer route={demandLoop} trackW={trackW} label={content.ui.sc_demand_label} />
+                            <div className="relative w-full pt-6 md:pt-14 pb-6 md:pb-16 overflow-visible" ref={flowTrackRef}>
+                                <div className="hidden md:contents">
+                                    <SCSkipRouteLayer skipRoutes={skipRoutes} trackW={trackW} trackH={trackH} />
+                                    <SCDemandLoopLayer route={demandLoop} trackW={trackW} label={content.ui.sc_demand_label} />
 
-                                <div className="absolute inset-0 pointer-events-none z-[5]" aria-hidden="true">
-                                    {connectorSegments.map((seg, i) => (
-                                        <SCConnectorSegment
-                                            key={i}
-                                            seg={seg}
-                                            index={i}
-                                            isPast={i < activeIdx}
-                                            isActive={i === activeIdx}
-                                        />
-                                    ))}
+                                    <div className="absolute inset-0 pointer-events-none z-[5]" aria-hidden="true">
+                                        {connectorSegments.map((seg, i) => (
+                                            <SCConnectorSegment
+                                                key={i}
+                                                seg={seg}
+                                                index={i}
+                                                isPast={i < activeIdx}
+                                                isActive={i === activeIdx}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
 
-                                <div ref={gridRef} className="relative z-10 grid grid-cols-6 gap-2 md:gap-3 min-h-[152px] md:min-h-[164px] items-start">
+                                <div ref={gridRef} className="relative z-10 grid grid-cols-3 md:grid-cols-6 gap-1 sm:gap-2 md:gap-3 min-h-0 md:min-h-[164px] items-start">
                                     {steps.map((step, idx) => {
                                         const Icon = SC_STEP_ICONS[idx];
                                         const isActive = idx === activeIdx;
@@ -3501,24 +3574,24 @@
                                                 type="button"
                                                 data-sc-node
                                                 onClick={() => setActiveIdx(idx)}
-                                                className={`group relative flex flex-col items-center text-center rounded-2xl p-2 md:p-3 pb-3 transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60 ${isActive ? 'opacity-100' : 'hover:opacity-100 opacity-90'}`}
+                                                className={`group relative flex flex-col items-center text-center rounded-xl md:rounded-2xl p-1.5 sm:p-2 md:p-3 pb-2 md:pb-3 transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60 ${isActive ? 'opacity-100' : 'hover:opacity-100 opacity-90'}`}
                                                 aria-pressed={isActive}
                                                 aria-label={step.label}
                                             >
                                                 {isActive && (
-                                                    <span className="absolute inset-x-2 top-2 bottom-7 rounded-2xl sc-pulse-ring sc-pulse-ring-gold pointer-events-none" />
+                                                    <span className="absolute inset-x-1 top-1 bottom-6 md:inset-x-2 md:top-2 md:bottom-7 rounded-xl md:rounded-2xl sc-pulse-ring sc-pulse-ring-gold pointer-events-none" />
                                                 )}
 
-                                                <div data-sc-icon className={`relative z-10 flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-2xl border transition-all duration-500 ${scNodeGlassClass(isActive, isPast)} ${isActive ? 'sc-node-active scale-105' : 'group-hover:border-brand-gold/25 group-hover:scale-[1.02]'}`}>
+                                                <div data-sc-icon className={`relative z-10 flex h-11 w-11 sm:h-12 sm:w-12 md:h-16 md:w-16 items-center justify-center rounded-xl md:rounded-2xl border transition-all duration-500 ${scNodeGlassClass(isActive, isPast)} ${isActive ? 'sc-node-active scale-105' : 'group-hover:border-brand-gold/25 group-hover:scale-[1.02]'}`}>
                                                     <span className={`transition-transform duration-500 ${isActive ? 'scale-110' : ''}`}>
                                                         <Icon />
                                                     </span>
                                                 </div>
 
-                                                <span className={`mt-2 text-[10px] md:text-xs font-bold uppercase tracking-wide transition-colors ${isActive ? 'text-brand-gold' : isPast ? 'text-amber-700/80 dark:text-amber-200/80' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                <span className={`mt-1.5 md:mt-2 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wide leading-tight line-clamp-2 transition-colors ${isActive ? 'text-brand-gold' : isPast ? 'text-amber-700/80 dark:text-amber-200/80' : 'text-slate-600 dark:text-slate-300'}`}>
                                                     {step.label}
                                                 </span>
-                                                <span className={`mt-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border transition-colors ${isActive ? 'text-brand-gold border-brand-gold/25 bg-brand-gold/8' : isPast ? 'text-amber-700/70 dark:text-amber-200/70 border-brand-gold/15 bg-brand-gold/5' : 'text-slate-400 border-slate-200/60 dark:border-slate-700/60'}`}>
+                                                <span className={`mt-0.5 text-[7px] sm:text-[9px] font-mono font-semibold uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full border transition-colors ${isActive ? 'text-brand-gold border-brand-gold/25 bg-brand-gold/8' : isPast ? 'text-amber-700/70 dark:text-amber-200/70 border-brand-gold/15 bg-brand-gold/5' : 'text-slate-400 border-slate-200/60 dark:border-slate-700/60'}`}>
                                                     {step.tag}
                                                 </span>
                                             </button>
@@ -3645,7 +3718,7 @@
             return (
                 <div
                     className={`i4l-node pointer-events-none${isAps && apsVisible ? ' i4l-node-pop' : ''}`}
-                    style={{ left: `${layout.left}%`, top: `${layout.top}%`, width: layout.width || 118 }}
+                    style={{ left: `${layout.left}%`, top: `${layout.top}%` }}
                     aria-hidden="true"
                 >
                     <div className={`i4l-node-icon ${isAps ? 'i4l-node-icon-aps' : ''} ${isGhost ? 'i4l-node-icon-ghost' : ''} ${highlighted && !isGhost ? 'i4l-node-icon-active' : ''}`}>
@@ -3745,9 +3818,9 @@
                             </div>
                         </div>
 
-                        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-6 md:gap-8 items-stretch">
+                        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-6 md:gap-8 items-stretch min-w-0">
                             <div
-                                className="group relative rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm px-3 pt-5 pb-4 md:px-5 md:pt-6 md:pb-5 flex flex-col cursor-pointer transition-colors hover:border-brand-gold/30"
+                                className="group relative min-w-0 overflow-hidden rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm px-2 sm:px-3 pt-4 sm:pt-5 pb-3 sm:pb-4 md:px-5 md:pt-6 md:pb-5 flex flex-col cursor-pointer transition-colors hover:border-brand-gold/30"
                                 onClick={togglePhase}
                                 onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePhase(); } }}
                                 role="button"
@@ -3758,8 +3831,8 @@
                                     <span className="text-right text-[8px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{ui.i4l_tap_hint}</span>
                                 </div>
 
-                                <div className="flex-1 flex items-center justify-center">
-                                    <div className="i4l-diagram-stage select-none">
+                                <div className="flex-1 flex items-center justify-center min-w-0 w-full">
+                                    <div className="i4l-diagram-stage select-none w-full">
                                         <svg viewBox="0 0 480 320" className="i4l-diagram-svg" aria-hidden="true">
                                             <defs>
                                                 <marker id="i4l-arrow-gold" viewBox="0 0 6 6" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="userSpaceOnUse">
@@ -3797,7 +3870,7 @@
                                         {I4L_FLOW_TAGS.filter(tag => apsVisible || !tag.apsOnly).map(tag => (
                                             <span
                                                 key={tag.key}
-                                                className={`i4l-flow-tag i4l-phase-layer ${tag.gold ? 'i4l-flow-tag-gold' : ''}${apsVisible ? '' : ' i4l-phase-hidden'}`}
+                                                className={`i4l-flow-tag i4l-phase-layer ${tag.key === 'i4l_flow_recording' ? 'i4l-flow-tag-recording' : ''} ${tag.gold ? 'i4l-flow-tag-gold' : ''}${apsVisible ? '' : ' i4l-phase-hidden'}`}
                                                 style={{ left: tag.left, top: tag.top }}
                                             >
                                                 {ui[tag.key]}
@@ -3821,7 +3894,7 @@
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-3 md:gap-4 h-full min-h-0">
+                            <div className="flex flex-col gap-3 md:gap-4 h-full min-h-0 min-w-0">
                                 <div className={`relative shrink-0 rounded-xl border px-4 py-3 md:px-5 md:py-4 min-h-[9.5rem] md:min-h-[10rem] transition-colors duration-700 ${apsVisible ? 'border-brand-gold/40 bg-brand-gold/5 dark:bg-brand-gold/10' : 'border-rose-200/70 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-950/20'}`}>
                                     <div className={`i4l-phase-layer${apsVisible ? ' i4l-phase-hidden' : ''}`}>
                                         <span className="inline-flex text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 text-rose-600 dark:text-rose-400 bg-rose-100/80 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-800/60">
@@ -4094,7 +4167,7 @@
                                 <button type="button" onClick={onExplore} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-gold text-white text-sm font-bold shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all">
                                     {content.ui.cta_explore} <ArrowRightIcon />
                                 </button>
-                                <button type="button" onClick={onWhy} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold hover:border-brand-gold hover:text-brand-gold transition-colors">
+                                <button type="button" onClick={onWhy} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold transition-all duration-200 hover:border-brand-gold hover:text-brand-gold hover:bg-brand-gold/5 dark:hover:border-brand-gold dark:hover:text-brand-gold dark:hover:bg-brand-gold/10">
                                     {content.ui.cta_why}
                                 </button>
                             </div>
@@ -4206,19 +4279,10 @@
 
         // Journey strip — connected horizon timeline (INFORM/Zentio process narrative)
         const JourneyStrip = ({ content, horizons, onNav }) => {
-            const [highlightIdx, setHighlightIdx] = useState(0);
-            const [paused, setPaused] = useState(false);
-
-            useEffect(() => {
-                if (paused) return undefined;
-                const timer = setInterval(() => {
-                    setHighlightIdx(prev => (prev + 1) % horizons.length);
-                }, 3800);
-                return () => clearInterval(timer);
-            }, [paused, horizons.length]);
+            const [selectedIdx, setSelectedIdx] = useState(-1);
 
             return (
-                <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+                <div>
                     <div className="max-w-2xl mb-8">
                         <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{content.ui.journey_eyebrow}</p>
                         <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-3">{content.ui.journey_title}</h2>
@@ -4226,24 +4290,24 @@
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {horizons.map((h, i) => {
-                            const isActive = i === highlightIdx;
+                            const isSelected = i === selectedIdx;
                             return (
                                 <button
                                     key={h.id}
                                     type="button"
                                     onClick={() => {
-                                        setHighlightIdx(i);
+                                        setSelectedIdx(i);
                                         onNav(h.id);
                                     }}
-                                    className={`relative z-10 text-left rounded-2xl border p-5 bg-white/90 dark:bg-slate-900/70 backdrop-blur-md transition-all duration-500 hover:-translate-y-1 ${isActive ? 'border-brand-gold/50 ring-1 ring-brand-gold/20 shadow-lg' : 'border-slate-200/80 dark:border-white/5 hover:border-brand-gold/30'}`}
-                                    aria-pressed={isActive}
+                                    className={`group relative z-10 text-left rounded-2xl border p-5 bg-white/90 dark:bg-slate-900/70 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.02] hover:border-brand-gold/55 hover:ring-2 hover:ring-brand-gold/25 hover:shadow-xl hover:shadow-brand-gold/10 ${isSelected ? 'border-brand-gold/50 ring-2 ring-brand-gold/20 shadow-lg shadow-brand-gold/5' : 'border-slate-200/80 dark:border-white/5'}`}
+                                    aria-pressed={isSelected}
                                 >
                                     <div className="flex items-center gap-3 mb-3">
-                                        <span className={`flex h-9 w-9 items-center justify-center rounded-full font-mono font-bold text-sm shrink-0 transition-colors duration-500 ${isActive ? 'bg-brand-gold text-white' : 'bg-brand-gold/10 text-brand-gold'}`}>{i + 1}</span>
-                                        <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">{h.subtitle}</span>
+                                        <span className={`flex h-9 w-9 items-center justify-center rounded-full font-mono font-bold text-sm shrink-0 transition-all duration-300 ${isSelected ? 'bg-brand-gold text-white shadow-md shadow-brand-gold/30' : 'bg-brand-gold/10 text-brand-gold group-hover:bg-brand-gold group-hover:text-white group-hover:shadow-md group-hover:shadow-brand-gold/25'}`}>{i + 1}</span>
+                                        <span className="text-[10px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 transition-colors duration-300 group-hover:text-slate-800 dark:group-hover:text-slate-300">{h.subtitle}</span>
                                     </div>
-                                    <h3 className={`font-bold text-sm mb-1 transition-colors duration-500 ${isActive ? 'text-brand-gold dark:text-amber-400' : 'text-slate-900 dark:text-white'}`}>{h.title}</h3>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-gold/80">
+                                    <h3 className={`font-bold text-sm mb-1 transition-colors duration-300 ${isSelected ? 'text-brand-gold dark:text-amber-400' : 'text-slate-900 dark:text-white group-hover:text-brand-gold dark:group-hover:text-amber-400'}`}>{h.title}</h3>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-gold/80 transition-colors duration-300 group-hover:text-brand-gold">
                                         {h.blocks.length} {content.ui.modules}
                                     </span>
                                 </button>
@@ -4569,7 +4633,7 @@
                             <Reveal>
                                 <div className="flex items-center gap-3 mb-4">
                                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-gold/10 text-brand-gold font-mono font-black">{index + 1}</span>
-                                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">{horizon.subtitle}</span>
+                                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400">{horizon.subtitle}</span>
                                 </div>
                                 <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">{horizon.title}</h2>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5">{horizon.definition}</p>
@@ -5086,7 +5150,7 @@
                         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 md:p-6 mb-4 md:mb-5 flex justify-center">
                             <div className="flex items-stretch gap-1 md:gap-2 w-full max-w-[34rem] sm:max-w-[36rem] md:max-w-[38rem]">
                                 <div className="aa-maturity-axis-y-wrap shrink-0 w-6 md:w-8 h-52 md:h-60">
-                                    <span className="aa-maturity-axis-y text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{ui.analytics_axis_value} ↑</span>
+                                    <span className="aa-maturity-axis-y text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{ui.analytics_axis_value} →</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div ref={chartRef} className="aa-maturity-chart relative h-52 md:h-60 border-l border-b border-slate-300 dark:border-slate-600">
@@ -5120,13 +5184,13 @@
                                             </div>
                                             <div />
                                         </div>
-                                        <div className="absolute inset-0 z-[2] grid grid-cols-4 items-stretch gap-2 sm:gap-3 px-3 sm:px-4 pb-1 pt-8">
+                                        <div className="absolute inset-0 z-[2] grid grid-cols-4 items-stretch gap-1 sm:gap-2 md:gap-3 px-2 sm:px-3 md:px-4 pb-1 pt-8">
                                             {levels.map((level, i) => {
                                                 const meta = ANALYTICS_LEVEL_META[i];
                                                 return (
                                                     <div
                                                         key={level.id}
-                                                        className="flex h-full flex-col items-center justify-end w-full max-w-[5rem] mx-auto min-w-0 gap-2"
+                                                        className="flex h-full flex-col items-center justify-end w-full min-w-0 max-w-none md:max-w-[5rem] mx-auto gap-1 sm:gap-2"
                                                     >
                                                         <div className="flex flex-1 w-full min-h-0 items-end">
                                                             <div
@@ -5135,7 +5199,10 @@
                                                                 style={{ height: `${meta.barH}%` }}
                                                             />
                                                         </div>
-                                                        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-center leading-tight w-full text-slate-600 dark:text-slate-400">{level.name}</span>
+                                                        <span className="aa-maturity-bar-label shrink-0 text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-[0.03em] md:tracking-wide text-slate-600 dark:text-slate-400" title={level.name}>
+                                                            <span className="md:hidden">{level.chartName || level.name}</span>
+                                                            <span className="hidden md:inline">{level.name}</span>
+                                                        </span>
                                                     </div>
                                                 );
                                             })}
