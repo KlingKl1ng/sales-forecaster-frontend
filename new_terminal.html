@@ -648,8 +648,12 @@
 
         /* Supply chain flow diagram */
         @keyframes sc-flow-dash {
+            from {
+                stroke-dashoffset: 0;
+            }
+
             to {
-                stroke-dashoffset: -22;
+                stroke-dashoffset: -9;
             }
         }
 
@@ -808,6 +812,14 @@
 
         .sc-flow-skip-path {
             transition: d 0.35s ease;
+        }
+
+        .sc-demand-loop-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
 
         /* ERP · APS · MES integration loop */
@@ -2138,6 +2150,7 @@
                     sc_eyebrow: "End-to-End Supply Chain",
                     sc_title: "From Raw Materials to End Customer",
                     sc_live: "Live flow",
+                    sc_demand_label: "Demand",
                     sc_steps: [
                         { id: 'procurement', label: 'Procurement', tag: 'Source', desc: 'Strategic sourcing, supplier selection, purchase orders, inbound quality checks, and raw-material staging before production.' },
                         { id: 'production', label: 'Production', tag: 'Make', desc: 'Factory planning, MRP/MPS, shop-floor scheduling, assembly lines, quality control, and finished-goods output.' },
@@ -2404,6 +2417,7 @@
                     sc_eyebrow: "Chuỗi cung ứng toàn trình",
                     sc_title: "Từ nguyên vật liệu đến khách hàng cuối",
                     sc_live: "Luồng trực tiếp",
+                    sc_demand_label: "Nhu cầu",
                     sc_steps: [
                         { id: 'procurement', label: 'Mua hàng', tag: 'Nguồn', desc: 'Tìm nguồn cung, lựa chọn nhà cung cấp, đặt hàng, kiểm tra chất lượng đầu vào và chuẩn bị nguyên liệu trước sản xuất.' },
                         { id: 'production', label: 'Sản xuất', tag: 'Sản xuất', desc: 'Hoạch định nhà máy, MRP/MPS, lịch xưởng, dây chuyền lắp ráp, kiểm soát chất lượng và thành phẩm.' },
@@ -2670,6 +2684,7 @@
                     sc_eyebrow: "End-to-End-Lieferkette",
                     sc_title: "Von Rohmaterial bis Endkunde",
                     sc_live: "Live-Fluss",
+                    sc_demand_label: "Nachfrage",
                     sc_steps: [
                         { id: 'procurement', label: 'Beschaffung', tag: 'Bezug', desc: 'Strategischer Einkauf, Lieferantenauswahl, Bestellungen, Wareneingangsprüfung und Materialbereitstellung vor der Produktion.' },
                         { id: 'production', label: 'Produktion', tag: 'Fertigung', desc: 'Werkplanung, MRP/MPS, Feinplanung, Montagelinien, Qualitätskontrolle und Fertigwarenausgang.' },
@@ -3169,10 +3184,62 @@
             );
         };
 
+        // Shared styling for skip routes and demand loop
+        const SC_ROUTE_STROKE = 'rgba(148,163,184,0.55)';
+        const SC_ROUTE_STROKE_WIDTH = 1.75;
+
+        // Closed-loop demand signal: End Customers → Procurement
+        const SC_DEMAND_LOOP = { from: 5, to: 0 };
+
+        const SCDemandLoopLayer = ({ route, trackW, label }) => {
+            if (!route || !trackW) return null;
+            const { x1, y1, x2, y2, loopY } = route;
+            const ah = SC_FLOW_ARROW_HALF;
+            const rise = SC_FLOW_ARROW_RISE;
+            const svgHeight = loopY + 10;
+            const lineProps = {
+                stroke: SC_ROUTE_STROKE,
+                strokeWidth: SC_ROUTE_STROKE_WIDTH,
+                strokeLinecap: 'round',
+                className: 'sc-flow-arrow',
+                vectorEffect: 'non-scaling-stroke',
+            };
+            const arrowBaseY = y2 + rise;
+            const labelX = (x1 + x2) / 2;
+            const labelY = loopY - 7;
+
+            return (
+                <svg
+                    className="absolute left-0 top-0 pointer-events-none z-[3] overflow-visible"
+                    style={{ width: trackW, height: svgHeight }}
+                    width={trackW}
+                    height={svgHeight}
+                    viewBox={`0 0 ${trackW} ${svgHeight}`}
+                    role="img"
+                    aria-label={label ? `${label} — closed-loop demand signal` : undefined}
+                >
+                    <g className="sc-flow-skip-path">
+                        <line x1={x1} y1={y1} x2={x1} y2={loopY} {...lineProps} />
+                        <line x1={x1} y1={loopY} x2={x2} y2={loopY} {...lineProps} />
+                        <line x1={x2} y1={loopY} x2={x2} y2={arrowBaseY} {...lineProps} />
+                        <polygon
+                            points={`${x2 - ah},${arrowBaseY} ${x2 + ah},${arrowBaseY} ${x2},${y2}`}
+                            fill={SC_ROUTE_STROKE}
+                        />
+                    </g>
+                    {label && (
+                        <text x={labelX} y={labelY} textAnchor="middle" className="sc-demand-loop-label" fill={SC_ROUTE_STROKE}>
+                            {label}
+                        </text>
+                    )}
+                </svg>
+            );
+        };
+
         const SCSkipRouteLayer = ({ skipRoutes, trackW, trackH }) => {
             if (!skipRoutes?.length || !trackW || !trackH) return null;
-            const stroke = 'rgba(148,163,184,0.55)';
-            const strokeWidth = 1.75;
+            const stroke = SC_ROUTE_STROKE;
+            const strokeWidth = SC_ROUTE_STROKE_WIDTH;
             const arrowClass = 'sc-flow-arrow';
 
             let viewMinY = 0;
@@ -3274,9 +3341,28 @@
                     return { x1, y1, x2, y2, routeY, arrowT };
                 }).filter(Boolean);
 
+                const nodes = grid.querySelectorAll('[data-sc-node]');
+                let demandLoop = null;
+                if (nodes.length > SC_DEMAND_LOOP.from && nodes[SC_DEMAND_LOOP.to]) {
+                    const fromNode = nodes[SC_DEMAND_LOOP.from].getBoundingClientRect();
+                    const toNode = nodes[SC_DEMAND_LOOP.to].getBoundingClientRect();
+                    const x1 = ((fromNode.left + fromNode.right) / 2) - trackRect.left;
+                    const y1 = fromNode.bottom - trackRect.top;
+                    const x2 = ((toNode.left + toNode.right) / 2) - trackRect.left;
+                    const y2 = toNode.bottom - trackRect.top;
+                    let maxBottom = 0;
+                    nodes.forEach((node) => {
+                        const rect = node.getBoundingClientRect();
+                        maxBottom = Math.max(maxBottom, rect.bottom - trackRect.top);
+                    });
+                    const loopY = maxBottom + 22;
+                    demandLoop = { x1, y1, x2, y2, loopY };
+                }
+
                 setConnectorGeom({
                     segments,
                     skipRoutes,
+                    demandLoop,
                     trackW: trackRect.width,
                     trackH: track.offsetHeight,
                 });
@@ -3316,6 +3402,7 @@
 
             const connectorSegments = connectorGeom?.segments || [];
             const skipRoutes = connectorGeom?.skipRoutes || [];
+            const demandLoop = connectorGeom?.demandLoop || null;
             const trackW = connectorGeom?.trackW || 0;
             const trackH = connectorGeom?.trackH || 0;
 
@@ -3344,8 +3431,9 @@
                         </div>
 
                         <div className="relative sc-flow-scroll -mx-1 px-1 pb-3">
-                            <div className="relative min-w-[920px] md:min-w-0 pt-12 md:pt-14 overflow-visible" ref={flowTrackRef}>
+                            <div className="relative min-w-[920px] md:min-w-0 pt-12 md:pt-14 pb-14 md:pb-16 overflow-visible" ref={flowTrackRef}>
                                 <SCSkipRouteLayer skipRoutes={skipRoutes} trackW={trackW} trackH={trackH} />
+                                <SCDemandLoopLayer route={demandLoop} trackW={trackW} label={content.ui.sc_demand_label} />
 
                                 <div className="absolute inset-0 pointer-events-none z-[5]" aria-hidden="true">
                                     {connectorSegments.map((seg, i) => (
@@ -3369,6 +3457,7 @@
                                             <button
                                                 key={step.id}
                                                 type="button"
+                                                data-sc-node
                                                 onClick={() => setActiveIdx(idx)}
                                                 className={`group relative flex flex-col items-center text-center rounded-2xl p-2 md:p-3 pb-3 transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60 ${isActive ? 'opacity-100' : 'hover:opacity-100 opacity-90'}`}
                                                 aria-pressed={isActive}
