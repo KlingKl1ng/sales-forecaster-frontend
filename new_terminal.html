@@ -1511,8 +1511,12 @@
 
         .aa-flow-stage-title {
             height: auto;
+            min-height: 2.36em;
             min-width: 0;
-            overflow: visible;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
             line-height: 1.18;
             overflow-wrap: break-word;
             word-break: normal;
@@ -1657,11 +1661,19 @@
             }
 
             .aa-flow-stage {
+                display: grid;
+                grid-template-rows: 3.35rem minmax(0, 1fr);
+                row-gap: 0.75rem;
                 min-height: 8.5rem;
             }
 
+            .aa-flow-stage-head {
+                margin-bottom: 0;
+                min-height: 3.35rem;
+            }
+
             .aa-flow-stage-title {
-                min-height: 0;
+                min-height: 2.36em;
             }
 
             .aa-flow-stage-body {
@@ -3527,8 +3539,8 @@
                     <div className="w-full px-4 sm:px-5 md:px-6 py-4 md:py-5 relative">
                         <div className="mb-4 md:mb-5">
                             <div>
-                                <p className="text-[10px] font-bold uppercase section-eyebrow text-brand-gold mb-1">{content.ui.sc_eyebrow}</p>
-                                <h2 className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight">{content.ui.sc_title}</h2>
+                                <p className="text-xs md:text-sm font-bold uppercase section-eyebrow text-brand-gold mb-1.5 tracking-wider">{content.ui.sc_eyebrow}</p>
+                                <h2 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">{content.ui.sc_title}</h2>
                             </div>
                         </div>
 
@@ -3789,8 +3801,8 @@
                     <div className="w-full px-4 sm:px-5 md:px-6 py-4 md:py-5 relative">
                         <div className="flex flex-wrap items-end justify-between gap-3 mb-5 md:mb-6">
                             <div>
-                                <p className="text-[10px] font-bold uppercase section-eyebrow text-brand-gold mb-1">{ui.i4l_eyebrow}</p>
-                                <h2 className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight">{ui.i4l_title}</h2>
+                                <p className="text-xs md:text-sm font-bold uppercase section-eyebrow text-brand-gold mb-1.5 tracking-wider">{ui.i4l_eyebrow}</p>
+                                <h2 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">{ui.i4l_title}</h2>
                             </div>
                             <div className="flex items-center gap-2">
                                 {[0, 1].map(i => (
@@ -4751,7 +4763,7 @@
 
                     <div className="w-full px-4 sm:px-5 md:px-6 py-5 md:py-6 relative">
                         <div className="mb-6 md:mb-8 max-w-3xl">
-                            <p className="text-[10px] font-bold uppercase section-eyebrow text-brand-gold mb-2">{ui.or_process_eyebrow}</p>
+                            <p className="text-xs md:text-sm font-bold uppercase section-eyebrow text-brand-gold mb-2 tracking-wider">{ui.or_process_eyebrow}</p>
                             <h2 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight mb-3">{ui.or_process_title}</h2>
                             <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed">{ui.or_process_subtitle}</p>
                         </div>
@@ -4990,7 +5002,7 @@
                     <div className="w-full px-4 sm:px-5 md:px-6 py-5 md:py-6 relative">
                         <div className="flex flex-wrap items-end justify-between gap-3 mb-6 md:mb-8">
                             <div className="max-w-2xl">
-                                <p className="text-[10px] font-bold uppercase section-eyebrow text-brand-gold mb-1">{ui.analytics_eyebrow}</p>
+                                <p className="text-xs md:text-sm font-bold uppercase section-eyebrow text-brand-gold mb-1.5 tracking-wider">{ui.analytics_eyebrow}</p>
                                 <h2 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight mb-2">{ui.analytics_title}</h2>
                                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{ui.analytics_subtitle}</p>
                             </div>
