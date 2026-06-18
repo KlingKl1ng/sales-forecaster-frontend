@@ -1295,7 +1295,7 @@
 
         .aa-maturity-arrow-svg {
             pointer-events: none;
-            z-index: 1;
+            z-index: 3;
         }
 
         .aa-maturity-arrow-line {
@@ -5066,26 +5066,6 @@
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div ref={chartRef} className="aa-maturity-chart relative h-52 md:h-60 border-l border-b border-slate-300 dark:border-slate-600">
-                                        {arrowLine && (
-                                            <svg className="aa-maturity-arrow-svg absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                                                <defs>
-                                                    <marker id="aa-maturity-arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                                                        <path d="M0,0 L8,4 L0,8 Z" fill="#f59e0b" />
-                                                    </marker>
-                                                </defs>
-                                                <line
-                                                    className="aa-maturity-arrow-line"
-                                                    x1={arrowLine.x1}
-                                                    y1={arrowLine.y1}
-                                                    x2={arrowLine.x2}
-                                                    y2={arrowLine.y2}
-                                                    stroke="#f59e0b"
-                                                    strokeWidth="2"
-                                                    markerEnd="url(#aa-maturity-arrowhead)"
-                                                    vectorEffect="non-scaling-stroke"
-                                                />
-                                            </svg>
-                                        )}
                                         <div className="absolute top-3 left-0 right-0 z-[2] grid grid-cols-4 gap-2 sm:gap-3 px-3 sm:px-4 pointer-events-none">
                                             <div className="relative h-4">
                                                 <span className="aa-band-label-info absolute right-0 top-0 translate-x-1/2 whitespace-nowrap text-[8px] font-bold uppercase tracking-wider">{ui.analytics_band_information}</span>
@@ -5119,6 +5099,26 @@
                                                 );
                                             })}
                                         </div>
+                                        {arrowLine && (
+                                            <svg className="aa-maturity-arrow-svg absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                                                <defs>
+                                                    <marker id="aa-maturity-arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                                                        <path d="M0,0 L8,4 L0,8 Z" fill="#f59e0b" />
+                                                    </marker>
+                                                </defs>
+                                                <line
+                                                    className="aa-maturity-arrow-line"
+                                                    x1={arrowLine.x1}
+                                                    y1={arrowLine.y1}
+                                                    x2={arrowLine.x2}
+                                                    y2={arrowLine.y2}
+                                                    stroke="#f59e0b"
+                                                    strokeWidth="2"
+                                                    markerEnd="url(#aa-maturity-arrowhead)"
+                                                    vectorEffect="non-scaling-stroke"
+                                                />
+                                            </svg>
+                                        )}
                                     </div>
                                     <p className="text-center mt-2">
                                         <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{ui.analytics_axis_complexity} →</span>
