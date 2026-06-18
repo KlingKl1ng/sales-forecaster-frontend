@@ -728,15 +728,15 @@
         .opus-metrics-glass {
             position: relative;
             overflow: hidden;
-            background: transparent;
-            border-color: rgba(148, 163, 184, 0.26);
+            background: rgba(255, 255, 255, 0.28);
+            border-color: rgba(148, 163, 184, 0.24);
             backdrop-filter: blur(18px) saturate(1.06);
             -webkit-backdrop-filter: blur(18px) saturate(1.06);
             box-shadow:
-                0 0 0 1px rgba(255, 255, 255, 0.18),
-                0 14px 34px rgba(15, 23, 42, 0.035),
-                inset 0 1px 0 rgba(255, 255, 255, 0.28),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+                0 0 0 1px rgba(255, 255, 255, 0.28),
+                0 14px 34px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.36),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.07);
         }
 
         .opus-metrics-glass::before {
@@ -745,8 +745,8 @@
             inset: 1px;
             border-radius: inherit;
             background:
-                radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.16), transparent 62%),
-                linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.025) 54%, rgba(245, 158, 11, 0.018));
+                radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.3), transparent 62%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 54%, rgba(245, 158, 11, 0.025));
             pointer-events: none;
         }
 
@@ -757,7 +757,7 @@
             border-radius: inherit;
             padding: 1px;
             background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(245, 158, 11, 0.32) 38%, rgba(14, 165, 233, 0.16) 66%, rgba(15, 23, 42, 0.16));
+                linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(245, 158, 11, 0.24) 42%, rgba(148, 163, 184, 0.16) 100%);
             -webkit-mask:
                 linear-gradient(#000 0 0) content-box,
                 linear-gradient(#000 0 0);
@@ -1189,7 +1189,7 @@
             background: rgba(120, 53, 15, 0.4);
             border-color: rgba(245, 158, 11, 0.5);
         }
-        /* Analytics maturity section */
+        /* Analytics Evolvement section */
         .aa-maturity-chart {
             position: relative;
             overflow: hidden;
@@ -2047,14 +2047,14 @@
                         { title: "Privacy Policy", text: "Your operational data stays protected. Operartis applies strict confidentiality, least-privilege access, and transparent handling — so responsible privacy becomes a trust advantage in every partnership." }
                     ],
                     invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
-                    analytics_eyebrow: "Analytics Maturity",
+                    analytics_eyebrow: "Analytics Evolvement",
                     analytics_title: "Four Levels of Analytics",
                     analytics_subtitle: "Each step increases business value and problem complexity — shifting from retrospective information to forward-looking models that guide optimized action.",
                     analytics_axis_value: "Business Value",
                     analytics_axis_complexity: "Problem Complexity",
                     analytics_band_information: "Information",
                     analytics_band_models: "Models & Optimization",
-                    analytics_source_note: "Framework inspired by Gartner analytics maturity models",
+                    analytics_source_note: "Framework inspired by Gartner Analytics Evolvement models",
                     analytics_levels: [
                         { id: 'descriptive', name: 'Descriptive', question: 'What happened?', desc: 'Summarize historical performance with dashboards, KPIs and standard reports.', focus: 'Visibility & record-keeping', band: 'information', operartis: 'Baseline visibility across ERP, inventory and production records.' },
                         { id: 'diagnostic', name: 'Diagnostic', question: 'Why did it happen?', desc: 'Drill down, root-cause analysis and variance explanations across operations.', focus: 'Understanding drivers', band: 'information', operartis: 'ABC-XYZ segmentation, deviation analysis and bottleneck identification.' },
@@ -2062,8 +2062,8 @@
                         { id: 'prescriptive', name: 'Prescriptive', question: 'What should we do?', desc: 'Recommend optimized decisions — from guided decision support to automated planning.', focus: 'Optimized action', band: 'models', operartis: 'APS scheduling, VRP, lot-sizing and network optimization modules.' },
                     ],
                     analytics_pipeline_title: "From Data to Outcomes",
-                    analytics_pipeline_desc: "As analytics maturity rises, required human input tapers while models drive decisions closer to execution.",
-                    analytics_sources: ["Enterprise Systems", "IoT & Shopfloor", "External Data"],
+                    analytics_pipeline_desc: "As Analytics Evolvement rises, required human input tapers while models drive decisions closer to execution.",
+                    analytics_sources: ["ERP", "MES", "External Data"],
                     analytics_raw_data: "Raw Data",
                     analytics_human_input: "Human Input",
                     analytics_human_input_short: "Human",
@@ -2080,7 +2080,7 @@
                     analytics_data_foundation: "Data Foundation",
                     analytics_data_foundation_desc: "Every analytics journey starts with consolidated data from core systems, shopfloor signals and external context.",
                     analytics_active_flow: "Analytics to Outcomes",
-                    analytics_active_flow_desc: "Follow one maturity level at a time — see how insight moves through human judgment into business results.",
+                    analytics_active_flow_desc: "Follow one analytic level at a time — see how insight moves through human judgment into business results.",
                     analytics_stage_analytics: "Analytics",
                     analytics_human_vs_model: "Human vs Model",
                     analytics_model_driven: "Model-driven",
@@ -2092,7 +2092,7 @@
                     analytics_operartis_title: "Where Operartis Creates Value",
                     analytics_operartis_desc: "Operartis bridges diagnostic visibility with predictive and prescriptive APS — turning ERP and MES data into optimized plans, simulations and decision support.",
                     analytics_tap_hint: "Select a level to explore",
-                    or_process_eyebrow: "OR Analytics Process",
+                    or_process_eyebrow: "Analytics Process",
                     or_process_title: "Build Your Own APS — Together With Operartis",
                     or_process_subtitle: "Want to build your own APS system or optimized scenario-based solution with Operartis? Here is how we work together to reach your purpose.",
                     or_process_model_world: "Model world",
@@ -2100,14 +2100,14 @@
                     or_process_tap_hint: "Click a step to explore",
                     or_process_loop_label: "Iterative optimization cycle",
                     or_process_steps: [
-                        { id: 'problem', label: 'Problem', desc: 'We frame your business challenge — capacity, cost, service level or network design — and define measurable objectives together.' },
-                        { id: 'data', label: 'Data', desc: 'We consolidate ERP, MES and external data into a reliable foundation for modeling and validation.' },
-                        { id: 'model', label: 'Model', desc: 'We translate your operations into a mathematical model that reflects real constraints, flows and decision logic.' },
-                        { id: 'algorithm', label: 'Algorithm', desc: 'We select and implement optimization or simulation methods suited to your problem structure and scale.' },
-                        { id: 'prototype', label: 'Prototype', desc: 'We build a working prototype so planners can test scenarios before full-scale rollout.' },
-                        { id: 'solution', label: 'Solution', desc: 'We deliver optimized plans, schedules or network designs ready for operational use.' },
-                        { id: 'plausibility', label: 'Plausibility', desc: 'We validate outcomes with your teams — checking feasibility, assumptions and business sense against reality.' },
-                        { id: 'deployment', label: 'Deployment', desc: 'We integrate the solution into your APS landscape, train users and establish a continuous improvement loop.' },
+                        { id: 'problem', label: 'Problem', desc: 'Framing your business challenge — capacity, cost, service level or network design — and define measurable objectives together.' },
+                        { id: 'data', label: 'Data', desc: 'Consolidating ERP, MES and external data into a reliable foundation for modeling and validation.' },
+                        { id: 'model', label: 'Model', desc: 'Translating your operational challenge into a mathematical model that reflects real constraints, flows and decision logic.' },
+                        { id: 'algorithm', label: 'Algorithm', desc: 'Selecting and implementing optimization or simulation methods suited to your problem structure and scale.' },
+                        { id: 'prototype', label: 'Prototype', desc: 'Building a working prototype so planners can test scenarios before full-scale rollout.' },
+                        { id: 'solution', label: 'Solution', desc: 'Delivering optimized plans, schedules or network designs ready for operational use.' },
+                        { id: 'plausibility', label: 'Plausibility', desc: 'Validating outcomes with your teams — checking feasibility, assumptions and business sense against reality.' },
+                        { id: 'deployment', label: 'Deployment', desc: 'Integrating the solution into your APS landscape, train users and establish a continuous improvement loop.' },
                     ],
                     footer_privacy: "Privacy Policy",
                     footer_imprint: "Imprint",
@@ -2120,7 +2120,7 @@
                     stat_horizons: "Planning Horizons",
                     stat_blocks: "Module Blocks",
                     stat_engines: "Optimization Engines",
-                    journey_eyebrow: "How the matrix fits together",
+                    journey_eyebrow: "How the APS matrix fits together",
                     journey_title: "From strategy to the shop floor",
                     journey_desc: "Every Operartis module maps to a planning horizon — connecting long-range network design down to real-time execution in one continuous decision chain.",
                     platform_eyebrow: "The APS Platform",
@@ -2212,7 +2212,7 @@
                     },
                     {
                         id: 'tactical', title: 'Tactical', subtitle: 'Months to Weeks',
-                        definition: 'Tactical planning (6-18 months) translates strategic goals into executable plans. It balances supply and demand through master production scheduling, inventory policy setting, and workforce capacity management to optimize resource utilization.',
+                        definition: 'Tactical planning (6-18 months) translates strategic goals into executable plans. Balancing supply and demand through master production scheduling, inventory policy setting, and workforce capacity management to optimize resource utilization.',
                         blocks: [
                             {
                                 name: 'Demand Planning & Forecasting',
@@ -2334,23 +2334,23 @@
                         { title: "Chính sách Bảo mật", text: "Dữ liệu vận hành của bạn được bảo vệ nghiêm ngặt. Operartis áp dụng bảo mật thông tin, quyền truy cập tối thiểu và xử lý minh bạch — biến quyền riêng tư thành lợi thế tin cậy trong mọi quan hệ đối tác." }
                     ],
                     invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
-                    analytics_eyebrow: "Trưởng thành Phân tích",
+                    analytics_eyebrow: "Sự phát triển của Phân tích dữ liệu",
                     analytics_title: "Bốn Cấp độ Phân tích Dữ liệu",
-                    analytics_subtitle: "Mỗi bước tăng giá trị kinh doanh và độ phức tạp bài toán — chuyển từ thông tin hồi cố sang mô hình hướng tới tối ưu hành động.",
+                    analytics_subtitle: "Mỗi bước tăng giá trị kinh doanh và độ phức tạp vấn đề — chuyển từ thông tin hồi cố sang mô hình hướng tới tối ưu hành động.",
                     analytics_axis_value: "Giá trị Kinh doanh",
-                    analytics_axis_complexity: "Độ phức tạp Bài toán",
+                    analytics_axis_complexity: "Độ phức tạp Vấn đề",
                     analytics_band_information: "Thông tin",
                     analytics_band_models: "Mô hình & Tối ưu",
-                    analytics_source_note: "Khung tham chiếu theo mô hình trưởng thành phân tích của Gartner",
+                    analytics_source_note: "Khung tham chiếu theo mô hình Sự phát triển của Phân tích dữ liệu của Gartner",
                     analytics_levels: [
-                        { id: 'descriptive', name: 'Mô tả', question: 'Chuyện gì đã xảy ra?', desc: 'Tổng hợp hiệu suất lịch sử qua dashboard, KPI và báo cáo chuẩn.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
-                        { id: 'diagnostic', name: 'Chẩn đoán', question: 'Vì sao nó xảy ra?', desc: 'Khoan sâu, phân tích nguyên nhân gốc và giải thích chênh lệch vận hành.', focus: 'Hiểu drivers', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
-                        { id: 'predictive', name: 'Dự báo', question: 'Điều gì sẽ xảy ra?', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Insight hướng tới tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
-                        { id: 'prescriptive', name: 'Khuyến nghị', question: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hành động tối ưu', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
+                        { id: 'descriptive', name: 'Mô tả', question: 'Chuyện gì đã xảy ra?', desc: 'Tổng hợp lịch sử hiệu suất công việc qua dashboard, KPI và các báo cáo được chuẩn hoá.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
+                        { id: 'diagnostic', name: 'Chẩn đoán', question: 'Vì sao nó xảy ra?', desc: 'Đi sâu chi tiết, phân tích nguyên nhân gốc rễ và giải thích sự khác nhau.', focus: 'Hiểu nguyên nhân', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
+                        { id: 'predictive', name: 'Dự báo', question: 'Điều gì sẽ xảy ra?', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Dự báo tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
+                        { id: 'prescriptive', name: 'Đề xuất', question: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hỗ trợ đưa ra quyết định', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
                     ],
                     analytics_pipeline_title: "Từ Dữ liệu đến Kết quả",
-                    analytics_pipeline_desc: "Khi trưởng thành phân tích tăng, nhu cầu con người giảm dần trong khi mô hình dẫn quyết định gần hơn tới thực thi.",
-                    analytics_sources: ["Hệ thống Doanh nghiệp", "IoT & Shopfloor", "Dữ liệu Bên ngoài"],
+                    analytics_pipeline_desc: "Khi Sự phát triển của Phân tích dữ liệu tăng, sự can thiệp bởi con người giảm dần trong khi mô hình hỗ trợ quyết định tăng lên.",
+                    analytics_sources: ["ERP", "MES", "Dữ liệu Bên ngoài"],
                     analytics_raw_data: "Dữ liệu Thô",
                     analytics_human_input: "Đầu vào Con người",
                     analytics_human_input_short: "Người",
@@ -2358,43 +2358,43 @@
                     analytics_decision_type: "Loại quyết định",
                     analytics_action: "Hành động",
                     analytics_results: "Kết quả",
-                    analytics_decision_types: ["Xem báo cáo", "Rà soát nguyên nhân", "Theo dự báo", "Khuyến nghị tối ưu"],
+                    analytics_decision_types: ["Xem xét báo cáo", "Phân tích nguyên nhân", "Thực hiện dự báo", "Đề xuất tối ưu"],
                     analytics_prescriptive_support: "Hỗ trợ Quyết định",
                     analytics_prescriptive_support_short: "Hỗ trợ",
                     analytics_prescriptive_auto: "Tự động Quyết định",
                     analytics_prescriptive_auto_short: "Tự động",
                     analytics_feedback: "Phản hồi & Học liên tục",
                     analytics_data_foundation: "Nền tảng Dữ liệu",
-                    analytics_data_foundation_desc: "Mọi hành trình phân tích bắt đầu từ dữ liệu hợp nhất từ hệ thống lõi, tín hiệu shopfloor và bối cảnh bên ngoài.",
+                    analytics_data_foundation_desc: "Mọi hành trình phân tích bắt đầu từ dữ liệu hợp nhất từ hệ thống quản trị nguồn lực (ERP), quản lý sản xuất (MES) và bối cảnh bên ngoài.",
                     analytics_active_flow: "Phân tích đến Kết quả",
-                    analytics_active_flow_desc: "Theo dõi từng cấp độ trưởng thành — xem insight đi qua phán đoán con người tới kết quả kinh doanh.",
+                    analytics_active_flow_desc: "Theo dõi từng cấp độ phân tích — quan sát chi tiết thay đổi của sự can thiệp của con người tới kết quả kinh doanh.",
                     analytics_stage_analytics: "Phân tích",
                     analytics_human_vs_model: "Con người vs Mô hình",
                     analytics_model_driven: "Do mô hình dẫn",
                     analytics_model_driven_short: "Mô hình",
                     analytics_maturity_comparison: "Đầu vào Con người theo Trưởng thành",
                     analytics_maturity_comparison_desc: "Trưởng thành cao hơn chuyển nỗ lực từ diễn giải thủ công sang tối ưu tự động.",
-                    analytics_prescriptive_paths: "Hướng khuyến nghị",
+                    analytics_prescriptive_paths: "Hướng đề xuất",
                     analytics_flow_bypassed: "Tự động",
                     analytics_operartis_title: "Operartis Tạo Giá trị Ở Đâu",
-                    analytics_operartis_desc: "Operartis kết nối tầm nhìn chẩn đoán với APS dự báo và khuyến nghị — biến dữ liệu ERP và MES thành kế hoạch tối ưu, mô phỏng và hỗ trợ quyết định.",
+                    analytics_operartis_desc: "Operartis tập trung vào dự báo và đề xuất quyết định với APS  — biến dữ liệu ERP và MES thành kế hoạch tối ưu, mô phỏng và hỗ trợ việc đưa quyết định cuối cùng.",
                     analytics_tap_hint: "Chọn cấp độ để xem chi tiết",
-                    or_process_eyebrow: "Quy trình Phân tích OR",
+                    or_process_eyebrow: "Quy trình Phân tích",
                     or_process_title: "Xây dựng APS của riêng bạn — Cùng Operartis",
-                    or_process_subtitle: "Muốn xây dựng hệ thống APS hoặc giải pháp kịch bản tối ưu cùng Operartis? Đây là cách chúng tôi phối hợp để đạt mục tiêu của bạn.",
+                    or_process_subtitle: "Xây dựng hệ thống APS riêng biệt hoặc giải pháp tối ưu theo kịch bản cùng Operartis? Đây là quy trình chúng tôi thực hiện để đạt mục tiêu của bạn.",
                     or_process_model_world: "Thế giới mô hình",
                     or_process_real_world: "Thế giới thực",
                     or_process_tap_hint: "Nhấn vào bước để xem chi tiết",
                     or_process_loop_label: "Vòng lặp tối ưu lặp lại",
                     or_process_steps: [
-                        { id: 'problem', label: 'Bài toán', desc: 'Chúng tôi xác định thách thức kinh doanh — năng lực, chi phí, mức dịch vụ hay thiết kế mạng — và cùng đặt mục tiêu đo lường được.' },
-                        { id: 'data', label: 'Dữ liệu', desc: 'Chúng tôi hợp nhất dữ liệu ERP, shopfloor và nguồn bên ngoài thành nền tảng tin cậy cho mô hình hóa.' },
-                        { id: 'model', label: 'Mô hình', desc: 'Chúng tôi chuyển vận hành thực tế thành mô hình toán học phản ánh ràng buộc, luồng và logic quyết định.' },
-                        { id: 'algorithm', label: 'Thuật toán', desc: 'Chúng tôi chọn và triển khai phương pháp tối ưu hoặc mô phỏng phù hợp quy mô và cấu trúc bài toán.' },
-                        { id: 'prototype', label: 'Nguyên mẫu', desc: 'Chúng tôi xây dựng prototype để planner thử nghiệm kịch bản trước khi triển khai rộng.' },
-                        { id: 'solution', label: 'Giải pháp', desc: 'Chúng tôi bàn giao kế hoạch, lịch hoặc thiết kế mạng đã tối ưu, sẵn sàng vận hành.' },
-                        { id: 'plausibility', label: 'Hợp lý', desc: 'Chúng tôi xác thực kết quả với đội ngũ của bạn — kiểm tra tính khả thi và giả định so với thực tế.' },
-                        { id: 'deployment', label: 'Triển khai', desc: 'Chúng tôi tích hợp giải pháp vào hệ sinh thái APS, đào tạo người dùng và thiết lập vòng cải tiến liên tục.' },
+                        { id: 'problem', label: 'Vấn đề', desc: 'Xác định vấn đề — năng lực sản xuất, chi phí sản xuất, mức dịch vụ hay thiết kế mạng lưới cung ứng — và đặt mục tiêu đo lường.' },
+                        { id: 'data', label: 'Dữ liệu', desc: 'Củng cố dữ liệu ERP, MES và nguồn bên ngoài thành nền tảng dữ liệu cần thiết cho bước mô hình hóa.' },
+                        { id: 'model', label: 'Mô hình', desc: 'Chuyển vấn đề thực tế thành mô hình tối ưu hoá toán học phản ánh ràng buộc, điều kiện và logic thực tế.' },
+                        { id: 'algorithm', label: 'Thuật toán', desc: 'Xây dựng và phát triển thuật toán tối ưu hoặc mô phỏng phù hợp quy mô và cấu trúc vấn đề.' },
+                        { id: 'prototype', label: 'Nguyên mẫu', desc: 'Dựng prototype để để thử nghiệm kịch bản trước khi triển khai rộng.' },
+                        { id: 'solution', label: 'Giải pháp', desc: 'Bàn giao kế hoạch, lịch trình hoặc thiết kế mạng lưới đã tối ưu, sẵn sàng vận hành.' },
+                        { id: 'plausibility', label: 'Hợp lý', desc: 'Kiểm định kết quả với đội ngũ của bạn — kiểm tra tính khả thi và giả định so với thực tế.' },
+                        { id: 'deployment', label: 'Triển khai', desc: 'Tích hợp giải pháp vào hệ thống APS xây dựng riêng cho bạn. Đào tạo và hướng dẫn sử dụng. Thiết lập vòng cải tiến liên tục.' },
                     ],
                     footer_privacy: "Chính sách bảo mật",
                     footer_imprint: "Thông tin pháp lý",
@@ -2407,8 +2407,8 @@
                     stat_horizons: "Khung Hoạch Định",
                     stat_blocks: "Khối Chức Năng",
                     stat_engines: "Công Cụ Tối Ưu",
-                    journey_eyebrow: "Cách ma trận kết nối với nhau",
-                    journey_title: "Từ chiến lược đến sàn sản xuất",
+                    journey_eyebrow: "Cách ma trận APS kết nối",
+                    journey_title: "Từ chiến lược tổng thể đến sản xuất chi tiết",
                     journey_desc: "Mỗi mô-đun Operartis tương ứng với một khung hoạch định — kết nối từ thiết kế mạng lưới dài hạn đến thực thi thời gian thực trong một chuỗi quyết định liền mạch.",
                     platform_eyebrow: "Nền Tảng APS",
                     platform_title: "Chọn một khối chức năng",
@@ -2499,7 +2499,7 @@
                     },
                     {
                         id: 'tactical', title: 'Chiến Thuật', subtitle: 'Tháng đến Tuần',
-                        definition: 'Hoạch định chiến thuật (6-18 tháng) chuyển đổi mục tiêu chiến lược thành kế hoạch khả thi. Nó cân đối cung cầu thông qua lịch trình sản xuất chính, thiết lập chính sách tồn kho và quản lý năng lực nhân sự để tối ưu hóa sử dụng tài nguyên.',
+                        definition: 'Hoạch định chiến thuật (6-18 tháng) chuyển đổi mục tiêu chiến lược thành kế hoạch khả thi. Cân đối cung cầu thông qua lịch trình sản xuất chính, thiết lập chính sách tồn kho và quản lý năng lực nhân sự để tối ưu hóa sử dụng tài nguyên.',
                         blocks: [
                             {
                                 name: 'Hoạch Định & Dự Báo Nhu Cầu',
@@ -2526,7 +2526,7 @@
                     },
                     {
                         id: 'operational', title: 'Vận Hành', subtitle: 'Tuần đến Giờ',
-                        definition: 'Hoạch định vận hành tập trung vào thực thi ngắn hạn (ngày đến tuần) và đáp ứng đơn hàng ngay lập tức. Bao gồm lịch trình chi tiết, định tuyến xe và kiểm soát xưởng để đáp ứng yêu cầu cụ thể của khách hàng trong các ràng buộc cố định.',
+                        definition: 'Hoạch định vận hành tập trung vào thực thi ngắn hạn (ngày đến tuần) và đáp ứng đơn hàng ngay lập tức. Bao gồm lịch trình chi tiết, định tuyến xe và kiểm soát sản xuất để đáp ứng yêu cầu cụ thể của khách hàng trong các ràng buộc cố định.',
                         blocks: [
                             {
                                 name: 'Hoạch Định Sản Xuất & Lịch Trình Chi Tiết',
@@ -4176,7 +4176,7 @@
 
         // Metrics band — Zentio "measurable impact" strip
         const MetricsBand = ({ content, stats }) => (
-            <div className="opus-metrics-glass rounded-3xl border border-white/35 dark:border-white/[0.06] ring-1 ring-white/15 dark:ring-white/[0.04] p-8 md:p-10">
+            <div className="opus-metrics-glass rounded-3xl border border-transparent dark:border-white/[0.06] ring-0 dark:ring-1 dark:ring-white/[0.04] p-8 md:p-10">
                 <div className="relative z-[1] text-center max-w-2xl mx-auto mb-8">
                     <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{content.ui.metrics_eyebrow}</p>
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{content.ui.metrics_title}</h2>

@@ -541,26 +541,97 @@
                 inset 0 -1px 0 0 rgba(255, 255, 255, 0.04);
         }
 
-        .stats-liquid-glass {
+        .opus-metrics-glass {
             position: relative;
-            isolation: isolate;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.28);
+            border-color: rgba(148, 163, 184, 0.24);
+            backdrop-filter: blur(18px) saturate(1.06);
+            -webkit-backdrop-filter: blur(18px) saturate(1.06);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.28),
+                0 14px 34px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.36),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.07);
         }
 
-        .stats-liquid-cell {
-            position: relative;
-            background: transparent;
-            box-shadow:
-                inset 1px 0 0 rgba(255, 255, 255, 0.16),
-                inset -1px 0 0 rgba(15, 23, 42, 0.04),
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        .opus-metrics-glass::before {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background:
+                radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.3), transparent 62%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 54%, rgba(245, 158, 11, 0.025));
+            pointer-events: none;
         }
 
-        .dark .stats-liquid-cell {
+        .opus-metrics-glass::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(245, 158, 11, 0.24) 42%, rgba(148, 163, 184, 0.16) 100%);
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .dark .opus-metrics-glass {
             background: transparent;
+            border-color: rgba(245, 158, 11, 0.2);
             box-shadow:
-                inset 1px 0 0 rgba(255, 255, 255, 0.08),
-                inset -1px 0 0 rgba(255, 255, 255, 0.035),
-                inset 0 1px 0 rgba(255, 255, 255, 0.035);
+                0 0 0 1px rgba(245, 158, 11, 0.12),
+                0 14px 34px rgba(0, 0, 0, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.055),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.012);
+        }
+
+        .dark .opus-metrics-glass::before {
+            background:
+                radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.028), transparent 64%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.008) 56%, rgba(245, 158, 11, 0.012));
+        }
+
+        .dark .opus-metrics-glass::after {
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(245, 158, 11, 0.48) 40%, rgba(56, 189, 248, 0.14) 70%, rgba(255, 255, 255, 0.1));
+        }
+
+        .opus-metrics-stat {
+            position: relative;
+        }
+
+        .opus-metrics-stat::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 2px;
+            background:
+                linear-gradient(to bottom, transparent, rgba(148, 163, 184, 0.34) 18%, rgba(245, 158, 11, 0.18) 50%, rgba(148, 163, 184, 0.34) 82%, transparent);
+            box-shadow:
+                0 0 14px rgba(245, 158, 11, 0.08),
+                1px 0 0 rgba(255, 255, 255, 0.16);
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .opus-metrics-stat:not(:first-child)::before {
+                display: block;
+            }
+        }
+
+        .dark .opus-metrics-stat::before {
+            background:
+                linear-gradient(to bottom, transparent, rgba(148, 163, 184, 0.16) 18%, rgba(245, 158, 11, 0.26) 50%, rgba(148, 163, 184, 0.16) 82%, transparent);
+            box-shadow:
+                0 0 14px rgba(245, 158, 11, 0.14),
+                1px 0 0 rgba(255, 255, 255, 0.06);
         }
 
         .section-eyebrow {
@@ -3914,9 +3985,9 @@
             ];
 
             return (
-                <div className="hero-liquid-glass stats-liquid-glass grid grid-cols-2 lg:grid-cols-4 gap-0 rounded-2xl sm:rounded-3xl overflow-hidden border border-transparent ring-1 ring-brand-gold/15 dark:ring-white/10 mb-16 md:mb-20">
+                <div className="opus-metrics-glass grid grid-cols-2 lg:grid-cols-4 gap-0 rounded-2xl sm:rounded-3xl overflow-hidden border border-transparent dark:border-white/[0.06] ring-0 dark:ring-1 dark:ring-white/[0.04] mb-16 md:mb-20">
                     {stats.map((stat, i) => (
-                        <div key={i} className="stats-liquid-cell px-5 py-6 md:py-8 text-center">
+                        <div key={i} className="opus-metrics-stat relative z-[1] px-5 py-6 md:py-8 text-center">
                             <div className="text-3xl md:text-4xl font-black font-mono tabular-nums text-transparent bg-clip-text bg-gradient-to-br from-brand-gold via-amber-500 to-brand-dark drop-shadow-sm">
                                 {stat.value}{stat.suffix}
                             </div>
