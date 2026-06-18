@@ -887,8 +887,12 @@
         }
 
         @keyframes i4l-flow-dash {
+            from {
+                stroke-dashoffset: 0;
+            }
+
             to {
-                stroke-dashoffset: -24;
+                stroke-dashoffset: -10;
             }
         }
 
@@ -3654,6 +3658,19 @@
             );
         };
 
+        const renderI4lIndustryTag = (text) => {
+            const highlight = ['Industry 4.0', 'Công nghiệp 4.0'].find((phrase) => text.includes(phrase));
+            if (!highlight) return text;
+            const idx = text.indexOf(highlight);
+            return (
+                <>
+                    {text.slice(0, idx)}
+                    <span className="text-brand-gold font-bold">{highlight}</span>
+                    {text.slice(idx + highlight.length)}
+                </>
+            );
+        };
+
         const SystemIntegrationLoop = ({ content }) => {
             const ui = content.ui;
             const [phase, setPhase] = useState(0);
@@ -3788,7 +3805,7 @@
                                     </div>
                                     <div className={`i4l-phase-layer absolute inset-x-0 top-3 flex flex-col items-center justify-center${apsVisible ? '' : ' i4l-phase-hidden'}`}>
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-brand-gold">{ui.i4l_loop_tagline}</p>
-                                        <p className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{ui.i4l_industry_tag}</p>
+                                        <p className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{renderI4lIndustryTag(ui.i4l_industry_tag)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -3871,10 +3888,6 @@
                                                         </li>
                                                     ))}
                                                 </ul>
-                                            </div>
-                                            <div className="pt-4 mt-4 border-t border-brand-gold/20 flex flex-col gap-1.5">
-                                                <span className="text-xs md:text-sm font-bold uppercase tracking-wider text-brand-gold">{ui.i4l_loop_tagline}</span>
-                                                <span className="text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300 underline decoration-brand-gold/40 underline-offset-2">{ui.i4l_industry_tag}</span>
                                             </div>
                                         </div>
                                     </div>
