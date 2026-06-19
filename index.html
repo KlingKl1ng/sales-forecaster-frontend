@@ -411,17 +411,31 @@
         }
 
         @media (hover: none), (pointer: coarse) {
+            .touch-open-card {
+                touch-action: pan-y;
+            }
+
             .touch-open-card .quick-view-overlay {
-                display: none;
+                display: flex;
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(1rem);
+                transition: opacity 0.3s ease-out, transform 0.3s ease-out;
             }
 
-            .touch-open-card .card-visible-content,
-            .touch-open-card .card-footer-cta {
-                opacity: 1 !important;
-                filter: none !important;
+            .touch-open-card.touch-quickview-active .quick-view-overlay {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0);
             }
 
-            .touch-open-card:active {
+            .touch-open-card.touch-quickview-active .card-visible-content,
+            .touch-open-card.touch-quickview-active .card-footer-cta {
+                opacity: 0.1 !important;
+                filter: blur(2px) !important;
+            }
+
+            .touch-open-card:active:not(.touch-quickview-active) {
                 transform: scale(0.99);
             }
         }
@@ -3152,6 +3166,22 @@
 
         // ModulaBlock — glass app tile with Quick View overlay
         const ModulaBlock = ({ block, content, onClick }) => {
+            const [mobileQuickView, setMobileQuickView] = useState(false);
+            const touchRef = useRef({ startX: 0, startY: 0, startTime: 0, moved: false, longPressTimer: null });
+
+            const LONG_PRESS_MS = 480;
+            const MOVE_THRESHOLD = 10;
+            const SCROLL_SLOP = 24;
+
+            const clearLongPress = useCallback(() => {
+                if (touchRef.current.longPressTimer) {
+                    clearTimeout(touchRef.current.longPressTimer);
+                    touchRef.current.longPressTimer = null;
+                }
+            }, []);
+
+            useEffect(() => () => clearLongPress(), [clearLongPress]);
+
             if (!block) return null;
 
             const rawSubModules = block.subModules;
@@ -3166,9 +3196,69 @@
             const hasLiveModule = subModulesList.some(m => m.status === 'live');
             const liveModules = subModulesList.filter(m => m.status === 'live');
 
+            const isTouchUi = () => window.matchMedia('(hover: none), (pointer: coarse)').matches;
+
+            const handleClick = () => {
+                if (isTouchUi()) return;
+                onClick(block);
+            };
+
+            const handleTouchStart = (e) => {
+                if (!isTouchUi()) return;
+                const t = e.touches[0];
+                touchRef.current.startX = t.clientX;
+                touchRef.current.startY = t.clientY;
+                touchRef.current.startTime = Date.now();
+                touchRef.current.moved = false;
+                clearLongPress();
+                touchRef.current.longPressTimer = setTimeout(() => {
+                    if (!touchRef.current.moved) {
+                        clearLongPress();
+                        setMobileQuickView(false);
+                        onClick(block);
+                    }
+                }, LONG_PRESS_MS);
+            };
+
+            const handleTouchMove = (e) => {
+                if (!isTouchUi()) return;
+                const t = e.touches[0];
+                const dx = t.clientX - touchRef.current.startX;
+                const dy = t.clientY - touchRef.current.startY;
+                const adx = Math.abs(dx);
+                const ady = Math.abs(dy);
+                if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
+
+                touchRef.current.moved = true;
+                clearLongPress();
+
+                if (ady > SCROLL_SLOP && ady > adx * 1.2) {
+                    setMobileQuickView(false);
+                    return;
+                }
+
+                setMobileQuickView(true);
+            };
+
+            const handleTouchEnd = () => {
+                if (!isTouchUi()) return;
+                clearLongPress();
+                if (!touchRef.current.moved && Date.now() - touchRef.current.startTime < LONG_PRESS_MS) {
+                    setMobileQuickView(false);
+                }
+            };
+
+            const handleTouchCancel = () => {
+                clearLongPress();
+            };
+
             return (
                 <div
-                    onClick={() => onClick(block)}
+                    onClick={handleClick}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchCancel={handleTouchCancel}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
@@ -3183,6 +3273,7 @@
                             ? 'bg-gradient-to-br from-brand-gold/5 to-brand-dark/10 shadow-[0_8px_28px_rgba(245,158,11,0.24),0_2px_14px_rgba(180,83,9,0.14),inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[0_8px_32px_rgba(245,158,11,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-1 ring-brand-gold/20 hover:shadow-[0_18px_44px_rgba(245,158,11,0.34),0_6px_22px_rgba(180,83,9,0.2),inset_0_1px_0_0_rgba(255,255,255,0.55)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)]'
                             : 'bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.15)] hover:from-white/30 hover:to-white/10 dark:hover:from-slate-800/50 dark:hover:to-slate-900/30 ring-1 ring-white/30 dark:ring-white/5 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.5)]'}
                         backdrop-blur-xl cursor-pointer overflow-hidden touch-open-card
+                        ${mobileQuickView ? 'touch-quickview-active' : ''}
                         transition-all duration-500 ease-out
                         hover:-translate-y-2 hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60
                         h-full min-h-[132px] sm:min-h-[140px] appearance-3d
