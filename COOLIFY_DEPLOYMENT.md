@@ -34,7 +34,7 @@ ALLOWED_ORIGINS=https://operartis.io,https://www.operartis.io,https://staging.op
 
 ## Root Page
 
-`index.html` redirects `/` to `terminal.html` so the production root opens the Operartis terminal experience.
+`index.html` contains the terminal experience directly so `/` opens Operartis without changing the visible URL to `/terminal.html`.
 
 ## Cutover Checklist
 
