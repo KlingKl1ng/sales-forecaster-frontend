@@ -34,7 +34,7 @@ ALLOWED_ORIGINS=https://operartis.io,https://www.operartis.io,https://staging.op
 
 ## Root Page
 
-`index.html` redirects `/` to `waiting_page.html`, replacing the old Vercel rewrite.
+`index.html` redirects `/` to `terminal.html` so the production root opens the Operartis terminal experience.
 
 ## Cutover Checklist
 
