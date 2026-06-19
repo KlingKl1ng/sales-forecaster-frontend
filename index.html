@@ -416,7 +416,11 @@
             }
 
             .touch-open-card.touch-quickview-active {
-                touch-action: none;
+                touch-action: pan-y;
+            }
+
+            .touch-open-card.touch-quickview-active .quick-view-overlay {
+                touch-action: pan-y;
             }
 
             .touch-open-card .quick-view-scroll {
@@ -3181,24 +3185,12 @@
                 startX: 0,
                 startY: 0,
                 lastY: 0,
-                startTime: 0,
                 moved: false,
-                longPressTimer: null,
                 inQuickViewGesture: false,
             });
 
-            const LONG_PRESS_MS = 480;
             const MOVE_THRESHOLD = 10;
             const SCROLL_SLOP = 24;
-
-            const clearLongPress = useCallback(() => {
-                if (touchRef.current.longPressTimer) {
-                    clearTimeout(touchRef.current.longPressTimer);
-                    touchRef.current.longPressTimer = null;
-                }
-            }, []);
-
-            useEffect(() => () => clearLongPress(), [clearLongPress]);
 
             if (!block) return null;
 
@@ -3237,22 +3229,12 @@
                 touchRef.current.startX = t.clientX;
                 touchRef.current.startY = t.clientY;
                 touchRef.current.lastY = t.clientY;
-                touchRef.current.startTime = Date.now();
                 touchRef.current.moved = false;
                 touchRef.current.inQuickViewGesture = mobileQuickView;
                 if (activeQuickViewBlockId && activeQuickViewBlockId !== blockId) {
                     onQuickViewActive(null);
                     touchRef.current.inQuickViewGesture = false;
                 }
-                clearLongPress();
-                touchRef.current.longPressTimer = setTimeout(() => {
-                    if (!touchRef.current.moved) {
-                        clearLongPress();
-                        closeQuickView();
-                        touchRef.current.inQuickViewGesture = false;
-                        onClick(block);
-                    }
-                }, LONG_PRESS_MS);
             };
 
             const handleTouchMove = (e) => {
@@ -3265,7 +3247,6 @@
                 if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
 
                 touchRef.current.moved = true;
-                clearLongPress();
 
                 const quickViewOpen = touchRef.current.inQuickViewGesture || mobileQuickView;
                 if (quickViewOpen) {
@@ -3278,16 +3259,12 @@
                         if (maxScroll > 0) {
                             scrollEl.scrollTop = Math.max(0, Math.min(maxScroll, nextScroll));
                             e.preventDefault();
-                        } else if (Math.abs(dy) > SCROLL_SLOP && scrollEl.scrollTop === 0) {
-                            closeQuickView();
-                            touchRef.current.inQuickViewGesture = false;
                         }
                     }
                     return;
                 }
 
                 if (ady > SCROLL_SLOP && ady > adx * 1.2) {
-                    closeQuickView();
                     return;
                 }
 
@@ -3297,16 +3274,15 @@
 
             const handleTouchEnd = () => {
                 if (!isTouchUi()) return;
-                clearLongPress();
                 touchRef.current.lastY = 0;
-                if (touchRef.current.inQuickViewGesture || mobileQuickView) return;
-                if (!touchRef.current.moved && Date.now() - touchRef.current.startTime < LONG_PRESS_MS) {
-                    closeQuickView();
+                if (touchRef.current.moved) return;
+                if (!mobileQuickView) {
+                    openQuickView();
                 }
             };
 
             const handleTouchCancel = () => {
-                clearLongPress();
+                touchRef.current.lastY = 0;
             };
 
             return (
@@ -3362,9 +3338,17 @@
                                 <p className="text-xs text-slate-500 dark:text-slate-500 italic">{content?.ui?.no_modules || "No modules"}</p>
                             )}
                         </div>
-                        <div className="mt-3 pt-2 text-[10px] font-bold text-brand-gold flex items-center justify-end border-t border-slate-200 dark:border-slate-800">
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                closeQuickView();
+                                onClick(block);
+                            }}
+                            className="mt-3 pt-2 text-[10px] font-bold text-brand-gold flex items-center justify-end border-t border-slate-200 dark:border-slate-800"
+                        >
                             {content?.ui?.click_to_open || "Open"} <ArrowRightIcon />
-                        </div>
+                        </button>
                     </div>
 
                     <div className="card-visible-content relative z-10 transition-all duration-300 group-hover:opacity-10 group-hover:blur-[2px]">
