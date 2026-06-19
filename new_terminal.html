@@ -2159,7 +2159,7 @@
                 ui: {
                     system_terminal: "System Terminal",
                     status_operational: "SYSTEM OPERATIONAL",
-                    header_title_1: "Advanced Planning &",
+                    header_title_1: "Advanced Planning",
                     header_title_2: "Scheduling System",
                     header_desc: "Turn ERP and shop-floor data into optimized plans — demand, capacity, inventory, and schedules — in one integrated APS platform.",
                     explore: "Explore",
@@ -2427,7 +2427,7 @@
                 ui: {
                     system_terminal: "Bảng Điều Hành Hệ Thống",
                     status_operational: "HỆ THỐNG HOẠT ĐỘNG",
-                    header_title_1: "Hệ Thống Hoạch Định &",
+                    header_title_1: "Hệ thống hoạch định",
                     header_title_2: "Lập Kế Hoạch Nâng Cao",
                     header_desc: "Biến dữ liệu ERP và shop-floor thành kế hoạch tối ưu — nhu cầu, năng lực, tồn kho và lịch sản xuất — trên một nền tảng APS tích hợp.",
                     explore: "Khám Phá",
@@ -2695,7 +2695,7 @@
                 ui: {
                     system_terminal: "Systemterminal",
                     status_operational: "SYSTEM BETRIEBSBEREIT",
-                    header_title_1: "Erweiterte Planungs- &",
+                    header_title_1: "Erweiterte Planungs-",
                     header_title_2: "Terminierungssystem",
                     header_desc: "Verwandeln Sie ERP- und Shopfloor-Daten in optimierte Pläne — Bedarf, Kapazität, Bestand und Terminierung — in einer integrierten APS-Plattform.",
                     explore: "Entdecken",
@@ -4229,8 +4229,15 @@
                 <div className="absolute -top-8 -right-12 h-48 w-48 sm:top-0 sm:right-0 sm:h-72 sm:w-72 bg-gradient-to-bl from-brand-gold/10 to-transparent rounded-full blur-3xl pointer-events-none" />
                 <div className="relative z-10 max-w-3xl">
                     <h1 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.08] sm:leading-[1.1] mb-4 sm:mb-5 break-words">
-                        {content.ui.header_title_1}{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-amber-500 to-brand-dark">{content.ui.header_title_2}</span>
+                        <span className="md:hidden">
+                            <span className="block">{content.ui.header_title_1}</span>
+                            <span className="block">&</span>
+                            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-amber-500 to-brand-dark">{content.ui.header_title_2}</span>
+                        </span>
+                        <span className="hidden md:inline">
+                            {content.ui.header_title_1}{' '}&{' '}
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-amber-500 to-brand-dark">{content.ui.header_title_2}</span>
+                        </span>
                     </h1>
                     <p className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mb-6 sm:mb-8">
                         {content.ui.header_desc}

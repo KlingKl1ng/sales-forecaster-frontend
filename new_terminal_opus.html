@@ -2103,7 +2103,7 @@
                         "solve schedule scenario",
                         "publish optimized plan to execution"
                     ],
-                    header_title_1: "Advanced Planning &",
+                    header_title_1: "Advanced Planning",
                     header_title_2: "Scheduling System",
                     header_desc: "Introducing APS System. An optimization system that transforms ERP and MES data into actionable, optimized plans for the entire supply chain.",
                     explore: "Explore",
@@ -2391,7 +2391,7 @@
                         "thiết lập kế hoạch sản xuất",
                         "thực thi kế hoạch tối ưu"
                     ],
-                    header_title_1: "Hệ Thống Hoạch Định &",
+                    header_title_1: "Hệ thống hoạch định",
                     header_title_2: "Lập Kế Hoạch Nâng Cao",
                     header_desc: "Giới thiệu Hệ thống APS (Advanced Planning & Scheduling). Một hệ thống tối ưu hóa biến dữ liệu ERP và MES thành kế hoạch thực thi tối ưu cho toàn bộ chuỗi cung ứng.",
                     explore: "Khám Phá",
@@ -2679,7 +2679,7 @@
                         "Terminierungsszenario lösen",
                         "Plan an Ausführung senden"
                     ],
-                    header_title_1: "Erweiterte Planungs- &",
+                    header_title_1: "Erweiterte Planungs-",
                     header_title_2: "Terminierungssystem",
                     header_desc: "Verwandeln Sie ERP- und Shopfloor-Daten in optimierte Pläne — Bedarf, Kapazität, Bestand und Terminierung — in einer integrierten APS-Plattform.",
                     explore: "Entdecken",
@@ -4175,15 +4175,22 @@
                     <div className="absolute -bottom-24 right-10 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
 
                     <div className="relative z-10 grid lg:grid-cols-12 gap-8 lg:gap-6 items-center p-8 md:p-12 lg:p-14">
-                        <div className="lg:col-span-7">
+                        <div className="lg:col-span-7 text-center lg:text-left">
                             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-6">
-                                {content.ui.header_title_1}{' '}
-                                <span className="opus-sheen">{content.ui.header_title_2}</span>
+                                <span className="md:hidden">
+                                    <span className="block">{content.ui.header_title_1}</span>
+                                    <span className="block">&</span>
+                                    <span className="block opus-sheen">{content.ui.header_title_2}</span>
+                                </span>
+                                <span className="hidden md:inline">
+                                    {content.ui.header_title_1}{' '}&{' '}
+                                    <span className="opus-sheen">{content.ui.header_title_2}</span>
+                                </span>
                             </h1>
-                            <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl mb-8">
+                            <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
                                 {content.ui.header_desc}
                             </p>
-                            <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
                                 <button type="button" onClick={onExplore} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-gold text-white text-sm font-bold shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all">
                                     {content.ui.cta_explore} <ArrowRightIcon />
                                 </button>
