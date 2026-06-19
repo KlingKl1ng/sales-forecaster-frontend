@@ -1,0 +1,44 @@
+# Coolify Frontend Deployment
+
+## Application
+
+- Type: Static site
+- Base directory: `frontend`
+- Build command: leave empty
+- Output directory: leave empty / root
+- Production domains: `https://operartis.io`, `https://www.operartis.io`
+- Staging domain: `https://staging.operartis.io`
+
+## DNS
+
+Create DNS records pointing to the Hetzner CPX32 public IP:
+
+- `A @`
+- `A www`
+- `A api`
+- Optional: `A staging`
+
+Use `AAAA` records only if IPv6 is configured on the server.
+
+## Backend
+
+Set the backend Coolify domain to:
+
+- `https://api.operartis.io`
+
+Set the backend environment variable if you want to override the default CORS list:
+
+```text
+ALLOWED_ORIGINS=https://operartis.io,https://www.operartis.io,https://staging.operartis.io
+```
+
+## Root Page
+
+`index.html` redirects `/` to `waiting_page.html`, replacing the old Vercel rewrite.
+
+## Cutover Checklist
+
+- Confirm `https://api.operartis.io/` returns the backend health response.
+- Confirm `https://operartis.io/` opens the waiting page.
+- Confirm `forecaster.html`, `mlforecaster.html`, and `inventory.html` call `https://api.operartis.io`.
+- Keep Vercel online for 7 days as rollback, then remove or disable it.
