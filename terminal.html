@@ -5764,7 +5764,11 @@
 
         const App = () => {
             const [theme, setTheme] = useState(() => window.getOperartisTheme());
-            const [lang, setLang] = useState(() => window.getOperartisLang());
+            const [lang, setLang] = useState(() => {
+                if (localStorage.getItem('lang')) return window.getOperartisLang();
+                if (localStorage.getItem('preferredLang') || localStorage.getItem('inv-lang')) return window.getOperartisLang();
+                return 'en';
+            });
             const [selectedBlock, setSelectedBlock] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [navCollapsed, setNavCollapsed] = useState(false);
@@ -5773,6 +5777,28 @@
             const scrollLockRef = useRef(false);
             const scrollEndTimerRef = useRef(null);
             const scrollAnimListenerRef = useRef(null);
+
+            useEffect(() => {
+                if (localStorage.getItem('lang')) return;
+                if (localStorage.getItem('preferredLang') || localStorage.getItem('inv-lang')) return;
+
+                const detectLanguage = async () => {
+                    try {
+                        const response = await fetch('https://ipapi.co/json/');
+                        if (response.ok) {
+                            const data = await response.json();
+                            const detectedLang = data.country_code === 'VN' ? 'vi' : 'en';
+                            setLang(detectedLang);
+                            window.persistOperartisLang(detectedLang);
+                        } else {
+                            window.persistOperartisLang('en');
+                        }
+                    } catch (error) {
+                        window.persistOperartisLang('en');
+                    }
+                };
+                detectLanguage();
+            }, []);
 
             // Derived Content
             const content = TRANSLATIONS[lang] || TRANSLATIONS.en;
