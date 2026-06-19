@@ -548,6 +548,80 @@
                 radial-gradient(70% 70% at 70% 100%, rgba(180, 83, 9, 0.06), transparent 60%);
         }
 
+        /* Footer — glass band that fades in over the landing canvas */
+        .opus-site-footer {
+            position: relative;
+            overflow-x: hidden;
+            flex-shrink: 0;
+            isolation: isolate;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.2) 0%,
+                rgba(248, 250, 252, 0.52) 32%,
+                rgba(241, 245, 249, 0.76) 100%
+            );
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .dark .opus-site-footer {
+            background: linear-gradient(
+                180deg,
+                rgba(2, 6, 23, 0.12) 0%,
+                rgba(2, 6, 23, 0.5) 28%,
+                rgba(2, 6, 23, 0.76) 100%
+            );
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+        }
+
+        .opus-site-footer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(50% 80% at 8% 100%, rgba(245, 158, 11, 0.12), transparent 68%),
+                radial-gradient(42% 60% at 92% 15%, rgba(14, 165, 233, 0.06), transparent 62%);
+        }
+
+        .opus-site-footer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            pointer-events: none;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(245, 158, 11, 0.42) 22%,
+                rgba(100, 116, 139, 0.5) 50%,
+                rgba(245, 158, 11, 0.35) 78%,
+                transparent 100%
+            );
+        }
+
+        .dark .opus-site-footer::after {
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(245, 158, 11, 0.28) 22%,
+                rgba(148, 163, 184, 0.22) 50%,
+                rgba(245, 158, 11, 0.2) 78%,
+                transparent 100%
+            );
+        }
+
+        .opus-site-footer-divider {
+            border-color: rgb(203 213 225);
+        }
+
+        .dark .opus-site-footer-divider {
+            border-color: rgb(30 41 59);
+        }
+
         /* Animated gold sweep for the hero headline accent */
         @keyframes opusSheen {
             0% { background-position: 0% 50%; }
@@ -2144,6 +2218,7 @@
                         { title: "Privacy Policy", text: "Your operational data stays protected. Operartis applies strict confidentiality, least-privilege access, and transparent handling — so responsible privacy becomes a trust advantage in every partnership." }
                     ],
                     invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
+                    contact_operartis: "Contact Operartis",
                     analytics_eyebrow: "Analytics Evolvement",
                     analytics_title: "Four Levels of Analytics",
                     analytics_subtitle: "Each step increases business value and problem complexity — shifting from retrospective information to forward-looking models that guide optimized action.",
@@ -2209,6 +2284,12 @@
                     footer_privacy: "Privacy Policy",
                     footer_imprint: "Imprint",
                     footer_terms: "Terms of Services",
+                    footer_tagline: "An APS optimization platform that transforms ERP and MES data into actionable plans across the supply chain.",
+                    footer_platform: "Platform",
+                    footer_legal: "Legal",
+                    footer_company: "Company",
+                    footer_modules: "APS Modules",
+                    footer_partner: "Partner with Operartis",
                     cta_explore: "Explore the Platform",
                     cta_why: "Why Operartis",
                     metrics_eyebrow: "Built for measurable impact",
@@ -2432,6 +2513,7 @@
                         { title: "Chính sách Bảo mật", text: "Dữ liệu vận hành của bạn được bảo vệ nghiêm ngặt. Operartis áp dụng bảo mật thông tin, quyền truy cập tối thiểu và xử lý minh bạch — biến quyền riêng tư thành lợi thế tin cậy trong mọi quan hệ đối tác." }
                     ],
                     invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
+                    contact_operartis: "Liên hệ Operartis",
                     analytics_eyebrow: "Sự phát triển của Phân tích dữ liệu",
                     analytics_title: "Bốn Cấp độ Phân tích Dữ liệu",
                     analytics_subtitle: "Mỗi bước tăng giá trị kinh doanh và độ phức tạp vấn đề — chuyển từ thông tin hồi cố sang mô hình hướng tới tối ưu hành động.",
@@ -2497,6 +2579,12 @@
                     footer_privacy: "Chính sách bảo mật",
                     footer_imprint: "Thông tin pháp lý",
                     footer_terms: "Điều khoản dịch vụ",
+                    footer_tagline: "Nền tảng APS tối ưu hoá biến dữ liệu ERP và MES thành kế hoạch thực thi cho toàn bộ chuỗi cung ứng.",
+                    footer_platform: "Nền tảng",
+                    footer_legal: "Pháp lý",
+                    footer_company: "Công ty",
+                    footer_modules: "Mô-đun APS",
+                    footer_partner: "Hợp tác với Operartis",
                     cta_explore: "Khám Phá Nền Tảng",
                     cta_why: "Vì Sao Chọn Operartis",
                     metrics_eyebrow: "Được xây dựng để đo lường tác động",
@@ -2720,6 +2808,7 @@
                         { title: "Datenschutz", text: "Ihre Betriebsdaten bleiben geschützt. Operartis setzt auf strikte Vertraulichkeit, minimalen Zugriff und transparente Handhabung — verantwortungsvoller Datenschutz als Vertrauensvorteil in jeder Partnerschaft." }
                     ],
                     invite_text: "Wir laden Unternehmen ein, die ihre Abläufe transformieren, ihre Supply Chain optimieren und einen Wettbewerbsvorteil aufbauen wollen, mit Operartis zusammenzuarbeiten.",
+                    contact_operartis: "Operartis kontaktieren",
                     analytics_eyebrow: "Analytics-Reifegrad",
                     analytics_title: "Vier Stufen der Analytics",
                     analytics_subtitle: "Jede Stufe steigert den Geschäftsnutzen und die Problemkomplexität — vom rückblickenden Informationszugriff zu vorausschauenden Modellen für optimiertes Handeln.",
@@ -2785,6 +2874,12 @@
                     footer_privacy: "Datenschutz",
                     footer_imprint: "Impressum",
                     footer_terms: "Nutzungsbedingungen",
+                    footer_tagline: "Eine APS-Optimierungsplattform, die ERP- und MES-Daten in umsetzbare Pläne für die Lieferkette verwandelt.",
+                    footer_platform: "Plattform",
+                    footer_legal: "Rechtliches",
+                    footer_company: "Unternehmen",
+                    footer_modules: "APS-Module",
+                    footer_partner: "Partner von Operartis werden",
                     cta_explore: "Plattform entdecken",
                     cta_why: "Warum Operartis",
                     metrics_eyebrow: "Für messbare Wirkung entwickelt",
@@ -5445,10 +5540,110 @@
                     <div className="mt-16 text-center rounded-2xl border border-brand-gold/20 bg-brand-gold/5 p-6 md:p-8">
                         <p className="text-slate-800 dark:text-slate-200 font-medium max-w-2xl mx-auto text-base md:text-lg leading-relaxed">{content.ui.invite_text}</p>
                         <p className="text-brand-gold font-bold uppercase tracking-widest mt-5 text-xs">Let’s optimize today — so you can grow stronger tomorrow.</p>
+                        <a
+                            href="mailto:info@operartis.io"
+                            className="inline-flex items-center justify-center gap-2 mt-6 px-6 py-3 rounded-xl bg-brand-gold text-white text-sm font-bold shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all"
+                        >
+                            {content.ui.contact_operartis}
+                        </a>
                     </div>
                 </Reveal>
             </div>
         );
+
+        const SiteFooter = ({ content, onNav }) => {
+            const ui = content.ui;
+            const year = new Date().getFullYear();
+            const footerLinkClass = 'text-sm text-slate-500 dark:text-slate-400 hover:text-brand-gold transition-colors text-left';
+
+            const platformLinks = [
+                { id: 'supply-chain', label: ui.nav_supply_chain },
+                { id: 'industry-40', label: ui.nav_industry_40 },
+                { id: 'analytics', label: ui.nav_analytics },
+                { id: 'or-process', label: ui.nav_or_process },
+                { id: 'platform', label: ui.footer_modules },
+            ];
+
+            const companyLinks = [
+                { id: 'about', label: ui.nav_about },
+                { id: 'about', label: ui.cta_why },
+            ];
+
+            const legalLinks = [
+                { href: '#about', label: ui.footer_privacy },
+                { href: '#', label: ui.footer_imprint },
+                { href: '#', label: ui.footer_terms },
+            ];
+
+            return (
+                <footer className="opus-site-footer w-full border-t border-slate-300 dark:border-white/10 pt-10 pb-8 pb-[max(2rem,env(safe-area-inset-bottom))] z-10 shrink-0">
+                    <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+                            <div className="sm:col-span-2 lg:col-span-1">
+                                <div className="flex items-center gap-2.5 mb-4">
+                                    <img
+                                        src="./icononly_transparent_nobuffer.png"
+                                        alt=""
+                                        className="h-9 w-9 object-contain"
+                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                    />
+                                    <span className="font-bold text-base tracking-tight text-slate-900 dark:text-white">OPERARTIS</span>
+                                </div>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs">{ui.footer_tagline}</p>
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_platform}</h3>
+                                <ul className="space-y-2.5">
+                                    {platformLinks.map((link) => (
+                                        <li key={`${link.id}-${link.label}`}>
+                                            <button type="button" onClick={() => onNav(link.id)} className={footerLinkClass}>
+                                                {link.label}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_legal}</h3>
+                                <ul className="space-y-2.5">
+                                    {legalLinks.map((link) => (
+                                        <li key={link.label}>
+                                            <a href={link.href} className={footerLinkClass}>{link.label}</a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_company}</h3>
+                                <ul className="space-y-2.5">
+                                    {companyLinks.map((link, i) => (
+                                        <li key={`${link.label}-${i}`}>
+                                            <button type="button" onClick={() => onNav(link.id)} className={footerLinkClass}>
+                                                {link.label}
+                                            </button>
+                                        </li>
+                                    ))}
+                                    <li className="opus-site-footer-divider pt-3 mt-1 border-t">
+                                        <a href="mailto:info@operartis.io" className={footerLinkClass}>
+                                            {ui.footer_partner}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className="opus-site-footer-divider mt-10 pt-6 border-t">
+                            <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
+                                © {year} Operartis Analytics. All rights reserved.
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
 
         const App = () => {
             const [theme, setTheme] = useState(() => window.getOperartisTheme());
@@ -5732,8 +5927,8 @@
                         content={content}
                     />
 
-                    <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full flex flex-col">
-                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col flex-1">
+                    <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full min-h-0">
+                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col">
                             <Reveal>
                                 <HeroSection content={content} onExplore={() => scrollToId('matrix-fit')} onWhy={() => scrollToId('about')} />
                             </Reveal>
@@ -5792,20 +5987,9 @@
 
                             <AboutSection content={content} />
                         </div>
-                    </main>
 
-                    <footer className="py-4 border-t border-slate-200 dark:border-slate-800 z-10 shrink-0 bg-white/30 dark:bg-brand-obsidian/30 glass-panel">
-                        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-2">
-                            <p className="text-[10px] text-slate-400">© {new Date().getFullYear()} Operartis Analytics. All rights reserved.</p>
-                            <div className="flex items-center gap-2 text-[10px] text-slate-500">
-                                <a href="#about" className="hover:text-brand-gold transition-colors">{content.ui.footer_privacy}</a>
-                                <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">|</span>
-                                <a href="#" className="hover:text-brand-gold transition-colors">{content.ui.footer_imprint}</a>
-                                <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">|</span>
-                                <a href="#" className="hover:text-brand-gold transition-colors">{content.ui.footer_terms}</a>
-                            </div>
-                        </div>
-                    </footer>
+                        <SiteFooter content={content} onNav={scrollToId} />
+                    </main>
 
                     <ModuleModal
                         block={selectedBlock}
