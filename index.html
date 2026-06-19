@@ -415,6 +415,16 @@
                 touch-action: pan-y;
             }
 
+            .touch-open-card.touch-quickview-active {
+                touch-action: none;
+            }
+
+            .touch-open-card .quick-view-scroll {
+                touch-action: pan-y;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+
             .touch-open-card .quick-view-overlay {
                 display: flex;
                 opacity: 0;
@@ -3167,7 +3177,16 @@
         // ModulaBlock — glass app tile with Quick View overlay
         const ModulaBlock = ({ block, content, onClick }) => {
             const [mobileQuickView, setMobileQuickView] = useState(false);
-            const touchRef = useRef({ startX: 0, startY: 0, startTime: 0, moved: false, longPressTimer: null });
+            const quickViewScrollRef = useRef(null);
+            const touchRef = useRef({
+                startX: 0,
+                startY: 0,
+                lastY: 0,
+                startTime: 0,
+                moved: false,
+                longPressTimer: null,
+                inQuickViewGesture: false,
+            });
 
             const LONG_PRESS_MS = 480;
             const MOVE_THRESHOLD = 10;
@@ -3208,13 +3227,16 @@
                 const t = e.touches[0];
                 touchRef.current.startX = t.clientX;
                 touchRef.current.startY = t.clientY;
+                touchRef.current.lastY = t.clientY;
                 touchRef.current.startTime = Date.now();
                 touchRef.current.moved = false;
+                touchRef.current.inQuickViewGesture = mobileQuickView;
                 clearLongPress();
                 touchRef.current.longPressTimer = setTimeout(() => {
                     if (!touchRef.current.moved) {
                         clearLongPress();
                         setMobileQuickView(false);
+                        touchRef.current.inQuickViewGesture = false;
                         onClick(block);
                     }
                 }, LONG_PRESS_MS);
@@ -3232,17 +3254,39 @@
                 touchRef.current.moved = true;
                 clearLongPress();
 
+                const quickViewOpen = touchRef.current.inQuickViewGesture || mobileQuickView;
+                if (quickViewOpen) {
+                    const scrollEl = quickViewScrollRef.current;
+                    if (scrollEl && ady >= adx) {
+                        const deltaY = t.clientY - touchRef.current.lastY;
+                        touchRef.current.lastY = t.clientY;
+                        const maxScroll = scrollEl.scrollHeight - scrollEl.clientHeight;
+                        const nextScroll = scrollEl.scrollTop - deltaY;
+                        if (maxScroll > 0) {
+                            scrollEl.scrollTop = Math.max(0, Math.min(maxScroll, nextScroll));
+                            e.preventDefault();
+                        } else if (Math.abs(dy) > SCROLL_SLOP && scrollEl.scrollTop === 0) {
+                            setMobileQuickView(false);
+                            touchRef.current.inQuickViewGesture = false;
+                        }
+                    }
+                    return;
+                }
+
                 if (ady > SCROLL_SLOP && ady > adx * 1.2) {
                     setMobileQuickView(false);
                     return;
                 }
 
+                touchRef.current.inQuickViewGesture = true;
                 setMobileQuickView(true);
             };
 
             const handleTouchEnd = () => {
                 if (!isTouchUi()) return;
                 clearLongPress();
+                touchRef.current.lastY = 0;
+                if (touchRef.current.inQuickViewGesture || mobileQuickView) return;
                 if (!touchRef.current.moved && Date.now() - touchRef.current.startTime < LONG_PRESS_MS) {
                     setMobileQuickView(false);
                 }
@@ -3281,7 +3325,7 @@
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-duration-500"></div>
 
-                    <div className="quick-view-overlay absolute inset-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5
+                    <div className="quick-view-overlay absolute inset-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 min-h-0
                                     opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out
                                     flex flex-col transform translate-y-4 group-hover:translate-y-0
                                     ring-1 ring-slate-200/80 dark:ring-white/10">
@@ -3289,7 +3333,7 @@
                             <span>{content?.ui?.quick_view || "Quick View"}</span>
                             <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded">{subModulesList.length}</span>
                         </div>
-                        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2">
+                        <div ref={quickViewScrollRef} className="quick-view-scroll flex-1 overflow-y-auto custom-scrollbar space-y-2 min-h-0">
                             {subModulesList.length > 0 ? (
                                 subModulesList.map(mod => {
                                     const isLive = mod.status === 'live';
