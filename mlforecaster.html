@@ -7,7 +7,7 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Operartis | Advanced-ML Forecaster</title>
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./vendor/tailwindcss-3.4.17.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -108,14 +108,15 @@
         }
     </style>
     <script src="./operartis-lang.js"></script>
-    <script src="./vendor/react-17.0.2.development.js"></script>
-    <script src="./vendor/react-dom-17.0.2.development.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.12/Recharts.min.js"></script>
+    <script src="./operartis-security.js"></script>
+    <script src="./vendor/react-17.0.2.production.min.js"></script>
+    <script src="./vendor/react-dom-17.0.2.production.min.js"></script>
+    <script src="./vendor/prop-types-15.8.1.min.js"></script>
+    <script src="./vendor/recharts-2.1.12.min.js"></script>
     <script src="./vendor/babel-standalone-7.26.10.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="./vendor/lucide-current.min.js"></script>
+    <script src="./vendor/xlsx-0.18.5.full.min.js"></script>
+    <script src="./vendor/lodash-4.17.21.min.js"></script>
 </head>
 
 <body>
@@ -487,10 +488,10 @@
         // --- UTILS ---
         const exportToCSV = (data, filename) => {
             if (!data || !data.length) return;
-            const ws = XLSX.utils.json_to_sheet(data);
+            const ws = XLSX.utils.json_to_sheet(window.OperartisSecurity.sanitizeForSpreadsheet(data));
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-            XLSX.writeFile(wb, filename + ".csv");
+            XLSX.writeFile(wb, window.OperartisSecurity.safeFilename(filename + ".csv"));
         };
 
         // --- SUB-COMPONENTS ---
@@ -1350,30 +1351,6 @@
             const [isDark, setIsDark] = useState(false);
             const [lang, setLang] = useState(() => window.getOperartisLang());
 
-            // --- Auto-detect Language (only for first-time visitors) ---
-            useEffect(() => {
-                if (localStorage.getItem('lang')) return;
-                if (localStorage.getItem('preferredLang') || localStorage.getItem('inv-lang')) return;
-
-                const detectLanguage = async () => {
-                    try {
-                        const response = await fetch('https://ipapi.co/json/');
-                        if (response.ok) {
-                            const data = await response.json();
-                            const country = data.country_code;
-                            let detectedLang = 'en';
-                            if (country === 'VN') detectedLang = 'vi';
-                            else if (country === 'DE') detectedLang = 'de';
-                            setLang(detectedLang);
-                            window.persistOperartisLang(detectedLang);
-                        }
-                    } catch (error) {
-                        console.warn("Language auto-detection failed, using default.");
-                    }
-                };
-                detectLanguage();
-            }, []);
-
             useEffect(() => {
                 window.persistOperartisLang(lang);
             }, [lang]);
@@ -1531,15 +1508,27 @@
             const handleFileUpload = (e) => {
                 const f = e.target.files[0];
                 if (!f) return;
+                try {
+                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.xls', '.csv'] });
+                } catch (err) {
+                    setStatus('failed');
+                    e.target.value = null;
+                    return;
+                }
                 setFile(f);
                 const reader = new FileReader();
                 reader.onload = (evt) => {
-                    const wb = XLSX.read(evt.target.result, { type: 'binary' });
-                    const ws = wb.Sheets[wb.SheetNames[0]];
-                    const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                    if (data.length) {
-                        setHeaders(data[0]);
-                        setMappingOpen(true);
+                    try {
+                        const wb = XLSX.read(evt.target.result, { type: 'binary' });
+                        window.OperartisSecurity.validateWorkbook(wb);
+                        const ws = wb.Sheets[wb.SheetNames[0]];
+                        const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        if (data.length) {
+                            setHeaders(data[0]);
+                            setMappingOpen(true);
+                        }
+                    } catch (err) {
+                        setStatus('failed');
                     }
                 };
                 reader.readAsBinaryString(f);
@@ -1605,10 +1594,7 @@
                             if (matches != null && matches[1]) { filename = matches[1].replace(/['"]/g, ''); }
                         }
                         const blob = await res.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url; a.download = filename;
-                        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                        window.OperartisSecurity.downloadBlob(blob, filename);
                     } catch (e) { console.error('Export error:', e); }
                     finally { setIsExporting(false); }
                 } else {
@@ -1635,10 +1621,7 @@
                             if (matches != null && matches[1]) { filename = matches[1].replace(/['"]/g, ''); }
                         }
                         const blob = await res.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url; a.download = filename;
-                        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                        window.OperartisSecurity.downloadBlob(blob, filename);
                     } catch (e) { console.error('Export error:', e); }
                     finally { setIsExporting(false); }
                 }

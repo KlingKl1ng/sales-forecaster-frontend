@@ -8,7 +8,7 @@
 
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./vendor/tailwindcss-3.4.17.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -127,15 +127,16 @@
     </style>
 
     <script src="./operartis-lang.js"></script>
-    <script src="./vendor/react-17.0.2.development.js"></script>
-    <script src="./vendor/react-dom-17.0.2.development.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.12/Recharts.min.js"></script>
+    <script src="./operartis-security.js"></script>
+    <script src="./vendor/react-17.0.2.production.min.js"></script>
+    <script src="./vendor/react-dom-17.0.2.production.min.js"></script>
+    <script src="./vendor/prop-types-15.8.1.min.js"></script>
+    <script src="./vendor/recharts-2.1.12.min.js"></script>
     <script src="./vendor/babel-standalone-7.26.10.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="./vendor/lucide-current.min.js"></script>
+    <script src="./vendor/xlsx-js-style-1.2.0.bundle.min.js"></script>
+    <script src="./vendor/exceljs-4.4.0.min.js"></script>
+    <script src="./vendor/lodash-4.17.21.min.js"></script>
 </head>
 
 <body>
@@ -721,24 +722,36 @@
             const handleFileUpload = (e) => {
                 const f = e.target.files[0];
                 if (!f) return;
+                try {
+                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.xls', '.csv'] });
+                } catch (err) {
+                    alert(err.message);
+                    e.target.value = null;
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = (evt) => {
-                    const bstr = evt.target.result;
-                    const wb = XLSX.read(bstr, { type: 'binary', cellDates: true });
-                    const wsname = wb.SheetNames[0];
-                    const ws = wb.Sheets[wsname];
+                    try {
+                        const bstr = evt.target.result;
+                        const wb = XLSX.read(bstr, { type: 'binary', cellDates: true });
+                        window.OperartisSecurity.validateWorkbook(wb);
+                        const wsname = wb.SheetNames[0];
+                        const ws = wb.Sheets[wsname];
 
-                    // Pass 1: Get Headers with formatting (preserves dates like "Jan 25")
-                    const formattedData = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false });
+                        // Pass 1: Get Headers with formatting (preserves dates like "Jan 25")
+                        const formattedData = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false });
 
-                    // Pass 2: Get Data with raw values (for numbers/math)
-                    const rawData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        // Pass 2: Get Data with raw values (for numbers/math)
+                        const rawData = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-                    if (rawData.length > 1) {
-                        setHeaders(formattedData[0]); // UI gets nice headers
-                        setRawJson(rawData.slice(1)); // Logic gets raw numbers
-                        setFile(f);
-                        setIsMappingOpen(true);
+                        if (rawData.length > 1) {
+                            setHeaders(formattedData[0]); // UI gets nice headers
+                            setRawJson(rawData.slice(1)); // Logic gets raw numbers
+                            setFile(f);
+                            setIsMappingOpen(true);
+                        }
+                    } catch (err) {
+                        alert(err.message || 'Failed to read file.');
                     }
                 };
                 reader.readAsBinaryString(f);
@@ -915,14 +928,14 @@
                     const row = worksheet.getRow(tableStartRow + 1 + index);
                     row.values = [
                         "",
-                        item.class,
-                        item.sku,
+                        window.OperartisSecurity.escapeSpreadsheetFormula(item.class),
+                        window.OperartisSecurity.escapeSpreadsheetFormula(item.sku),
                         item.totalValue,
                         item.totalQty,
                         item.avgDemand,
                         item.cv,
-                        item.abc,
-                        item.xyz
+                        window.OperartisSecurity.escapeSpreadsheetFormula(item.abc),
+                        window.OperartisSecurity.escapeSpreadsheetFormula(item.xyz)
                     ];
 
                     // Formatting
@@ -973,10 +986,7 @@
                 // --- 5. EXPORT ---
                 const bufferOut = await workbook.xlsx.writeBuffer();
                 const blobOut = new Blob([bufferOut], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blobOut);
-                link.download = `Operartis_ABC_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
-                link.click();
+                window.OperartisSecurity.downloadBlob(blobOut, `Operartis_ABC_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
             };
 
             // Recalculate Classes whenever sliders or data change

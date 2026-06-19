@@ -9,7 +9,7 @@
 
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./vendor/tailwindcss-3.4.17.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -237,13 +237,14 @@
     </style>
 
     <script src="./operartis-lang.js"></script>
-    <script src="./vendor/react-17.0.2.development.js"></script>
-    <script src="./vendor/react-dom-17.0.2.development.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/1.8.5/Recharts.min.js"></script>
+    <script src="./operartis-security.js"></script>
+    <script src="./vendor/react-17.0.2.production.min.js"></script>
+    <script src="./vendor/react-dom-17.0.2.production.min.js"></script>
+    <script src="./vendor/prop-types-15.8.1.min.js"></script>
+    <script src="./vendor/recharts-1.8.5.min.js"></script>
     <script src="./vendor/babel-standalone-7.26.10.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="./vendor/lucide-current.min.js"></script>
+    <script src="./vendor/xlsx-0.18.5.full.min.js"></script>
 </head>
 
 <body>
@@ -1494,6 +1495,13 @@
             const handleFileChange = (e) => {
                 const f = e.target.files[0];
                 if (!f) return;
+                try {
+                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.xls'] });
+                } catch (err) {
+                    setError(err.message);
+                    e.target.value = null;
+                    return;
+                }
                 setFile(f);
                 setError(null);
                 setAvailableCols([]);
@@ -1504,6 +1512,7 @@
                 reader.onload = (evt) => {
                     try {
                         const wb = XLSX.read(evt.target.result, { type: 'binary', cellDates: true });
+                        window.OperartisSecurity.validateWorkbook(wb);
                         const ws = wb.Sheets[wb.SheetNames[0]];
                         const rawHeaders = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false })[0];
 
@@ -1525,8 +1534,6 @@
                             }
                             return String(h);
                         });
-
-                        console.log('Parsed headers:', headers.slice(0, 5), '...');
 
                         if (headers && headers.length > 0) {
                             setAvailableCols(headers);
@@ -1635,13 +1642,7 @@
                             }
                         }
                         const blob = await res.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
+                        window.OperartisSecurity.downloadBlob(blob, filename);
                     } catch (e) { setError(e.message); }
                     finally { setIsExporting(false); }
                 } else {
@@ -1673,13 +1674,7 @@
                             }
                         }
                         const blob = await res.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
+                        window.OperartisSecurity.downloadBlob(blob, filename);
                     } catch (e) { setError(e.message); }
                     finally { setIsExporting(false); }
                 }

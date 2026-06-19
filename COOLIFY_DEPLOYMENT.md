@@ -32,6 +32,23 @@ Set the backend environment variable if you want to override the default CORS li
 ALLOWED_ORIGINS=https://operartis.io,https://www.operartis.io,https://staging.operartis.io
 ```
 
+Recommended backend abuse-protection variables:
+
+```text
+MAX_REQUEST_BYTES=26214400
+RATE_LIMIT_WINDOW_SECONDS=60
+RATE_LIMIT_REQUESTS=120
+HEAVY_RATE_LIMIT_REQUESTS=30
+```
+
+The backend defaults now allow only the three Operartis HTTPS origins. Add local origins to `ALLOWED_ORIGINS` only while actively testing from your Mac.
+
+## Security Headers
+
+For the frontend Coolify Static app, paste the directives from `coolify-nginx-security.conf` into the Coolify custom Nginx configuration/server context.
+
+The current CSP is intentionally temporary/relaxed because the static frontend still uses inline scripts and runtime Babel. After the future React/Vite rebuild, remove `'unsafe-inline'` and `'unsafe-eval'`.
+
 ## Root Page
 
 `index.html` is the single source for the Operartis terminal / landing experience at `/`.
@@ -49,6 +66,6 @@ location = /terminal.html {
 ## Cutover Checklist
 
 - Confirm `https://api.operartis.io/` returns the backend health response.
-- Confirm `https://operartis.io/` opens the waiting page.
+- Confirm `https://operartis.io/` opens the Operartis terminal.
 - Confirm `forecaster.html`, `mlforecaster.html`, and `inventory.html` call `https://api.operartis.io`.
 - Keep Vercel online for 7 days as rollback, then remove or disable it.

@@ -78,7 +78,7 @@ body {
    1. Include this CSS file in your HTML head:
       <link rel="stylesheet" href="design_system.css">
    
-   2. Include the Tailwind script and config:
-      <script src="https://cdn.tailwindcss.com"></script>
+   2. Include the vendored Tailwind script and config:
+      <script src="./vendor/tailwindcss-3.4.17.js"></script>
       <script src="tailwind_config.js"></script>
 */

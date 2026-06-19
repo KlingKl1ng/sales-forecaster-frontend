@@ -9,7 +9,7 @@
 
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./vendor/tailwindcss-3.4.17.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -44,17 +44,18 @@
         })();
     </script>
     <script src="./operartis-lang.js"></script>
+    <script src="./operartis-security.js"></script>
 
-    <script src="./vendor/react-17.0.2.development.js"></script>
-    <script src="./vendor/react-dom-17.0.2.development.js"></script>
+    <script src="./vendor/react-17.0.2.production.min.js"></script>
+    <script src="./vendor/react-dom-17.0.2.production.min.js"></script>
 
     <!-- PropTypes is required by Recharts UMD build -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.12/Recharts.min.js"></script>
+    <script src="./vendor/prop-types-15.8.1.min.js"></script>
+    <script src="./vendor/recharts-2.1.12.min.js"></script>
 
     <script src="./vendor/babel-standalone-7.26.10.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="./vendor/lucide-current.min.js"></script>
+    <script src="./vendor/xlsx-0.18.5.full.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
@@ -3687,6 +3688,15 @@
 
             // Translation helper
             const t = (key) => translations[language]?.[key] || translations.en[key] || key;
+            const renderParametersLockedMessage = () => {
+                if (language === 'vi') {
+                    return <span>Tham số đã khóa. Chuyển sang chế độ <strong>Giả lập</strong> để chỉnh sửa.</span>;
+                }
+                if (language === 'de') {
+                    return <span>Parameter gesperrt. Wechseln Sie in den <strong>What-If</strong>-Modus zum Bearbeiten.</span>;
+                }
+                return <span>Parameters locked. Switch to <strong>What-If</strong> mode to edit.</span>;
+            };
 
             // Language Effect — synced across Operartis pages via localStorage('lang')
             useEffect(() => {
@@ -3800,6 +3810,13 @@
             const handleFileChange = (e) => {
                 const f = e.target.files[0];
                 if (!f) return;
+                try {
+                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.xls', '.csv'] });
+                } catch (err) {
+                    showToast(err.message, 'error');
+                    e.target.value = '';
+                    return;
+                }
 
                 // Reset file input value to allow re-uploading the same file
                 e.target.value = '';
@@ -3815,6 +3832,7 @@
                 reader.onload = (evt) => {
                     try {
                         const wb = XLSX.read(evt.target.result, { type: 'binary', cellStyles: true });
+                        window.OperartisSecurity.validateWorkbook(wb);
                         const ws = wb.Sheets[wb.SheetNames[0]];
 
                         // Try to detect Operartis Forecast Report format
@@ -3906,6 +3924,7 @@
                 reader.onload = (evt) => {
                     try {
                         const wb = XLSX.read(evt.target.result, { type: 'binary', cellDates: true });
+                        window.OperartisSecurity.validateWorkbook(wb);
                         const ws = wb.Sheets[wb.SheetNames[0]];
 
                         let data;
@@ -5002,14 +5021,7 @@
 
                     // Download the file
                     const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
+                    window.OperartisSecurity.downloadBlob(blob, filename);
 
                     console.log('Export complete:', filename);
                 } catch (error) {
@@ -5262,7 +5274,7 @@
                                 {hasAnyParamLocked && (
                                     <div className="text-[9px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded px-2 py-1.5 flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                                        <span dangerouslySetInnerHTML={{ __html: t('parametersLocked') }} />
+                                        {renderParametersLockedMessage()}
                                     </div>
                                 )}
 

@@ -39,26 +39,26 @@ Every page MUST include the same dependency stack so behavior and styling stay i
 <title>Operartis | {Module Name}</title>
 <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
 
-<!-- Tailwind (CDN, JIT in-browser) -->
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- Tailwind (vendored, JIT in-browser) -->
+<script src="./vendor/tailwindcss-3.4.17.js"></script>
 <script> tailwind.config = { /* see Section 3 */ } </script>
 
 <!-- Fonts + page styles -->
 <style> @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap'); /* ... */ </style>
 
-<!-- React 17 + Babel (in-browser JSX) -->
-<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
-<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<!-- React 17 + Babel (vendored, in-browser JSX) -->
+<script src="./vendor/react-17.0.2.production.min.js"></script>
+<script src="./vendor/react-dom-17.0.2.production.min.js"></script>
+<script src="./vendor/babel-standalone-7.26.10.min.js"></script>
 
 <!-- Icons -->
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="./vendor/lucide-current.min.js"></script>
 
 <!-- Data modules add as needed: -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.12/Recharts.min.js"></script>     <!-- charts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>          <!-- excel I/O -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>       <!-- utils -->
+<script src="./vendor/prop-types-15.8.1.min.js"></script>
+<script src="./vendor/recharts-2.1.12.min.js"></script>     <!-- charts -->
+<script src="./vendor/xlsx-0.18.5.full.min.js"></script>    <!-- excel I/O -->
+<script src="./vendor/lodash-4.17.21.min.js"></script>      <!-- utils -->
 ```
 
 Body + mount point:

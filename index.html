@@ -8,7 +8,7 @@
 
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./vendor/tailwindcss-3.4.17.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -60,6 +60,7 @@
         })();
     </script>
     <script src="./operartis-lang.js"></script>
+    <script src="./operartis-security.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
 
@@ -2104,10 +2105,10 @@
         }
     </style>
 
-    <script src="./vendor/react-17.0.2.development.js"></script>
-    <script src="./vendor/react-dom-17.0.2.development.js"></script>
+    <script src="./vendor/react-17.0.2.production.min.js"></script>
+    <script src="./vendor/react-dom-17.0.2.production.min.js"></script>
     <script src="./vendor/babel-standalone-7.26.10.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="./vendor/lucide-current.min.js"></script>
 </head>
 
 <body class="bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-100 transition-colors duration-500">
@@ -5948,11 +5949,7 @@
 
         const App = () => {
             const [theme, setTheme] = useState(() => window.getOperartisTheme());
-            const [lang, setLang] = useState(() => {
-                if (localStorage.getItem('lang')) return window.getOperartisLang();
-                if (localStorage.getItem('preferredLang') || localStorage.getItem('inv-lang')) return window.getOperartisLang();
-                return 'en';
-            });
+            const [lang, setLang] = useState(() => window.getOperartisLang());
             const [selectedBlock, setSelectedBlock] = useState(null);
             const [activeQuickViewBlockId, setActiveQuickViewBlockId] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -5962,28 +5959,6 @@
             const scrollLockRef = useRef(false);
             const scrollEndTimerRef = useRef(null);
             const scrollAnimListenerRef = useRef(null);
-
-            useEffect(() => {
-                if (localStorage.getItem('lang')) return;
-                if (localStorage.getItem('preferredLang') || localStorage.getItem('inv-lang')) return;
-
-                const detectLanguage = async () => {
-                    try {
-                        const response = await fetch('https://ipapi.co/json/');
-                        if (response.ok) {
-                            const data = await response.json();
-                            const detectedLang = data.country_code === 'VN' ? 'vi' : 'en';
-                            setLang(detectedLang);
-                            window.persistOperartisLang(detectedLang);
-                        } else {
-                            window.persistOperartisLang('en');
-                        }
-                    } catch (error) {
-                        window.persistOperartisLang('en');
-                    }
-                };
-                detectLanguage();
-            }, []);
 
             // Derived Content
             const content = TRANSLATIONS[lang] || TRANSLATIONS.en;
