@@ -622,6 +622,33 @@
             border-color: rgb(30 41 59);
         }
 
+        .opus-footer-accordion-panel {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .opus-footer-accordion-panel > div {
+            overflow: hidden;
+        }
+
+        .opus-footer-accordion-panel--open {
+            grid-template-rows: 1fr;
+        }
+
+        .opus-footer-accordion-chevron {
+            color: rgb(100 116 139);
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .opus-footer-accordion-chevron--open {
+            transform: rotate(180deg);
+        }
+
+        .dark .opus-footer-accordion-chevron {
+            color: rgb(148 163 184);
+        }
+
         /* Animated gold sweep for the hero headline accent */
         @keyframes opusSheen {
             0% { background-position: 0% 50%; }
@@ -2111,7 +2138,6 @@
         const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>;
         const ArrowRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
         const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
-        const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
         const CloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
         const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>;
@@ -2220,6 +2246,7 @@
                     ],
                     invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
                     contact_operartis: "Contact Operartis",
+                    nav_contact: "Contact",
                     analytics_eyebrow: "Analytics Evolvement",
                     analytics_title: "Four Levels of Analytics",
                     analytics_subtitle: "Each step increases business value and problem complexity — shifting from retrospective information to forward-looking models that guide optimized action.",
@@ -2516,6 +2543,7 @@
                     ],
                     invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
                     contact_operartis: "Liên hệ Operartis",
+                    nav_contact: "Liên hệ",
                     analytics_eyebrow: "Sự phát triển của Phân tích dữ liệu",
                     analytics_title: "Bốn Cấp độ Phân tích Dữ liệu",
                     analytics_subtitle: "Mỗi bước tăng giá trị kinh doanh và độ phức tạp vấn đề — chuyển từ thông tin hồi cố sang mô hình hướng tới tối ưu hành động.",
@@ -2812,6 +2840,7 @@
                     ],
                     invite_text: "Wir laden Unternehmen ein, die ihre Abläufe transformieren, ihre Supply Chain optimieren und einen Wettbewerbsvorteil aufbauen wollen, mit Operartis zusammenzuarbeiten.",
                     contact_operartis: "Operartis kontaktieren",
+                    nav_contact: "Kontakt",
                     analytics_eyebrow: "Analytics-Reifegrad",
                     analytics_title: "Vier Stufen der Analytics",
                     analytics_subtitle: "Jede Stufe steigert den Geschäftsnutzen und die Problemkomplexität — vom rückblickenden Informationszugriff zu vorausschauenden Modellen für optimiertes Handeln.",
@@ -5554,10 +5583,32 @@
             </div>
         );
 
+        const FooterAccordion = ({ title, children, defaultOpen = false }) => {
+            const [open, setOpen] = useState(defaultOpen);
+
+            return (
+                <div className="border-b border-slate-200 dark:border-slate-800/80">
+                    <button
+                        type="button"
+                        onClick={() => setOpen((prev) => !prev)}
+                        aria-expanded={open}
+                        className="flex w-full items-center justify-between gap-3 py-3.5 text-left"
+                    >
+                        <span className="text-sm font-semibold text-slate-900 dark:text-white">{title}</span>
+                        <ChevronDownIcon className={`opus-footer-accordion-chevron shrink-0 ${open ? 'opus-footer-accordion-chevron--open' : ''}`} />
+                    </button>
+                    <div className={`opus-footer-accordion-panel ${open ? 'opus-footer-accordion-panel--open' : ''}`}>
+                        <div className="pb-1">{children}</div>
+                    </div>
+                </div>
+            );
+        };
+
         const SiteFooter = ({ content, onNav }) => {
             const ui = content.ui;
             const year = new Date().getFullYear();
             const footerLinkClass = 'text-sm text-slate-500 dark:text-slate-400 hover:text-brand-gold transition-colors text-left';
+            const footerMobileLinkClass = `${footerLinkClass} flex min-h-11 w-full items-center`;
 
             const platformLinks = [
                 { id: 'supply-chain', label: ui.nav_supply_chain },
@@ -5579,10 +5630,73 @@
             ];
 
             return (
-                <footer className="opus-site-footer w-full border-t border-slate-300 dark:border-white/10 pt-10 pb-8 pb-[max(2rem,env(safe-area-inset-bottom))] z-10 shrink-0">
+                <footer className="opus-site-footer w-full border-t border-slate-300 dark:border-white/10 pt-8 pb-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:pt-10 md:pb-8 md:pb-[max(2rem,env(safe-area-inset-bottom))] z-10 shrink-0">
                     <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-                            <div className="sm:col-span-2 lg:col-span-1">
+                        <div className="md:hidden">
+                            <div className="flex flex-col items-center text-center mb-2">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <img
+                                        src="./icononly_transparent_nobuffer.png"
+                                        alt=""
+                                        className="h-10 w-10 object-contain"
+                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                    />
+                                    <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">OPERARTIS</span>
+                                </div>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">{ui.footer_tagline}</p>
+                            </div>
+
+                            <div className="mt-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/40 dark:bg-slate-900/30 overflow-hidden px-4">
+                                <FooterAccordion title={ui.footer_platform} defaultOpen>
+                                    <ul className="space-y-0.5 pb-3">
+                                        {platformLinks.map((link) => (
+                                            <li key={`${link.id}-${link.label}`}>
+                                                <button type="button" onClick={() => onNav(link.id)} className={footerMobileLinkClass}>
+                                                    {link.label}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </FooterAccordion>
+
+                                <FooterAccordion title={ui.footer_company}>
+                                    <ul className="space-y-0.5 pb-3">
+                                        {companyLinks.map((link, i) => (
+                                            <li key={`${link.label}-${i}`}>
+                                                <button type="button" onClick={() => onNav(link.id)} className={footerMobileLinkClass}>
+                                                    {link.label}
+                                                </button>
+                                            </li>
+                                        ))}
+                                        <li className="opus-site-footer-divider pt-2 mt-1 border-t">
+                                            <a href="mailto:info@operartis.io" className={footerMobileLinkClass}>
+                                                {ui.footer_partner}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </FooterAccordion>
+
+                                <FooterAccordion title={ui.footer_legal}>
+                                    <ul className="space-y-0.5 pb-3">
+                                        {legalLinks.map((link) => (
+                                            <li key={link.label}>
+                                                <a href={link.href} className={footerMobileLinkClass}>{link.label}</a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </FooterAccordion>
+                            </div>
+
+                            <a
+                                href="mailto:info@operartis.io"
+                                className="mt-6 flex h-11 w-full items-center justify-center rounded-xl bg-gradient-to-tr from-brand-gold to-brand-dark text-sm font-bold text-white shadow-lg shadow-brand-gold/20 hover:scale-[1.01] active:scale-[0.98] transition-transform"
+                            >
+                                {ui.nav_contact}
+                            </a>
+                        </div>
+
+                        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+                            <div className="md:col-span-2 lg:col-span-1">
                                 <div className="flex items-center gap-3 mb-5">
                                     <img
                                         src="./icononly_transparent_nobuffer.png"
@@ -5638,7 +5752,7 @@
                             </div>
                         </div>
 
-                        <div className="opus-site-footer-divider mt-10 pt-6 border-t">
+                        <div className="opus-site-footer-divider mt-8 md:mt-10 pt-5 md:pt-6 border-t">
                             <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
                                 © {year} Operartis Analytics. All rights reserved.
                             </p>
@@ -5911,9 +6025,12 @@
                                 </div>
                             </div>
 
-                            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shadow-md cursor-pointer">
-                                <UserIcon />
-                            </div>
+                            <a
+                                href="mailto:info@operartis.io"
+                                className="h-8 px-3 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white text-xs font-bold shadow-md hover:scale-[1.02] active:scale-95 transition-all shrink-0"
+                            >
+                                {content.ui.nav_contact}
+                            </a>
                         </div>
                         </div>
                         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 pb-2">
