@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operartis APS | Command Center</title>
+    <title>Operartis | An Optimization System For The Entire Supply Chain</title>
 
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
 
@@ -2165,6 +2165,7 @@
         const TRANSLATIONS = {
             en: {
                 ui: {
+                    page_title: "Operartis | An Optimization System For The Entire Supply Chain",
                     system_terminal: "System Terminal",
                     hero_pipeline_label: "APS pipeline for production",
                     hero_pipeline_steps: ["ERP Data", "Demand", "Capacity", "Inventory", "Schedule", "Optimized Plan"],
@@ -2460,6 +2461,7 @@
             },
             vi: {
                 ui: {
+                    page_title: "Operartis | Hệ Thống Tối Ưu Hóa Cho Toàn Bộ Chuỗi Cung Ứng",
                     system_terminal: "Bảng Điều Hành Hệ Thống",
                     hero_pipeline_label: "Luồng APS cho sản xuất",
                     hero_pipeline_steps: ["Dữ liệu ERP", "Nhu cầu", "Năng lực", "Tồn kho", "Lịch trình", "Kế hoạch tối ưu"],
@@ -2755,6 +2757,7 @@
             },
             de: {
                 ui: {
+                    page_title: "Operartis | Ein Optimierungssystem für die gesamte Lieferkette",
                     system_terminal: "Systemterminal",
                     hero_pipeline_label: "Live-APS-Pipeline",
                     hero_pipeline_steps: ["ERP-Daten", "Bedarf", "Kapazität", "Bestand", "Terminplan", "Optimaler Plan"],
@@ -5772,7 +5775,9 @@
 
             useEffect(() => {
                 window.persistOperartisLang(lang);
-            }, [lang]);
+                document.documentElement.lang = lang;
+                document.title = content.ui.page_title || TRANSLATIONS.en.ui.page_title;
+            }, [lang, content]);
 
             // Scroll-spy: sync header nav highlight with section position in main scroll container
             useEffect(() => {
