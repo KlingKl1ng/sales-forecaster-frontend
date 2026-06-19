@@ -3186,11 +3186,23 @@
                 startY: 0,
                 lastY: 0,
                 moved: false,
+                longPressTimer: null,
+                longPressTriggered: false,
                 inQuickViewGesture: false,
             });
 
+            const LONG_PRESS_MS = 560;
             const MOVE_THRESHOLD = 10;
             const SCROLL_SLOP = 24;
+
+            const clearLongPress = useCallback(() => {
+                if (touchRef.current.longPressTimer) {
+                    clearTimeout(touchRef.current.longPressTimer);
+                    touchRef.current.longPressTimer = null;
+                }
+            }, []);
+
+            useEffect(() => () => clearLongPress(), [clearLongPress]);
 
             if (!block) return null;
 
@@ -3230,11 +3242,22 @@
                 touchRef.current.startY = t.clientY;
                 touchRef.current.lastY = t.clientY;
                 touchRef.current.moved = false;
+                touchRef.current.longPressTriggered = false;
                 touchRef.current.inQuickViewGesture = mobileQuickView;
                 if (activeQuickViewBlockId && activeQuickViewBlockId !== blockId) {
                     onQuickViewActive(null);
                     touchRef.current.inQuickViewGesture = false;
                 }
+                clearLongPress();
+                touchRef.current.longPressTimer = setTimeout(() => {
+                    if (!touchRef.current.moved) {
+                        touchRef.current.longPressTriggered = true;
+                        touchRef.current.inQuickViewGesture = false;
+                        closeQuickView();
+                        onClick(block);
+                    }
+                    clearLongPress();
+                }, LONG_PRESS_MS);
             };
 
             const handleTouchMove = (e) => {
@@ -3247,6 +3270,7 @@
                 if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
 
                 touchRef.current.moved = true;
+                clearLongPress();
 
                 const quickViewOpen = touchRef.current.inQuickViewGesture || mobileQuickView;
                 if (quickViewOpen) {
@@ -3274,7 +3298,12 @@
 
             const handleTouchEnd = () => {
                 if (!isTouchUi()) return;
+                clearLongPress();
                 touchRef.current.lastY = 0;
+                if (touchRef.current.longPressTriggered) {
+                    touchRef.current.longPressTriggered = false;
+                    return;
+                }
                 if (touchRef.current.moved) return;
                 if (!mobileQuickView) {
                     openQuickView();
@@ -3282,7 +3311,9 @@
             };
 
             const handleTouchCancel = () => {
+                clearLongPress();
                 touchRef.current.lastY = 0;
+                touchRef.current.longPressTriggered = false;
             };
 
             return (
@@ -3292,6 +3323,9 @@
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                     onTouchCancel={handleTouchCancel}
+                    onContextMenu={(e) => {
+                        if (isTouchUi()) e.preventDefault();
+                    }}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
