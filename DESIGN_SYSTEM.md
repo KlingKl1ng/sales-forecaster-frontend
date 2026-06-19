@@ -79,7 +79,7 @@ Body + mount point:
 - Use **Recharts 2.x** for new modules (Terminal-era files used 1.8.5; standardize on 2.1.12).
 - All JSX lives in one `<script type="text/babel">` block. This is intentional — modules are portable single files.
 - Asset paths are relative (`./icononly_transparent_nobuffer.png`, etc.).
-- The logo always links back to the Terminal: `https://operartis.vercel.app/terminal.html`.
+- The logo always links back to the Terminal: `./terminal.html`.
 
 ---
 
@@ -672,4 +672,3 @@ When you build the next module, follow this so it stays consistent:
 ---
 
 *Operartis Analytics — "Optimizing today, Growing tomorrow."*
-
