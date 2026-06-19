@@ -34,7 +34,17 @@ ALLOWED_ORIGINS=https://operartis.io,https://www.operartis.io,https://staging.op
 
 ## Root Page
 
-`index.html` contains the terminal experience directly so `/` opens Operartis without changing the visible URL to `/terminal.html`.
+`index.html` is the single source for the Operartis terminal / landing experience at `/`.
+
+`terminal.html` is a lightweight redirect to `/` so old bookmarks to `/terminal.html` keep working without maintaining a second copy of the app.
+
+Optional server redirect (preferred over the HTML stub if your reverse proxy supports it):
+
+```nginx
+location = /terminal.html {
+    return 301 /;
+}
+```
 
 ## Cutover Checklist
 

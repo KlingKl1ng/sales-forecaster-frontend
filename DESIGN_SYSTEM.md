@@ -12,7 +12,7 @@ Operartis is a multi-page application made of self-contained HTML files. Each pa
 
 There are **two archetypes** of page. Every screen you build is one of these:
 
-### 1.1 The Terminal (`terminal.html`)
+### 1.1 The Terminal (`index.html`)
 The **hub / launcher** shown after login. It is the home base of the APS system.
 - Presents all optimization modules organized in a **planning-horizon matrix** (Strategic → Tactical → Operational → Cross-Functional).
 - Groups modules into clickable **Module Blocks**; each block opens a **modal** listing its sub-modules.
@@ -79,7 +79,7 @@ Body + mount point:
 - Use **Recharts 2.x** for new modules (Terminal-era files used 1.8.5; standardize on 2.1.12).
 - All JSX lives in one `<script type="text/babel">` block. This is intentional — modules are portable single files.
 - Asset paths are relative (`./icononly_transparent_nobuffer.png`, etc.).
-- The logo always links back to the Terminal: `./terminal.html`.
+- The logo always links back to the Terminal: `./` (served by `index.html`).
 
 ---
 
@@ -637,9 +637,9 @@ When you build the next module, follow this so it stays consistent:
 5. Add full `TRANSLATIONS` (`en` + `vi`). No hardcoded strings.
 6. Charts via **Recharts 2.1.12**; Excel I/O via **xlsx**; keep number formatting consistent (`font-mono tabular-nums`).
 7. Honor the gold rule (one primary action), glass-on-chrome / solid-on-data, and the motion guidelines.
-8. Link the logo back to `terminal.html`; footer = `Operartis Analytics` + slogan.
+8. Link the logo back to `./` (`index.html`); footer = `Operartis Analytics` + slogan.
 
-**Register it in the Terminal (`terminal.html`)**
+**Register it in the Terminal (`index.html`)**
 9. Add an icon component (Lucide-style inline SVG) for the module.
 10. Add an entry to **`MODULE_STATIC_DATA`**:
     ```js
