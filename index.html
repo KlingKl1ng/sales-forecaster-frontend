@@ -3175,8 +3175,7 @@
         };
 
         // ModulaBlock — glass app tile with Quick View overlay
-        const ModulaBlock = ({ block, content, onClick }) => {
-            const [mobileQuickView, setMobileQuickView] = useState(false);
+        const ModulaBlock = ({ block, blockId, content, onClick, activeQuickViewBlockId, onQuickViewActive }) => {
             const quickViewScrollRef = useRef(null);
             const touchRef = useRef({
                 startX: 0,
@@ -3202,6 +3201,16 @@
             useEffect(() => () => clearLongPress(), [clearLongPress]);
 
             if (!block) return null;
+
+            const mobileQuickView = activeQuickViewBlockId === blockId;
+
+            const closeQuickView = () => {
+                if (activeQuickViewBlockId === blockId) onQuickViewActive(null);
+            };
+
+            const openQuickView = () => {
+                onQuickViewActive(blockId);
+            };
 
             const rawSubModules = block.subModules;
             const subModules = Array.isArray(rawSubModules) ? rawSubModules : [];
@@ -3231,11 +3240,15 @@
                 touchRef.current.startTime = Date.now();
                 touchRef.current.moved = false;
                 touchRef.current.inQuickViewGesture = mobileQuickView;
+                if (activeQuickViewBlockId && activeQuickViewBlockId !== blockId) {
+                    onQuickViewActive(null);
+                    touchRef.current.inQuickViewGesture = false;
+                }
                 clearLongPress();
                 touchRef.current.longPressTimer = setTimeout(() => {
                     if (!touchRef.current.moved) {
                         clearLongPress();
-                        setMobileQuickView(false);
+                        closeQuickView();
                         touchRef.current.inQuickViewGesture = false;
                         onClick(block);
                     }
@@ -3266,7 +3279,7 @@
                             scrollEl.scrollTop = Math.max(0, Math.min(maxScroll, nextScroll));
                             e.preventDefault();
                         } else if (Math.abs(dy) > SCROLL_SLOP && scrollEl.scrollTop === 0) {
-                            setMobileQuickView(false);
+                            closeQuickView();
                             touchRef.current.inQuickViewGesture = false;
                         }
                     }
@@ -3274,12 +3287,12 @@
                 }
 
                 if (ady > SCROLL_SLOP && ady > adx * 1.2) {
-                    setMobileQuickView(false);
+                    closeQuickView();
                     return;
                 }
 
                 touchRef.current.inQuickViewGesture = true;
-                setMobileQuickView(true);
+                openQuickView();
             };
 
             const handleTouchEnd = () => {
@@ -3288,7 +3301,7 @@
                 touchRef.current.lastY = 0;
                 if (touchRef.current.inQuickViewGesture || mobileQuickView) return;
                 if (!touchRef.current.moved && Date.now() - touchRef.current.startTime < LONG_PRESS_MS) {
-                    setMobileQuickView(false);
+                    closeQuickView();
                 }
             };
 
@@ -4917,7 +4930,7 @@
         };
 
         // HorizonSection — editorial feature row (sticky info + module grid). APS matrix preserved.
-        const HorizonSection = ({ horizon, content, onBlockClick, index }) => (
+        const HorizonSection = ({ horizon, content, onBlockClick, index, activeQuickViewBlockId, onQuickViewActive }) => (
             <section id={`horizon-${horizon.id}`} className="opus-scroll-target mb-16 md:mb-24 last:mb-8">
                 <div className="grid lg:grid-cols-12 gap-6 lg:gap-10">
                     {/* Left editorial column */}
@@ -4940,7 +4953,14 @@
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                             {horizon.blocks.map((block, idx) => (
                                 <Reveal key={idx} delay={idx * 80}>
-                                    <ModulaBlock block={block} content={content} onClick={onBlockClick} />
+                                    <ModulaBlock
+                                        block={block}
+                                        blockId={`${horizon.id}-${idx}`}
+                                        content={content}
+                                        onClick={onBlockClick}
+                                        activeQuickViewBlockId={activeQuickViewBlockId}
+                                        onQuickViewActive={onQuickViewActive}
+                                    />
                                 </Reveal>
                             ))}
                         </div>
@@ -5910,6 +5930,7 @@
                 return 'en';
             });
             const [selectedBlock, setSelectedBlock] = useState(null);
+            const [activeQuickViewBlockId, setActiveQuickViewBlockId] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [navCollapsed, setNavCollapsed] = useState(false);
             const [activeNavId, setActiveNavId] = useState('supply-chain');
@@ -6103,6 +6124,11 @@
                 setSelectedBlock(null);
             };
 
+            const resetMatrixBlocks = useCallback(() => {
+                setActiveQuickViewBlockId(null);
+                setSelectedBlock(null);
+            }, []);
+
             const closeMobileNav = useCallback(() => {
                 setMobileNavOpen(false);
             }, []);
@@ -6114,6 +6140,23 @@
             useEffect(() => {
                 if (!navCollapsed) setMobileNavOpen(false);
             }, [navCollapsed]);
+
+            useEffect(() => {
+                const isTouchUi = () => window.matchMedia('(hover: none), (pointer: coarse)').matches;
+
+                const onOutsideTouch = (e) => {
+                    if (!isTouchUi()) return;
+                    const target = e.target;
+                    if (!(target instanceof Element)) return;
+                    if (target.closest('.touch-open-card')) return;
+                    if (target.closest('.modal-content')) return;
+                    if (target.closest('.mobile-nav-panel')) return;
+                    resetMatrixBlocks();
+                };
+
+                document.addEventListener('touchstart', onOutsideTouch, { passive: true });
+                return () => document.removeEventListener('touchstart', onOutsideTouch);
+            }, [resetMatrixBlocks]);
 
             return (
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
@@ -6255,6 +6298,8 @@
                                         content={content}
                                         onBlockClick={handleBlockClick}
                                         index={index}
+                                        activeQuickViewBlockId={activeQuickViewBlockId}
+                                        onQuickViewActive={setActiveQuickViewBlockId}
                                     />
                                 ))}
                             </div>
