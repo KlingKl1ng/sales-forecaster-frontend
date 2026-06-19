@@ -2586,10 +2586,10 @@
                     analytics_band_models: "Mô hình & Tối ưu",
                     analytics_source_note: "Khung tham chiếu theo mô hình Sự phát triển của Phân tích dữ liệu của Gartner",
                     analytics_levels: [
-                        { id: 'descriptive', name: 'Mô tả', chartName: 'Mô tả', question: 'Chuyện gì đã xảy ra?', desc: 'Nắm bắt lịch sử hiệu suất công việc, KPI và các báo cáo được chuẩn hoá.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
-                        { id: 'diagnostic', name: 'Chẩn đoán', chartName: 'C.Đoán', question: 'Vì sao nó xảy ra?', desc: 'Đi sâu chi tiết, phân tích nguyên nhân gốc rễ và giải thích sự khác nhau.', focus: 'Hiểu nguyên nhân', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
-                        { id: 'predictive', name: 'Dự báo', chartName: 'Dự báo', question: 'Điều gì sẽ xảy ra?', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Dự báo tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
-                        { id: 'prescriptive', name: 'Đề xuất', chartName: 'Đề xuất', question: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hỗ trợ đưa ra quyết định', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
+                        { id: 'descriptive', name: 'Mô tả', nameShort: 'Mô tả', chartName: 'Mô tả', question: 'Chuyện gì đã xảy ra?', questionShort: 'Đã xảy ra', desc: 'Nắm bắt lịch sử hiệu suất công việc, KPI và các báo cáo được chuẩn hoá.', focus: 'Hiển thị & ghi nhận', band: 'information', operartis: 'Tầm nhìn cơ bản trên dữ liệu ERP, tồn kho và sản xuất.' },
+                        { id: 'diagnostic', name: 'Chẩn đoán', nameShort: 'C. Đoán', chartName: 'C.Đoán', question: 'Vì sao nó xảy ra?', questionShort: 'Vì sao', desc: 'Đi sâu chi tiết, phân tích nguyên nhân gốc rễ và giải thích sự khác nhau.', focus: 'Hiểu nguyên nhân', band: 'information', operartis: 'Phân loại ABC-XYZ, phân tích sai lệch và xác định nút thắt.' },
+                        { id: 'predictive', name: 'Dự báo', nameShort: 'Dự báo', chartName: 'Dự báo', question: 'Điều gì sẽ xảy ra?', questionShort: 'Sẽ xảy ra', desc: 'Dự báo nhu cầu, năng lực và rủi ro bằng mô hình thống kê và ML.', focus: 'Dự báo tương lai', band: 'models', operartis: 'Engine dự báo ML, mô phỏng và lập kịch bản đa phương án.' },
+                        { id: 'prescriptive', name: 'Đề xuất', nameShort: 'Đề xuất', chartName: 'Đề xuất', question: 'Nên làm gì?', questionShort: 'Nên làm gì?', desc: 'Đề xuất quyết định tối ưu — từ hỗ trợ quyết định đến hoạch định tự động.', focus: 'Hỗ trợ đưa ra quyết định', band: 'models', operartis: 'Lập lịch APS, VRP, lot-sizing và tối ưu mạng lưới.' },
                     ],
                     analytics_pipeline_title: "Từ Dữ liệu đến Kết quả",
                     analytics_pipeline_desc: "Khi Sự phát triển của Phân tích dữ liệu tăng, sự can thiệp bởi con người giảm dần trong khi mô hình hỗ trợ quyết định tăng lên.",
@@ -5596,8 +5596,14 @@
                                                 onClick={() => setActiveIdx(i)}
                                                 className={`aa-chevron-seg ${isLevelActive ? `aa-chevron-seg-active ${meta.chevronActive}` : 'aa-chevron-seg-inactive'}`}
                                             >
-                                                <p className={`text-[8px] sm:text-[9px] font-bold uppercase tracking-wider mb-0.5 truncate ${isLevelActive ? 'opacity-80' : 'opacity-80'}`}>{level.name}</p>
-                                                <p className="text-[10px] sm:text-xs md:text-sm font-bold leading-tight line-clamp-2">{level.question}</p>
+                                                <p className={`text-[8px] sm:text-[9px] font-bold tracking-wider mb-0.5 truncate ${isLevelActive ? 'opacity-80' : 'opacity-80'}`}>
+                                                    <span className="sm:hidden normal-case">{level.nameShort || level.name}</span>
+                                                    <span className="hidden sm:inline uppercase">{level.name}</span>
+                                                </p>
+                                                <p className="text-[10px] sm:text-xs md:text-sm font-bold leading-tight line-clamp-2">
+                                                    <span className="sm:hidden">{level.questionShort || level.question}</span>
+                                                    <span className="hidden sm:inline">{level.question}</span>
+                                                </p>
                                             </button>
                                         );
                                     })}
