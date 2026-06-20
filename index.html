@@ -2316,6 +2316,7 @@
                     contact_operartis: "Contact Operartis",
                     nav_contact: "Contact",
                     nav_login: "Login",
+                    nav_dashboard: "Your Dashboard",
                     nav_logout: "Logout",
                     analytics_eyebrow: "Analytics Evolvement",
                     analytics_title: "Four Levels of Analytics",
@@ -2615,6 +2616,7 @@
                     contact_operartis: "Liên hệ Operartis",
                     nav_contact: "Liên hệ",
                     nav_login: "Đăng nhập",
+                    nav_dashboard: "Bảng điều khiển của bạn",
                     nav_logout: "Đăng xuất",
                     analytics_eyebrow: "Sự phát triển của Phân tích dữ liệu",
                     analytics_title: "Bốn Cấp độ Phân tích Dữ liệu",
@@ -2914,6 +2916,7 @@
                     contact_operartis: "Operartis kontaktieren",
                     nav_contact: "Kontakt",
                     nav_login: "Anmelden",
+                    nav_dashboard: "Ihr Dashboard",
                     nav_logout: "Abmelden",
                     analytics_eyebrow: "Analytics-Reifegrad",
                     analytics_title: "Vier Stufen der Analytics",
@@ -5996,7 +5999,9 @@
             const [navCollapsed, setNavCollapsed] = useState(false);
             const [activeNavId, setActiveNavId] = useState('supply-chain');
             const [authUser, setAuthUser] = useState(() => window.OperartisAuth?.getUser?.() || null);
+            const [accountMenuOpen, setAccountMenuOpen] = useState(false);
             const headerNavRef = useRef(null);
+            const accountMenuRef = useRef(null);
             const scrollLockRef = useRef(false);
             const scrollEndTimerRef = useRef(null);
             const scrollAnimListenerRef = useRef(null);
@@ -6124,7 +6129,10 @@
                 const handleAuthState = (event) => {
                     setAuthUser(event.detail?.user || window.OperartisAuth?.getUser?.() || null);
                 };
-                const handleLoggedOut = () => setAuthUser(null);
+                const handleLoggedOut = () => {
+                    setAuthUser(null);
+                    setAccountMenuOpen(false);
+                };
                 window.addEventListener('operartis:authenticated', handleAuthState);
                 window.addEventListener('operartis:auth-state', handleAuthState);
                 window.addEventListener('operartis:logged-out', handleLoggedOut);
@@ -6193,14 +6201,45 @@
                 setNavCollapsed(collapsed);
             }, []);
 
-            const handleAuthAction = useCallback(async () => {
-                if (authUser) {
-                    await window.OperartisAuth?.logout?.();
-                    setAuthUser(null);
+            const handleAuthButtonClick = useCallback(() => {
+                if (!authUser) {
+                    window.OperartisAuth?.showLogin?.();
                     return;
                 }
-                window.OperartisAuth?.showLogin?.();
+                setAccountMenuOpen(prev => !prev);
             }, [authUser]);
+
+            const handleDashboardOpen = useCallback(() => {
+                setAccountMenuOpen(false);
+                window.location.href = './admin.html';
+            }, []);
+
+            const handleLogout = useCallback(async () => {
+                setAccountMenuOpen(false);
+                await window.OperartisAuth?.logout?.();
+                setAuthUser(null);
+            }, []);
+
+            useEffect(() => {
+                if (!accountMenuOpen) return undefined;
+
+                const handleOutsideClick = (event) => {
+                    if (!accountMenuRef.current || accountMenuRef.current.contains(event.target)) return;
+                    setAccountMenuOpen(false);
+                };
+                const handleEscape = (event) => {
+                    if (event.key === 'Escape') setAccountMenuOpen(false);
+                };
+
+                document.addEventListener('mousedown', handleOutsideClick);
+                document.addEventListener('touchstart', handleOutsideClick, { passive: true });
+                document.addEventListener('keydown', handleEscape);
+                return () => {
+                    document.removeEventListener('mousedown', handleOutsideClick);
+                    document.removeEventListener('touchstart', handleOutsideClick);
+                    document.removeEventListener('keydown', handleEscape);
+                };
+            }, [accountMenuOpen]);
 
             useEffect(() => {
                 if (!navCollapsed) setMobileNavOpen(false);
@@ -6222,6 +6261,8 @@
                 document.addEventListener('touchstart', onOutsideTouch, { passive: true });
                 return () => document.removeEventListener('touchstart', onOutsideTouch);
             }, [resetMatrixBlocks]);
+
+            const canOpenDashboard = authUser?.role === 'admin';
 
             return (
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
@@ -6299,16 +6340,51 @@
                                 </div>
                             </div>
 
-                            <button
-                                type="button"
-                                onClick={handleAuthAction}
-                                aria-label={authUser ? `${content.ui.nav_logout}: ${authUser.email}` : content.ui.nav_login}
-                                title={authUser ? `${content.ui.nav_logout}: ${authUser.email}` : content.ui.nav_login}
-                                className="relative header-auth-btn header-auth-btn--gold h-9 w-9 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shrink-0"
-                            >
-                                <span className="header-util-icon" aria-hidden="true"><UserIcon /></span>
-                                <span className={`absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#020617] ${authUser ? 'bg-emerald-400 shadow-[0_0_0_2px_rgba(52,211,153,0.28),0_0_12px_rgba(52,211,153,0.9)]' : 'bg-white shadow-[0_0_0_1px_rgba(255,255,255,0.45)]'}`} aria-hidden="true" />
-                            </button>
+                            <div ref={accountMenuRef} className="relative shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={handleAuthButtonClick}
+                                    aria-expanded={authUser ? accountMenuOpen : undefined}
+                                    aria-haspopup={authUser ? 'menu' : undefined}
+                                    aria-label={authUser ? `Account: ${authUser.email}` : content.ui.nav_login}
+                                    title={authUser ? authUser.email : content.ui.nav_login}
+                                    className="relative header-auth-btn header-auth-btn--gold h-9 w-9 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shrink-0"
+                                >
+                                    <span className="header-util-icon" aria-hidden="true"><UserIcon /></span>
+                                    <span className={`absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#020617] ${authUser ? 'bg-emerald-400 shadow-[0_0_0_2px_rgba(52,211,153,0.28),0_0_12px_rgba(52,211,153,0.9)]' : 'bg-white shadow-[0_0_0_1px_rgba(255,255,255,0.45)]'}`} aria-hidden="true" />
+                                </button>
+
+                                {authUser && accountMenuOpen && (
+                                    <div
+                                        role="menu"
+                                        aria-label="Account menu"
+                                        className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-lg border border-slate-200/70 dark:border-slate-700/70 bg-white/95 dark:bg-slate-950/95 shadow-2xl shadow-slate-900/20 dark:shadow-black/45 backdrop-blur-xl"
+                                    >
+                                        <div className="px-3 py-2.5 border-b border-slate-200/70 dark:border-slate-800/80">
+                                            <p className="truncate text-xs font-black text-slate-900 dark:text-white">{authUser.email}</p>
+                                            <p className="mt-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{authUser.role}</p>
+                                        </div>
+                                        {canOpenDashboard && (
+                                            <button
+                                                type="button"
+                                                role="menuitem"
+                                                onClick={handleDashboardOpen}
+                                                className="w-full px-3 py-2.5 text-left text-sm font-black text-slate-800 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-100 dark:hover:bg-amber-400/10 dark:hover:text-amber-300"
+                                            >
+                                                {content.ui.nav_dashboard}
+                                            </button>
+                                        )}
+                                        <button
+                                            type="button"
+                                            role="menuitem"
+                                            onClick={handleLogout}
+                                            className="w-full px-3 py-2.5 text-left text-sm font-black text-slate-800 hover:bg-red-50 hover:text-red-700 dark:text-slate-100 dark:hover:bg-red-400/10 dark:hover:text-red-300"
+                                        >
+                                            {content.ui.nav_logout}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         </div>
                         <div className="horizon-nav-session-track shrink-0" aria-hidden="true">
