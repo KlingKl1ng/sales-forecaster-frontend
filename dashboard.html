@@ -1510,12 +1510,12 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Module</th>
-                                        <th>Status</th>
-                                        <th>Progress</th>
-                                        <th>Input</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
+                                        <th data-i18n="table.module">Module</th>
+                                        <th data-i18n="table.status">Status</th>
+                                        <th data-i18n="table.progress">Progress</th>
+                                        <th data-i18n="table.input">Input</th>
+                                        <th data-i18n="table.created">Created</th>
+                                        <th data-i18n="table.expires">Expires</th>
                                     </tr>
                                 </thead>
                                 <tbody id="recent-jobs-body"></tbody>
@@ -1548,13 +1548,13 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Module</th>
-                                        <th>Type</th>
-                                        <th>Status</th>
-                                        <th>Progress</th>
-                                        <th>Input</th>
-                                        <th>Reports</th>
-                                        <th>Updated</th>
+                                        <th data-i18n="table.module">Module</th>
+                                        <th data-i18n="table.type">Type</th>
+                                        <th data-i18n="table.status">Status</th>
+                                        <th data-i18n="table.progress">Progress</th>
+                                        <th data-i18n="table.input">Input</th>
+                                        <th data-i18n="table.reports">Reports</th>
+                                        <th data-i18n="table.updated">Updated</th>
                                     </tr>
                                 </thead>
                                 <tbody id="jobs-body"></tbody>
@@ -1571,7 +1571,7 @@
                             <p class="sub">Download retained outputs before the automatic cleanup window ends.</p>
                         </div>
                     </div>
-                    <div class="grid two-col">
+                    <div class="grid">
                         <div class="card">
                             <div class="section-head">
                                 <div>
@@ -1583,10 +1583,10 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>File</th>
-                                            <th>Module</th>
-                                            <th>Created</th>
-                                            <th>Expires</th>
+                                            <th data-i18n="table.file">File</th>
+                                            <th data-i18n="table.module">Module</th>
+                                            <th data-i18n="table.created">Created</th>
+                                            <th data-i18n="table.expires">Expires</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -1618,57 +1618,57 @@
                         <form id="profile-form" class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Member Information</h2>
-                                    <p class="section-sub">Name, company, position, contact details, and avatar.</p>
+                                    <h2 data-i18n="sections.profile.member_information">Member Information</h2>
+                                    <p class="section-sub" data-i18n="sections.profile.member_information_sub">Name, company, position, contact details, and avatar.</p>
                                 </div>
                             </div>
                             <div class="avatar-editor">
                                 <div id="profile-avatar" class="avatar avatar-large"></div>
                                 <div>
-                                    <h3>Profile Avatar</h3>
-                                    <p class="inline-note">Use a PNG, JPEG, or WebP image up to 256 KB.</p>
+                                    <h3 data-i18n="sections.profile.avatar_title">Profile Avatar</h3>
+                                    <p class="inline-note" data-i18n="sections.profile.avatar_note">Use a PNG, JPEG, or WebP image up to 256 KB.</p>
                                     <div class="avatar-actions">
                                         <input id="avatar-file" class="hidden" type="file" accept="image/png,image/jpeg,image/webp">
-                                        <button id="choose-avatar" class="button-ghost" type="button">Change Avatar</button>
-                                        <button id="clear-avatar" class="button-danger" type="button">Clear Avatar</button>
+                                        <button id="choose-avatar" class="button-ghost" type="button" data-i18n="sections.profile.change_avatar">Change Avatar</button>
+                                        <button id="clear-avatar" class="button-danger" type="button" data-i18n="sections.profile.clear_avatar">Clear Avatar</button>
                                     </div>
                                 </div>
                             </div>
                             <div class="grid form-grid">
-                                <label>Full Name<input id="profile-full-name" name="full_name" autocomplete="name" maxlength="255"></label>
-                                <label>Company<input id="profile-company" name="company_name" autocomplete="organization" maxlength="255"></label>
-                                <label>Position<input id="profile-position" name="position_title" autocomplete="organization-title" maxlength="255"></label>
-                                <label>Gender
+                                <label><span data-i18n="sections.profile.full_name">Full Name</span><input id="profile-full-name" name="full_name" autocomplete="name" maxlength="255"></label>
+                                <label><span data-i18n="sections.profile.company">Company</span><input id="profile-company" name="company_name" autocomplete="organization" maxlength="255"></label>
+                                <label><span data-i18n="sections.profile.position">Position</span><input id="profile-position" name="position_title" autocomplete="organization-title" maxlength="255"></label>
+                                <label><span data-i18n="sections.profile.gender">Gender</span>
                                     <select id="profile-gender" name="gender">
-                                        <option value="">Prefer not to say</option>
-                                        <option value="female">Female</option>
-                                        <option value="male">Male</option>
-                                        <option value="non_binary">Non-binary</option>
-                                        <option value="custom">Self-described</option>
+                                        <option value="" data-i18n="sections.profile.gender_prefer_not">Prefer not to say</option>
+                                        <option value="female" data-i18n="sections.profile.gender_female">Female</option>
+                                        <option value="male" data-i18n="sections.profile.gender_male">Male</option>
+                                        <option value="non_binary" data-i18n="sections.profile.gender_non_binary">Non-binary</option>
+                                        <option value="custom" data-i18n="sections.profile.gender_custom">Self-described</option>
                                     </select>
                                 </label>
-                                <label>Phone<input id="profile-phone" name="phone" autocomplete="tel" maxlength="64"></label>
-                                <label>Language
+                                <label><span data-i18n="sections.profile.phone">Phone</span><input id="profile-phone" name="phone" autocomplete="tel" maxlength="64"></label>
+                                <label><span data-i18n="sections.profile.language">Language</span>
                                     <select id="profile-locale" name="locale">
-                                        <option value="">Browser default</option>
-                                        <option value="en">English</option>
-                                        <option value="vi">Vietnamese</option>
-                                        <option value="de">German</option>
+                                        <option value="" data-i18n="sections.profile.browser_default">Browser default</option>
+                                        <option value="en" data-i18n="sections.profile.lang_en">English</option>
+                                        <option value="vi" data-i18n="sections.profile.lang_vi">Vietnamese</option>
+                                        <option value="de" data-i18n="sections.profile.lang_de">German</option>
                                     </select>
                                 </label>
-                                <label>Timezone<input id="profile-timezone" name="timezone" autocomplete="off" maxlength="64" placeholder="Europe/Berlin"></label>
+                                <label><span data-i18n="sections.profile.timezone">Timezone</span><input id="profile-timezone" name="timezone" autocomplete="off" maxlength="64" placeholder="Europe/Berlin"></label>
                             </div>
                             <div class="form-actions">
-                                <button id="reset-profile" class="button-ghost" type="button">Reset</button>
-                                <button id="save-profile" class="button-link" type="submit">Save Profile</button>
+                                <button id="reset-profile" class="button-ghost" type="button" data-i18n="sections.profile.reset">Reset</button>
+                                <button id="save-profile" class="button-link" type="submit" data-i18n="sections.profile.save_profile">Save Profile</button>
                             </div>
                         </form>
                         <div class="stack">
                             <div class="card">
                                 <div class="section-head">
                                     <div>
-                                        <h2>Account Summary</h2>
-                                        <p class="section-sub">Current signed-in account details.</p>
+                                        <h2 data-i18n="sections.profile.account_summary">Account Summary</h2>
+                                        <p class="section-sub" data-i18n="sections.profile.account_summary_sub">Current signed-in account details.</p>
                                     </div>
                                 </div>
                                 <div id="account-info" class="kv-list"></div>
@@ -1676,8 +1676,8 @@
                             <div class="card">
                                 <div class="section-head">
                                     <div>
-                                        <h2>Data Retention</h2>
-                                        <p class="section-sub">Uploads, reports, and scenario artifacts are automatically deleted after the retention window.</p>
+                                        <h2 data-i18n="sections.profile.data_retention">Data Retention</h2>
+                                        <p class="section-sub" data-i18n="sections.profile.data_retention_sub">Uploads, reports, and scenario artifacts are automatically deleted after the retention window.</p>
                                     </div>
                                 </div>
                                 <div id="retention-info" class="kv-list"></div>
@@ -1817,8 +1817,8 @@
                         <div class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>User Status</h2>
-                                    <p class="section-sub">Current account distribution.</p>
+                                    <h2 data-i18n="sections.admin-overview.user_status">User Status</h2>
+                                    <p class="section-sub" data-i18n="sections.admin-overview.user_status_sub">Current account distribution.</p>
                                 </div>
                             </div>
                             <div id="admin-user-statuses" class="kv-list"></div>
@@ -1826,8 +1826,8 @@
                         <div class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Invite Status</h2>
-                                    <p class="section-sub">Invite lifecycle summary.</p>
+                                    <h2 data-i18n="sections.admin-overview.invite_status">Invite Status</h2>
+                                    <p class="section-sub" data-i18n="sections.admin-overview.invite_status_sub">Invite lifecycle summary.</p>
                                 </div>
                             </div>
                             <div id="admin-invite-statuses" class="kv-list"></div>
@@ -1835,8 +1835,8 @@
                         <div class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Job Status</h2>
-                                    <p class="section-sub">All organization module runs.</p>
+                                    <h2 data-i18n="sections.admin-overview.job_status">Job Status</h2>
+                                    <p class="section-sub" data-i18n="sections.admin-overview.job_status_sub">All organization module runs.</p>
                                 </div>
                             </div>
                             <div id="admin-job-statuses" class="kv-list"></div>
@@ -1855,20 +1855,20 @@
                     <div class="card">
                         <div class="toolbar">
                             <div>
-                                <h2>User Management</h2>
-                                <p class="section-sub">Admins can update account role and status.</p>
+                                <h2 data-i18n="sections.admin-users.card_title">User Management</h2>
+                                <p class="section-sub" data-i18n="sections.admin-users.card_sub">Admins can update account role and status.</p>
                             </div>
                         </div>
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Last Login</th>
-                                        <th>Actions</th>
+                                        <th data-i18n="table.email">Email</th>
+                                        <th data-i18n="table.role">Role</th>
+                                        <th data-i18n="table.status">Status</th>
+                                        <th data-i18n="table.created">Created</th>
+                                        <th data-i18n="table.last_login">Last Login</th>
+                                        <th data-i18n="table.actions">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-users-body"></tbody>
@@ -1888,46 +1888,46 @@
                     <div class="card">
                         <div class="section-head">
                             <div>
-                                <h2>Create Invite</h2>
-                                <p class="section-sub">New accounts can only activate through an invite link.</p>
+                                <h2 data-i18n="sections.admin-invites.create_title">Create Invite</h2>
+                                <p class="section-sub" data-i18n="sections.admin-invites.create_sub">New accounts can only activate through an invite link.</p>
                             </div>
                         </div>
                         <form id="admin-invite-form" class="admin-form-grid">
-                            <label>Email<input id="admin-invite-email" type="email" autocomplete="email" required></label>
-                            <label>Role
+                            <label><span data-i18n="table.email">Email</span><input id="admin-invite-email" type="email" autocomplete="email" required></label>
+                            <label><span data-i18n="table.role">Role</span>
                                 <select id="admin-invite-role">
-                                    <option value="member">Member</option>
-                                    <option value="admin">Admin</option>
+                                    <option value="member" data-i18n="sections.security.role_member">Member</option>
+                                    <option value="admin" data-i18n="sections.security.role_admin">Admin</option>
                                 </select>
                             </label>
-                            <button id="admin-invite-submit" type="submit">Create Invite</button>
+                            <button id="admin-invite-submit" type="submit" data-i18n="sections.admin-invites.create_invite">Create Invite</button>
                         </form>
                         <section id="admin-invite-result" class="invite-result">
-                            <strong>Invite link</strong>
+                            <strong data-i18n="sections.admin-invites.invite_link">Invite link</strong>
                             <div class="invite-row">
                                 <input id="admin-invite-url" readonly>
-                                <button id="admin-copy-invite" class="button-secondary" type="button">Copy</button>
+                                <button id="admin-copy-invite" class="button-secondary" type="button" data-i18n="actions.copy">Copy</button>
                             </div>
                         </section>
                     </div>
                     <div class="card" style="margin-top:16px">
                         <div class="toolbar">
                             <div>
-                                <h2>Invite History</h2>
-                                <p class="section-sub">Accepted invite links are not recoverable. Pending invites can be revoked.</p>
+                                <h2 data-i18n="sections.admin-invites.history_title">Invite History</h2>
+                                <p class="section-sub" data-i18n="sections.admin-invites.history_sub">Accepted invite links are not recoverable. Pending invites can be revoked.</p>
                             </div>
                         </div>
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
-                                        <th>Invited By</th>
-                                        <th>Actions</th>
+                                        <th data-i18n="table.email">Email</th>
+                                        <th data-i18n="table.role">Role</th>
+                                        <th data-i18n="table.status">Status</th>
+                                        <th data-i18n="table.created">Created</th>
+                                        <th data-i18n="table.expires">Expires</th>
+                                        <th data-i18n="table.invited_by">Invited By</th>
+                                        <th data-i18n="table.actions">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-invites-body"></tbody>
@@ -1949,14 +1949,14 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Module</th>
-                                        <th>Type</th>
-                                        <th>User</th>
-                                        <th>Status</th>
-                                        <th>Progress</th>
-                                        <th>File</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
+                                        <th data-i18n="table.module">Module</th>
+                                        <th data-i18n="table.type">Type</th>
+                                        <th data-i18n="table.user">User</th>
+                                        <th data-i18n="table.status">Status</th>
+                                        <th data-i18n="table.progress">Progress</th>
+                                        <th data-i18n="table.file">File</th>
+                                        <th data-i18n="table.created">Created</th>
+                                        <th data-i18n="table.expires">Expires</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-jobs-body"></tbody>
@@ -1978,10 +1978,10 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Event</th>
-                                        <th>User</th>
-                                        <th>Details</th>
-                                        <th>Created</th>
+                                        <th data-i18n="table.event">Event</th>
+                                        <th data-i18n="table.user">User</th>
+                                        <th data-i18n="table.details">Details</th>
+                                        <th data-i18n="table.created">Created</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-audit-body"></tbody>
@@ -2047,6 +2047,23 @@
         function dt(key, vars) {
             return window.OperartisDashboardI18n ? window.OperartisDashboardI18n.t(key, vars) : key;
         }
+        function roleLabel(role) {
+            const s = 'sections.security.';
+            if (role === 'admin') return dt(s + 'role_admin');
+            if (role === 'member') return dt(s + 'role_member');
+            return role || '-';
+        }
+        function statusLabel(key) {
+            if (!key) return '-';
+            const translated = dt('admin_status.' + key);
+            return translated !== 'admin_status.' + key ? translated : String(key).replace(/_/g, ' ');
+        }
+        function auditEventLabel(key) {
+            if (!key) return '-';
+            const normalized = String(key).toLowerCase();
+            const translated = dt('audit_events.' + normalized);
+            return translated !== 'audit_events.' + normalized ? translated : String(key).replace(/_/g, ' ');
+        }
         function syncDashboardI18n() {
             if (!window.OperartisDashboardI18n) return;
             window.OperartisDashboardI18n.apply();
@@ -2055,20 +2072,25 @@
                 topTitle.textContent = sectionCopy[state.activeSection][0];
                 topSubtitle.textContent = sectionCopy[state.activeSection][1];
             }
+            if (state.user) {
+                renderAccount();
+                renderSummary();
+                if (state.user.role === 'admin') renderAdminAll();
+            }
             applySidebarCollapsedUi();
         }
         const moduleMeta = {
-            sales_forecaster: { label: 'Sales Forecaster', href: './forecaster.html', code: 'SF' },
+            sales_forecaster: { label: 'ML Forecaster', href: './forecaster.html', code: 'SF' },
             ml_forecaster: { label: 'Advanced ML Forecaster', href: './mlforecaster.html', code: 'ML' },
             inventory_optimizer: { label: 'Inventory Optimizer', href: './inventory.html', code: 'IO' },
             inventory: { label: 'Inventory Optimizer', href: './inventory.html', code: 'IO' },
             abcxyz: { label: 'ABC-XYZ Analysis', href: './abcxyz.html', code: 'AX' },
         };
         const shortcuts = [
-            { label: 'Sales Forecaster', href: './forecaster.html', code: 'SF', desc: 'Demand forecasting from ERP-style sales history.' },
-            { label: 'Advanced ML Forecaster', href: './mlforecaster.html', code: 'ML', desc: 'Driver-based forecasting, synthesis, and scenarios.' },
-            { label: 'Inventory Optimizer', href: './inventory.html', code: 'IO', desc: 'Simulation and inventory policy optimization.' },
-            { label: 'ABC-XYZ Analysis', href: './abcxyz.html', code: 'AX', desc: 'Portfolio segmentation and matrix analysis.' },
+            { href: './forecaster.html', code: 'SF' },
+            { href: './mlforecaster.html', code: 'ML' },
+            { href: './inventory.html', code: 'IO' },
+            { href: './abcxyz.html', code: 'AX' },
         ];
 
         const shortcutThemes = {
@@ -2161,12 +2183,27 @@
             return element;
         }
 
-        function badge(value) {
-            return el('span', { class: `badge ${String(value || '').toLowerCase()}`, text: value || 'unknown' });
+        function badge(value, kind) {
+            const text = kind === 'role'
+                ? roleLabel(value)
+                : kind === 'audit'
+                    ? auditEventLabel(value)
+                    : statusLabel(value);
+            return el('span', { class: `badge ${String(value || '').toLowerCase()}`, text: text || 'unknown' });
         }
 
         function moduleLabel(value) {
+            const key = 'module_names.' + value;
+            const translated = dt(key);
+            if (translated !== key) return translated;
             return (moduleMeta[value] && moduleMeta[value].label) || String(value || 'Module').replace(/_/g, ' ');
+        }
+
+        function shortcutCopy(code) {
+            return {
+                label: dt('module_cards.' + code + '.label'),
+                desc: dt('module_cards.' + code + '.desc'),
+            };
         }
 
         function initials(user) {
@@ -2307,12 +2344,13 @@
 
         function shortcutCard(item, compact = false) {
             const theme = shortcutThemes[item.code] || 'shortcut-theme-gold';
+            const copy = shortcutCopy(item.code);
             if (compact) {
                 return el('article', { class: `shortcut-compact ${theme}` }, [
                     createShortcutIcon(item.code),
                     el('div', { class: 'shortcut-copy' }, [
-                        el('h3', { text: item.label }),
-                        el('p', { text: item.desc }),
+                        el('h3', { text: copy.label }),
+                        el('p', { text: copy.desc }),
                     ]),
                     el('a', { class: 'shortcut-action', href: item.href, text: dt('actions.open') }),
                 ]);
@@ -2323,8 +2361,8 @@
                     badge(dt('actions.available')),
                 ]),
                 el('div', { class: 'shortcut-copy' }, [
-                    el('h3', { text: item.label }),
-                    el('p', { text: item.desc }),
+                    el('h3', { text: copy.label }),
+                    el('p', { text: copy.desc }),
                 ]),
                 el('div', { class: 'shortcut-foot' }, [
                     el('a', { class: 'shortcut-action', href: item.href, text: dt('actions.open_module') }),
@@ -2345,11 +2383,11 @@
             const completion = profileCompletion();
             document.getElementById('profile-progress').style.width = `${completion}%`;
             const profileRows = [
-                ['Completion', `${completion}%`],
-                ['Name', state.user?.full_name || 'Missing'],
-                ['Company', state.user?.company_name || 'Missing'],
-                ['Position', state.user?.position_title || 'Missing'],
-                ['Language', state.user?.locale || 'Browser default'],
+                [dt('profile_summary.completion'), `${completion}%`],
+                [dt('profile_summary.name'), state.user?.full_name || dt('profile_summary.missing')],
+                [dt('profile_summary.company'), state.user?.company_name || dt('profile_summary.missing')],
+                [dt('profile_summary.position'), state.user?.position_title || dt('profile_summary.missing')],
+                [dt('profile_summary.language'), state.user?.locale || dt('profile_summary.browser_default')],
             ];
             const summary = document.getElementById('profile-summary');
             clear(summary);
@@ -2365,24 +2403,25 @@
             clear(account);
             clear(retention);
             clear(access);
+            const p = 'sections.profile.';
+            const s = 'sections.security.';
             [
-                ['Email', state.user?.email || '-'],
-                ['Role', state.user?.role || '-'],
-                ['Company', state.user?.company_name || '-'],
-                ['Position', state.user?.position_title || '-'],
+                [dt(p + 'email'), state.user?.email || '-'],
+                [dt(p + 'role'), roleLabel(state.user?.role)],
+                [dt(p + 'company'), state.user?.company_name || '-'],
+                [dt(p + 'position'), state.user?.position_title || '-'],
             ].forEach(([label, value]) => account.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
             [
-                ['Retention Window', `${state.overview?.retention_days || 7} days`],
-                ['Reports Available', state.overview?.metrics?.reports_available || 0],
-                ['Stored Output Size', formatBytes(state.overview?.metrics?.artifact_bytes || 0)],
+                [dt(p + 'retention_window'), dt(p + 'retention_days', { days: state.overview?.retention_days || 7 })],
+                [dt(p + 'reports_available'), state.overview?.metrics?.reports_available || 0],
+                [dt(p + 'stored_output_size'), formatBytes(state.overview?.metrics?.artifact_bytes || 0)],
             ].forEach(([label, value]) => retention.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
             [
-                ['Account Status', 'Active'],
-                ['Member Role', state.user?.role || 'member'],
-                ['Modules Available', shortcuts.length],
-                ['Other Sessions', 'Closed after password change'],
+                [dt(s + 'account_status'), dt(s + 'status_active')],
+                [dt(s + 'member_role'), roleLabel(state.user?.role)],
+                [dt(s + 'modules_available'), shortcuts.length],
+                [dt(s + 'other_sessions'), dt(s + 'sessions_closed')],
             ].forEach(([label, value]) => access.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
-            retentionPill.textContent = `Retention: ${state.overview?.retention_days || 7} days`;
         }
 
         function renderStatusList() {
@@ -2390,7 +2429,7 @@
             clear(container);
             const entries = Object.entries(state.overview?.job_statuses || {});
             if (!entries.length) {
-                container.appendChild(el('div', { class: 'empty', text: 'No runs yet.' }));
+                container.appendChild(el('div', { class: 'empty', text: dt('empty.no_runs') }));
                 return;
             }
             entries.forEach(([label, count]) => {
@@ -2424,8 +2463,9 @@
             clear(recentBody);
             clear(jobsBody);
             if (!state.jobs.length) {
-                recentBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: 'No module runs yet.' })]));
-                jobsBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '7', text: 'No module runs yet.' })]));
+                const emptyText = dt('empty.no_module_runs');
+                recentBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: emptyText })]));
+                jobsBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '7', text: emptyText })]));
                 return;
             }
             state.jobs.slice(0, 5).forEach(job => recentBody.appendChild(jobRow(job, true)));
@@ -2436,7 +2476,7 @@
             const tbody = document.getElementById('artifacts-body');
             clear(tbody);
             if (!state.artifacts.length) {
-                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '5', text: 'No retained downloads yet.' })]));
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '5', text: dt('empty.no_retained_downloads') })]));
                 return;
             }
             state.artifacts.forEach(artifact => {
@@ -2452,11 +2492,12 @@
 
         function renderAdminMetrics() {
             const metrics = state.adminOverview?.metrics || {};
+            const a = 'sections.admin-overview.';
             const items = [
-                ['Users', metrics.users || 0, `${metrics.active_users || 0} active`],
-                ['Pending Invites', metrics.pending_invites || 0, 'Awaiting activation'],
-                ['Active Sessions', metrics.active_sessions || 0, 'Currently valid sessions'],
-                ['Artifacts', formatBytes(metrics.artifact_bytes || 0), 'Stored until retention expiry'],
+                [dt(a + 'metrics_users'), metrics.users || 0, dt(a + 'metrics_users_note', { count: metrics.active_users || 0 })],
+                [dt(a + 'metrics_pending_invites'), metrics.pending_invites || 0, dt(a + 'metrics_pending_invites_note')],
+                [dt(a + 'metrics_active_sessions'), metrics.active_sessions || 0, dt(a + 'metrics_active_sessions_note')],
+                [dt(a + 'metrics_artifacts'), formatBytes(metrics.artifact_bytes || 0), dt(a + 'metrics_artifacts_note')],
             ];
             const container = document.getElementById('admin-metrics');
             clear(container);
@@ -2474,12 +2515,12 @@
             clear(container);
             const entries = Object.entries(values || {});
             if (!entries.length) {
-                container.appendChild(el('div', { class: 'empty', text: 'No data yet.' }));
+                container.appendChild(el('div', { class: 'empty', text: dt('empty.no_data') }));
                 return;
             }
             entries.forEach(([label, count]) => {
                 container.appendChild(el('div', { class: 'kv-row' }, [
-                    el('span', { text: label }),
+                    el('span', { text: statusLabel(label) }),
                     el('strong', { text: count }),
                 ]));
             });
@@ -2489,24 +2530,24 @@
             const tbody = document.getElementById('admin-users-body');
             clear(tbody);
             if (!state.adminUsers.length) {
-                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: 'No users yet.' })]));
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: dt('empty.no_users') })]));
                 return;
             }
             state.adminUsers.forEach(user => {
                 const role = el('select', { class: 'select-small', dataset: { field: 'role', userId: user.id } }, [
-                    el('option', { value: 'member', text: 'Member' }),
-                    el('option', { value: 'admin', text: 'Admin' }),
+                    el('option', { value: 'member', text: roleLabel('member') }),
+                    el('option', { value: 'admin', text: roleLabel('admin') }),
                 ]);
                 role.value = user.role;
                 const status = el('select', { class: 'select-small', dataset: { field: 'status', userId: user.id } }, [
-                    el('option', { value: 'active', text: 'Active' }),
-                    el('option', { value: 'suspended', text: 'Suspended' }),
+                    el('option', { value: 'active', text: statusLabel('active') }),
+                    el('option', { value: 'suspended', text: statusLabel('suspended') }),
                 ]);
                 status.value = user.status;
                 tbody.appendChild(el('tr', {}, [
                     el('td', {}, [
                         el('strong', { text: user.email }),
-                        el('div', { class: 'metric-note', text: user.full_name || 'No profile name' }),
+                        el('div', { class: 'metric-note', text: user.full_name || dt('sections.admin-users.no_profile_name') }),
                     ]),
                     el('td', {}, [role]),
                     el('td', {}, [status]),
@@ -2514,7 +2555,7 @@
                     el('td', { text: formatDate(user.last_login_at) }),
                     el('td', {}, [
                         el('div', { class: 'row-actions' }, [
-                            el('button', { class: 'button-secondary', type: 'button', dataset: { action: 'save-user', userId: user.id }, text: 'Save' }),
+                            el('button', { class: 'button-secondary', type: 'button', dataset: { action: 'save-user', userId: user.id }, text: dt('actions.save') }),
                             badge(user.status),
                         ]),
                     ]),
@@ -2522,23 +2563,37 @@
             });
         }
 
+        function renderAdminInviteForm() {
+            const submit = document.getElementById('admin-invite-submit');
+            if (submit && !submit.disabled) {
+                submit.textContent = dt('sections.admin-invites.create_invite');
+            }
+            const roleSelect = document.getElementById('admin-invite-role');
+            if (roleSelect) {
+                Array.from(roleSelect.options).forEach(option => {
+                    if (option.value === 'member') option.textContent = roleLabel('member');
+                    if (option.value === 'admin') option.textContent = roleLabel('admin');
+                });
+            }
+        }
+
         function renderAdminInvites() {
             const tbody = document.getElementById('admin-invites-body');
             clear(tbody);
             if (!state.adminInvites.length) {
-                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '7', text: 'No invites yet.' })]));
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '7', text: dt('empty.no_invites') })]));
                 return;
             }
             state.adminInvites.forEach(invite => {
                 const actions = el('div', { class: 'row-actions' });
                 if (invite.status === 'pending') {
-                    actions.appendChild(el('button', { class: 'button-danger', type: 'button', dataset: { action: 'revoke-invite', inviteId: invite.id }, text: 'Revoke' }));
+                    actions.appendChild(el('button', { class: 'button-danger', type: 'button', dataset: { action: 'revoke-invite', inviteId: invite.id }, text: dt('actions.revoke') }));
                 } else {
                     actions.appendChild(el('span', { class: 'metric-note', text: '-' }));
                 }
                 tbody.appendChild(el('tr', {}, [
                     el('td', { text: invite.email }),
-                    el('td', {}, [badge(invite.role)]),
+                    el('td', {}, [badge(invite.role, 'role')]),
                     el('td', {}, [badge(invite.status)]),
                     el('td', { text: formatDate(invite.created_at) }),
                     el('td', { text: formatDate(invite.expires_at) }),
@@ -2552,7 +2607,7 @@
             const tbody = document.getElementById('admin-jobs-body');
             clear(tbody);
             if (!state.adminJobs.length) {
-                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '8', text: 'No jobs yet.' })]));
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '8', text: dt('empty.no_jobs') })]));
                 return;
             }
             state.adminJobs.forEach(job => {
@@ -2573,12 +2628,12 @@
             const tbody = document.getElementById('admin-audit-body');
             clear(tbody);
             if (!state.adminAuditEvents.length) {
-                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '4', text: 'No audit events yet.' })]));
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '4', text: dt('empty.no_audit_events') })]));
                 return;
             }
             state.adminAuditEvents.forEach(event => {
                 tbody.appendChild(el('tr', {}, [
-                    el('td', {}, [badge(event.event_type)]),
+                    el('td', {}, [badge(event.event_type, 'audit')]),
                     el('td', { text: event.user_email || '-' }),
                     el('td', { text: event.details ? JSON.stringify(event.details) : '-' }),
                     el('td', { text: formatDate(event.created_at) }),
@@ -2592,6 +2647,7 @@
             renderAdminStatusList('admin-user-statuses', state.adminOverview?.user_statuses || {});
             renderAdminStatusList('admin-invite-statuses', state.adminOverview?.invite_statuses || {});
             renderAdminStatusList('admin-job-statuses', state.adminOverview?.job_statuses || {});
+            renderAdminInviteForm();
             renderAdminUsers();
             renderAdminInvites();
             renderAdminJobs();
@@ -2727,7 +2783,7 @@
             const button = document.getElementById('admin-invite-submit');
             const result = document.getElementById('admin-invite-result');
             button.disabled = true;
-            button.textContent = 'Creating...';
+            button.textContent = dt('sections.admin-invites.creating');
             result.style.display = 'none';
             showMessage('');
             try {
@@ -2749,7 +2805,7 @@
                 showMessage(error.message || dt('messages.invite_create_failed'), 'error');
             } finally {
                 button.disabled = false;
-                button.textContent = 'Create Invite';
+                button.textContent = dt('sections.admin-invites.create_invite');
             }
         });
         document.getElementById('admin-copy-invite').addEventListener('click', async () => {
