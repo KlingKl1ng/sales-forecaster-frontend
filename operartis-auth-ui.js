@@ -1,7 +1,7 @@
 (function () {
     if (!window.OperartisApi) return;
 
-    var state = { user: null };
+    var state = { user: null, mode: 'login' };
     var autoPrompt = window.OPERARTIS_AUTH_AUTO_PROMPT !== false;
     var dismissible = window.OPERARTIS_AUTH_DISMISSIBLE === true || !autoPrompt;
     var showFloatingAccount = window.OPERARTIS_AUTH_FLOATING_ACCOUNT !== false;
@@ -21,6 +21,14 @@
             invalidCredentials: 'Invalid email or password.',
             showPassword: 'Show password',
             hidePassword: 'Hide password',
+            forgotPassword: 'Forgot password?',
+            backToLogin: 'Back to sign in',
+            resetTitle: 'Reset Password',
+            resetSubtitle: 'Enter your account email and we will send a secure reset link.',
+            resetSubmit: 'Send Reset Link',
+            resetting: 'Sending...',
+            resetSent: 'If this account exists, a password reset link has been sent.',
+            resetFailed: 'Password reset email could not be sent. Please contact Operartis.',
             accountPrompt: 'Still do not have your own account?',
             contactOperartis: 'Contact Operartis!',
             contactTitle: 'Email Operartis'
@@ -38,9 +46,42 @@
             invalidCredentials: 'Email hoặc mật khẩu không đúng.',
             showPassword: 'Hiển thị mật khẩu',
             hidePassword: 'Ẩn mật khẩu',
+            forgotPassword: 'Quên mật khẩu?',
+            backToLogin: 'Quay lại đăng nhập',
+            resetTitle: 'Đặt Lại Mật Khẩu',
+            resetSubtitle: 'Nhập email tài khoản của bạn, chúng tôi sẽ gửi liên kết đặt lại an toàn.',
+            resetSubmit: 'Gửi Liên Kết Đặt Lại',
+            resetting: 'Đang gửi...',
+            resetSent: 'Nếu tài khoản này tồn tại, liên kết đặt lại mật khẩu đã được gửi.',
+            resetFailed: 'Không thể gửi email đặt lại mật khẩu. Vui lòng liên hệ Operartis.',
             accountPrompt: 'Bạn vẫn chưa có tài khoản riêng?',
             contactOperartis: 'Liên hệ Operartis!',
             contactTitle: 'Gửi email cho Operartis'
+        },
+        de: {
+            title: 'Operartis Anmeldung',
+            subtitle: 'Melden Sie sich mit Ihrem eingeladenen Konto an, um die Optimierungsmodule zu nutzen.',
+            email: 'E-Mail',
+            password: 'Passwort',
+            signIn: 'Anmelden',
+            signingIn: 'Anmeldung...',
+            closeLogin: 'Anmeldung schließen',
+            logout: 'Abmelden',
+            loginFailed: 'Anmeldung fehlgeschlagen. Bitte prüfen Sie E-Mail und Passwort.',
+            invalidCredentials: 'E-Mail oder Passwort ist ungültig.',
+            showPassword: 'Passwort anzeigen',
+            hidePassword: 'Passwort ausblenden',
+            forgotPassword: 'Passwort vergessen?',
+            backToLogin: 'Zurück zur Anmeldung',
+            resetTitle: 'Passwort zurücksetzen',
+            resetSubtitle: 'Geben Sie Ihre Konto-E-Mail ein. Wir senden einen sicheren Link zum Zurücksetzen.',
+            resetSubmit: 'Reset-Link senden',
+            resetting: 'Wird gesendet...',
+            resetSent: 'Wenn dieses Konto existiert, wurde ein Link zum Zurücksetzen gesendet.',
+            resetFailed: 'Die E-Mail zum Zurücksetzen konnte nicht gesendet werden. Bitte kontaktieren Sie Operartis.',
+            accountPrompt: 'Sie haben noch kein eigenes Konto?',
+            contactOperartis: 'Operartis kontaktieren!',
+            contactTitle: 'Operartis per E-Mail kontaktieren'
         }
     };
 
@@ -59,12 +100,14 @@
 
     function localizeError(message) {
         if (!message) return t('loginFailed');
-        if (message === authCopy.en.invalidCredentials || message === authCopy.vi.invalidCredentials) {
+        if (message === authCopy.en.invalidCredentials || message === authCopy.vi.invalidCredentials || message === authCopy.de.invalidCredentials) {
             return t('invalidCredentials');
         }
-        if (message === authCopy.en.loginFailed || message === authCopy.vi.loginFailed) {
+        if (message === authCopy.en.loginFailed || message === authCopy.vi.loginFailed || message === authCopy.de.loginFailed) {
             return t('loginFailed');
         }
+        if (message === authCopy.en.resetSent) return t('resetSent');
+        if (message.indexOf('Password reset email could not be sent') === 0) return t('resetFailed');
         return message;
     }
 
@@ -92,11 +135,16 @@
             '.op-auth-password-toggle:focus-visible{outline:2px solid rgba(245,158,11,.6);outline-offset:2px}',
             '.op-auth-password-toggle svg{width:18px;height:18px;stroke:currentColor}',
             '.op-auth-button{height:44px;width:100%;border:0;border-radius:8px;background:#f59e0b;color:#ffffff;font-weight:900;cursor:pointer}',
+            '.op-auth-link{display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:#d97706;font-weight:900;font-size:12px;line-height:1.4;text-decoration:none;cursor:pointer;padding:0;margin:0 0 14px}',
+            '.op-auth-link:hover{text-decoration:underline}',
+            '.op-auth-link:focus-visible{outline:2px solid rgba(245,158,11,.55);outline-offset:3px;border-radius:4px}',
             '.op-auth-contact{margin:12px 0 0;color:var(--op-auth-muted);font-size:12px;line-height:1.5;text-align:center}',
             '.op-auth-contact a{color:#d97706;font-weight:900;text-decoration:none}',
             '.op-auth-contact a:hover{text-decoration:underline}',
             '.op-auth-contact a:focus-visible{outline:2px solid rgba(245,158,11,.55);outline-offset:3px;border-radius:4px}',
             '.op-auth-error{display:none;color:var(--op-auth-error-text);background:var(--op-auth-error-bg);border:1px solid var(--op-auth-error-border);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:800;line-height:1.4;margin-bottom:14px}',
+            '.op-auth-error[data-kind="success"]{color:#166534;background:rgba(220,252,231,.95);border-color:rgba(34,197,94,.35)}',
+            '.op-auth-overlay[data-auth-theme="dark"] .op-auth-error[data-kind="success"]{color:#bbf7d0;background:rgba(34,197,94,.14);border-color:rgba(74,222,128,.35)}',
             '.op-auth-account{position:fixed;right:18px;bottom:18px;z-index:99990;display:none;gap:8px;align-items:center;background:rgba(15,23,42,.92);color:#e2e8f0;border:1px solid rgba(148,163,184,.28);border-radius:999px;padding:8px 10px;font:700 12px Inter,system-ui,sans-serif;box-shadow:0 12px 36px rgba(0,0,0,.22)}',
             '.op-auth-account[data-auth-theme="light"]{background:rgba(255,255,255,.92);color:#0f172a;border-color:rgba(15,23,42,.14)}',
             '.op-auth-account[data-open="true"]{display:flex}',
@@ -156,19 +204,28 @@
         var subtitle = document.getElementById('operartis-auth-subtitle');
         var emailLabel = document.getElementById('operartis-auth-email-label-text');
         var passwordLabel = document.getElementById('operartis-auth-password-label-text');
+        var passwordField = document.getElementById('operartis-auth-password-field');
         var submit = document.getElementById('operartis-auth-submit');
         var close = document.getElementById('operartis-auth-close');
         var logout = document.getElementById('operartis-auth-logout');
         var passwordInput = document.getElementById('operartis-auth-password');
         var passwordToggle = document.getElementById('operartis-auth-password-toggle');
+        var forgot = document.getElementById('operartis-auth-forgot');
         var contactPrompt = document.getElementById('operartis-auth-contact-prompt');
         var contactLink = document.getElementById('operartis-auth-contact-link');
+        var isReset = state.mode === 'reset';
 
-        if (title) title.textContent = t('title');
-        if (subtitle) subtitle.textContent = t('subtitle');
+        if (title) title.textContent = isReset ? t('resetTitle') : t('title');
+        if (subtitle) subtitle.textContent = isReset ? t('resetSubtitle') : t('subtitle');
         if (emailLabel) emailLabel.textContent = t('email');
         if (passwordLabel) passwordLabel.textContent = t('password');
-        if (submit && !submit.disabled) submit.textContent = t('signIn');
+        if (passwordField) passwordField.style.display = isReset ? 'none' : 'flex';
+        if (passwordInput) {
+            passwordInput.required = !isReset;
+            passwordInput.disabled = isReset;
+        }
+        if (submit && !submit.disabled) submit.textContent = isReset ? t('resetSubmit') : t('signIn');
+        if (forgot) forgot.textContent = isReset ? t('backToLogin') : t('forgotPassword');
         if (close) {
             close.setAttribute('aria-label', t('closeLogin'));
             close.setAttribute('title', t('closeLogin'));
@@ -212,7 +269,8 @@
             '<p class="op-auth-sub" id="operartis-auth-subtitle"></p>',
             '<div class="op-auth-error" id="operartis-auth-error" role="alert" aria-live="polite"></div>',
             '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-email-label-text"></span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
-            '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-password-label-text"></span><span class="op-auth-password-wrap"><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required><button class="op-auth-password-toggle" id="operartis-auth-password-toggle" type="button" aria-pressed="false"></button></span></label>',
+            '<label class="op-auth-field" id="operartis-auth-password-field"><span class="op-auth-label" id="operartis-auth-password-label-text"></span><span class="op-auth-password-wrap"><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required><button class="op-auth-password-toggle" id="operartis-auth-password-toggle" type="button" aria-pressed="false"></button></span></label>',
+            '<button class="op-auth-link" id="operartis-auth-forgot" type="button"></button>',
             '<button class="op-auth-button" id="operartis-auth-submit" type="submit"></button>',
             '<p class="op-auth-contact"><span id="operartis-auth-contact-prompt"></span><a id="operartis-auth-contact-link" href="mailto:info@operartis.io"></a></p>',
             '</form>'
@@ -227,7 +285,11 @@
 
         document.getElementById('operartis-auth-form').addEventListener('submit', async function (event) {
             event.preventDefault();
-            await handleLogin();
+            if (state.mode === 'reset') await handlePasswordResetRequest();
+            else await handleLogin();
+        });
+        document.getElementById('operartis-auth-forgot').addEventListener('click', function () {
+            setAuthMode(state.mode === 'reset' ? 'login' : 'reset');
         });
         document.getElementById('operartis-auth-password-toggle').addEventListener('click', function () {
             var passwordInput = document.getElementById('operartis-auth-password');
@@ -259,15 +321,29 @@
         document.getElementById('operartis-auth-password-toggle').innerHTML = passwordIcon(false);
     }
 
-    function setError(message) {
+    function setMessage(message, kind) {
         var error = document.getElementById('operartis-auth-error');
         if (!error) return;
         error.textContent = message || '';
+        error.dataset.kind = kind || 'error';
         error.style.display = message ? 'block' : 'none';
+    }
+
+    function setError(message) {
+        setMessage(message, 'error');
+    }
+
+    function setAuthMode(mode) {
+        state.mode = mode === 'reset' ? 'reset' : 'login';
+        var passwordInput = document.getElementById('operartis-auth-password');
+        if (passwordInput && state.mode === 'reset') passwordInput.value = '';
+        setError('');
+        syncAuthLanguage();
     }
 
     function showLogin() {
         buildUi();
+        setAuthMode('login');
         syncAuthTheme();
         syncAuthLanguage();
         document.getElementById('operartis-auth-overlay').setAttribute('data-open', 'true');
@@ -311,6 +387,23 @@
         } finally {
             button.disabled = false;
             button.textContent = t('signIn');
+        }
+    }
+
+    async function handlePasswordResetRequest() {
+        var email = document.getElementById('operartis-auth-email').value;
+        var button = document.getElementById('operartis-auth-submit');
+        button.disabled = true;
+        button.textContent = t('resetting');
+        setError('');
+        try {
+            var data = await window.OperartisApi.requestPasswordReset(email);
+            setMessage(localizeError(data.message || t('resetSent')), 'success');
+        } catch (error) {
+            setError(localizeError(error.message || t('resetFailed')));
+        } finally {
+            button.disabled = false;
+            button.textContent = t('resetSubmit');
         }
     }
 

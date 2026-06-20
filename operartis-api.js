@@ -125,6 +125,24 @@
         return data.user;
     }
 
+    async function requestPasswordReset(email) {
+        var response = await apiFetch('/auth/password/reset/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+        });
+        return parseJsonResponse(response);
+    }
+
+    async function confirmPasswordReset(email, token, newPassword) {
+        var response = await apiFetch('/auth/password/reset/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, token: token, new_password: newPassword })
+        });
+        return parseJsonResponse(response);
+    }
+
     async function logout() {
         await apiFetch('/auth/logout', { method: 'POST' }).catch(function () { });
         setCsrf('');
@@ -138,6 +156,8 @@
         setCsrf: setCsrf,
         me: me,
         login: login,
+        requestPasswordReset: requestPasswordReset,
+        confirmPasswordReset: confirmPasswordReset,
         logout: logout
     };
 })();
