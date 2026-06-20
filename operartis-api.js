@@ -28,6 +28,17 @@
         }
     }
 
+    function shouldDispatchUnauthorized(input) {
+        var raw = typeof input === 'string' ? input : input && input.url;
+        if (!raw) return true;
+        try {
+            var url = new URL(raw, window.location.href);
+            return url.pathname !== '/auth/login';
+        } catch (e) {
+            return true;
+        }
+    }
+
     function methodOf(init) {
         return String((init && init.method) || 'GET').toUpperCase();
     }
@@ -54,7 +65,7 @@
     window.fetch = function (input, init) {
         var options = isApiRequest(input) ? withAuthOptions(init) : init;
         return originalFetch(input, options).then(function (response) {
-            if (isApiRequest(input) && response.status === 401) {
+            if (isApiRequest(input) && response.status === 401 && shouldDispatchUnauthorized(input)) {
                 window.dispatchEvent(new CustomEvent('operartis:unauthorized'));
             }
             return response;
@@ -65,14 +76,33 @@
         var base = getDefaultApiBase();
         var url = path.indexOf('http') === 0 ? path : base + path;
         var response = await originalFetch(url, withAuthOptions(init));
-        if (response.status === 401) window.dispatchEvent(new CustomEvent('operartis:unauthorized'));
+        if (response.status === 401 && shouldDispatchUnauthorized(url)) {
+            window.dispatchEvent(new CustomEvent('operartis:unauthorized'));
+        }
         return response;
+    }
+
+    function readErrorMessage(data, fallback) {
+        if (!data) return fallback;
+        if (typeof data.detail === 'string') return data.detail;
+        if (Array.isArray(data.detail)) {
+            var messages = data.detail.map(function (item) {
+                if (typeof item === 'string') return item;
+                return item && (item.msg || item.message || item.detail);
+            }).filter(Boolean);
+            return messages.join(' ') || fallback;
+        }
+        if (data.detail && typeof data.detail === 'object') {
+            return data.detail.message || data.detail.msg || fallback;
+        }
+        if (typeof data.message === 'string') return data.message;
+        return fallback;
     }
 
     async function parseJsonResponse(response) {
         var data = await response.json().catch(function () { return {}; });
         if (!response.ok) {
-            throw new Error(data.detail || data.message || 'Request failed');
+            throw new Error(readErrorMessage(data, 'Request failed'));
         }
         return data;
     }

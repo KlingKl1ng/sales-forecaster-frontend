@@ -23,7 +23,7 @@
             '.op-auth-input{height:44px;border-radius:8px;border:1px solid rgba(148,163,184,.32);background:#020617;color:#f8fafc;padding:0 12px;font-size:14px;outline:none}',
             '.op-auth-input:focus{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.18)}',
             '.op-auth-button{height:44px;width:100%;border:0;border-radius:8px;background:#f59e0b;color:#111827;font-weight:900;cursor:pointer}',
-            '.op-auth-error{display:none;color:#fecaca;background:rgba(239,68,68,.14);border:1px solid rgba(248,113,113,.35);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:14px}',
+            '.op-auth-error{display:none;color:#fecaca;background:rgba(239,68,68,.14);border:1px solid rgba(248,113,113,.35);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:800;line-height:1.4;margin-bottom:14px}',
             '.op-auth-account{position:fixed;right:18px;bottom:18px;z-index:99990;display:none;gap:8px;align-items:center;background:rgba(15,23,42,.92);color:#e2e8f0;border:1px solid rgba(148,163,184,.28);border-radius:999px;padding:8px 10px;font:700 12px Inter,system-ui,sans-serif;box-shadow:0 12px 36px rgba(0,0,0,.22)}',
             '.op-auth-account[data-open="true"]{display:flex}',
             '.op-auth-logout{border:0;border-radius:999px;background:#334155;color:#fff;font-weight:800;font-size:11px;padding:6px 9px;cursor:pointer}'
@@ -43,7 +43,7 @@
             dismissible ? '<button class="op-auth-close" id="operartis-auth-close" type="button" aria-label="Close login" title="Close login">&times;</button>' : '',
             '<h1 class="op-auth-title">Operartis Login</h1>',
             '<p class="op-auth-sub">Sign in with your invited account to use the optimization modules.</p>',
-            '<div class="op-auth-error" id="operartis-auth-error"></div>',
+            '<div class="op-auth-error" id="operartis-auth-error" role="alert" aria-live="polite"></div>',
             '<label class="op-auth-field"><span class="op-auth-label">Email</span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
             '<label class="op-auth-field"><span class="op-auth-label">Password</span><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required></label>',
             '<button class="op-auth-button" id="operartis-auth-submit" type="submit">Sign In</button>',
@@ -118,7 +118,7 @@
             var user = await window.OperartisApi.login(email, password);
             showAccount(user);
         } catch (error) {
-            setError(error.message || 'Login failed');
+            setError(error.message || 'Login failed. Please check your email and password.');
         } finally {
             button.disabled = false;
             button.textContent = 'Sign In';
