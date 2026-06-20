@@ -109,6 +109,8 @@
     </style>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
+    <script src="./operartis-api.js"></script>
+    <script src="./operartis-auth-ui.js"></script>
     <script src="./vendor/react-17.0.2.production.min.js"></script>
     <script src="./vendor/react-dom-17.0.2.production.min.js"></script>
     <script src="./vendor/prop-types-15.8.1.min.js"></script>
@@ -157,7 +159,7 @@
 
         const API_ENDPOINTS = {
             LOCAL: 'http://127.0.0.1:8000',
-            PROD: 'https://api.operartis.io'
+            PROD: window.OperartisApi ? window.OperartisApi.getDefaultApiBase() : 'https://api.operartis.io'
         };
 
         // --- TRANSLATIONS ---

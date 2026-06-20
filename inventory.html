@@ -45,6 +45,8 @@
     </script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
+    <script src="./operartis-api.js"></script>
+    <script src="./operartis-auth-ui.js"></script>
 
     <script src="./vendor/react-17.0.2.production.min.js"></script>
     <script src="./vendor/react-dom-17.0.2.production.min.js"></script>
@@ -1846,7 +1848,7 @@
         // --- API CONFIGURATION ---
         const API_ENDPOINTS = {
             LOCAL: 'http://localhost:8000',
-            PROD: 'https://api.operartis.io'
+            PROD: window.OperartisApi ? window.OperartisApi.getDefaultApiBase() : 'https://api.operartis.io'
         };
 
         // --- API CALL: Timeline Simulation (Single Run for Animation) ---
@@ -3638,7 +3640,7 @@
             const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
             // API URL State & Auto-Detection
-            const [apiUrl, setApiUrl] = useState(API_ENDPOINTS.LOCAL);
+            const [apiUrl, setApiUrl] = useState(API_ENDPOINTS.PROD);
             const [connectionStatus, setConnectionStatus] = useState('checking'); // checking, local, cloud
 
             // Auto-detect API connection (LOCAL or CLOUD)

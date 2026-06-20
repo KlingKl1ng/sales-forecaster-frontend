@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operartis | Admin</title>
+    <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
+    <script src="./operartis-api.js"></script>
+    <script src="./operartis-auth-ui.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #020617;
+            color: #f8fafc;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            padding: 32px 20px;
+        }
+        main {
+            width: min(720px, 100%);
+            margin: 0 auto;
+            border: 1px solid rgba(148, 163, 184, .28);
+            border-radius: 10px;
+            background: #0f172a;
+            padding: 28px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+        }
+        h1 { margin: 0 0 8px; font-size: 26px; }
+        p { margin: 0 0 22px; color: #94a3b8; line-height: 1.5; }
+        form { display: grid; grid-template-columns: 1fr 140px; gap: 14px; align-items: end; }
+        label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #cbd5e1; }
+        input, select {
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, .32);
+            background: #020617;
+            color: #f8fafc;
+            padding: 0 12px;
+            font-size: 14px;
+        }
+        button {
+            height: 44px;
+            border: 0;
+            border-radius: 8px;
+            background: #f59e0b;
+            color: #111827;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        button.secondary { background: #334155; color: #fff; padding: 0 14px; }
+        .message { display: none; border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 14px; }
+        .error { color: #fecaca; background: rgba(239, 68, 68, .14); border: 1px solid rgba(248, 113, 113, .35); }
+        .success { color: #bbf7d0; background: rgba(34, 197, 94, .14); border: 1px solid rgba(74, 222, 128, .35); }
+        .invite-result {
+            display: none;
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, .28);
+            background: rgba(2, 6, 23, .7);
+        }
+        .invite-row { display: flex; gap: 10px; margin-top: 10px; }
+        .invite-row input { flex: 1; }
+        .hidden { display: none; }
+        @media (max-width: 640px) {
+            form { grid-template-columns: 1fr; }
+            .invite-row { flex-direction: column; }
+        }
+    </style>
+</head>
+
+<body>
+    <main id="admin-panel" class="hidden">
+        <h1>Operartis Admin</h1>
+        <p>Create invite links for approved Operartis users. New accounts can activate only through an invite link.</p>
+        <div id="message" class="message"></div>
+        <form id="invite-form" class="hidden">
+            <label>Email<input id="email" type="email" autocomplete="email" required></label>
+            <label>Role
+                <select id="role">
+                    <option value="member">Member</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </label>
+            <button id="submit" type="submit">Create Invite</button>
+        </form>
+        <section id="invite-result" class="invite-result">
+            <strong>Invite link</strong>
+            <div class="invite-row">
+                <input id="invite-url" readonly>
+                <button id="copy" class="secondary" type="button">Copy</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const panel = document.getElementById('admin-panel');
+        const form = document.getElementById('invite-form');
+        const message = document.getElementById('message');
+        const submit = document.getElementById('submit');
+        const inviteResult = document.getElementById('invite-result');
+        const inviteUrl = document.getElementById('invite-url');
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = text ? 'block' : 'none';
+        }
+
+        function showAdmin(user) {
+            if (!user || user.role !== 'admin') {
+                panel.classList.remove('hidden');
+                form.classList.add('hidden');
+                showMessage('Admin access required.', 'error');
+                return;
+            }
+            panel.classList.remove('hidden');
+            form.classList.remove('hidden');
+        }
+
+        window.addEventListener('operartis:authenticated', (event) => {
+            showAdmin(event.detail.user);
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            submit.disabled = true;
+            submit.textContent = 'Creating...';
+            inviteResult.style.display = 'none';
+            showMessage('', 'success');
+            try {
+                const response = await window.OperartisApi.apiFetch('/auth/invites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        role: document.getElementById('role').value
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'Invite could not be created.');
+                inviteUrl.value = data.accept_url;
+                inviteResult.style.display = 'block';
+                showMessage('Invite created.', 'success');
+            } catch (error) {
+                showMessage(error.message || 'Invite could not be created.', 'error');
+            } finally {
+                submit.disabled = false;
+                submit.textContent = 'Create Invite';
+            }
+        });
+
+        document.getElementById('copy').addEventListener('click', async () => {
+            await navigator.clipboard.writeText(inviteUrl.value);
+            showMessage('Invite link copied.', 'success');
+        });
+    </script>
+</body>
+
+</html>
