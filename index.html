@@ -61,6 +61,12 @@
     </script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
+    <script>
+        window.OPERARTIS_AUTH_AUTO_PROMPT = false;
+        window.OPERARTIS_AUTH_FLOATING_ACCOUNT = false;
+    </script>
+    <script src="./operartis-api.js"></script>
+    <script src="./operartis-auth-ui.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
 
@@ -2178,6 +2184,7 @@
         const GlobeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>;
         // NEW ICONS
         const FactoryIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="17" y1="13" x2="17" y2="13.01"></line><line x1="7" y1="13" x2="7" y2="13.01"></line></svg>;
+        const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
         const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>;
         const GitBranchIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>;
         // STRATEGIC ICONS
@@ -2281,6 +2288,8 @@
                     invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
                     contact_operartis: "Contact Operartis",
                     nav_contact: "Contact",
+                    nav_login: "Login",
+                    nav_logout: "Logout",
                     analytics_eyebrow: "Analytics Evolvement",
                     analytics_title: "Four Levels of Analytics",
                     analytics_subtitle: "Each step increases business value and problem complexity — shifting from retrospective information to forward-looking models that guide optimized action.",
@@ -2578,6 +2587,8 @@
                     invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
                     contact_operartis: "Liên hệ Operartis",
                     nav_contact: "Liên hệ",
+                    nav_login: "Đăng nhập",
+                    nav_logout: "Đăng xuất",
                     analytics_eyebrow: "Sự phát triển của Phân tích dữ liệu",
                     analytics_title: "Bốn Cấp độ Phân tích Dữ liệu",
                     analytics_subtitle: "Mỗi bước tăng giá trị kinh doanh và độ phức tạp vấn đề — chuyển từ thông tin hồi cố sang mô hình hướng tới tối ưu hành động.",
@@ -2875,6 +2886,8 @@
                     invite_text: "Wir laden Unternehmen ein, die ihre Abläufe transformieren, ihre Supply Chain optimieren und einen Wettbewerbsvorteil aufbauen wollen, mit Operartis zusammenzuarbeiten.",
                     contact_operartis: "Operartis kontaktieren",
                     nav_contact: "Kontakt",
+                    nav_login: "Anmelden",
+                    nav_logout: "Abmelden",
                     analytics_eyebrow: "Analytics-Reifegrad",
                     analytics_title: "Vier Stufen der Analytics",
                     analytics_subtitle: "Jede Stufe steigert den Geschäftsnutzen und die Problemkomplexität — vom rückblickenden Informationszugriff zu vorausschauenden Modellen für optimiertes Handeln.",
@@ -5955,6 +5968,7 @@
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [navCollapsed, setNavCollapsed] = useState(false);
             const [activeNavId, setActiveNavId] = useState('supply-chain');
+            const [authUser, setAuthUser] = useState(() => window.OperartisAuth?.getUser?.() || null);
             const headerNavRef = useRef(null);
             const scrollLockRef = useRef(false);
             const scrollEndTimerRef = useRef(null);
@@ -6079,6 +6093,22 @@
                 document.title = content.ui.page_title || TRANSLATIONS.en.ui.page_title;
             }, [lang, content]);
 
+            useEffect(() => {
+                const handleAuthState = (event) => {
+                    setAuthUser(event.detail?.user || window.OperartisAuth?.getUser?.() || null);
+                };
+                const handleLoggedOut = () => setAuthUser(null);
+                window.addEventListener('operartis:authenticated', handleAuthState);
+                window.addEventListener('operartis:auth-state', handleAuthState);
+                window.addEventListener('operartis:logged-out', handleLoggedOut);
+                window.OperartisAuth?.refresh?.().catch(() => setAuthUser(null));
+                return () => {
+                    window.removeEventListener('operartis:authenticated', handleAuthState);
+                    window.removeEventListener('operartis:auth-state', handleAuthState);
+                    window.removeEventListener('operartis:logged-out', handleLoggedOut);
+                };
+            }, []);
+
             // Scroll-spy: sync header nav highlight with section position in main scroll container
             useEffect(() => {
                 const scrollRoot = getMainScrollRoot();
@@ -6135,6 +6165,15 @@
             const handleNavCollapse = useCallback((collapsed) => {
                 setNavCollapsed(collapsed);
             }, []);
+
+            const handleAuthAction = useCallback(async () => {
+                if (authUser) {
+                    await window.OperartisAuth?.logout?.();
+                    setAuthUser(null);
+                    return;
+                }
+                window.OperartisAuth?.showLogin?.();
+            }, [authUser]);
 
             useEffect(() => {
                 if (!navCollapsed) setMobileNavOpen(false);
@@ -6233,12 +6272,16 @@
                                 </div>
                             </div>
 
-                            <a
-                                href="mailto:info@operartis.io"
-                                className="h-8 px-3 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white text-xs font-bold shadow-md hover:scale-[1.02] active:scale-95 transition-all shrink-0"
+                            <button
+                                type="button"
+                                onClick={handleAuthAction}
+                                aria-label={authUser ? `${content.ui.nav_logout}: ${authUser.email}` : content.ui.nav_login}
+                                title={authUser ? `${content.ui.nav_logout}: ${authUser.email}` : content.ui.nav_login}
+                                className={`relative h-8 w-8 rounded-full flex items-center justify-center text-white shadow-md hover:scale-[1.02] active:scale-95 transition-all shrink-0 ${authUser ? 'bg-gradient-to-tr from-emerald-500 to-teal-600' : 'bg-gradient-to-tr from-brand-gold to-brand-dark'}`}
                             >
-                                {content.ui.nav_contact}
-                            </a>
+                                <span className="header-util-icon" aria-hidden="true"><UserIcon /></span>
+                                <span className={`absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border border-white/80 ${authUser ? 'bg-emerald-300' : 'bg-slate-300'}`} aria-hidden="true" />
+                            </button>
                         </div>
                         </div>
                         <div className="horizon-nav-session-track shrink-0" aria-hidden="true">

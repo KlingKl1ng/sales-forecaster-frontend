@@ -2,6 +2,8 @@
     if (!window.OperartisApi) return;
 
     var state = { user: null };
+    var autoPrompt = window.OPERARTIS_AUTH_AUTO_PROMPT !== false;
+    var showFloatingAccount = window.OPERARTIS_AUTH_FLOATING_ACCOUNT !== false;
 
     function addStyles() {
         if (document.getElementById('operartis-auth-style')) return;
@@ -75,11 +77,19 @@
         setError('');
     }
 
+    function hideUi() {
+        buildUi();
+        document.getElementById('operartis-auth-overlay').removeAttribute('data-open');
+        document.getElementById('operartis-auth-account').removeAttribute('data-open');
+        setError('');
+    }
+
     function showAccount(user) {
         buildUi();
         state.user = user;
         document.getElementById('operartis-auth-overlay').removeAttribute('data-open');
-        document.getElementById('operartis-auth-account').setAttribute('data-open', 'true');
+        if (showFloatingAccount) document.getElementById('operartis-auth-account').setAttribute('data-open', 'true');
+        else document.getElementById('operartis-auth-account').removeAttribute('data-open');
         document.getElementById('operartis-auth-email-label').textContent = user.email;
         window.dispatchEvent(new CustomEvent('operartis:authenticated', { detail: { user: user } }));
     }
@@ -102,18 +112,40 @@
         }
     }
 
-    async function init() {
+    function handleUnauthenticated() {
+        state.user = null;
+        if (autoPrompt) showLogin();
+        else hideUi();
+        window.dispatchEvent(new CustomEvent('operartis:auth-state', { detail: { user: null } }));
+    }
+
+    async function refresh() {
         buildUi();
         try {
             var user = await window.OperartisApi.me();
             showAccount(user);
+            window.dispatchEvent(new CustomEvent('operartis:auth-state', { detail: { user: user } }));
+            return user;
         } catch (error) {
-            showLogin();
+            handleUnauthenticated();
+            throw error;
         }
     }
 
-    window.addEventListener('operartis:unauthorized', showLogin);
-    window.addEventListener('operartis:logged-out', showLogin);
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
+    async function logout() {
+        await window.OperartisApi.logout();
+        handleUnauthenticated();
+    }
+
+    window.OperartisAuth = {
+        showLogin: showLogin,
+        refresh: refresh,
+        logout: logout,
+        getUser: function () { return state.user; }
+    };
+
+    window.addEventListener('operartis:unauthorized', handleUnauthenticated);
+    window.addEventListener('operartis:logged-out', handleUnauthenticated);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { refresh().catch(function () { }); });
+    else refresh().catch(function () { });
 })();
