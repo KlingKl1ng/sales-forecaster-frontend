@@ -3,6 +3,7 @@
 
     var state = { user: null };
     var autoPrompt = window.OPERARTIS_AUTH_AUTO_PROMPT !== false;
+    var dismissible = window.OPERARTIS_AUTH_DISMISSIBLE === true || !autoPrompt;
     var showFloatingAccount = window.OPERARTIS_AUTH_FLOATING_ACCOUNT !== false;
 
     function addStyles() {
@@ -12,7 +13,9 @@
         style.textContent = [
             '.op-auth-overlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.86);backdrop-filter:blur(14px);font-family:Inter,system-ui,sans-serif;padding:24px}',
             '.op-auth-overlay[data-open="true"]{display:flex}',
-            '.op-auth-card{width:min(420px,100%);background:#0f172a;color:#f8fafc;border:1px solid rgba(148,163,184,.28);border-radius:10px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.42)}',
+            '.op-auth-card{position:relative;width:min(420px,100%);background:#0f172a;color:#f8fafc;border:1px solid rgba(148,163,184,.28);border-radius:10px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.42)}',
+            '.op-auth-close{position:absolute;right:12px;top:12px;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;border-radius:999px;background:rgba(148,163,184,.16);color:#cbd5e1;font-size:18px;font-weight:900;line-height:1;cursor:pointer}',
+            '.op-auth-close:hover{background:rgba(148,163,184,.28);color:#f8fafc}',
             '.op-auth-title{font-size:22px;font-weight:900;margin:0 0 6px}',
             '.op-auth-sub{font-size:13px;color:#94a3b8;margin:0 0 22px;line-height:1.5}',
             '.op-auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}',
@@ -37,6 +40,7 @@
         overlay.className = 'op-auth-overlay';
         overlay.innerHTML = [
             '<form class="op-auth-card" id="operartis-auth-form">',
+            dismissible ? '<button class="op-auth-close" id="operartis-auth-close" type="button" aria-label="Close login" title="Close login">&times;</button>' : '',
             '<h1 class="op-auth-title">Operartis Login</h1>',
             '<p class="op-auth-sub">Sign in with your invited account to use the optimization modules.</p>',
             '<div class="op-auth-error" id="operartis-auth-error"></div>',
@@ -57,6 +61,15 @@
             event.preventDefault();
             await handleLogin();
         });
+        if (dismissible) {
+            document.getElementById('operartis-auth-close').addEventListener('click', hideUi);
+            overlay.addEventListener('click', function (event) {
+                if (event.target === overlay) hideUi();
+            });
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') hideUi();
+            });
+        }
         account.querySelector('button').addEventListener('click', async function () {
             await window.OperartisApi.logout();
             showLogin();
