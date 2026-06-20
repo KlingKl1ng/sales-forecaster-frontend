@@ -6,6 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Operartis | Member Dashboard</title>
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
+    <script>
+        window.getOperartisTheme = function () {
+            var session = null;
+            try { session = sessionStorage.getItem('theme'); } catch (e) { }
+            if (session === 'light' || session === 'dark') return session;
+            return 'system';
+        };
+        window.applyOperartisThemeClass = function (theme) {
+            var systemDark = false;
+            try { systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { }
+            var dark = theme === 'dark' || (theme === 'system' && systemDark);
+            document.documentElement.classList.toggle('dark', dark);
+            return dark;
+        };
+        window.persistOperartisTheme = function (theme) {
+            try { localStorage.setItem('theme', theme); } catch (e) { }
+            try {
+                if (theme === 'system') sessionStorage.removeItem('theme');
+                else sessionStorage.setItem('theme', theme);
+            } catch (e) { }
+        };
+        (function () {
+            try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
+        })();
+    </script>
+    <script src="./operartis-lang.js"></script>
+    <script src="./operartis-dashboard-i18n.js"></script>
     <script src="./operartis-security.js"></script>
     <script src="./operartis-api.js"></script>
     <script>
@@ -38,9 +65,94 @@
             --shadow-sm: 0 8px 32px rgba(0, 0, 0, .18);
             --radius: 10px;
             --radius-lg: 14px;
-            --sidebar-width: 288px;
+            --sidebar-width: 256px;
             --shell-header-height: 72px;
             --ease: cubic-bezier(.4, 0, .2, 1);
+            --surface-sidebar: linear-gradient(180deg, rgba(2, 6, 23, .94), rgba(2, 6, 23, .88));
+            --surface-topbar: rgba(2, 6, 23, .72);
+            --surface-card: linear-gradient(180deg, rgba(15, 23, 42, .92), rgba(15, 23, 42, .78));
+            --surface-elevated: rgba(15, 23, 42, .96);
+            --surface-inset: rgba(2, 6, 23, .28);
+            --surface-inset-strong: rgba(2, 6, 23, .5);
+            --surface-profile: rgba(15, 23, 42, .55);
+            --surface-profile-hover: rgba(15, 23, 42, .72);
+            --surface-footer: rgba(2, 6, 23, .72);
+            --surface-ghost-btn: rgba(15, 23, 42, .4);
+            --surface-pill: rgba(15, 23, 42, .78);
+            --surface-shortcut-compact: rgba(2, 6, 23, .38);
+            --surface-backdrop: rgba(2, 6, 23, .62);
+            --surface-secondary: rgba(51, 65, 85, .92);
+            --surface-secondary-hover: rgba(71, 85, 105, .95);
+            --surface-mobile-menu: rgba(51, 65, 85, .85);
+            --surface-access: linear-gradient(180deg, rgba(15, 23, 42, .94), rgba(15, 23, 42, .82));
+            --surface-input: rgba(2, 6, 23, .72);
+            --text-table: #e2e8f0;
+            --text-badge: #e2e8f0;
+            --text-nav-active-icon: #fde68a;
+            --text-pill-accent: #fde68a;
+            --text-danger: #fecaca;
+            --text-success: #bbf7d0;
+            --text-download: #bbf7d0;
+            --shadow-sidebar: 4px 0 40px rgba(0, 0, 0, .12);
+        }
+        html.dark {
+            color-scheme: dark;
+        }
+        html:not(.dark) {
+            color-scheme: light;
+            --bg: #f8fafc;
+            --panel: rgba(255, 255, 255, .92);
+            --panel-strong: rgba(255, 255, 255, .98);
+            --panel-soft: rgba(241, 245, 249, .88);
+            --line: rgba(148, 163, 184, .28);
+            --line-strong: rgba(148, 163, 184, .38);
+            --text: #0f172a;
+            --soft: #334155;
+            --muted: #64748b;
+            --muted-2: #94a3b8;
+            --shadow: 0 24px 80px rgba(15, 23, 42, .12);
+            --shadow-sm: 0 8px 32px rgba(15, 23, 42, .08);
+            --surface-sidebar: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 250, 252, .95));
+            --surface-topbar: rgba(255, 255, 255, .9);
+            --surface-card: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 250, 252, .95));
+            --surface-elevated: rgba(255, 255, 255, .98);
+            --surface-inset: rgba(241, 245, 249, .92);
+            --surface-inset-strong: rgba(226, 232, 240, .96);
+            --surface-profile: rgba(255, 255, 255, .88);
+            --surface-profile-hover: rgba(255, 255, 255, .98);
+            --surface-footer: rgba(248, 250, 252, .96);
+            --surface-ghost-btn: rgba(241, 245, 249, .92);
+            --surface-pill: rgba(241, 245, 249, .95);
+            --surface-shortcut-compact: rgba(248, 250, 252, .96);
+            --surface-backdrop: rgba(15, 23, 42, .35);
+            --surface-secondary: rgba(226, 232, 240, .95);
+            --surface-secondary-hover: rgba(203, 213, 225, .98);
+            --surface-mobile-menu: rgba(255, 255, 255, .95);
+            --surface-access: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 250, 252, .95));
+            --surface-input: rgba(255, 255, 255, .98);
+            --text-table: #334155;
+            --text-badge: #475569;
+            --text-nav-active-icon: #b45309;
+            --text-pill-accent: #b45309;
+            --text-danger: #b91c1c;
+            --text-success: #15803d;
+            --text-download: #047857;
+            --shadow-sidebar: 4px 0 24px rgba(15, 23, 42, .06);
+        }
+        html:not(.dark) body {
+            background:
+                linear-gradient(rgba(148, 163, 184, .06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, .06) 1px, transparent 1px),
+                radial-gradient(circle at 10% 8%, rgba(245, 158, 11, .08), transparent 28rem),
+                radial-gradient(circle at 88% 2%, rgba(56, 189, 248, .06), transparent 30rem),
+                radial-gradient(circle at 50% 100%, rgba(226, 232, 240, .9), transparent 50%),
+                var(--bg);
+        }
+        html:not(.dark) input,
+        html:not(.dark) select {
+            background: var(--surface-input);
+            border-color: rgba(148, 163, 184, .35);
+            color: var(--text);
         }
         html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         body {
@@ -79,7 +191,7 @@
             height: 42px;
             border: 1px solid rgba(148, 163, 184, .22);
             border-radius: var(--radius);
-            background: rgba(2, 6, 23, .72);
+            background: var(--surface-input);
             color: var(--text);
             padding: 0 12px;
             outline: none;
@@ -110,8 +222,7 @@
             padding: 28px 26px;
             border: 1px solid rgba(245, 158, 11, .22);
             border-radius: var(--radius-lg);
-            background:
-                linear-gradient(180deg, rgba(15, 23, 42, .94), rgba(15, 23, 42, .82));
+            background: var(--surface-access);
             box-shadow: var(--shadow);
             position: relative;
             overflow: hidden;
@@ -164,11 +275,11 @@
         }
         .button-link { background: linear-gradient(180deg, #fbbf24, #f59e0b); color: #0f172a; box-shadow: 0 4px 18px rgba(245, 158, 11, .22); }
         .button-link:hover { filter: brightness(1.05); }
-        .button-secondary { background: rgba(51, 65, 85, .92); color: #fff; border: 1px solid rgba(148, 163, 184, .16); }
-        .button-secondary:hover { background: rgba(71, 85, 105, .95); }
-        .button-danger { background: rgba(239, 68, 68, .12); color: #fecaca; border: 1px solid rgba(239, 68, 68, .32); }
+        .button-secondary { background: var(--surface-secondary); color: var(--text); border: 1px solid var(--line); }
+        .button-secondary:hover { background: var(--surface-secondary-hover); }
+        .button-danger { background: rgba(239, 68, 68, .12); color: var(--text-danger); border: 1px solid rgba(239, 68, 68, .32); }
         .button-danger:hover { background: rgba(239, 68, 68, .18); }
-        .button-ghost { border: 1px solid rgba(148, 163, 184, .24); background: rgba(15, 23, 42, .4); color: var(--soft); }
+        .button-ghost { border: 1px solid var(--line); background: var(--surface-ghost-btn); color: var(--soft); }
         .button-ghost:hover { border-color: rgba(245, 158, 11, .35); color: var(--text); background: rgba(245, 158, 11, .08); }
         .shell {
             min-height: 100vh;
@@ -180,7 +291,7 @@
             position: fixed;
             inset: 0;
             z-index: 25;
-            background: rgba(2, 6, 23, .62);
+            background: var(--surface-backdrop);
             backdrop-filter: blur(4px);
             opacity: 0;
             transition: opacity .22s var(--ease);
@@ -198,43 +309,69 @@
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--line);
-            background:
-                linear-gradient(180deg, rgba(2, 6, 23, .94), rgba(2, 6, 23, .88));
+            background: var(--surface-sidebar);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            box-shadow: 4px 0 40px rgba(0, 0, 0, .12);
+            box-shadow: var(--shadow-sidebar);
         }
         .side-brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             height: var(--shell-header-height);
             min-height: var(--shell-header-height);
             padding: 0 18px;
             border-bottom: 1px solid var(--line);
             flex-shrink: 0;
-            transition: background .2s var(--ease);
             box-sizing: border-box;
         }
-        .side-brand:hover { background: rgba(245, 158, 11, .04); }
-        .side-brand img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(245, 158, 11, .2)); flex-shrink: 0; }
-        .side-brand strong { display: block; letter-spacing: .12em; font-size: 13px; font-weight: 800; color: var(--gold-2); line-height: 1.2; }
-        .side-brand span { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; letter-spacing: .02em; line-height: 1.25; }
+        .side-brand-logo {
+            display: inline-flex;
+            flex-shrink: 0;
+            line-height: 0;
+        }
+        .side-brand-logo img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(245, 158, 11, .2));
+            cursor: pointer;
+            transition: transform .2s var(--ease);
+        }
+        .side-brand-logo:hover img { transform: scale(1.1); }
+        .side-brand strong { display: block; letter-spacing: .12em; font-size: 16px; font-weight: 800; color: var(--gold-2); line-height: 1.15; }
+        .side-brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; letter-spacing: .03em; line-height: 1.2; }
+        .profile-menu { position: relative; }
         .topbar-profile {
             display: grid;
-            grid-template-columns: 40px minmax(0, 1fr);
+            grid-template-columns: 40px minmax(0, 1fr) 14px;
             gap: 10px;
             align-items: center;
             max-width: min(320px, 42vw);
+            width: 100%;
             padding: 6px 10px 6px 6px;
             border: 1px solid rgba(148, 163, 184, .14);
             border-radius: 999px;
-            background: rgba(15, 23, 42, .55);
+            background: var(--surface-profile);
             flex-shrink: 0;
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color .2s var(--ease), background .2s var(--ease);
+        }
+        .topbar-profile:hover,
+        .profile-menu.open .topbar-profile {
+            border-color: rgba(245, 158, 11, .32);
+            background: var(--surface-profile-hover);
         }
         .topbar-profile.is-admin {
             border-color: rgba(245, 158, 11, .28);
             background: rgba(245, 158, 11, .08);
+        }
+        .topbar-profile.is-admin:hover,
+        .profile-menu.open .topbar-profile.is-admin {
+            border-color: rgba(245, 158, 11, .38);
+            background: rgba(245, 158, 11, .12);
         }
         .topbar-profile .avatar {
             width: 40px;
@@ -260,6 +397,56 @@
             font-size: 11px;
             margin-top: 2px;
             line-height: 1.2;
+        }
+        .profile-chevron {
+            width: 14px;
+            height: 14px;
+            color: var(--muted);
+            transition: transform .2s var(--ease), color .2s var(--ease);
+        }
+        .profile-menu.open .profile-chevron {
+            transform: rotate(180deg);
+            color: var(--gold-2);
+        }
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            z-index: 20;
+            min-width: 210px;
+            padding: 6px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface-elevated);
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .profile-dropdown[hidden] { display: none; }
+        .profile-dropdown-item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 40px;
+            padding: 0 12px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--soft);
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .18s var(--ease), color .18s var(--ease);
+        }
+        .profile-dropdown-item:hover {
+            background: rgba(148, 163, 184, .1);
+            color: var(--text);
+        }
+        .profile-dropdown-item.danger:hover {
+            background: rgba(239, 68, 68, .12);
+            color: var(--text-danger);
         }
         .avatar {
             width: 48px;
@@ -334,16 +521,33 @@
         }
         .nav-btn.active .nav-ico {
             background: rgba(245, 158, 11, .22);
-            color: #fde68a;
+            color: var(--text-nav-active-icon);
         }
         .side-footer {
             margin-top: auto;
-            display: grid;
-            gap: 8px;
-            padding: 14px;
+            padding: 16px;
             border-top: 1px solid var(--line);
             flex-shrink: 0;
-            background: rgba(2, 6, 23, .4);
+            background: var(--surface-footer);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, .08);
+            text-align: center;
+        }
+        .side-footer-title {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--soft);
+        }
+        .side-footer-slogan {
+            margin: 4px 0 0;
+            font-size: 10px;
+            font-weight: 500;
+            font-style: italic;
+            color: var(--gold-2);
         }
         .main-shell {
             min-width: 0;
@@ -362,7 +566,7 @@
             min-height: var(--shell-header-height);
             padding: 0 clamp(16px, 3vw, 28px);
             border-bottom: 1px solid var(--line);
-            background: rgba(2, 6, 23, .72);
+            background: var(--surface-topbar);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             box-sizing: border-box;
@@ -370,14 +574,14 @@
         .topbar-heading { min-width: 0; line-height: 1.2; }
         .topbar-heading h2 { font-size: 17px; font-weight: 700; line-height: 1.2; }
         .topbar-heading .section-sub { margin-top: 2px; font-size: 12px; line-height: 1.25; }
-        .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; position: relative; }
         .mobile-menu {
             display: none;
             width: 42px;
             height: 42px;
             padding: 0;
             border-radius: var(--radius);
-            background: rgba(51, 65, 85, .85);
+            background: var(--surface-mobile-menu);
             border: 1px solid rgba(148, 163, 184, .18);
             color: var(--soft);
             flex-shrink: 0;
@@ -388,7 +592,7 @@
             align-items: center;
             min-height: 34px;
             border: 1px solid var(--line);
-            background: rgba(15, 23, 42, .78);
+            background: var(--surface-pill);
             border-radius: 999px;
             padding: 0 13px;
             color: var(--soft);
@@ -402,7 +606,7 @@
         .pill.accent {
             border-color: rgba(245, 158, 11, .32);
             background: rgba(245, 158, 11, .1);
-            color: #fde68a;
+            color: var(--text-pill-accent);
         }
         .main {
             width: min(1400px, 100%);
@@ -473,7 +677,7 @@
         .card {
             border: 1px solid var(--line);
             border-radius: var(--radius-lg);
-            background: linear-gradient(180deg, rgba(15, 23, 42, .92), rgba(15, 23, 42, .78));
+            background: var(--surface-card);
             box-shadow: var(--shadow-sm);
             padding: 18px;
             transition: border-color .2s var(--ease), box-shadow .2s var(--ease), transform .2s var(--ease);
@@ -541,6 +745,9 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, .2);
             transform: translateY(-2px);
         }
+        html:not(.dark) .shortcut:hover {
+            box-shadow: 0 12px 40px rgba(15, 23, 42, .08);
+        }
         .shortcut-top {
             display: flex;
             align-items: flex-start;
@@ -597,7 +804,7 @@
             padding: 14px 16px;
             border: 1px solid var(--line);
             border-radius: var(--radius);
-            background: rgba(2, 6, 23, .38);
+            background: var(--surface-shortcut-compact);
             transition: border-color .2s var(--ease), background .2s var(--ease);
         }
         .shortcut-compact:hover {
@@ -661,18 +868,18 @@
             text-transform: uppercase;
             letter-spacing: .05em;
             border: 1px solid rgba(148, 163, 184, .2);
-            color: #e2e8f0;
+            color: var(--text-badge);
             background: rgba(148, 163, 184, .1);
             white-space: nowrap;
         }
-        .badge.active, .badge.completed, .badge.available { color: #bbf7d0; background: rgba(16, 185, 129, .12); border-color: rgba(16, 185, 129, .32); }
-        .badge.pending, .badge.processing, .badge.queued { color: #fde68a; background: rgba(245, 158, 11, .12); border-color: rgba(245, 158, 11, .32); }
-        .badge.failed, .badge.expired, .badge.suspended { color: #fecaca; background: rgba(239, 68, 68, .12); border-color: rgba(239, 68, 68, .32); }
+        .badge.active, .badge.completed, .badge.available { color: var(--text-success); background: rgba(16, 185, 129, .12); border-color: rgba(16, 185, 129, .32); }
+        .badge.pending, .badge.processing, .badge.queued { color: var(--text-pill-accent); background: rgba(245, 158, 11, .12); border-color: rgba(245, 158, 11, .32); }
+        .badge.failed, .badge.expired, .badge.suspended { color: var(--text-danger); background: rgba(239, 68, 68, .12); border-color: rgba(239, 68, 68, .32); }
         .table-wrap {
             overflow-x: auto;
             border: 1px solid var(--line);
             border-radius: var(--radius);
-            background: rgba(2, 6, 23, .28);
+            background: var(--surface-inset);
             -webkit-overflow-scrolling: touch;
         }
         table { width: 100%; border-collapse: collapse; min-width: 780px; }
@@ -683,12 +890,12 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: .08em;
-            background: rgba(2, 6, 23, .5);
+            background: var(--surface-inset-strong);
             position: sticky;
             top: 0;
             z-index: 1;
         }
-        td { color: #e2e8f0; font-size: 13px; }
+        td { color: var(--text-table); font-size: 13px; }
         tbody tr { transition: background .15s var(--ease); }
         tbody tr:hover td { background: rgba(148, 163, 184, .06); }
         tr:last-child td { border-bottom: 0; }
@@ -707,8 +914,8 @@
             margin-bottom: 16px;
             font-weight: 500;
         }
-        .message.error { display: block; color: #fecaca; background: rgba(239, 68, 68, .12); border: 1px solid rgba(248, 113, 113, .3); }
-        .message.success { display: block; color: #bbf7d0; background: rgba(34, 197, 94, .12); border: 1px solid rgba(74, 222, 128, .3); }
+        .message.error { display: block; color: var(--text-danger); background: rgba(239, 68, 68, .12); border: 1px solid rgba(248, 113, 113, .3); }
+        .message.success { display: block; color: var(--text-success); background: rgba(34, 197, 94, .12); border: 1px solid rgba(74, 222, 128, .3); }
         .kv-list { display: grid; gap: 0; }
         .kv-row {
             display: flex;
@@ -740,6 +947,7 @@
         }
         .admin-only { display: none !important; }
         .is-admin .side-label.admin-only { display: flex !important; }
+        .side-label.always-visible { display: flex !important; }
         .is-admin .nav-btn.admin-only { display: grid !important; }
         .is-admin .section.admin-only.active { display: block !important; }
         .is-admin .section.admin-only:not(.active) { display: none !important; }
@@ -762,6 +970,88 @@
             min-width: 112px;
             height: 34px;
             font-size: 13px;
+        }
+        .settings-options {
+            display: grid;
+            gap: 12px;
+        }
+        .settings-options-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .settings-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 12px;
+            border: 2px solid var(--line);
+            border-radius: var(--radius-lg);
+            background: var(--panel-soft);
+            color: var(--soft);
+            font-weight: 700;
+            font-size: 13px;
+            text-align: center;
+            transition: border-color .2s var(--ease), background .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
+        }
+        .settings-option:hover {
+            border-color: var(--line-strong);
+            background: var(--panel);
+            filter: none;
+        }
+        .settings-option.active {
+            border-color: rgba(245, 158, 11, .75);
+            background: rgba(245, 158, 11, .08);
+            color: var(--text);
+            box-shadow: 0 0 0 1px rgba(245, 158, 11, .15);
+        }
+        .settings-option-icon {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            background: var(--panel);
+            color: var(--muted);
+            box-shadow: var(--shadow-sm);
+        }
+        .settings-option-icon svg { width: 20px; height: 20px; }
+        .settings-option-icon.theme-light { background: #fff; color: #f59e0b; }
+        .settings-option-icon.theme-dark { background: #0f172a; color: #f8fafc; }
+        .settings-option-icon.theme-system { background: linear-gradient(135deg, #e2e8f0 50%, #0f172a 50%); color: #64748b; }
+        .settings-option.lang-option {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            padding: 14px 16px;
+        }
+        .settings-option.lang-option .lang-copy {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+        .settings-option.lang-option .lang-flag { font-size: 24px; line-height: 1; }
+        .settings-option.lang-option strong {
+            display: block;
+            color: var(--text);
+            font-size: 14px;
+        }
+        .settings-option.lang-option span {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .settings-option-check {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: transparent;
+            flex-shrink: 0;
+        }
+        .settings-option.active .settings-option-check { background: var(--gold); }
+        @media (max-width: 860px) {
+            .settings-options-three { grid-template-columns: 1fr; }
         }
         .row-actions {
             display: flex;
@@ -813,7 +1103,7 @@
             padding: 14px;
             border-radius: var(--radius);
             border: 1px solid var(--line);
-            background: rgba(2, 6, 23, .28);
+            background: var(--surface-inset);
         }
         .avatar-large {
             width: 88px;
@@ -844,7 +1134,7 @@
             padding: 0 12px;
             border-radius: 8px;
             background: rgba(16, 185, 129, .14);
-            color: #bbf7d0;
+            color: var(--text-download);
             border: 1px solid rgba(16, 185, 129, .32);
             font-size: 12px;
             font-weight: 700;
@@ -929,14 +1219,14 @@
                 <img src="./icononly_transparent_nobuffer.png" alt="">
                 <div>
                     <strong>OPERARTIS</strong>
-                    <span>Member Dashboard</span>
+                    <span data-i18n="access.subtitle">Member Dashboard</span>
                 </div>
             </div>
-            <h1>Sign In To Continue</h1>
-            <p class="sub">Sign in with your invited account to manage your profile, open modules, view retained reports, and change your password.</p>
+            <h1 data-i18n="access.title">Sign In To Continue</h1>
+            <p class="sub" data-i18n="access.body">Sign in with your invited account to manage your profile, open modules, view retained reports, and change your password.</p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
-                <button id="access-login" type="button" style="height:42px;padding:0 18px">Sign In</button>
-                <a class="button-ghost" href="./">Back To Site</a>
+                <button id="access-login" type="button" style="height:42px;padding:0 18px" data-i18n="access.sign_in">Sign In</button>
+                <a class="button-ghost" href="./" data-i18n="access.back_to_site">Back To Site</a>
             </div>
         </div>
     </div>
@@ -944,13 +1234,15 @@
     <div id="dashboard-app" class="shell hidden">
         <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
         <aside id="sidebar" class="sidebar">
-            <a class="side-brand" href="./" aria-label="Operartis Home">
-                <img src="./icononly_transparent_nobuffer.png" alt="">
+            <div class="side-brand">
+                <a class="side-brand-logo" href="./index.html" aria-label="Operartis Home">
+                    <img src="./icononly_transparent_nobuffer.png" alt="">
+                </a>
                 <div>
                     <strong>OPERARTIS</strong>
-                    <span>Member Workspace</span>
+                    <span>Dashboard</span>
                 </div>
-            </a>
+            </div>
             <nav class="side-nav" aria-label="Dashboard">
                 <div class="side-label admin-only">Member Dashboard</div>
                 <button class="nav-btn active" type="button" data-section="overview"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span><span>Overview</span></button>
@@ -965,10 +1257,12 @@
                 <button class="nav-btn admin-only" type="button" data-section="admin-invites"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg></span><span>Invites</span></button>
                 <button class="nav-btn admin-only" type="button" data-section="admin-jobs"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg></span><span>All Jobs</span></button>
                 <button class="nav-btn admin-only" type="button" data-section="admin-audit"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span><span>Audit Log</span></button>
+                <div class="side-label always-visible">Configuration</div>
+                <button class="nav-btn" type="button" data-section="settings"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span><span>Settings</span></button>
             </nav>
             <div class="side-footer">
-                <a class="button-ghost" href="./">Back To Site</a>
-                <button id="side-logout" class="button-secondary" type="button">Logout</button>
+                <p class="side-footer-title" data-i18n="chrome.footer_title">Operartis Analytics</p>
+                <p class="side-footer-slogan" data-i18n="chrome.footer_slogan">Optimizing Today, Growing Tomorrow</p>
             </div>
         </aside>
 
@@ -984,11 +1278,18 @@
                     </div>
                 </div>
                 <div class="top-actions">
-                    <div id="user-profile" class="topbar-profile">
-                        <div id="user-avatar" class="avatar"></div>
-                        <div>
-                            <strong id="user-name">Member</strong>
-                            <span id="user-email">Signed in</span>
+                    <div id="profile-menu" class="profile-menu">
+                        <button id="user-profile" class="topbar-profile" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="profile-dropdown">
+                            <div id="user-avatar" class="avatar"></div>
+                            <div>
+                                <strong id="user-name">Member</strong>
+                                <span id="user-email">Signed in</span>
+                            </div>
+                            <svg class="profile-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div id="profile-dropdown" class="profile-dropdown" role="menu" hidden>
+                            <a class="profile-dropdown-item" role="menuitem" href="./index.html" data-i18n="chrome.back_to_operartis">Back to Operartis</a>
+                            <button id="profile-logout" class="profile-dropdown-item danger" type="button" role="menuitem" data-i18n="chrome.logout">Logout</button>
                         </div>
                     </div>
                 </div>
@@ -1011,20 +1312,20 @@
                         <div class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Module Shortcuts</h2>
-                                    <p class="section-sub">The fastest route to your optimization tools.</p>
+                                    <h2 data-i18n="sections.overview.module_shortcuts">Module Shortcuts</h2>
+                                    <p class="section-sub" data-i18n="sections.overview.module_shortcuts_sub">The fastest route to your optimization tools.</p>
                                 </div>
-                                <button class="button-ghost nav-jump" type="button" data-section="modules">All Modules</button>
+                                <button class="button-ghost nav-jump" type="button" data-section="modules" data-i18n="sections.overview.all_modules">All Modules</button>
                             </div>
                             <div id="overview-shortcuts" class="grid shortcut-list"></div>
                         </div>
                         <div class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Profile Completion</h2>
-                                    <p class="section-sub">Complete profile data helps future team and company-level workflows.</p>
+                                    <h2 data-i18n="sections.overview.profile_completion">Profile Completion</h2>
+                                    <p class="section-sub" data-i18n="sections.overview.profile_completion_sub">Complete profile data helps future team and company-level workflows.</p>
                                 </div>
-                                <button class="button-ghost nav-jump" type="button" data-section="profile">Edit</button>
+                                <button class="button-ghost nav-jump" type="button" data-section="profile" data-i18n="sections.overview.edit">Edit</button>
                             </div>
                             <div class="progress" aria-label="Profile completion"><span id="profile-progress"></span></div>
                             <div id="profile-summary" class="kv-list" style="margin-top:14px"></div>
@@ -1033,10 +1334,10 @@
                     <div class="card" style="margin-top:16px">
                         <div class="section-head">
                             <div>
-                                <h2>Recent Module Runs</h2>
-                                <p class="section-sub">Latest work linked to your member account.</p>
+                                <h2 data-i18n="sections.overview.recent_runs">Recent Module Runs</h2>
+                                <p class="section-sub" data-i18n="sections.overview.recent_runs_sub">Latest work linked to your member account.</p>
                             </div>
-                            <button class="button-ghost nav-jump" type="button" data-section="activity">View Activity</button>
+                            <button class="button-ghost nav-jump" type="button" data-section="activity" data-i18n="sections.overview.view_activity">View Activity</button>
                         </div>
                         <div class="table-wrap">
                             <table>
@@ -1107,8 +1408,8 @@
                         <div class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Available Downloads</h2>
-                                    <p class="section-sub">Reports and artifacts still available.</p>
+                                    <h2 data-i18n="sections.reports.available_downloads">Available Downloads</h2>
+                                    <p class="section-sub" data-i18n="sections.reports.available_downloads_sub">Reports and artifacts still available.</p>
                                 </div>
                             </div>
                             <div class="table-wrap">
@@ -1129,8 +1430,8 @@
                         <div class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Run Status</h2>
-                                    <p class="section-sub">Distribution of your current job history.</p>
+                                    <h2 data-i18n="sections.reports.run_status">Run Status</h2>
+                                    <p class="section-sub" data-i18n="sections.reports.run_status_sub">Distribution of your current job history.</p>
                                 </div>
                             </div>
                             <div id="status-list" class="kv-list"></div>
@@ -1230,24 +1531,24 @@
                         <form id="password-form" class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Change Password</h2>
-                                    <p class="section-sub">After saving, other active sessions for this account are closed.</p>
+                                    <h2 data-i18n="sections.security.change_password">Change Password</h2>
+                                    <p class="section-sub" data-i18n="sections.security.change_password_sub">After saving, other active sessions for this account are closed.</p>
                                 </div>
                             </div>
                             <div class="grid">
-                                <label>Current Password
+                                <label><span data-i18n="sections.security.current_password">Current Password</span>
                                     <span class="password-wrap">
                                         <input id="current-password" type="password" autocomplete="current-password" minlength="8" required>
                                         <button class="password-toggle" type="button" data-target="current-password" aria-label="Show password"></button>
                                     </span>
                                 </label>
-                                <label>New Password
+                                <label><span data-i18n="sections.security.new_password">New Password</span>
                                     <span class="password-wrap">
                                         <input id="new-password" type="password" autocomplete="new-password" minlength="8" required>
                                         <button class="password-toggle" type="button" data-target="new-password" aria-label="Show password"></button>
                                     </span>
                                 </label>
-                                <label>Confirm New Password
+                                <label><span data-i18n="sections.security.confirm_password">Confirm New Password</span>
                                     <span class="password-wrap">
                                         <input id="confirm-password" type="password" autocomplete="new-password" minlength="8" required>
                                         <button class="password-toggle" type="button" data-target="confirm-password" aria-label="Show password"></button>
@@ -1255,17 +1556,83 @@
                                 </label>
                             </div>
                             <div class="form-actions">
-                                <button id="change-password" class="button-link" type="submit">Update Password</button>
+                                <button id="change-password" class="button-link" type="submit" data-i18n="sections.security.update_password">Update Password</button>
                             </div>
                         </form>
                         <div class="card">
                             <div class="section-head">
                                 <div>
-                                    <h2>Account Access</h2>
-                                    <p class="section-sub">What this member account can currently access.</p>
+                                    <h2 data-i18n="sections.security.account_access">Account Access</h2>
+                                    <p class="section-sub" data-i18n="sections.security.account_access_sub">What this member account can currently access.</p>
                                 </div>
                             </div>
                             <div id="access-info" class="kv-list"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-settings" class="section">
+                    <div class="hero">
+                        <div>
+                            <div class="hero-eyebrow">Preferences</div>
+                            <h1>Settings</h1>
+                            <p class="sub">Theme and language stay in sync with Operartis home and your optimization modules.</p>
+                        </div>
+                    </div>
+                    <div class="grid two-col">
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2 data-i18n="sections.settings.theme_mode">Theme Mode</h2>
+                                    <p class="section-sub" data-i18n="sections.settings.theme_mode_sub">Shared with index, forecaster, ML forecaster, inventory, and ABC-XYZ.</p>
+                                </div>
+                            </div>
+                            <div id="theme-options" class="settings-options settings-options-three" role="group" aria-label="Theme mode">
+                                <button type="button" class="settings-option" data-theme="light" aria-pressed="false">
+                                    <span class="settings-option-icon theme-light" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span>
+                                    <span data-i18n-theme>Light</span>
+                                </button>
+                                <button type="button" class="settings-option" data-theme="dark" aria-pressed="false">
+                                    <span class="settings-option-icon theme-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+                                    <span data-i18n-theme>Dark</span>
+                                </button>
+                                <button type="button" class="settings-option" data-theme="system" aria-pressed="false">
+                                    <span class="settings-option-icon theme-system" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></span>
+                                    <span data-i18n-theme>System</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2 data-i18n="sections.settings.language">Language</h2>
+                                    <p class="section-sub" data-i18n="sections.settings.language_sub">Applies to translated Operartis pages and modules.</p>
+                                </div>
+                            </div>
+                            <div id="lang-options" class="settings-options" role="group" aria-label="Language">
+                                <button type="button" class="settings-option lang-option" data-lang="en" aria-pressed="false">
+                                    <span class="lang-copy">
+                                        <span class="lang-flag" aria-hidden="true">🇺🇸</span>
+                                        <span><strong>English</strong><span data-i18n-lang-sub="en">US English</span></span>
+                                    </span>
+                                    <span class="settings-option-check" aria-hidden="true"></span>
+                                </button>
+                                <button type="button" class="settings-option lang-option" data-lang="vi" aria-pressed="false">
+                                    <span class="lang-copy">
+                                        <span class="lang-flag" aria-hidden="true">🇻🇳</span>
+                                        <span><strong>Tiếng Việt</strong><span data-i18n-lang-sub="vi">Vietnamese</span></span>
+                                    </span>
+                                    <span class="settings-option-check" aria-hidden="true"></span>
+                                </button>
+                                <!-- German temporarily disabled -->
+                                <button type="button" class="settings-option lang-option hidden" data-lang="de" aria-pressed="false" hidden>
+                                    <span class="lang-copy">
+                                        <span class="lang-flag" aria-hidden="true">🇩🇪</span>
+                                        <span><strong>Deutsch</strong><span data-i18n-lang-sub="de">German</span></span>
+                                    </span>
+                                    <span class="settings-option-check" aria-hidden="true"></span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -1464,6 +1831,8 @@
         const accessPanel = document.getElementById('access-panel');
         const message = document.getElementById('message');
         const userProfile = document.getElementById('user-profile');
+        const profileMenu = document.getElementById('profile-menu');
+        const profileDropdown = document.getElementById('profile-dropdown');
         const retentionPill = document.getElementById('retention-pill');
         const sidebar = document.getElementById('sidebar');
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
@@ -1471,6 +1840,7 @@
         const topTitle = document.getElementById('top-title');
         const topSubtitle = document.getElementById('top-subtitle');
         let messageHideTimer = null;
+        const GERMAN_LANG_ENABLED = false;
         const state = {
             activeSection: 'overview',
             user: null,
@@ -1492,12 +1862,25 @@
             reports: ['Reports', 'Download retained outputs before cleanup.'],
             profile: ['Profile', 'Manage your member information.'],
             security: ['Security', 'Update your password and account access.'],
+            settings: ['Settings', 'Theme and language preferences.'],
             'admin-overview': ['Overview', 'Manage organization-level activity.'],
             'admin-users': ['Users', 'Manage roles and account status.'],
             'admin-invites': ['Invites', 'Create and revoke account invites.'],
             'admin-jobs': ['All Jobs', 'Monitor organization module runs.'],
             'admin-audit': ['Audit Log', 'Review recent security and admin events.'],
         };
+        function dt(key, vars) {
+            return window.OperartisDashboardI18n ? window.OperartisDashboardI18n.t(key, vars) : key;
+        }
+        function syncDashboardI18n() {
+            if (!window.OperartisDashboardI18n) return;
+            window.OperartisDashboardI18n.apply();
+            Object.assign(sectionCopy, window.OperartisDashboardI18n.buildSectionCopy());
+            if (state.activeSection && sectionCopy[state.activeSection]) {
+                topTitle.textContent = sectionCopy[state.activeSection][0];
+                topSubtitle.textContent = sectionCopy[state.activeSection][1];
+            }
+        }
         const moduleMeta = {
             sales_forecaster: { label: 'Sales Forecaster', href: './forecaster.html', code: 'SF' },
             ml_forecaster: { label: 'Advanced ML Forecaster', href: './mlforecaster.html', code: 'ML' },
@@ -1540,6 +1923,17 @@
             document.body.classList.toggle('sidebar-open', open);
             mobileMenu.setAttribute('aria-expanded', open ? 'true' : 'false');
             mobileMenu.setAttribute('aria-label', open ? 'Close dashboard menu' : 'Open dashboard menu');
+        }
+
+        function setProfileMenuOpen(open) {
+            profileMenu.classList.toggle('open', open);
+            userProfile.setAttribute('aria-expanded', open ? 'true' : 'false');
+            profileDropdown.hidden = !open;
+        }
+
+        async function logoutUser() {
+            setProfileMenuOpen(false);
+            await window.OperartisAuth.logout();
         }
 
         function showMessage(text, type = 'success') {
@@ -1623,7 +2017,7 @@
         async function api(path, options) {
             const response = await window.OperartisApi.apiFetch(path, options);
             const data = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(readError(data, 'Request failed.'));
+            if (!response.ok) throw new Error(readError(data, dt('messages.request_failed')));
             return data;
         }
 
@@ -1684,15 +2078,17 @@
         }
 
         function renderChrome() {
-            const displayName = state.user?.full_name || 'Member';
+            const displayName = state.user?.full_name || dt('chrome.member');
             const isAdmin = state.user?.role === 'admin';
             app.classList.toggle('is-admin', isAdmin);
             if (!isAdmin && isAdminSection(state.activeSection)) setSection('overview');
             document.getElementById('user-name').textContent = displayName;
-            document.getElementById('user-email').textContent = state.user?.email || '';
+            document.getElementById('user-email').textContent = state.user?.email || dt('chrome.signed_in');
             userProfile.classList.toggle('is-admin', isAdmin);
-            document.getElementById('welcome-title').textContent = `Welcome, ${displayName}`;
-            document.querySelector('.side-brand span').textContent = isAdmin ? 'Member + Admin Workspace' : 'Member Workspace';
+            document.getElementById('welcome-title').textContent = dt('chrome.welcome', { name: displayName });
+            const retentionDays = state.overview?.retention_days || 7;
+            const retentionPill = document.getElementById('retention-pill');
+            if (retentionPill) retentionPill.textContent = dt('sections.overview.retention', { days: retentionDays });
             renderAvatar(document.getElementById('user-avatar'), state.user);
             renderAvatar(document.getElementById('profile-avatar'), state.user, true);
         }
@@ -1700,10 +2096,10 @@
         function renderMetrics() {
             const metrics = state.overview?.metrics || {};
             const items = [
-                ['Runs', metrics.jobs || 0, `${metrics.completed_jobs || 0} completed`],
-                ['Active', metrics.active_jobs || 0, 'Queued or processing'],
-                ['Downloads', metrics.reports_available || 0, 'Available now'],
-                ['Profile', `${profileCompletion()}%`, 'Member information'],
+                [dt('metrics.runs'), metrics.jobs || 0, dt('metrics.runs_note', { count: metrics.completed_jobs || 0 })],
+                [dt('metrics.active'), metrics.active_jobs || 0, dt('metrics.active_note')],
+                [dt('metrics.downloads'), metrics.reports_available || 0, dt('metrics.downloads_note')],
+                [dt('metrics.profile'), `${profileCompletion()}%`, dt('metrics.profile_note')],
             ];
             const container = document.getElementById('metrics');
             clear(container);
@@ -1725,20 +2121,20 @@
                         el('h3', { text: item.label }),
                         el('p', { text: item.desc }),
                     ]),
-                    el('a', { class: 'shortcut-action', href: item.href, text: 'Open' }),
+                    el('a', { class: 'shortcut-action', href: item.href, text: dt('actions.open') }),
                 ]);
             }
             return el('article', { class: `card shortcut ${theme}` }, [
                 el('div', { class: 'shortcut-top' }, [
                     createShortcutIcon(item.code),
-                    badge('available'),
+                    badge(dt('actions.available')),
                 ]),
                 el('div', { class: 'shortcut-copy' }, [
                     el('h3', { text: item.label }),
                     el('p', { text: item.desc }),
                 ]),
                 el('div', { class: 'shortcut-foot' }, [
-                    el('a', { class: 'shortcut-action', href: item.href, text: 'Open Module' }),
+                    el('a', { class: 'shortcut-action', href: item.href, text: dt('actions.open_module') }),
                 ]),
             ]);
         }
@@ -1856,7 +2252,7 @@
                     el('td', { text: moduleLabel(artifact.module) }),
                     el('td', { text: formatDate(artifact.created_at) }),
                     el('td', { text: formatDate(artifact.expires_at) }),
-                    el('td', {}, [el('button', { class: 'download-btn', type: 'button', dataset: { artifactId: artifact.id }, text: 'Download' })]),
+                    el('td', {}, [el('button', { class: 'download-btn', type: 'button', dataset: { artifactId: artifact.id }, text: dt('actions.download') })]),
                 ]));
             });
         }
@@ -2023,7 +2419,40 @@
             renderAvatar(document.getElementById('profile-avatar'), state.user, true);
         }
 
+        function renderSettings() {
+            const theme = window.getOperartisTheme ? window.getOperartisTheme() : 'system';
+            const lang = window.getOperartisLang ? window.getOperartisLang() : 'en';
+            document.querySelectorAll('[data-theme]').forEach(button => {
+                const active = button.dataset.theme === theme;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+            document.querySelectorAll('[data-lang]').forEach(button => {
+                if (!GERMAN_LANG_ENABLED && button.dataset.lang === 'de') return;
+                const active = button.dataset.lang === lang;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+        }
+
+        function selectDashboardTheme(theme) {
+            if (!['light', 'dark', 'system'].includes(theme)) return;
+            window.persistOperartisTheme(theme);
+            window.applyOperartisThemeClass(theme);
+            renderSettings();
+        }
+
+        function selectDashboardLang(lang) {
+            const allowed = GERMAN_LANG_ENABLED ? ['en', 'vi', 'de'] : ['en', 'vi'];
+            if (!allowed.includes(lang)) return;
+            window.persistOperartisLang(lang);
+            syncDashboardI18n();
+            renderAll();
+            showMessage(dt('messages.lang_saved'), 'success');
+        }
+
         function renderAll() {
+            syncDashboardI18n();
             renderChrome();
             renderMetrics();
             renderShortcuts();
@@ -2034,6 +2463,7 @@
             renderArtifacts();
             renderAdminAll();
             fillProfileForm();
+            renderSettings();
         }
 
         function showDashboard(user) {
@@ -2046,7 +2476,7 @@
             }
             accessPanel.classList.add('hidden');
             app.classList.remove('hidden');
-            loadDashboard().catch(error => showMessage(error.message || 'Dashboard could not be loaded.', 'error'));
+            loadDashboard().catch(error => showMessage(error.message || dt('messages.dashboard_load_failed'), 'error'));
         }
 
         function passwordIcon(visible) {
@@ -2060,17 +2490,42 @@
         mobileMenu.addEventListener('click', () => setSidebarOpen(!sidebar.classList.contains('open')));
         sidebarBackdrop.addEventListener('click', () => setSidebarOpen(false));
         document.addEventListener('keydown', event => {
-            if (event.key === 'Escape') setSidebarOpen(false);
+            if (event.key === 'Escape') {
+                setSidebarOpen(false);
+                setProfileMenuOpen(false);
+            }
         });
         window.addEventListener('resize', () => {
             if (window.innerWidth > 860) setSidebarOpen(false);
+            setProfileMenuOpen(false);
         });
+        userProfile.addEventListener('click', event => {
+            event.stopPropagation();
+            setProfileMenuOpen(!profileMenu.classList.contains('open'));
+        });
+        document.addEventListener('click', () => setProfileMenuOpen(false));
+        document.getElementById('profile-logout').addEventListener('click', logoutUser);
         document.querySelectorAll('.nav-btn, .nav-jump').forEach(button => {
             button.addEventListener('click', () => setSection(button.dataset.section));
         });
-        document.getElementById('side-logout').addEventListener('click', async () => {
-            await window.OperartisAuth.logout();
+        document.getElementById('theme-options').addEventListener('click', event => {
+            const button = event.target.closest('[data-theme]');
+            if (!button) return;
+            selectDashboardTheme(button.dataset.theme);
         });
+        document.getElementById('lang-options').addEventListener('click', event => {
+            const button = event.target.closest('[data-lang]');
+            if (!button) return;
+            selectDashboardLang(button.dataset.lang);
+        });
+        try {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (window.getOperartisTheme() === 'system') {
+                    window.applyOperartisThemeClass('system');
+                    renderSettings();
+                }
+            });
+        } catch (error) { }
         document.getElementById('admin-invite-form').addEventListener('submit', async event => {
             event.preventDefault();
             if (state.user?.role !== 'admin') return;
@@ -2094,9 +2549,9 @@
                 document.getElementById('admin-invite-email').value = '';
                 await loadDashboard();
                 setSection('admin-invites');
-                showMessage('Invite created.', 'success');
+                showMessage(dt('messages.invite_created'), 'success');
             } catch (error) {
-                showMessage(error.message || 'Invite could not be created.', 'error');
+                showMessage(error.message || dt('messages.invite_create_failed'), 'error');
             } finally {
                 button.disabled = false;
                 button.textContent = 'Create Invite';
@@ -2111,7 +2566,7 @@
                 input.select();
                 document.execCommand('copy');
             }
-            showMessage('Invite link copied.', 'success');
+            showMessage(dt('messages.invite_copied'), 'success');
         });
         document.getElementById('reset-profile').addEventListener('click', fillProfileForm);
         document.getElementById('choose-avatar').addEventListener('click', () => document.getElementById('avatar-file').click());
@@ -2124,12 +2579,12 @@
             const file = event.target.files && event.target.files[0];
             if (!file) return;
             if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-                showMessage('Avatar must be a PNG, JPEG, or WebP image.', 'error');
+                showMessage(dt('messages.avatar_type_error'), 'error');
                 event.target.value = '';
                 return;
             }
             if (file.size > 256 * 1024) {
-                showMessage('Avatar image must be 256 KB or smaller.', 'error');
+                showMessage(dt('messages.avatar_size_error'), 'error');
                 event.target.value = '';
                 return;
             }
@@ -2164,9 +2619,9 @@
                 state.avatarDraft = null;
                 state.avatarChanged = false;
                 renderAll();
-                showMessage('Profile saved.', 'success');
+                showMessage(dt('messages.profile_saved'), 'success');
             } catch (error) {
-                showMessage(error.message || 'Profile could not be saved.', 'error');
+                showMessage(error.message || dt('messages.profile_save_failed'), 'error');
             } finally {
                 button.disabled = false;
             }
@@ -2177,7 +2632,7 @@
             const newPassword = document.getElementById('new-password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             if (newPassword !== confirmPassword) {
-                showMessage('New password and confirmation do not match.', 'error');
+                showMessage(dt('messages.password_mismatch'), 'error');
                 return;
             }
             const button = document.getElementById('change-password');
@@ -2189,9 +2644,9 @@
                     body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
                 });
                 event.target.reset();
-                showMessage('Password updated. Other active sessions were closed.', 'success');
+                showMessage(dt('messages.password_updated'), 'success');
             } catch (error) {
-                showMessage(error.message || 'Password could not be updated.', 'error');
+                showMessage(error.message || dt('messages.password_update_failed'), 'error');
             } finally {
                 button.disabled = false;
             }
@@ -2219,13 +2674,13 @@
                     const response = await window.OperartisApi.apiFetch(`/auth/dashboard/artifacts/${artifactId}/download`);
                     if (!response.ok) {
                         const data = await response.json().catch(() => ({}));
-                        throw new Error(readError(data, 'Download failed.'));
+                        throw new Error(readError(data, dt('messages.download_failed')));
                     }
                     const blob = await response.blob();
                     window.OperartisSecurity.downloadBlob(blob, artifact.filename);
-                    showMessage('Download started.', 'success');
+                    showMessage(dt('messages.download_started'), 'success');
                 } catch (error) {
-                    showMessage(error.message || 'Download failed.', 'error');
+                    showMessage(error.message || dt('messages.download_failed'), 'error');
                 } finally {
                     downloadButton.disabled = false;
                 }
@@ -2249,9 +2704,9 @@
                         body: JSON.stringify({ role, status }),
                     });
                     await loadDashboard();
-                    showMessage('User updated.', 'success');
+                    showMessage(dt('messages.user_updated'), 'success');
                 } catch (error) {
-                    showMessage(error.message || 'User could not be updated.', 'error');
+                    showMessage(error.message || dt('messages.user_update_failed'), 'error');
                 } finally {
                     actionButton.disabled = false;
                 }
@@ -2263,9 +2718,9 @@
                 try {
                     await api(`/auth/admin/invites/${inviteId}`, { method: 'DELETE' });
                     await loadDashboard();
-                    showMessage('Invite revoked.', 'success');
+                    showMessage(dt('messages.invite_revoked'), 'success');
                 } catch (error) {
-                    showMessage(error.message || 'Invite could not be revoked.', 'error');
+                    showMessage(error.message || dt('messages.invite_revoke_failed'), 'error');
                 } finally {
                     actionButton.disabled = false;
                 }
@@ -2280,6 +2735,8 @@
             accessPanel.classList.remove('hidden');
         });
         setSection(String(window.location.hash || '#overview').replace('#', ''));
+        syncDashboardI18n();
+        renderSettings();
         window.OperartisAuth?.refresh?.().then(showDashboard).catch(() => {
             app.classList.add('hidden');
             accessPanel.classList.remove('hidden');
