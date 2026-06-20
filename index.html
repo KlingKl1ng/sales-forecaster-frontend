@@ -6211,7 +6211,7 @@
 
             const handleDashboardOpen = useCallback(() => {
                 setAccountMenuOpen(false);
-                window.location.href = authUser?.role === 'admin' ? './admin.html' : './dashboard.html';
+                window.location.href = authUser?.role === 'admin' ? './dashboard.html#admin-overview' : './dashboard.html';
             }, [authUser]);
 
             const handleLogout = useCallback(async () => {

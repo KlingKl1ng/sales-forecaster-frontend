@@ -358,7 +358,7 @@
         }
         .badge.active, .badge.completed, .badge.available { color: #bbf7d0; background: rgba(16, 185, 129, .12); border-color: rgba(16, 185, 129, .34); }
         .badge.pending, .badge.processing, .badge.queued { color: #fde68a; background: rgba(245, 158, 11, .12); border-color: rgba(245, 158, 11, .34); }
-        .badge.failed, .badge.expired { color: #fecaca; background: rgba(239, 68, 68, .12); border-color: rgba(239, 68, 68, .34); }
+        .badge.failed, .badge.expired, .badge.suspended { color: #fecaca; background: rgba(239, 68, 68, .12); border-color: rgba(239, 68, 68, .34); }
         .table-wrap {
             overflow-x: auto;
             border: 1px solid var(--line);
@@ -382,6 +382,64 @@
         .kv-list { display: grid; gap: 10px; }
         .kv-row { display: flex; justify-content: space-between; gap: 10px; color: var(--soft); font-size: 13px; }
         .kv-row span:first-child { color: var(--muted); }
+        .side-label {
+            display: none;
+            padding: 14px 11px 5px;
+            color: var(--gold-2);
+            font-size: 11px;
+            font-weight: 950;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+        }
+        .admin-only { display: none !important; }
+        .is-admin .side-label.admin-only { display: block !important; }
+        .is-admin .nav-btn.admin-only { display: grid !important; }
+        .is-admin .section.admin-only.active { display: block !important; }
+        .is-admin .section.admin-only:not(.active) { display: none !important; }
+        .admin-form-grid {
+            display: grid;
+            grid-template-columns: minmax(240px, 1fr) 180px 148px;
+            gap: 12px;
+            align-items: end;
+        }
+        .panel-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .toolbar {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .select-small {
+            min-width: 112px;
+            height: 34px;
+            font-size: 13px;
+        }
+        .row-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .row-actions button {
+            min-height: 34px;
+            padding: 0 10px;
+        }
+        .invite-result {
+            display: none;
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(245, 158, 11, .28);
+            background: rgba(245, 158, 11, .08);
+        }
+        .invite-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 92px;
+            gap: 10px;
+            margin-top: 10px;
+        }
         .progress {
             height: 10px;
             border-radius: 999px;
@@ -453,7 +511,7 @@
         .password-toggle svg { width: 18px; height: 18px; stroke: currentColor; }
         @media (max-width: 1180px) {
             .metric-grid, .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .two-col { grid-template-columns: 1fr; }
+            .two-col, .panel-grid, .admin-form-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 860px) {
             .shell { grid-template-columns: 1fr; }
@@ -469,7 +527,7 @@
             .main { padding: 18px; }
             .topbar, .hero { align-items: flex-start; }
             .hero { flex-direction: column; }
-            .form-grid, .metric-grid, .shortcut-grid { grid-template-columns: 1fr; }
+            .form-grid, .metric-grid, .shortcut-grid, .admin-form-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 560px) {
             .topbar { flex-direction: column; }
@@ -516,6 +574,12 @@
                 <button class="nav-btn" type="button" data-section="reports"><span class="nav-ico">RE</span><span>Reports</span></button>
                 <button class="nav-btn" type="button" data-section="profile"><span class="nav-ico">PR</span><span>Profile</span></button>
                 <button class="nav-btn" type="button" data-section="security"><span class="nav-ico">SE</span><span>Security</span></button>
+                <div class="side-label admin-only">Admin</div>
+                <button class="nav-btn admin-only" type="button" data-section="admin-overview"><span class="nav-ico">AO</span><span>Admin Overview</span></button>
+                <button class="nav-btn admin-only" type="button" data-section="admin-users"><span class="nav-ico">US</span><span>Users</span></button>
+                <button class="nav-btn admin-only" type="button" data-section="admin-invites"><span class="nav-ico">IN</span><span>Invites</span></button>
+                <button class="nav-btn admin-only" type="button" data-section="admin-jobs"><span class="nav-ico">AJ</span><span>All Jobs</span></button>
+                <button class="nav-btn admin-only" type="button" data-section="admin-audit"><span class="nav-ico">AU</span><span>Audit Log</span></button>
             </nav>
             <div class="side-footer">
                 <a class="button-ghost" href="./">Back To Site</a>
@@ -807,6 +871,187 @@
                         </div>
                     </div>
                 </section>
+
+                <section id="section-admin-overview" class="section admin-only">
+                    <div class="hero">
+                        <div>
+                            <h1>Admin Overview</h1>
+                            <p class="sub">Manage users, invites, jobs, and audit events from the same workspace.</p>
+                        </div>
+                    </div>
+                    <div id="admin-metrics" class="grid metric-grid"></div>
+                    <div class="grid panel-grid" style="margin-top:16px">
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>User Status</h2>
+                                    <p class="section-sub">Current account distribution.</p>
+                                </div>
+                            </div>
+                            <div id="admin-user-statuses" class="kv-list"></div>
+                        </div>
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Invite Status</h2>
+                                    <p class="section-sub">Invite lifecycle summary.</p>
+                                </div>
+                            </div>
+                            <div id="admin-invite-statuses" class="kv-list"></div>
+                        </div>
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Job Status</h2>
+                                    <p class="section-sub">All organization module runs.</p>
+                                </div>
+                            </div>
+                            <div id="admin-job-statuses" class="kv-list"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-admin-users" class="section admin-only">
+                    <div class="hero">
+                        <div>
+                            <h1>Users</h1>
+                            <p class="sub">Change roles and suspend or reactivate accounts. Passwords are never shown.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="toolbar">
+                            <div>
+                                <h2>User Management</h2>
+                                <p class="section-sub">Admins can update account role and status.</p>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Last Login</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-users-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-admin-invites" class="section admin-only">
+                    <div class="hero">
+                        <div>
+                            <h1>Invites</h1>
+                            <p class="sub">Create invite links and revoke pending invites before they are accepted.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="section-head">
+                            <div>
+                                <h2>Create Invite</h2>
+                                <p class="section-sub">New accounts can only activate through an invite link.</p>
+                            </div>
+                        </div>
+                        <form id="admin-invite-form" class="admin-form-grid">
+                            <label>Email<input id="admin-invite-email" type="email" autocomplete="email" required></label>
+                            <label>Role
+                                <select id="admin-invite-role">
+                                    <option value="member">Member</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </label>
+                            <button id="admin-invite-submit" type="submit">Create Invite</button>
+                        </form>
+                        <section id="admin-invite-result" class="invite-result">
+                            <strong>Invite link</strong>
+                            <div class="invite-row">
+                                <input id="admin-invite-url" readonly>
+                                <button id="admin-copy-invite" class="button-secondary" type="button">Copy</button>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="card" style="margin-top:16px">
+                        <div class="toolbar">
+                            <div>
+                                <h2>Invite History</h2>
+                                <p class="section-sub">Accepted invite links are not recoverable. Pending invites can be revoked.</p>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Expires</th>
+                                        <th>Invited By</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-invites-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-admin-jobs" class="section admin-only">
+                    <div class="hero">
+                        <div>
+                            <h1>All Jobs</h1>
+                            <p class="sub">Monitor recent module runs, file names, status, progress, and retention dates.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Module</th>
+                                        <th>Type</th>
+                                        <th>User</th>
+                                        <th>Status</th>
+                                        <th>Progress</th>
+                                        <th>File</th>
+                                        <th>Created</th>
+                                        <th>Expires</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-jobs-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-admin-audit" class="section admin-only">
+                    <div class="hero">
+                        <div>
+                            <h1>Audit Log</h1>
+                            <p class="sub">Review recent admin and authentication events. IP addresses are stored only as hashes and are not shown here.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>User</th>
+                                        <th>Details</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-audit-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
             </main>
         </div>
     </div>
@@ -826,6 +1071,11 @@
             overview: null,
             jobs: [],
             artifacts: [],
+            adminOverview: null,
+            adminUsers: [],
+            adminInvites: [],
+            adminJobs: [],
+            adminAuditEvents: [],
             avatarDraft: null,
             avatarChanged: false,
         };
@@ -836,6 +1086,11 @@
             reports: ['Reports', 'Download retained outputs before cleanup.'],
             profile: ['Profile', 'Manage your member information.'],
             security: ['Security', 'Update your password and account access.'],
+            'admin-overview': ['Admin Overview', 'Manage organization-level activity.'],
+            'admin-users': ['Users', 'Manage roles and account status.'],
+            'admin-invites': ['Invites', 'Create and revoke account invites.'],
+            'admin-jobs': ['All Jobs', 'Monitor organization module runs.'],
+            'admin-audit': ['Audit Log', 'Review recent security and admin events.'],
         };
         const moduleMeta = {
             sales_forecaster: { label: 'Sales Forecaster', href: './forecaster.html', code: 'SF' },
@@ -925,8 +1180,13 @@
             return data;
         }
 
+        function isAdminSection(section) {
+            return String(section || '').indexOf('admin-') === 0;
+        }
+
         function setSection(section) {
             if (!sectionCopy[section]) section = 'overview';
+            if (isAdminSection(section) && state.user && state.user.role !== 'admin') section = 'overview';
             state.activeSection = section;
             document.querySelectorAll('.section').forEach(item => item.classList.toggle('active', item.id === `section-${section}`));
             document.querySelectorAll('.nav-btn').forEach(item => item.classList.toggle('active', item.dataset.section === section));
@@ -948,7 +1208,26 @@
             state.overview = overview;
             state.jobs = jobs;
             state.artifacts = artifacts;
+            if (user.role === 'admin') {
+                await loadAdminDashboard(false);
+            }
             renderAll();
+        }
+
+        async function loadAdminDashboard(shouldRender = true) {
+            const [overview, users, invites, jobs, auditEvents] = await Promise.all([
+                api('/auth/admin/overview'),
+                api('/auth/admin/users'),
+                api('/auth/admin/invites'),
+                api('/auth/admin/jobs'),
+                api('/auth/admin/audit-events'),
+            ]);
+            state.adminOverview = overview;
+            state.adminUsers = users;
+            state.adminInvites = invites;
+            state.adminJobs = jobs;
+            state.adminAuditEvents = auditEvents;
+            if (shouldRender) renderAdminAll();
         }
 
         function profileCompletion() {
@@ -959,10 +1238,14 @@
 
         function renderChrome() {
             const displayName = state.user?.full_name || 'Member';
+            const isAdmin = state.user?.role === 'admin';
+            app.classList.toggle('is-admin', isAdmin);
+            if (!isAdmin && isAdminSection(state.activeSection)) setSection('overview');
             document.getElementById('side-name').textContent = displayName;
             document.getElementById('side-email').textContent = state.user?.email || '';
             userPill.textContent = `${state.user?.email || 'Signed in'} · ${state.user?.role || 'member'}`;
             document.getElementById('welcome-title').textContent = `Welcome, ${displayName}`;
+            document.querySelector('.side-brand span').textContent = isAdmin ? 'Member + Admin Workspace' : 'Member Workspace';
             renderAvatar(document.getElementById('side-avatar'), state.user);
             renderAvatar(document.getElementById('profile-avatar'), state.user, true);
         }
@@ -1118,6 +1401,154 @@
             });
         }
 
+        function renderAdminMetrics() {
+            const metrics = state.adminOverview?.metrics || {};
+            const items = [
+                ['Users', metrics.users || 0, `${metrics.active_users || 0} active`],
+                ['Pending Invites', metrics.pending_invites || 0, 'Awaiting activation'],
+                ['Active Sessions', metrics.active_sessions || 0, 'Currently valid sessions'],
+                ['Artifacts', formatBytes(metrics.artifact_bytes || 0), 'Stored until retention expiry'],
+            ];
+            const container = document.getElementById('admin-metrics');
+            clear(container);
+            items.forEach(([label, value, note]) => {
+                container.appendChild(el('div', { class: 'card' }, [
+                    el('div', { class: 'metric-label', text: label }),
+                    el('div', { class: 'metric-value', text: value }),
+                    el('div', { class: 'metric-note', text: note }),
+                ]));
+            });
+        }
+
+        function renderAdminStatusList(id, values) {
+            const container = document.getElementById(id);
+            clear(container);
+            const entries = Object.entries(values || {});
+            if (!entries.length) {
+                container.appendChild(el('div', { class: 'empty', text: 'No data yet.' }));
+                return;
+            }
+            entries.forEach(([label, count]) => {
+                container.appendChild(el('div', { class: 'kv-row' }, [
+                    el('span', { text: label }),
+                    el('strong', { text: count }),
+                ]));
+            });
+        }
+
+        function renderAdminUsers() {
+            const tbody = document.getElementById('admin-users-body');
+            clear(tbody);
+            if (!state.adminUsers.length) {
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: 'No users yet.' })]));
+                return;
+            }
+            state.adminUsers.forEach(user => {
+                const role = el('select', { class: 'select-small', dataset: { field: 'role', userId: user.id } }, [
+                    el('option', { value: 'member', text: 'Member' }),
+                    el('option', { value: 'admin', text: 'Admin' }),
+                ]);
+                role.value = user.role;
+                const status = el('select', { class: 'select-small', dataset: { field: 'status', userId: user.id } }, [
+                    el('option', { value: 'active', text: 'Active' }),
+                    el('option', { value: 'suspended', text: 'Suspended' }),
+                ]);
+                status.value = user.status;
+                tbody.appendChild(el('tr', {}, [
+                    el('td', {}, [
+                        el('strong', { text: user.email }),
+                        el('div', { class: 'metric-note', text: user.full_name || 'No profile name' }),
+                    ]),
+                    el('td', {}, [role]),
+                    el('td', {}, [status]),
+                    el('td', { text: formatDate(user.created_at) }),
+                    el('td', { text: formatDate(user.last_login_at) }),
+                    el('td', {}, [
+                        el('div', { class: 'row-actions' }, [
+                            el('button', { class: 'button-secondary', type: 'button', dataset: { action: 'save-user', userId: user.id }, text: 'Save' }),
+                            badge(user.status),
+                        ]),
+                    ]),
+                ]));
+            });
+        }
+
+        function renderAdminInvites() {
+            const tbody = document.getElementById('admin-invites-body');
+            clear(tbody);
+            if (!state.adminInvites.length) {
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '7', text: 'No invites yet.' })]));
+                return;
+            }
+            state.adminInvites.forEach(invite => {
+                const actions = el('div', { class: 'row-actions' });
+                if (invite.status === 'pending') {
+                    actions.appendChild(el('button', { class: 'button-danger', type: 'button', dataset: { action: 'revoke-invite', inviteId: invite.id }, text: 'Revoke' }));
+                } else {
+                    actions.appendChild(el('span', { class: 'metric-note', text: '-' }));
+                }
+                tbody.appendChild(el('tr', {}, [
+                    el('td', { text: invite.email }),
+                    el('td', {}, [badge(invite.role)]),
+                    el('td', {}, [badge(invite.status)]),
+                    el('td', { text: formatDate(invite.created_at) }),
+                    el('td', { text: formatDate(invite.expires_at) }),
+                    el('td', { text: invite.invited_by_email || '-' }),
+                    el('td', {}, [actions]),
+                ]));
+            });
+        }
+
+        function renderAdminJobs() {
+            const tbody = document.getElementById('admin-jobs-body');
+            clear(tbody);
+            if (!state.adminJobs.length) {
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '8', text: 'No jobs yet.' })]));
+                return;
+            }
+            state.adminJobs.forEach(job => {
+                tbody.appendChild(el('tr', {}, [
+                    el('td', { text: moduleLabel(job.module) }),
+                    el('td', { text: job.job_type || '-' }),
+                    el('td', { text: job.user_email || '-' }),
+                    el('td', {}, [badge(job.status)]),
+                    el('td', { text: `${job.progress || 0}%` }),
+                    el('td', { text: job.input_filename || '-' }),
+                    el('td', { text: formatDate(job.created_at) }),
+                    el('td', { text: formatDate(job.expires_at) }),
+                ]));
+            });
+        }
+
+        function renderAdminAudit() {
+            const tbody = document.getElementById('admin-audit-body');
+            clear(tbody);
+            if (!state.adminAuditEvents.length) {
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '4', text: 'No audit events yet.' })]));
+                return;
+            }
+            state.adminAuditEvents.forEach(event => {
+                tbody.appendChild(el('tr', {}, [
+                    el('td', {}, [badge(event.event_type)]),
+                    el('td', { text: event.user_email || '-' }),
+                    el('td', { text: event.details ? JSON.stringify(event.details) : '-' }),
+                    el('td', { text: formatDate(event.created_at) }),
+                ]));
+            });
+        }
+
+        function renderAdminAll() {
+            if (state.user?.role !== 'admin') return;
+            renderAdminMetrics();
+            renderAdminStatusList('admin-user-statuses', state.adminOverview?.user_statuses || {});
+            renderAdminStatusList('admin-invite-statuses', state.adminOverview?.invite_statuses || {});
+            renderAdminStatusList('admin-job-statuses', state.adminOverview?.job_statuses || {});
+            renderAdminUsers();
+            renderAdminInvites();
+            renderAdminJobs();
+            renderAdminAudit();
+        }
+
         function fillProfileForm() {
             const user = state.user || {};
             document.getElementById('profile-full-name').value = user.full_name || '';
@@ -1141,6 +1572,7 @@
             renderStatusList();
             renderJobs();
             renderArtifacts();
+            renderAdminAll();
             fillProfileForm();
         }
 
@@ -1148,6 +1580,7 @@
             state.user = user;
             if (!user) {
                 app.classList.add('hidden');
+                app.classList.remove('is-admin');
                 accessPanel.classList.remove('hidden');
                 return;
             }
@@ -1175,6 +1608,48 @@
         });
         document.getElementById('side-logout').addEventListener('click', async () => {
             await window.OperartisAuth.logout();
+        });
+        document.getElementById('admin-invite-form').addEventListener('submit', async event => {
+            event.preventDefault();
+            if (state.user?.role !== 'admin') return;
+            const button = document.getElementById('admin-invite-submit');
+            const result = document.getElementById('admin-invite-result');
+            button.disabled = true;
+            button.textContent = 'Creating...';
+            result.style.display = 'none';
+            showMessage('');
+            try {
+                const data = await api('/auth/invites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('admin-invite-email').value,
+                        role: document.getElementById('admin-invite-role').value,
+                    }),
+                });
+                document.getElementById('admin-invite-url').value = data.accept_url;
+                result.style.display = 'block';
+                document.getElementById('admin-invite-email').value = '';
+                await loadDashboard();
+                setSection('admin-invites');
+                showMessage('Invite created.', 'success');
+            } catch (error) {
+                showMessage(error.message || 'Invite could not be created.', 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Create Invite';
+            }
+        });
+        document.getElementById('admin-copy-invite').addEventListener('click', async () => {
+            const input = document.getElementById('admin-invite-url');
+            if (!input.value) return;
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(input.value);
+            } else {
+                input.select();
+                document.execCommand('copy');
+            }
+            showMessage('Invite link copied.', 'success');
         });
         document.getElementById('reset-profile').addEventListener('click', fillProfileForm);
         document.getElementById('choose-avatar').addEventListener('click', () => document.getElementById('avatar-file').click());
@@ -1271,26 +1746,67 @@
             });
         });
         document.addEventListener('click', async event => {
-            const button = event.target.closest('.download-btn');
-            if (!button) return;
-            event.preventDefault();
-            const artifactId = button.dataset.artifactId;
-            const artifact = state.artifacts.find(item => item.id === artifactId);
-            if (!artifact) return;
-            button.disabled = true;
-            try {
-                const response = await window.OperartisApi.apiFetch(`/auth/dashboard/artifacts/${artifactId}/download`);
-                if (!response.ok) {
-                    const data = await response.json().catch(() => ({}));
-                    throw new Error(readError(data, 'Download failed.'));
+            const downloadButton = event.target.closest('.download-btn');
+            if (downloadButton) {
+                event.preventDefault();
+                const artifactId = downloadButton.dataset.artifactId;
+                const artifact = state.artifacts.find(item => item.id === artifactId);
+                if (!artifact) return;
+                downloadButton.disabled = true;
+                try {
+                    const response = await window.OperartisApi.apiFetch(`/auth/dashboard/artifacts/${artifactId}/download`);
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        throw new Error(readError(data, 'Download failed.'));
+                    }
+                    const blob = await response.blob();
+                    window.OperartisSecurity.downloadBlob(blob, artifact.filename);
+                    showMessage('Download started.', 'success');
+                } catch (error) {
+                    showMessage(error.message || 'Download failed.', 'error');
+                } finally {
+                    downloadButton.disabled = false;
                 }
-                const blob = await response.blob();
-                window.OperartisSecurity.downloadBlob(blob, artifact.filename);
-                showMessage('Download started.', 'success');
-            } catch (error) {
-                showMessage(error.message || 'Download failed.', 'error');
-            } finally {
-                button.disabled = false;
+                return;
+            }
+
+            const actionButton = event.target.closest('[data-action]');
+            if (!actionButton) return;
+            event.preventDefault();
+            if (state.user?.role !== 'admin') return;
+
+            if (actionButton.dataset.action === 'save-user') {
+                const userId = actionButton.dataset.userId;
+                const role = document.querySelector(`select[data-user-id="${userId}"][data-field="role"]`).value;
+                const status = document.querySelector(`select[data-user-id="${userId}"][data-field="status"]`).value;
+                actionButton.disabled = true;
+                try {
+                    await api(`/auth/admin/users/${userId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ role, status }),
+                    });
+                    await loadDashboard();
+                    showMessage('User updated.', 'success');
+                } catch (error) {
+                    showMessage(error.message || 'User could not be updated.', 'error');
+                } finally {
+                    actionButton.disabled = false;
+                }
+            }
+
+            if (actionButton.dataset.action === 'revoke-invite') {
+                const inviteId = actionButton.dataset.inviteId;
+                actionButton.disabled = true;
+                try {
+                    await api(`/auth/admin/invites/${inviteId}`, { method: 'DELETE' });
+                    await loadDashboard();
+                    showMessage('Invite revoked.', 'success');
+                } catch (error) {
+                    showMessage(error.message || 'Invite could not be revoked.', 'error');
+                } finally {
+                    actionButton.disabled = false;
+                }
             }
         });
         window.addEventListener('operartis:authenticated', event => showDashboard(event.detail.user));
@@ -1298,6 +1814,7 @@
         window.addEventListener('operartis:logged-out', () => {
             state.user = null;
             app.classList.add('hidden');
+            app.classList.remove('is-admin');
             accessPanel.classList.remove('hidden');
         });
         setSection(String(window.location.hash || '#overview').replace('#', ''));
