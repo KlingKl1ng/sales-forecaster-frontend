@@ -91,7 +91,7 @@
             '.op-auth-password-toggle:hover{background:var(--op-auth-close-bg);color:var(--op-auth-card-text)}',
             '.op-auth-password-toggle:focus-visible{outline:2px solid rgba(245,158,11,.6);outline-offset:2px}',
             '.op-auth-password-toggle svg{width:18px;height:18px;stroke:currentColor}',
-            '.op-auth-button{height:44px;width:100%;border:0;border-radius:8px;background:#f59e0b;color:#111827;font-weight:900;cursor:pointer}',
+            '.op-auth-button{height:44px;width:100%;border:0;border-radius:8px;background:#f59e0b;color:#ffffff;font-weight:900;cursor:pointer}',
             '.op-auth-contact{margin:12px 0 0;color:var(--op-auth-muted);font-size:12px;line-height:1.5;text-align:center}',
             '.op-auth-contact a{color:#d97706;font-weight:900;text-decoration:none}',
             '.op-auth-contact a:hover{text-decoration:underline}',
