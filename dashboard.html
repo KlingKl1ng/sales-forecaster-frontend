@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operartis | Your Dashboard</title>
+    <title>Operartis | Member Dashboard</title>
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
     <script src="./operartis-security.js"></script>
     <script src="./operartis-api.js"></script>
@@ -18,29 +18,37 @@
         * { box-sizing: border-box; }
         :root {
             --bg: #020617;
-            --panel: #0f172a;
-            --panel-2: #111827;
-            --line: rgba(148, 163, 184, .22);
+            --panel: rgba(15, 23, 42, .86);
+            --panel-strong: rgba(15, 23, 42, .96);
+            --panel-soft: rgba(30, 41, 59, .66);
+            --line: rgba(148, 163, 184, .2);
+            --line-strong: rgba(148, 163, 184, .32);
             --text: #f8fafc;
-            --muted: #94a3b8;
             --soft: #cbd5e1;
+            --muted: #94a3b8;
+            --muted-2: #64748b;
             --gold: #f59e0b;
+            --gold-2: #fbbf24;
             --green: #10b981;
             --red: #ef4444;
             --blue: #38bdf8;
+            --shadow: 0 24px 80px rgba(0, 0, 0, .28);
         }
         body {
             margin: 0;
             min-height: 100vh;
             background:
-                radial-gradient(circle at 14% 8%, rgba(245, 158, 11, .12), transparent 28rem),
-                radial-gradient(circle at 78% 0%, rgba(56, 189, 248, .12), transparent 25rem),
+                linear-gradient(rgba(148, 163, 184, .05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, .05) 1px, transparent 1px),
+                radial-gradient(circle at 10% 8%, rgba(245, 158, 11, .14), transparent 27rem),
+                radial-gradient(circle at 82% 0%, rgba(56, 189, 248, .13), transparent 28rem),
                 var(--bg);
+            background-size: 80px 80px, 80px 80px, auto, auto, auto;
             color: var(--text);
             font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
-        button, input { font: inherit; }
         a { color: inherit; text-decoration: none; }
+        button, input, select { font: inherit; }
         button {
             border: 0;
             border-radius: 8px;
@@ -50,6 +58,29 @@
             cursor: pointer;
         }
         button:disabled { opacity: .55; cursor: not-allowed; }
+        input, select {
+            width: 100%;
+            height: 42px;
+            border: 1px solid rgba(148, 163, 184, .26);
+            border-radius: 8px;
+            background: rgba(2, 6, 23, .78);
+            color: var(--text);
+            padding: 0 12px;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: rgba(245, 158, 11, .8);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, .16);
+        }
+        label {
+            display: grid;
+            gap: 7px;
+            color: var(--soft);
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
         .hidden { display: none !important; }
         .access {
             min-height: 100vh;
@@ -57,17 +88,150 @@
             place-items: center;
             padding: 24px;
         }
-        .access-card, .card {
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: rgba(15, 23, 42, .84);
-            box-shadow: 0 18px 60px rgba(0, 0, 0, .24);
-        }
         .access-card {
             width: min(520px, 100%);
             padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
         }
-        .shell { min-height: 100vh; }
+        h1, h2, h3, p { margin: 0; }
+        h1 { font-size: clamp(28px, 3vw, 42px); line-height: 1.02; letter-spacing: -.03em; }
+        h2 { font-size: 19px; letter-spacing: -.01em; }
+        h3 { font-size: 15px; line-height: 1.25; }
+        .sub {
+            max-width: 720px;
+            color: var(--muted);
+            line-height: 1.55;
+            margin-top: 8px;
+        }
+        .button-link, .button-secondary, .button-danger, .button-ghost {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0 14px;
+            border-radius: 8px;
+            font-weight: 950;
+        }
+        .button-link { background: var(--gold); color: #fff; }
+        .button-secondary { background: #334155; color: #fff; }
+        .button-danger { background: rgba(239, 68, 68, .16); color: #fecaca; border: 1px solid rgba(239, 68, 68, .34); }
+        .button-ghost { border: 1px solid rgba(148, 163, 184, .28); background: rgba(15, 23, 42, .45); color: var(--soft); }
+        .shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr);
+        }
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--line);
+            background: rgba(2, 6, 23, .86);
+            backdrop-filter: blur(18px);
+        }
+        .side-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+        .side-brand img { width: 42px; height: 42px; object-fit: contain; }
+        .side-brand strong { display: block; letter-spacing: .04em; }
+        .side-brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+        .side-profile {
+            display: grid;
+            grid-template-columns: 48px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            padding: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border: 1px solid rgba(245, 158, 11, .45);
+            background: radial-gradient(circle at 30% 25%, rgba(251, 191, 36, .95), rgba(217, 119, 6, .85));
+            color: #08111f;
+            font-size: 16px;
+            font-weight: 950;
+            box-shadow: 0 10px 28px rgba(245, 158, 11, .18);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .side-profile strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .side-profile span {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        .side-nav {
+            display: grid;
+            gap: 6px;
+            padding: 14px;
+        }
+        .nav-btn {
+            display: grid;
+            grid-template-columns: 34px minmax(0, 1fr);
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            min-height: 44px;
+            padding: 0 11px 0 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--muted);
+            text-align: left;
+        }
+        .nav-btn .nav-ico {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: rgba(148, 163, 184, .12);
+            color: var(--soft);
+            font-size: 11px;
+            font-weight: 950;
+        }
+        .nav-btn.active {
+            border-color: rgba(245, 158, 11, .42);
+            background: rgba(245, 158, 11, .12);
+            color: var(--text);
+        }
+        .nav-btn.active .nav-ico {
+            background: rgba(245, 158, 11, .22);
+            color: #fde68a;
+        }
+        .side-footer {
+            margin-top: auto;
+            display: grid;
+            gap: 8px;
+            padding: 14px;
+            border-top: 1px solid var(--line);
+        }
+        .main-shell {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
         .topbar {
             position: sticky;
             top: 0;
@@ -75,40 +239,29 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            gap: 14px;
+            min-height: 72px;
             padding: 14px 24px;
             border-bottom: 1px solid var(--line);
-            background: rgba(2, 6, 23, .78);
+            background: rgba(2, 6, 23, .68);
             backdrop-filter: blur(18px);
         }
-        .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .brand img { width: 38px; height: 38px; object-fit: contain; }
-        .brand strong { display: block; letter-spacing: .03em; }
-        .brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
         .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .mobile-menu { display: none; width: 42px; height: 40px; background: rgba(51, 65, 85, .9); }
         .pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
             border: 1px solid var(--line);
             background: rgba(15, 23, 42, .82);
             border-radius: 999px;
-            padding: 9px 12px;
+            padding: 0 12px;
             color: var(--soft);
             font-size: 13px;
-        }
-        .button-secondary {
-            height: 40px;
-            padding: 0 14px;
-            background: #334155;
-            color: #fff;
-        }
-        .button-ghost {
-            height: 38px;
-            padding: 0 12px;
-            border: 1px solid rgba(148, 163, 184, .28);
-            background: rgba(15, 23, 42, .45);
-            color: var(--soft);
+            white-space: nowrap;
         }
         .main {
-            width: min(1280px, 100%);
+            width: min(1400px, 100%);
             margin: 0 auto;
             padding: 24px;
         }
@@ -116,24 +269,38 @@
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
-            gap: 20px;
+            gap: 18px;
             margin-bottom: 18px;
         }
-        h1, h2, h3, p { margin: 0; }
-        h1 { font-size: clamp(26px, 3vw, 38px); letter-spacing: -.03em; }
-        h2 { font-size: 18px; }
-        h3 { font-size: 15px; }
-        .sub {
-            color: var(--muted);
-            line-height: 1.5;
-            margin-top: 7px;
-            max-width: 760px;
-        }
+        .section { display: none; }
+        .section.active { display: block; }
         .grid { display: grid; gap: 16px; }
         .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        .content-grid { grid-template-columns: minmax(0, 1.4fr) minmax(320px, .8fr); align-items: start; margin-top: 16px; }
-        .shortcut-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 16px; }
-        .card { padding: 16px; }
+        .two-col { grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr); align-items: start; }
+        .shortcut-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .stack { display: grid; gap: 16px; }
+        .card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: 0 18px 60px rgba(0, 0, 0, .16);
+            padding: 16px;
+        }
+        .card.tight { padding: 0; overflow: hidden; }
+        .section-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .section-sub {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+            margin-top: 5px;
+        }
         .metric-label {
             color: var(--muted);
             font-size: 11px;
@@ -152,23 +319,10 @@
             color: var(--muted);
             font-size: 12px;
         }
-        .section-head {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-        .section-sub {
-            color: var(--muted);
-            font-size: 13px;
-            margin-top: 5px;
-            line-height: 1.45;
-        }
         .shortcut {
             display: grid;
             gap: 14px;
-            min-height: 154px;
+            min-height: 170px;
         }
         .shortcut-top {
             display: flex;
@@ -186,19 +340,7 @@
             color: #fbbf24;
             font-weight: 950;
         }
-        .shortcut h3 { line-height: 1.25; }
         .shortcut p { color: var(--muted); font-size: 13px; line-height: 1.45; }
-        .shortcut a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 38px;
-            border-radius: 8px;
-            background: var(--gold);
-            color: #fff;
-            font-weight: 950;
-            margin-top: auto;
-        }
         .badge {
             display: inline-flex;
             align-items: center;
@@ -222,7 +364,7 @@
             border: 1px solid var(--line);
             border-radius: 8px;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 760px; }
+        table { width: 100%; border-collapse: collapse; min-width: 780px; }
         th, td { padding: 11px 12px; border-bottom: 1px solid rgba(148, 163, 184, .14); text-align: left; vertical-align: middle; }
         th { color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; background: rgba(2, 6, 23, .42); }
         td { color: #e2e8f0; font-size: 13px; }
@@ -240,7 +382,44 @@
         .kv-list { display: grid; gap: 10px; }
         .kv-row { display: flex; justify-content: space-between; gap: 10px; color: var(--soft); font-size: 13px; }
         .kv-row span:first-child { color: var(--muted); }
-        .stack { display: grid; gap: 16px; }
+        .progress {
+            height: 10px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(148, 163, 184, .16);
+        }
+        .progress > span {
+            display: block;
+            height: 100%;
+            width: 0;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #f59e0b, #10b981);
+        }
+        .avatar-editor {
+            display: grid;
+            grid-template-columns: 88px minmax(0, 1fr);
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .avatar-large {
+            width: 88px;
+            height: 88px;
+            font-size: 27px;
+        }
+        .avatar-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .form-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .inline-note {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.45;
+        }
         .download-btn {
             display: inline-flex;
             align-items: center;
@@ -253,14 +432,51 @@
             color: #bbf7d0;
             border: 1px solid rgba(16, 185, 129, .34);
         }
-        @media (max-width: 1060px) {
-            .metric-grid, .shortcut-grid, .content-grid { grid-template-columns: 1fr 1fr; }
+        .password-wrap { position: relative; }
+        .password-wrap input { padding-right: 46px; }
+        .password-toggle {
+            position: absolute;
+            right: 7px;
+            top: 50%;
+            width: 32px;
+            height: 32px;
+            transform: translateY(-50%);
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            border: 0;
+            padding: 0;
         }
-        @media (max-width: 760px) {
-            .topbar, .hero { align-items: flex-start; flex-direction: column; }
+        .password-toggle:hover { background: rgba(148, 163, 184, .12); color: var(--text); }
+        .password-toggle svg { width: 18px; height: 18px; stroke: currentColor; }
+        @media (max-width: 1180px) {
+            .metric-grid, .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .two-col { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 860px) {
+            .shell { grid-template-columns: 1fr; }
+            .sidebar {
+                position: fixed;
+                z-index: 30;
+                width: min(300px, 86vw);
+                transform: translateX(-100%);
+                transition: transform .18s ease;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .mobile-menu { display: inline-flex; align-items: center; justify-content: center; }
             .main { padding: 18px; }
-            .metric-grid, .shortcut-grid, .content-grid { grid-template-columns: 1fr; }
-            .top-actions { justify-content: flex-start; }
+            .topbar, .hero { align-items: flex-start; }
+            .hero { flex-direction: column; }
+            .form-grid, .metric-grid, .shortcut-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 560px) {
+            .topbar { flex-direction: column; }
+            .top-actions { justify-content: flex-start; width: 100%; }
+            .avatar-editor { grid-template-columns: 1fr; }
+            .form-actions { align-items: stretch; flex-direction: column; }
+            .button-link, .button-secondary, .button-danger, .button-ghost, .download-btn { width: 100%; }
         }
     </style>
 </head>
@@ -269,53 +485,101 @@
     <div id="access-panel" class="access hidden">
         <div class="access-card">
             <h1>Operartis Dashboard</h1>
-            <p class="sub">Sign in with your invited account to view your module runs, report history, and retained downloads.</p>
+            <p class="sub">Sign in with your invited account to manage your profile, open modules, view retained reports, and change your password.</p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
                 <button id="access-login" type="button" style="height:40px;padding:0 14px">Sign In</button>
-                <a class="button-ghost" style="display:inline-flex;align-items:center" href="./">Home</a>
+                <a class="button-ghost" href="./">Home</a>
             </div>
         </div>
     </div>
 
     <div id="dashboard-app" class="shell hidden">
-        <header class="topbar">
-            <a class="brand" href="./" aria-label="Operartis Home">
+        <aside id="sidebar" class="sidebar">
+            <a class="side-brand" href="./" aria-label="Operartis Home">
                 <img src="./icononly_transparent_nobuffer.png" alt="">
                 <div>
                     <strong>OPERARTIS</strong>
-                    <span>Your Dashboard</span>
+                    <span>Member Workspace</span>
                 </div>
             </a>
-            <div class="top-actions">
-                <span id="user-pill" class="pill">Not signed in</span>
-                <button id="refresh" class="button-secondary" type="button">Refresh</button>
-                <button id="logout" class="button-secondary" type="button">Logout</button>
-            </div>
-        </header>
-
-        <main class="main">
-            <section class="hero">
+            <div class="side-profile">
+                <div id="side-avatar" class="avatar"></div>
                 <div>
-                    <h1>Your Dashboard</h1>
-                    <p class="sub">Track your optimization activity, reopen modules, and download retained outputs while they are still inside the retention window.</p>
+                    <strong id="side-name">Member</strong>
+                    <span id="side-email">Signed in</span>
                 </div>
-                <span id="retention-pill" class="pill">Retention: 7 days</span>
-            </section>
+            </div>
+            <nav class="side-nav" aria-label="Dashboard">
+                <button class="nav-btn active" type="button" data-section="overview"><span class="nav-ico">OV</span><span>Overview</span></button>
+                <button class="nav-btn" type="button" data-section="modules"><span class="nav-ico">MO</span><span>Modules</span></button>
+                <button class="nav-btn" type="button" data-section="activity"><span class="nav-ico">AC</span><span>Activity</span></button>
+                <button class="nav-btn" type="button" data-section="reports"><span class="nav-ico">RE</span><span>Reports</span></button>
+                <button class="nav-btn" type="button" data-section="profile"><span class="nav-ico">PR</span><span>Profile</span></button>
+                <button class="nav-btn" type="button" data-section="security"><span class="nav-ico">SE</span><span>Security</span></button>
+            </nav>
+            <div class="side-footer">
+                <a class="button-ghost" href="./">Back To Site</a>
+                <button id="side-logout" class="button-secondary" type="button">Logout</button>
+            </div>
+        </aside>
 
-            <div id="message" class="message"></div>
+        <div class="main-shell">
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;min-width:0">
+                    <button id="mobile-menu" class="mobile-menu" type="button" aria-label="Open dashboard menu">Menu</button>
+                    <div>
+                        <h2 id="top-title">Overview</h2>
+                        <p id="top-subtitle" class="section-sub">Your optimization workspace.</p>
+                    </div>
+                </div>
+                <div class="top-actions">
+                    <span id="user-pill" class="pill">Not signed in</span>
+                    <button id="refresh" class="button-secondary" type="button">Refresh</button>
+                </div>
+            </header>
 
-            <section id="metrics" class="grid metric-grid"></section>
+            <main class="main">
+                <div id="message" class="message"></div>
 
-            <section class="grid shortcut-grid" id="module-shortcuts"></section>
-
-            <section class="grid content-grid">
-                <div class="stack">
-                    <div class="card">
+                <section id="section-overview" class="section active">
+                    <div class="hero">
+                        <div>
+                            <h1 id="welcome-title">Your Dashboard</h1>
+                            <p class="sub">Track optimization activity, manage your account, and reopen frequently used modules from one place.</p>
+                        </div>
+                        <span id="retention-pill" class="pill">Retention: 7 days</span>
+                    </div>
+                    <div id="metrics" class="grid metric-grid"></div>
+                    <div class="grid two-col" style="margin-top:16px">
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Module Shortcuts</h2>
+                                    <p class="section-sub">The fastest route to your optimization tools.</p>
+                                </div>
+                                <button class="button-ghost nav-jump" type="button" data-section="modules">All Modules</button>
+                            </div>
+                            <div id="overview-shortcuts" class="grid shortcut-grid"></div>
+                        </div>
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Profile Completion</h2>
+                                    <p class="section-sub">Complete profile data helps future team and company-level workflows.</p>
+                                </div>
+                                <button class="button-ghost nav-jump" type="button" data-section="profile">Edit</button>
+                            </div>
+                            <div class="progress" aria-label="Profile completion"><span id="profile-progress"></span></div>
+                            <div id="profile-summary" class="kv-list" style="margin-top:14px"></div>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top:16px">
                         <div class="section-head">
                             <div>
                                 <h2>Recent Module Runs</h2>
-                                <p class="section-sub">Latest runs linked to your account.</p>
+                                <p class="section-sub">Latest work linked to your member account.</p>
                             </div>
+                            <button class="button-ghost nav-jump" type="button" data-section="activity">View Activity</button>
                         </div>
                         <div class="table-wrap">
                             <table>
@@ -329,80 +593,222 @@
                                         <th>Expires</th>
                                     </tr>
                                 </thead>
-                                <tbody id="jobs-body"></tbody>
+                                <tbody id="recent-jobs-body"></tbody>
                             </table>
                         </div>
                     </div>
+                </section>
 
-                    <div class="card">
-                        <div class="section-head">
-                            <div>
-                                <h2>Upload & Report History</h2>
-                                <p class="section-sub">Input files, generated outputs, and retention status.</p>
-                            </div>
+                <section id="section-modules" class="section">
+                    <div class="hero">
+                        <div>
+                            <h1>Module Shortcuts</h1>
+                            <p class="sub">Open the operational modules available to your account.</p>
                         </div>
+                    </div>
+                    <div id="module-shortcuts" class="grid shortcut-grid"></div>
+                </section>
+
+                <section id="section-activity" class="section">
+                    <div class="hero">
+                        <div>
+                            <h1>Activity</h1>
+                            <p class="sub">Review uploads, processing status, and retained module activity.</p>
+                        </div>
+                    </div>
+                    <div class="card">
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Input File</th>
                                         <th>Module</th>
-                                        <th>Reports</th>
+                                        <th>Type</th>
                                         <th>Status</th>
-                                        <th>Last Updated</th>
+                                        <th>Progress</th>
+                                        <th>Input</th>
+                                        <th>Reports</th>
+                                        <th>Updated</th>
                                     </tr>
                                 </thead>
-                                <tbody id="history-body"></tbody>
+                                <tbody id="jobs-body"></tbody>
                             </table>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="stack">
-                    <div class="card">
-                        <div class="section-head">
-                            <div>
-                                <h2>Account</h2>
-                                <p class="section-sub">Current signed-in profile.</p>
-                            </div>
-                        </div>
-                        <div id="account-info" class="kv-list"></div>
-                    </div>
-
-                    <div class="card">
-                        <div class="section-head">
-                            <div>
-                                <h2>Available Downloads</h2>
-                                <p class="section-sub">Reports and artifacts still available before automatic cleanup.</p>
-                            </div>
-                        </div>
-                        <div class="table-wrap">
-                            <table style="min-width:520px">
-                                <thead>
-                                    <tr>
-                                        <th>File</th>
-                                        <th>Module</th>
-                                        <th>Expires</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="artifacts-body"></tbody>
-                            </table>
+                <section id="section-reports" class="section">
+                    <div class="hero">
+                        <div>
+                            <h1>Reports</h1>
+                            <p class="sub">Download retained outputs before the automatic cleanup window ends.</p>
                         </div>
                     </div>
-
-                    <div class="card">
-                        <div class="section-head">
-                            <div>
-                                <h2>Run Status</h2>
-                                <p class="section-sub">Distribution of your current job history.</p>
+                    <div class="grid two-col">
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Available Downloads</h2>
+                                    <p class="section-sub">Reports and artifacts still available.</p>
+                                </div>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>File</th>
+                                            <th>Module</th>
+                                            <th>Created</th>
+                                            <th>Expires</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="artifacts-body"></tbody>
+                                </table>
                             </div>
                         </div>
-                        <div id="status-list" class="kv-list"></div>
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Run Status</h2>
+                                    <p class="section-sub">Distribution of your current job history.</p>
+                                </div>
+                            </div>
+                            <div id="status-list" class="kv-list"></div>
+                        </div>
                     </div>
-                </div>
-            </section>
-        </main>
+                </section>
+
+                <section id="section-profile" class="section">
+                    <div class="hero">
+                        <div>
+                            <h1>Profile</h1>
+                            <p class="sub">Manage your member information. These details are visible to your account and future team workflows.</p>
+                        </div>
+                    </div>
+                    <div class="grid two-col">
+                        <form id="profile-form" class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Member Information</h2>
+                                    <p class="section-sub">Name, company, position, contact details, and avatar.</p>
+                                </div>
+                            </div>
+                            <div class="avatar-editor">
+                                <div id="profile-avatar" class="avatar avatar-large"></div>
+                                <div>
+                                    <h3>Profile Avatar</h3>
+                                    <p class="inline-note">Use a PNG, JPEG, or WebP image up to 256 KB.</p>
+                                    <div class="avatar-actions">
+                                        <input id="avatar-file" class="hidden" type="file" accept="image/png,image/jpeg,image/webp">
+                                        <button id="choose-avatar" class="button-ghost" type="button">Change Avatar</button>
+                                        <button id="clear-avatar" class="button-danger" type="button">Clear Avatar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid form-grid">
+                                <label>Full Name<input id="profile-full-name" name="full_name" autocomplete="name" maxlength="255"></label>
+                                <label>Company<input id="profile-company" name="company_name" autocomplete="organization" maxlength="255"></label>
+                                <label>Position<input id="profile-position" name="position_title" autocomplete="organization-title" maxlength="255"></label>
+                                <label>Gender
+                                    <select id="profile-gender" name="gender">
+                                        <option value="">Prefer not to say</option>
+                                        <option value="female">Female</option>
+                                        <option value="male">Male</option>
+                                        <option value="non_binary">Non-binary</option>
+                                        <option value="custom">Self-described</option>
+                                    </select>
+                                </label>
+                                <label>Phone<input id="profile-phone" name="phone" autocomplete="tel" maxlength="64"></label>
+                                <label>Language
+                                    <select id="profile-locale" name="locale">
+                                        <option value="">Browser default</option>
+                                        <option value="en">English</option>
+                                        <option value="vi">Vietnamese</option>
+                                        <option value="de">German</option>
+                                    </select>
+                                </label>
+                                <label>Timezone<input id="profile-timezone" name="timezone" autocomplete="off" maxlength="64" placeholder="Europe/Berlin"></label>
+                            </div>
+                            <div class="form-actions">
+                                <button id="reset-profile" class="button-ghost" type="button">Reset</button>
+                                <button id="save-profile" class="button-link" type="submit">Save Profile</button>
+                            </div>
+                        </form>
+                        <div class="stack">
+                            <div class="card">
+                                <div class="section-head">
+                                    <div>
+                                        <h2>Account Summary</h2>
+                                        <p class="section-sub">Current signed-in account details.</p>
+                                    </div>
+                                </div>
+                                <div id="account-info" class="kv-list"></div>
+                            </div>
+                            <div class="card">
+                                <div class="section-head">
+                                    <div>
+                                        <h2>Data Retention</h2>
+                                        <p class="section-sub">Uploads, reports, and scenario artifacts are automatically deleted after the retention window.</p>
+                                    </div>
+                                </div>
+                                <div id="retention-info" class="kv-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-security" class="section">
+                    <div class="hero">
+                        <div>
+                            <h1>Security</h1>
+                            <p class="sub">Change your password and keep your member account protected.</p>
+                        </div>
+                    </div>
+                    <div class="grid two-col">
+                        <form id="password-form" class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Change Password</h2>
+                                    <p class="section-sub">After saving, other active sessions for this account are closed.</p>
+                                </div>
+                            </div>
+                            <div class="grid">
+                                <label>Current Password
+                                    <span class="password-wrap">
+                                        <input id="current-password" type="password" autocomplete="current-password" minlength="8" required>
+                                        <button class="password-toggle" type="button" data-target="current-password" aria-label="Show password"></button>
+                                    </span>
+                                </label>
+                                <label>New Password
+                                    <span class="password-wrap">
+                                        <input id="new-password" type="password" autocomplete="new-password" minlength="8" required>
+                                        <button class="password-toggle" type="button" data-target="new-password" aria-label="Show password"></button>
+                                    </span>
+                                </label>
+                                <label>Confirm New Password
+                                    <span class="password-wrap">
+                                        <input id="confirm-password" type="password" autocomplete="new-password" minlength="8" required>
+                                        <button class="password-toggle" type="button" data-target="confirm-password" aria-label="Show password"></button>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button id="change-password" class="button-link" type="submit">Update Password</button>
+                            </div>
+                        </form>
+                        <div class="card">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Account Access</h2>
+                                    <p class="section-sub">What this member account can currently access.</p>
+                                </div>
+                            </div>
+                            <div id="access-info" class="kv-list"></div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
     </div>
 
     <script>
@@ -411,11 +817,25 @@
         const message = document.getElementById('message');
         const userPill = document.getElementById('user-pill');
         const retentionPill = document.getElementById('retention-pill');
+        const sidebar = document.getElementById('sidebar');
+        const topTitle = document.getElementById('top-title');
+        const topSubtitle = document.getElementById('top-subtitle');
         const state = {
+            activeSection: 'overview',
             user: null,
             overview: null,
             jobs: [],
             artifacts: [],
+            avatarDraft: null,
+            avatarChanged: false,
+        };
+        const sectionCopy = {
+            overview: ['Overview', 'Your optimization workspace.'],
+            modules: ['Modules', 'Open the tools available to your account.'],
+            activity: ['Activity', 'Review your module runs and upload history.'],
+            reports: ['Reports', 'Download retained outputs before cleanup.'],
+            profile: ['Profile', 'Manage your member information.'],
+            security: ['Security', 'Update your password and account access.'],
         };
         const moduleMeta = {
             sales_forecaster: { label: 'Sales Forecaster', href: './forecaster.html', code: 'SF' },
@@ -440,24 +860,41 @@
             while (node.firstChild) node.removeChild(node.firstChild);
         }
 
-        function node(tag, attrs = {}, children = []) {
-            const el = document.createElement(tag);
+        function el(tag, attrs = {}, children = []) {
+            const element = document.createElement(tag);
             Object.entries(attrs).forEach(([key, value]) => {
-                if (key === 'class') el.className = value;
-                else if (key === 'text') el.textContent = value == null ? '' : String(value);
-                else if (key === 'dataset') Object.assign(el.dataset, value);
-                else el.setAttribute(key, value);
+                if (key === 'class') element.className = value;
+                else if (key === 'text') element.textContent = value == null ? '' : String(value);
+                else if (key === 'dataset') Object.assign(element.dataset, value);
+                else element.setAttribute(key, value);
             });
-            children.forEach(child => el.appendChild(typeof child === 'string' ? document.createTextNode(child) : child));
-            return el;
+            children.forEach(child => element.appendChild(typeof child === 'string' ? document.createTextNode(child) : child));
+            return element;
         }
 
         function badge(value) {
-            return node('span', { class: `badge ${String(value || '').toLowerCase()}`, text: value || 'unknown' });
+            return el('span', { class: `badge ${String(value || '').toLowerCase()}`, text: value || 'unknown' });
         }
 
         function moduleLabel(value) {
             return (moduleMeta[value] && moduleMeta[value].label) || String(value || 'Module').replace(/_/g, ' ');
+        }
+
+        function initials(user) {
+            const name = user?.full_name || user?.email || 'Member';
+            const parts = name.replace(/@.*/, '').split(/[.\s_-]+/).filter(Boolean);
+            return (parts[0]?.[0] || 'M') + (parts[1]?.[0] || parts[0]?.[1] || '');
+        }
+
+        function renderAvatar(container, user, large = false) {
+            clear(container);
+            container.className = large ? 'avatar avatar-large' : 'avatar';
+            const avatar = state.avatarChanged ? state.avatarDraft : user?.avatar_data_url;
+            if (avatar) {
+                container.appendChild(el('img', { src: avatar, alt: '' }));
+            } else {
+                container.textContent = initials(user).toUpperCase();
+            }
         }
 
         function formatDate(value) {
@@ -488,17 +925,46 @@
             return data;
         }
 
+        function setSection(section) {
+            if (!sectionCopy[section]) section = 'overview';
+            state.activeSection = section;
+            document.querySelectorAll('.section').forEach(item => item.classList.toggle('active', item.id === `section-${section}`));
+            document.querySelectorAll('.nav-btn').forEach(item => item.classList.toggle('active', item.dataset.section === section));
+            topTitle.textContent = sectionCopy[section][0];
+            topSubtitle.textContent = sectionCopy[section][1];
+            window.location.hash = section;
+            sidebar.classList.remove('open');
+        }
+
         async function loadDashboard() {
             showMessage('');
-            const [overview, jobs, artifacts] = await Promise.all([
+            const [user, overview, jobs, artifacts] = await Promise.all([
+                window.OperartisApi.me(),
                 api('/auth/dashboard/overview'),
                 api('/auth/dashboard/jobs'),
                 api('/auth/dashboard/artifacts'),
             ]);
+            state.user = user;
             state.overview = overview;
             state.jobs = jobs;
             state.artifacts = artifacts;
             renderAll();
+        }
+
+        function profileCompletion() {
+            const fields = ['full_name', 'company_name', 'position_title', 'phone', 'locale', 'timezone', 'avatar_data_url'];
+            const completed = fields.filter(field => Boolean(state.user?.[field])).length;
+            return Math.round((completed / fields.length) * 100);
+        }
+
+        function renderChrome() {
+            const displayName = state.user?.full_name || 'Member';
+            document.getElementById('side-name').textContent = displayName;
+            document.getElementById('side-email').textContent = state.user?.email || '';
+            userPill.textContent = `${state.user?.email || 'Signed in'} · ${state.user?.role || 'member'}`;
+            document.getElementById('welcome-title').textContent = `Welcome, ${displayName}`;
+            renderAvatar(document.getElementById('side-avatar'), state.user);
+            renderAvatar(document.getElementById('profile-avatar'), state.user, true);
         }
 
         function renderMetrics() {
@@ -507,52 +973,84 @@
                 ['Runs', metrics.jobs || 0, `${metrics.completed_jobs || 0} completed`],
                 ['Active', metrics.active_jobs || 0, 'Queued or processing'],
                 ['Downloads', metrics.reports_available || 0, 'Available now'],
-                ['Storage', formatBytes(metrics.artifact_bytes || 0), 'Within retention'],
+                ['Profile', `${profileCompletion()}%`, 'Member information'],
             ];
             const container = document.getElementById('metrics');
             clear(container);
             items.forEach(([label, value, note]) => {
-                container.appendChild(node('div', { class: 'card' }, [
-                    node('div', { class: 'metric-label', text: label }),
-                    node('div', { class: 'metric-value', text: value }),
-                    node('div', { class: 'metric-note', text: note }),
+                container.appendChild(el('div', { class: 'card' }, [
+                    el('div', { class: 'metric-label', text: label }),
+                    el('div', { class: 'metric-value', text: value }),
+                    el('div', { class: 'metric-note', text: note }),
                 ]));
             });
         }
 
+        function shortcutCard(item) {
+            return el('article', { class: 'card shortcut' }, [
+                el('div', { class: 'shortcut-top' }, [
+                    el('div', { class: 'shortcut-icon', text: item.code }),
+                    badge('available'),
+                ]),
+                el('div', {}, [
+                    el('h3', { text: item.label }),
+                    el('p', { text: item.desc }),
+                ]),
+                el('a', { class: 'button-link', href: item.href, text: 'Open Module' }),
+            ]);
+        }
+
         function renderShortcuts() {
-            const container = document.getElementById('module-shortcuts');
-            clear(container);
-            shortcuts.forEach(item => {
-                container.appendChild(node('article', { class: 'card shortcut' }, [
-                    node('div', { class: 'shortcut-top' }, [
-                        node('div', { class: 'shortcut-icon', text: item.code }),
-                        badge('available'),
-                    ]),
-                    node('div', {}, [
-                        node('h3', { text: item.label }),
-                        node('p', { text: item.desc }),
-                    ]),
-                    node('a', { href: item.href, text: 'Open Module' }),
-                ]));
+            const overview = document.getElementById('overview-shortcuts');
+            const full = document.getElementById('module-shortcuts');
+            clear(overview);
+            clear(full);
+            shortcuts.slice(0, 2).forEach(item => overview.appendChild(shortcutCard(item)));
+            shortcuts.forEach(item => full.appendChild(shortcutCard(item)));
+        }
+
+        function renderSummary() {
+            const completion = profileCompletion();
+            document.getElementById('profile-progress').style.width = `${completion}%`;
+            const profileRows = [
+                ['Completion', `${completion}%`],
+                ['Name', state.user?.full_name || 'Missing'],
+                ['Company', state.user?.company_name || 'Missing'],
+                ['Position', state.user?.position_title || 'Missing'],
+                ['Language', state.user?.locale || 'Browser default'],
+            ];
+            const summary = document.getElementById('profile-summary');
+            clear(summary);
+            profileRows.forEach(([label, value]) => {
+                summary.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })]));
             });
         }
 
         function renderAccount() {
-            const container = document.getElementById('account-info');
-            clear(container);
-            const rows = [
+            const account = document.getElementById('account-info');
+            const retention = document.getElementById('retention-info');
+            const access = document.getElementById('access-info');
+            clear(account);
+            clear(retention);
+            clear(access);
+            [
                 ['Email', state.user?.email || '-'],
                 ['Role', state.user?.role || '-'],
-                ['Organization', state.user?.organization_id || '-'],
-                ['Retention', `${state.overview?.retention_days || 7} days`],
-            ];
-            rows.forEach(([label, value]) => {
-                container.appendChild(node('div', { class: 'kv-row' }, [
-                    node('span', { text: label }),
-                    node('strong', { text: value }),
-                ]));
-            });
+                ['Company', state.user?.company_name || '-'],
+                ['Position', state.user?.position_title || '-'],
+            ].forEach(([label, value]) => account.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
+            [
+                ['Retention Window', `${state.overview?.retention_days || 7} days`],
+                ['Reports Available', state.overview?.metrics?.reports_available || 0],
+                ['Stored Output Size', formatBytes(state.overview?.metrics?.artifact_bytes || 0)],
+            ].forEach(([label, value]) => retention.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
+            [
+                ['Account Status', 'Active'],
+                ['Member Role', state.user?.role || 'member'],
+                ['Modules Available', shortcuts.length],
+                ['Other Sessions', 'Closed after password change'],
+            ].forEach(([label, value]) => access.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
+            retentionPill.textContent = `Retention: ${state.overview?.retention_days || 7} days`;
         }
 
         function renderStatusList() {
@@ -560,85 +1058,90 @@
             clear(container);
             const entries = Object.entries(state.overview?.job_statuses || {});
             if (!entries.length) {
-                container.appendChild(node('div', { class: 'empty', text: 'No runs yet.' }));
+                container.appendChild(el('div', { class: 'empty', text: 'No runs yet.' }));
                 return;
             }
             entries.forEach(([label, count]) => {
-                container.appendChild(node('div', { class: 'kv-row' }, [
-                    node('span', { text: label }),
-                    node('strong', { text: count }),
-                ]));
+                container.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: count })]));
             });
+        }
+
+        function jobRow(job, compact = false) {
+            const cells = compact ? [
+                el('td', { text: moduleLabel(job.module) }),
+                el('td', {}, [badge(job.status)]),
+                el('td', { text: `${job.progress || 0}%` }),
+                el('td', { text: job.input_filename || '-' }),
+                el('td', { text: formatDate(job.created_at) }),
+                el('td', { text: formatDate(job.expires_at) }),
+            ] : [
+                el('td', { text: moduleLabel(job.module) }),
+                el('td', { text: job.job_type || '-' }),
+                el('td', {}, [badge(job.status)]),
+                el('td', { text: `${job.progress || 0}%` }),
+                el('td', { text: job.input_filename || '-' }),
+                el('td', { text: job.artifact_count || 0 }),
+                el('td', { text: formatDate(job.updated_at) }),
+            ];
+            return el('tr', {}, cells);
         }
 
         function renderJobs() {
-            const tbody = document.getElementById('jobs-body');
-            clear(tbody);
+            const recentBody = document.getElementById('recent-jobs-body');
+            const jobsBody = document.getElementById('jobs-body');
+            clear(recentBody);
+            clear(jobsBody);
             if (!state.jobs.length) {
-                tbody.appendChild(node('tr', {}, [node('td', { class: 'empty', colspan: '6', text: 'No module runs yet.' })]));
+                recentBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: 'No module runs yet.' })]));
+                jobsBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '7', text: 'No module runs yet.' })]));
                 return;
             }
-            state.jobs.forEach(job => {
-                tbody.appendChild(node('tr', {}, [
-                    node('td', { text: moduleLabel(job.module) }),
-                    node('td', {}, [badge(job.status)]),
-                    node('td', { text: `${job.progress || 0}%` }),
-                    node('td', { text: job.input_filename || '-' }),
-                    node('td', { text: formatDate(job.created_at) }),
-                    node('td', { text: formatDate(job.expires_at) }),
-                ]));
-            });
-        }
-
-        function renderHistory() {
-            const tbody = document.getElementById('history-body');
-            clear(tbody);
-            if (!state.jobs.length) {
-                tbody.appendChild(node('tr', {}, [node('td', { class: 'empty', colspan: '5', text: 'No uploads or reports yet.' })]));
-                return;
-            }
-            state.jobs.forEach(job => {
-                tbody.appendChild(node('tr', {}, [
-                    node('td', { text: job.input_filename || '-' }),
-                    node('td', { text: moduleLabel(job.module) }),
-                    node('td', { text: job.artifact_count || 0 }),
-                    node('td', {}, [badge(job.status)]),
-                    node('td', { text: formatDate(job.updated_at) }),
-                ]));
-            });
+            state.jobs.slice(0, 5).forEach(job => recentBody.appendChild(jobRow(job, true)));
+            state.jobs.forEach(job => jobsBody.appendChild(jobRow(job, false)));
         }
 
         function renderArtifacts() {
             const tbody = document.getElementById('artifacts-body');
             clear(tbody);
             if (!state.artifacts.length) {
-                tbody.appendChild(node('tr', {}, [node('td', { class: 'empty', colspan: '4', text: 'No retained downloads yet.' })]));
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '5', text: 'No retained downloads yet.' })]));
                 return;
             }
             state.artifacts.forEach(artifact => {
-                tbody.appendChild(node('tr', {}, [
-                    node('td', {}, [
-                        node('strong', { text: artifact.filename }),
-                        node('div', { class: 'metric-note', text: formatBytes(artifact.byte_size) }),
-                    ]),
-                    node('td', { text: moduleLabel(artifact.module) }),
-                    node('td', { text: formatDate(artifact.expires_at) }),
-                    node('td', {}, [
-                        node('button', { class: 'download-btn', type: 'button', dataset: { artifactId: artifact.id }, text: 'Download' }),
-                    ]),
+                tbody.appendChild(el('tr', {}, [
+                    el('td', {}, [el('strong', { text: artifact.filename }), el('div', { class: 'metric-note', text: formatBytes(artifact.byte_size) })]),
+                    el('td', { text: moduleLabel(artifact.module) }),
+                    el('td', { text: formatDate(artifact.created_at) }),
+                    el('td', { text: formatDate(artifact.expires_at) }),
+                    el('td', {}, [el('button', { class: 'download-btn', type: 'button', dataset: { artifactId: artifact.id }, text: 'Download' })]),
                 ]));
             });
         }
 
+        function fillProfileForm() {
+            const user = state.user || {};
+            document.getElementById('profile-full-name').value = user.full_name || '';
+            document.getElementById('profile-company').value = user.company_name || '';
+            document.getElementById('profile-position').value = user.position_title || '';
+            document.getElementById('profile-gender').value = user.gender || '';
+            document.getElementById('profile-phone').value = user.phone || '';
+            document.getElementById('profile-locale').value = user.locale || '';
+            document.getElementById('profile-timezone').value = user.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            state.avatarDraft = null;
+            state.avatarChanged = false;
+            renderAvatar(document.getElementById('profile-avatar'), state.user, true);
+        }
+
         function renderAll() {
-            retentionPill.textContent = `Retention: ${state.overview?.retention_days || 7} days`;
+            renderChrome();
             renderMetrics();
             renderShortcuts();
+            renderSummary();
             renderAccount();
             renderStatusList();
             renderJobs();
-            renderHistory();
             renderArtifacts();
+            fillProfileForm();
         }
 
         function showDashboard(user) {
@@ -650,24 +1153,123 @@
             }
             accessPanel.classList.add('hidden');
             app.classList.remove('hidden');
-            userPill.textContent = `${user.email} · ${user.role}`;
             loadDashboard().catch(error => showMessage(error.message || 'Dashboard could not be loaded.', 'error'));
         }
 
-        document.getElementById('access-login').addEventListener('click', () => {
-            window.OperartisAuth?.showLogin?.();
-        });
+        function passwordIcon(visible) {
+            if (visible) {
+                return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.89 1 12a18.15 18.15 0 0 1 5.06-7.94"/><path d="M9.9 4.24A10.86 10.86 0 0 1 12 4c5 0 9.27 3.11 11 8a18.2 18.2 0 0 1-3.22 5.02"/><path d="M14.12 14.12a3 3 0 0 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+            }
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a11.13 11.13 0 0 1 19.88 0"/><path d="M21.94 11.65a11.13 11.13 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg>';
+        }
 
+        document.getElementById('access-login').addEventListener('click', () => window.OperartisAuth?.showLogin?.());
+        document.getElementById('mobile-menu').addEventListener('click', () => sidebar.classList.toggle('open'));
+        document.querySelectorAll('.nav-btn, .nav-jump').forEach(button => {
+            button.addEventListener('click', () => setSection(button.dataset.section));
+        });
         document.getElementById('refresh').addEventListener('click', () => {
             loadDashboard()
                 .then(() => showMessage('Dashboard refreshed.', 'success'))
                 .catch(error => showMessage(error.message || 'Refresh failed.', 'error'));
         });
-
-        document.getElementById('logout').addEventListener('click', async () => {
+        document.getElementById('side-logout').addEventListener('click', async () => {
             await window.OperartisAuth.logout();
         });
-
+        document.getElementById('reset-profile').addEventListener('click', fillProfileForm);
+        document.getElementById('choose-avatar').addEventListener('click', () => document.getElementById('avatar-file').click());
+        document.getElementById('clear-avatar').addEventListener('click', () => {
+            state.avatarDraft = null;
+            state.avatarChanged = true;
+            renderAvatar(document.getElementById('profile-avatar'), state.user, true);
+        });
+        document.getElementById('avatar-file').addEventListener('change', event => {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+                showMessage('Avatar must be a PNG, JPEG, or WebP image.', 'error');
+                event.target.value = '';
+                return;
+            }
+            if (file.size > 256 * 1024) {
+                showMessage('Avatar image must be 256 KB or smaller.', 'error');
+                event.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                state.avatarDraft = String(reader.result || '');
+                state.avatarChanged = true;
+                renderAvatar(document.getElementById('profile-avatar'), state.user, true);
+            };
+            reader.readAsDataURL(file);
+        });
+        document.getElementById('profile-form').addEventListener('submit', async event => {
+            event.preventDefault();
+            const button = document.getElementById('save-profile');
+            button.disabled = true;
+            const payload = {
+                full_name: document.getElementById('profile-full-name').value,
+                company_name: document.getElementById('profile-company').value,
+                position_title: document.getElementById('profile-position').value,
+                gender: document.getElementById('profile-gender').value,
+                phone: document.getElementById('profile-phone').value,
+                locale: document.getElementById('profile-locale').value,
+                timezone: document.getElementById('profile-timezone').value,
+            };
+            if (state.avatarChanged) payload.avatar_data_url = state.avatarDraft;
+            try {
+                state.user = await api('/auth/profile', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                state.avatarDraft = null;
+                state.avatarChanged = false;
+                renderAll();
+                showMessage('Profile saved.', 'success');
+            } catch (error) {
+                showMessage(error.message || 'Profile could not be saved.', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        });
+        document.getElementById('password-form').addEventListener('submit', async event => {
+            event.preventDefault();
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            if (newPassword !== confirmPassword) {
+                showMessage('New password and confirmation do not match.', 'error');
+                return;
+            }
+            const button = document.getElementById('change-password');
+            button.disabled = true;
+            try {
+                await api('/auth/password/change', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+                });
+                event.target.reset();
+                showMessage('Password updated. Other active sessions were closed.', 'success');
+            } catch (error) {
+                showMessage(error.message || 'Password could not be updated.', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        });
+        document.querySelectorAll('.password-toggle').forEach(button => {
+            button.innerHTML = passwordIcon(false);
+            button.addEventListener('click', () => {
+                const input = document.getElementById(button.dataset.target);
+                const visible = input.type === 'password';
+                input.type = visible ? 'text' : 'password';
+                button.innerHTML = passwordIcon(visible);
+                button.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+                input.focus();
+            });
+        });
         document.addEventListener('click', async event => {
             const button = event.target.closest('.download-btn');
             if (!button) return;
@@ -691,7 +1293,6 @@
                 button.disabled = false;
             }
         });
-
         window.addEventListener('operartis:authenticated', event => showDashboard(event.detail.user));
         window.addEventListener('operartis:auth-state', event => showDashboard(event.detail.user));
         window.addEventListener('operartis:logged-out', () => {
@@ -699,6 +1300,7 @@
             app.classList.add('hidden');
             accessPanel.classList.remove('hidden');
         });
+        setSection(String(window.location.hash || '#overview').replace('#', ''));
         window.OperartisAuth?.refresh?.().then(showDashboard).catch(() => {
             app.classList.add('hidden');
             accessPanel.classList.remove('hidden');
