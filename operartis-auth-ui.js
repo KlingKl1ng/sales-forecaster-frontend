@@ -6,6 +6,57 @@
     var dismissible = window.OPERARTIS_AUTH_DISMISSIBLE === true || !autoPrompt;
     var showFloatingAccount = window.OPERARTIS_AUTH_FLOATING_ACCOUNT !== false;
     var themeObserverStarted = false;
+    var langObserverStarted = false;
+    var authCopy = {
+        en: {
+            title: 'Operartis Login',
+            subtitle: 'Sign in with your invited account to use the optimization modules.',
+            email: 'Email',
+            password: 'Password',
+            signIn: 'Sign In',
+            signingIn: 'Signing in...',
+            closeLogin: 'Close login',
+            logout: 'Logout',
+            loginFailed: 'Login failed. Please check your email and password.',
+            invalidCredentials: 'Invalid email or password.'
+        },
+        vi: {
+            title: 'Đăng Nhập Operartis',
+            subtitle: 'Đăng nhập bằng tài khoản đã được mời để sử dụng các module tối ưu hóa.',
+            email: 'Email',
+            password: 'Mật Khẩu',
+            signIn: 'Đăng Nhập',
+            signingIn: 'Đang đăng nhập...',
+            closeLogin: 'Đóng cửa sổ đăng nhập',
+            logout: 'Đăng Xuất',
+            loginFailed: 'Đăng nhập không thành công. Vui lòng kiểm tra email và mật khẩu.',
+            invalidCredentials: 'Email hoặc mật khẩu không đúng.'
+        }
+    };
+
+    function authLang() {
+        var lang = '';
+        if (typeof window.getOperartisLang === 'function') lang = window.getOperartisLang();
+        if (!lang && document.documentElement.lang) lang = document.documentElement.lang;
+        lang = String(lang || 'en').toLowerCase().split('-')[0];
+        return authCopy[lang] ? lang : 'en';
+    }
+
+    function t(key) {
+        var copy = authCopy[authLang()] || authCopy.en;
+        return copy[key] || authCopy.en[key] || key;
+    }
+
+    function localizeError(message) {
+        if (!message) return t('loginFailed');
+        if (message === authCopy.en.invalidCredentials || message === authCopy.vi.invalidCredentials) {
+            return t('invalidCredentials');
+        }
+        if (message === authCopy.en.loginFailed || message === authCopy.vi.loginFailed) {
+            return t('loginFailed');
+        }
+        return message;
+    }
 
     function addStyles() {
         if (document.getElementById('operartis-auth-style')) return;
@@ -73,6 +124,39 @@
         } catch (e) { }
     }
 
+    function syncAuthLanguage() {
+        var title = document.getElementById('operartis-auth-title');
+        var subtitle = document.getElementById('operartis-auth-subtitle');
+        var emailLabel = document.getElementById('operartis-auth-email-label-text');
+        var passwordLabel = document.getElementById('operartis-auth-password-label-text');
+        var submit = document.getElementById('operartis-auth-submit');
+        var close = document.getElementById('operartis-auth-close');
+        var logout = document.getElementById('operartis-auth-logout');
+
+        if (title) title.textContent = t('title');
+        if (subtitle) subtitle.textContent = t('subtitle');
+        if (emailLabel) emailLabel.textContent = t('email');
+        if (passwordLabel) passwordLabel.textContent = t('password');
+        if (submit && !submit.disabled) submit.textContent = t('signIn');
+        if (close) {
+            close.setAttribute('aria-label', t('closeLogin'));
+            close.setAttribute('title', t('closeLogin'));
+        }
+        if (logout) logout.textContent = t('logout');
+    }
+
+    function observeLanguageChanges() {
+        if (langObserverStarted) return;
+        langObserverStarted = true;
+        if (typeof MutationObserver !== 'undefined') {
+            var observer = new MutationObserver(syncAuthLanguage);
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+        }
+        window.addEventListener('storage', function (event) {
+            if (event.key === 'lang') syncAuthLanguage();
+        });
+    }
+
     function buildUi() {
         addStyles();
         if (document.getElementById('operartis-auth-overlay')) return;
@@ -82,13 +166,13 @@
         overlay.className = 'op-auth-overlay';
         overlay.innerHTML = [
             '<form class="op-auth-card" id="operartis-auth-form">',
-            dismissible ? '<button class="op-auth-close" id="operartis-auth-close" type="button" aria-label="Close login" title="Close login">&times;</button>' : '',
-            '<h1 class="op-auth-title">Operartis Login</h1>',
-            '<p class="op-auth-sub">Sign in with your invited account to use the optimization modules.</p>',
+            dismissible ? '<button class="op-auth-close" id="operartis-auth-close" type="button">&times;</button>' : '',
+            '<h1 class="op-auth-title" id="operartis-auth-title"></h1>',
+            '<p class="op-auth-sub" id="operartis-auth-subtitle"></p>',
             '<div class="op-auth-error" id="operartis-auth-error" role="alert" aria-live="polite"></div>',
-            '<label class="op-auth-field"><span class="op-auth-label">Email</span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
-            '<label class="op-auth-field"><span class="op-auth-label">Password</span><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required></label>',
-            '<button class="op-auth-button" id="operartis-auth-submit" type="submit">Sign In</button>',
+            '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-email-label-text"></span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
+            '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-password-label-text"></span><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required></label>',
+            '<button class="op-auth-button" id="operartis-auth-submit" type="submit"></button>',
             '</form>'
         ].join('');
         document.body.appendChild(overlay);
@@ -96,7 +180,7 @@
         var account = document.createElement('div');
         account.id = 'operartis-auth-account';
         account.className = 'op-auth-account';
-        account.innerHTML = '<span id="operartis-auth-email-label"></span><button class="op-auth-logout" type="button">Logout</button>';
+        account.innerHTML = '<span id="operartis-auth-email-label"></span><button class="op-auth-logout" id="operartis-auth-logout" type="button"></button>';
         document.body.appendChild(account);
 
         document.getElementById('operartis-auth-form').addEventListener('submit', async function (event) {
@@ -117,7 +201,9 @@
             showLogin();
         });
         observeThemeChanges();
+        observeLanguageChanges();
         syncAuthTheme();
+        syncAuthLanguage();
     }
 
     function setError(message) {
@@ -130,6 +216,7 @@
     function showLogin() {
         buildUi();
         syncAuthTheme();
+        syncAuthLanguage();
         document.getElementById('operartis-auth-overlay').setAttribute('data-open', 'true');
         document.getElementById('operartis-auth-account').removeAttribute('data-open');
         setError('');
@@ -138,6 +225,7 @@
     function hideUi() {
         buildUi();
         syncAuthTheme();
+        syncAuthLanguage();
         document.getElementById('operartis-auth-overlay').removeAttribute('data-open');
         document.getElementById('operartis-auth-account').removeAttribute('data-open');
         setError('');
@@ -146,6 +234,7 @@
     function showAccount(user) {
         buildUi();
         syncAuthTheme();
+        syncAuthLanguage();
         state.user = user;
         document.getElementById('operartis-auth-overlay').removeAttribute('data-open');
         if (showFloatingAccount) document.getElementById('operartis-auth-account').setAttribute('data-open', 'true');
@@ -159,16 +248,16 @@
         var password = document.getElementById('operartis-auth-password').value;
         var button = document.getElementById('operartis-auth-submit');
         button.disabled = true;
-        button.textContent = 'Signing in...';
+        button.textContent = t('signingIn');
         setError('');
         try {
             var user = await window.OperartisApi.login(email, password);
             showAccount(user);
         } catch (error) {
-            setError(error.message || 'Login failed. Please check your email and password.');
+            setError(localizeError(error.message));
         } finally {
             button.disabled = false;
-            button.textContent = 'Sign In';
+            button.textContent = t('signIn');
         }
     }
 
