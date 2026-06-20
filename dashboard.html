@@ -1470,6 +1470,7 @@
         const mobileMenu = document.getElementById('mobile-menu');
         const topTitle = document.getElementById('top-title');
         const topSubtitle = document.getElementById('top-subtitle');
+        let messageHideTimer = null;
         const state = {
             activeSection: 'overview',
             user: null,
@@ -1542,8 +1543,19 @@
         }
 
         function showMessage(text, type = 'success') {
+            if (messageHideTimer) {
+                clearTimeout(messageHideTimer);
+                messageHideTimer = null;
+            }
             message.textContent = text || '';
             message.className = text ? `message ${type}` : 'message';
+            if (text) {
+                messageHideTimer = setTimeout(() => {
+                    message.textContent = '';
+                    message.className = 'message';
+                    messageHideTimer = null;
+                }, 4500);
+            }
         }
 
         function clear(node) {
