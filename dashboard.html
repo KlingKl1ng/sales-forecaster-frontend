@@ -1472,7 +1472,7 @@
                             <h1 id="welcome-title">Your Dashboard</h1>
                             <p class="sub">Track optimization activity, manage your account, and reopen frequently used modules from one place.</p>
                         </div>
-                        <span id="retention-pill" class="pill accent">Retention: 7 days</span>
+                        <span id="retention-pill" class="pill accent">Retention: 180 days</span>
                     </div>
                     <div id="metrics" class="grid metric-grid"></div>
                     <div class="grid two-col" style="margin-top:16px">
@@ -2316,7 +2316,7 @@
             document.getElementById('user-email').textContent = state.user?.email || dt('chrome.signed_in');
             userProfile.classList.toggle('is-admin', isAdmin);
             document.getElementById('welcome-title').textContent = dt('chrome.welcome', { name: displayName });
-            const retentionDays = state.overview?.retention_days || 7;
+            const retentionDays = state.overview?.retention_days || 180;
             const retentionPill = document.getElementById('retention-pill');
             if (retentionPill) retentionPill.textContent = dt('sections.overview.retention', { days: retentionDays });
             renderAvatar(document.getElementById('user-avatar'), state.user);
@@ -2412,7 +2412,7 @@
                 [dt(p + 'position'), state.user?.position_title || '-'],
             ].forEach(([label, value]) => account.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
             [
-                [dt(p + 'retention_window'), dt(p + 'retention_days', { days: state.overview?.retention_days || 7 })],
+                [dt(p + 'retention_window'), dt(p + 'retention_days', { days: state.overview?.retention_days || 180 })],
                 [dt(p + 'reports_available'), state.overview?.metrics?.reports_available || 0],
                 [dt(p + 'stored_output_size'), formatBytes(state.overview?.metrics?.artifact_bytes || 0)],
             ].forEach(([label, value]) => retention.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
