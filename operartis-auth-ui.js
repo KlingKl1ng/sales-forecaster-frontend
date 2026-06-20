@@ -20,7 +20,10 @@
             loginFailed: 'Login failed. Please check your email and password.',
             invalidCredentials: 'Invalid email or password.',
             showPassword: 'Show password',
-            hidePassword: 'Hide password'
+            hidePassword: 'Hide password',
+            accountPrompt: 'Still do not have your own account?',
+            contactOperartis: 'Contact Operartis!',
+            contactTitle: 'Email Operartis'
         },
         vi: {
             title: 'Đăng Nhập Operartis',
@@ -34,7 +37,10 @@
             loginFailed: 'Đăng nhập không thành công. Vui lòng kiểm tra email và mật khẩu.',
             invalidCredentials: 'Email hoặc mật khẩu không đúng.',
             showPassword: 'Hiển thị mật khẩu',
-            hidePassword: 'Ẩn mật khẩu'
+            hidePassword: 'Ẩn mật khẩu',
+            accountPrompt: 'Bạn vẫn chưa có tài khoản riêng?',
+            contactOperartis: 'Liên hệ Operartis!',
+            contactTitle: 'Gửi email cho Operartis'
         }
     };
 
@@ -86,6 +92,10 @@
             '.op-auth-password-toggle:focus-visible{outline:2px solid rgba(245,158,11,.6);outline-offset:2px}',
             '.op-auth-password-toggle svg{width:18px;height:18px;stroke:currentColor}',
             '.op-auth-button{height:44px;width:100%;border:0;border-radius:8px;background:#f59e0b;color:#111827;font-weight:900;cursor:pointer}',
+            '.op-auth-contact{margin:12px 0 0;color:var(--op-auth-muted);font-size:12px;line-height:1.5;text-align:center}',
+            '.op-auth-contact a{color:#d97706;font-weight:900;text-decoration:none}',
+            '.op-auth-contact a:hover{text-decoration:underline}',
+            '.op-auth-contact a:focus-visible{outline:2px solid rgba(245,158,11,.55);outline-offset:3px;border-radius:4px}',
             '.op-auth-error{display:none;color:var(--op-auth-error-text);background:var(--op-auth-error-bg);border:1px solid var(--op-auth-error-border);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:800;line-height:1.4;margin-bottom:14px}',
             '.op-auth-account{position:fixed;right:18px;bottom:18px;z-index:99990;display:none;gap:8px;align-items:center;background:rgba(15,23,42,.92);color:#e2e8f0;border:1px solid rgba(148,163,184,.28);border-radius:999px;padding:8px 10px;font:700 12px Inter,system-ui,sans-serif;box-shadow:0 12px 36px rgba(0,0,0,.22)}',
             '.op-auth-account[data-auth-theme="light"]{background:rgba(255,255,255,.92);color:#0f172a;border-color:rgba(15,23,42,.14)}',
@@ -151,6 +161,8 @@
         var logout = document.getElementById('operartis-auth-logout');
         var passwordInput = document.getElementById('operartis-auth-password');
         var passwordToggle = document.getElementById('operartis-auth-password-toggle');
+        var contactPrompt = document.getElementById('operartis-auth-contact-prompt');
+        var contactLink = document.getElementById('operartis-auth-contact-link');
 
         if (title) title.textContent = t('title');
         if (subtitle) subtitle.textContent = t('subtitle');
@@ -166,6 +178,11 @@
             var visible = passwordInput.type === 'text';
             passwordToggle.setAttribute('aria-label', visible ? t('hidePassword') : t('showPassword'));
             passwordToggle.setAttribute('title', visible ? t('hidePassword') : t('showPassword'));
+        }
+        if (contactPrompt) contactPrompt.textContent = t('accountPrompt') + ' ';
+        if (contactLink) {
+            contactLink.textContent = t('contactOperartis');
+            contactLink.setAttribute('title', t('contactTitle'));
         }
     }
 
@@ -197,6 +214,7 @@
             '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-email-label-text"></span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
             '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-password-label-text"></span><span class="op-auth-password-wrap"><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required><button class="op-auth-password-toggle" id="operartis-auth-password-toggle" type="button" aria-pressed="false"></button></span></label>',
             '<button class="op-auth-button" id="operartis-auth-submit" type="submit"></button>',
+            '<p class="op-auth-contact"><span id="operartis-auth-contact-prompt"></span><a id="operartis-auth-contact-link" href="mailto:info@operartis.io"></a></p>',
             '</form>'
         ].join('');
         document.body.appendChild(overlay);
