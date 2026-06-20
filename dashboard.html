@@ -66,6 +66,7 @@
             --radius: 10px;
             --radius-lg: 14px;
             --sidebar-width: 256px;
+            --sidebar-width-collapsed: 76px;
             --shell-header-height: 72px;
             --ease: cubic-bezier(.4, 0, .2, 1);
             --surface-sidebar: linear-gradient(180deg, rgba(2, 6, 23, .94), rgba(2, 6, 23, .88));
@@ -182,7 +183,7 @@
             transition: background .2s var(--ease), transform .15s var(--ease), box-shadow .2s var(--ease), opacity .2s var(--ease);
         }
         button:hover:not(:disabled) { filter: brightness(1.06); }
-        button:active:not(:disabled) { transform: translateY(1px); }
+        button:active:not(:disabled):not(.sidebar-collapse):not(.password-toggle):not(.mobile-menu) { transform: translateY(1px); }
         button:focus-visible { outline: 2px solid rgba(245, 158, 11, .55); outline-offset: 2px; }
         button:disabled { opacity: .55; cursor: not-allowed; }
         input, select {
@@ -288,8 +289,8 @@
         .button-ghost:hover { border-color: rgba(245, 158, 11, .35); color: var(--text); background: rgba(245, 158, 11, .08); }
         .shell {
             min-height: 100vh;
-            display: grid;
-            grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+            display: flex;
+            align-items: stretch;
         }
         .sidebar-backdrop {
             display: none;
@@ -309,6 +310,8 @@
             position: sticky;
             top: 0;
             z-index: 30;
+            width: var(--sidebar-width);
+            flex-shrink: 0;
             height: 100vh;
             height: 100dvh;
             display: flex;
@@ -318,6 +321,105 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             box-shadow: var(--shadow-sidebar);
+            transition: width .3s var(--ease), box-shadow .3s var(--ease);
+            overflow: visible;
+        }
+        .shell.sidebar-collapsed .sidebar {
+            width: var(--sidebar-width-collapsed);
+        }
+        .sidebar-collapse {
+            display: none;
+            position: absolute;
+            right: -12px;
+            top: calc(var(--shell-header-height) / 2);
+            z-index: 40;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            border-radius: 999px;
+            background: var(--panel-strong);
+            border: 1px solid var(--line-strong);
+            color: var(--muted);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            filter: none;
+            transform: translateY(-50%);
+            transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+        }
+        .sidebar-collapse:hover,
+        .sidebar-collapse:active:not(:disabled),
+        .sidebar-collapse:focus-visible {
+            transform: translateY(-50%);
+            filter: none;
+        }
+        .sidebar-collapse:hover {
+            color: var(--gold);
+            border-color: rgba(245, 158, 11, .55);
+            background: var(--panel);
+        }
+        .sidebar-collapse svg {
+            width: 14px;
+            height: 14px;
+            display: block;
+        }
+        .shell.sidebar-collapsed .side-brand {
+            justify-content: center;
+            padding: 0 10px;
+            gap: 0;
+        }
+        .shell.sidebar-collapsed .side-brand > div {
+            max-width: 0;
+            opacity: 0;
+            margin: 0;
+            pointer-events: none;
+        }
+        .shell.sidebar-collapsed .side-brand-logo img {
+            width: 36px;
+            height: 36px;
+        }
+        .shell.sidebar-collapsed .side-nav {
+            padding: 10px 8px 14px;
+            overflow-x: hidden;
+        }
+        .shell.sidebar-collapsed .nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            min-height: 44px;
+            max-height: 44px;
+            margin-inline: auto;
+            padding: 0;
+            gap: 0;
+        }
+        .is-admin.shell.sidebar-collapsed .nav-btn.admin-only {
+            display: flex !important;
+        }
+        .shell.sidebar-collapsed .nav-btn > span:not(.nav-ico) {
+            display: none !important;
+        }
+        .shell.sidebar-collapsed .nav-btn .nav-ico {
+            width: 34px;
+            height: 34px;
+        }
+        .shell.sidebar-collapsed .nav-btn.active {
+            box-shadow: none;
+            background: rgba(245, 158, 11, .1);
+            border-color: rgba(245, 158, 11, .4);
+        }
+        .shell.sidebar-collapsed .nav-btn.active .nav-ico {
+            background: rgba(245, 158, 11, .22);
+            color: var(--text-nav-active-icon);
+        }
+        .shell.sidebar-collapsed .side-footer {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            border-top-color: transparent;
+            pointer-events: none;
+            overflow: hidden;
         }
         .side-brand {
             display: flex;
@@ -329,6 +431,16 @@
             border-bottom: 1px solid var(--line);
             flex-shrink: 0;
             box-sizing: border-box;
+            overflow: hidden;
+            transition: padding .3s var(--ease), gap .3s var(--ease);
+        }
+        .side-brand > div {
+            overflow: hidden;
+            min-width: 0;
+            flex: 1;
+            max-width: 180px;
+            opacity: 1;
+            transition: opacity .2s var(--ease), max-width .3s var(--ease), margin .3s var(--ease);
         }
         .side-brand-logo {
             display: inline-flex;
@@ -341,7 +453,7 @@
             object-fit: contain;
             filter: drop-shadow(0 4px 12px rgba(245, 158, 11, .2));
             cursor: pointer;
-            transition: transform .2s var(--ease);
+            transition: width .3s var(--ease), height .3s var(--ease), transform .2s var(--ease);
         }
         .side-brand-logo:hover img { transform: scale(1.1); }
         .side-brand strong { display: block; letter-spacing: .12em; font-size: 16px; font-weight: 800; color: var(--gold-2); line-height: 1.15; }
@@ -478,6 +590,7 @@
             align-content: start;
             scrollbar-width: thin;
             scrollbar-color: rgba(148, 163, 184, .25) transparent;
+            transition: padding .3s var(--ease);
         }
         .side-nav::-webkit-scrollbar { width: 5px; }
         .side-nav::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, .22); border-radius: 999px; }
@@ -496,7 +609,14 @@
             text-align: left;
             font-size: 13px;
             font-weight: 600;
-            transition: background .18s var(--ease), border-color .18s var(--ease), color .18s var(--ease), box-shadow .18s var(--ease);
+            transition: background .18s var(--ease), border-color .18s var(--ease), color .18s var(--ease), box-shadow .18s var(--ease), width .3s var(--ease), padding .3s var(--ease), gap .3s var(--ease);
+        }
+        .nav-btn > span:not(.nav-ico) {
+            overflow: hidden;
+            white-space: nowrap;
+            opacity: 1;
+            max-width: 160px;
+            transition: opacity .2s var(--ease), max-width .25s var(--ease);
         }
         .nav-btn:hover {
             background: rgba(148, 163, 184, .08);
@@ -538,6 +658,10 @@
             -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, .08);
             text-align: center;
+            max-height: 96px;
+            overflow: hidden;
+            opacity: 1;
+            transition: max-height .3s var(--ease), opacity .2s var(--ease), padding .3s var(--ease), border-color .3s var(--ease);
         }
         .side-footer-title {
             margin: 0;
@@ -556,6 +680,7 @@
         }
         .main-shell {
             min-width: 0;
+            flex: 1;
             display: flex;
             flex-direction: column;
         }
@@ -956,6 +1081,31 @@
         .is-admin .nav-btn.admin-only { display: grid !important; }
         .is-admin .section.admin-only.active { display: block !important; }
         .is-admin .section.admin-only:not(.active) { display: none !important; }
+        .shell.sidebar-collapsed .side-nav > .side-label {
+            display: none !important;
+        }
+        .shell.sidebar-collapsed .side-nav > .side-label.always-visible,
+        .is-admin.shell.sidebar-collapsed .side-nav > .side-label.admin-only:not(:first-child) {
+            display: block !important;
+            width: 28px;
+            height: 1px;
+            min-height: 1px;
+            margin: 10px auto;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, .42), transparent);
+            color: transparent;
+            font-size: 0;
+            line-height: 0;
+            overflow: hidden;
+            letter-spacing: 0;
+            text-transform: none;
+            font-weight: 400;
+        }
+        .shell.sidebar-collapsed .side-nav > .side-label::after {
+            display: none;
+        }
         .admin-form-grid {
             display: grid;
             grid-template-columns: minmax(240px, 1fr) 180px 148px;
@@ -1165,12 +1315,17 @@
         }
         .password-toggle:hover { background: rgba(148, 163, 184, .12); color: var(--text); }
         .password-toggle svg { width: 18px; height: 18px; stroke: currentColor; }
+        @media (min-width: 861px) {
+            .sidebar-collapse { display: inline-flex; align-items: center; justify-content: center; }
+        }
         @media (max-width: 1180px) {
             .metric-grid, .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .two-col, .panel-grid, .admin-form-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 860px) {
-            .shell { grid-template-columns: 1fr; }
+            .shell { display: block; }
+            .shell.sidebar-collapsed .sidebar { width: min(var(--sidebar-width), 88vw); }
+            .sidebar-collapse { display: none !important; }
             .sidebar {
                 position: fixed;
                 left: 0;
@@ -1239,6 +1394,9 @@
     <div id="dashboard-app" class="shell hidden">
         <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
         <aside id="sidebar" class="sidebar">
+            <button id="sidebar-collapse" class="sidebar-collapse" type="button" aria-expanded="true" aria-controls="sidebar" title="Collapse sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
             <div class="side-brand">
                 <a class="side-brand-logo" href="./index.html" aria-label="Operartis Home">
                     <img src="./icononly_transparent_nobuffer.png" alt="">
@@ -1841,6 +1999,14 @@
         const retentionPill = document.getElementById('retention-pill');
         const sidebar = document.getElementById('sidebar');
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        const sidebarCollapse = document.getElementById('sidebar-collapse');
+        const SIDEBAR_COLLAPSED_KEY = 'dashboard-sidebar-collapsed';
+        const sidebarCollapseIcons = {
+            collapse: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>',
+            expand: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+        };
+        let sidebarCollapsed = false;
+        try { sidebarCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1'; } catch (error) { }
         const mobileMenu = document.getElementById('mobile-menu');
         const topTitle = document.getElementById('top-title');
         const topSubtitle = document.getElementById('top-subtitle');
@@ -1885,6 +2051,7 @@
                 topTitle.textContent = sectionCopy[state.activeSection][0];
                 topSubtitle.textContent = sectionCopy[state.activeSection][1];
             }
+            applySidebarCollapsedUi();
         }
         const moduleMeta = {
             sales_forecaster: { label: 'Sales Forecaster', href: './forecaster.html', code: 'SF' },
@@ -1919,6 +2086,23 @@
             icon.setAttribute('aria-hidden', 'true');
             icon.innerHTML = moduleIconSvg[code] || moduleIconSvg.SF;
             return icon;
+        }
+
+        function applySidebarCollapsedUi() {
+            const collapsed = window.innerWidth > 860 && sidebarCollapsed;
+            app.classList.toggle('sidebar-collapsed', collapsed);
+            if (!sidebarCollapse) return;
+            sidebarCollapse.innerHTML = collapsed ? sidebarCollapseIcons.expand : sidebarCollapseIcons.collapse;
+            sidebarCollapse.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            const label = collapsed ? dt('chrome.expand_sidebar') : dt('chrome.collapse_sidebar');
+            sidebarCollapse.setAttribute('aria-label', label);
+            sidebarCollapse.title = label;
+        }
+
+        function setSidebarCollapsed(collapsed) {
+            sidebarCollapsed = collapsed;
+            applySidebarCollapsedUi();
+            try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch (error) { }
         }
 
         function setSidebarOpen(open) {
@@ -2492,6 +2676,7 @@
         }
 
         document.getElementById('access-login').addEventListener('click', () => window.OperartisAuth?.showLogin?.());
+        sidebarCollapse.addEventListener('click', () => setSidebarCollapsed(!sidebarCollapsed));
         mobileMenu.addEventListener('click', () => setSidebarOpen(!sidebar.classList.contains('open')));
         sidebarBackdrop.addEventListener('click', () => setSidebarOpen(false));
         document.addEventListener('keydown', event => {
@@ -2502,6 +2687,7 @@
         });
         window.addEventListener('resize', () => {
             if (window.innerWidth > 860) setSidebarOpen(false);
+            applySidebarCollapsedUi();
             setProfileMenuOpen(false);
         });
         userProfile.addEventListener('click', event => {
@@ -2740,6 +2926,7 @@
             accessPanel.classList.remove('hidden');
         });
         setSection(String(window.location.hash || '#overview').replace('#', ''));
+        setSidebarCollapsed(sidebarCollapsed);
         syncDashboardI18n();
         renderSettings();
         window.OperartisAuth?.refresh?.().then(showDashboard).catch(() => {

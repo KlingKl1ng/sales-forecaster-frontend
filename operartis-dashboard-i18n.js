@@ -32,6 +32,8 @@
                 logout: 'Logout',
                 open_menu: 'Open dashboard menu',
                 close_menu: 'Close dashboard menu',
+                collapse_sidebar: 'Collapse sidebar',
+                expand_sidebar: 'Expand sidebar',
                 footer_title: 'Operartis Analytics',
                 footer_slogan: 'Optimizing Today, Growing Tomorrow',
             },
@@ -222,6 +224,8 @@
                 logout: 'Đăng xuất',
                 open_menu: 'Mở menu bảng điều khiển',
                 close_menu: 'Đóng menu bảng điều khiển',
+                collapse_sidebar: 'Thu gọn thanh bên',
+                expand_sidebar: 'Mở rộng thanh bên',
                 footer_title: 'Operartis Analytics',
                 footer_slogan: 'Optimizing Today, Growing Tomorrow',
             },
@@ -412,6 +416,8 @@
                 logout: 'Abmelden',
                 open_menu: 'Dashboard-Menü öffnen',
                 close_menu: 'Dashboard-Menü schließen',
+                collapse_sidebar: 'Seitenleiste einklappen',
+                expand_sidebar: 'Seitenleiste ausklappen',
                 footer_title: 'Operartis Analytics',
                 footer_slogan: 'Optimizing Today, Growing Tomorrow',
             },
@@ -646,7 +652,10 @@
         document.querySelectorAll('.nav-btn[data-section]').forEach(function (button) {
             const key = NAV_SECTION_KEYS[button.dataset.section];
             const label = button.querySelector('span:last-child');
-            if (key && label) label.textContent = t(key);
+            if (key && label) {
+                label.textContent = t(key);
+                button.setAttribute('title', t(key));
+            }
         });
         const memberLabel = document.querySelector('.side-label.admin-only');
         const adminLabels = document.querySelectorAll('.side-label.admin-only');
