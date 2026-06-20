@@ -18,7 +18,9 @@
             closeLogin: 'Close login',
             logout: 'Logout',
             loginFailed: 'Login failed. Please check your email and password.',
-            invalidCredentials: 'Invalid email or password.'
+            invalidCredentials: 'Invalid email or password.',
+            showPassword: 'Show password',
+            hidePassword: 'Hide password'
         },
         vi: {
             title: 'Đăng Nhập Operartis',
@@ -30,7 +32,9 @@
             closeLogin: 'Đóng cửa sổ đăng nhập',
             logout: 'Đăng Xuất',
             loginFailed: 'Đăng nhập không thành công. Vui lòng kiểm tra email và mật khẩu.',
-            invalidCredentials: 'Email hoặc mật khẩu không đúng.'
+            invalidCredentials: 'Email hoặc mật khẩu không đúng.',
+            showPassword: 'Hiển thị mật khẩu',
+            hidePassword: 'Ẩn mật khẩu'
         }
     };
 
@@ -73,8 +77,14 @@
             '.op-auth-sub{font-size:13px;color:var(--op-auth-muted);margin:0 0 22px;line-height:1.5}',
             '.op-auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}',
             '.op-auth-label{font-size:12px;font-weight:800;color:var(--op-auth-label);text-transform:uppercase;letter-spacing:.04em}',
-            '.op-auth-input{height:44px;border-radius:8px;border:1px solid rgba(148,163,184,.32);background:var(--op-auth-input-bg);color:var(--op-auth-input-text);padding:0 12px;font-size:14px;outline:none}',
+            '.op-auth-input{height:44px;width:100%;border-radius:8px;border:1px solid rgba(148,163,184,.32);background:var(--op-auth-input-bg);color:var(--op-auth-input-text);padding:0 12px;font-size:14px;outline:none}',
             '.op-auth-input:focus{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.18)}',
+            '.op-auth-password-wrap{position:relative;display:flex;align-items:center;width:100%}',
+            '.op-auth-password-wrap .op-auth-input{padding-right:46px}',
+            '.op-auth-password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:var(--op-auth-muted);cursor:pointer;padding:0}',
+            '.op-auth-password-toggle:hover{background:var(--op-auth-close-bg);color:var(--op-auth-card-text)}',
+            '.op-auth-password-toggle:focus-visible{outline:2px solid rgba(245,158,11,.6);outline-offset:2px}',
+            '.op-auth-password-toggle svg{width:18px;height:18px;stroke:currentColor}',
             '.op-auth-button{height:44px;width:100%;border:0;border-radius:8px;background:#f59e0b;color:#111827;font-weight:900;cursor:pointer}',
             '.op-auth-error{display:none;color:var(--op-auth-error-text);background:var(--op-auth-error-bg);border:1px solid var(--op-auth-error-border);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:800;line-height:1.4;margin-bottom:14px}',
             '.op-auth-account{position:fixed;right:18px;bottom:18px;z-index:99990;display:none;gap:8px;align-items:center;background:rgba(15,23,42,.92);color:#e2e8f0;border:1px solid rgba(148,163,184,.28);border-radius:999px;padding:8px 10px;font:700 12px Inter,system-ui,sans-serif;box-shadow:0 12px 36px rgba(0,0,0,.22)}',
@@ -83,6 +93,13 @@
             '.op-auth-logout{border:0;border-radius:999px;background:#334155;color:#fff;font-weight:800;font-size:11px;padding:6px 9px;cursor:pointer}'
         ].join('');
         document.head.appendChild(style);
+    }
+
+    function passwordIcon(visible) {
+        if (visible) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.89 1 12a18.15 18.15 0 0 1 5.06-7.94"/><path d="M9.9 4.24A10.86 10.86 0 0 1 12 4c5 0 9.27 3.11 11 8a18.2 18.2 0 0 1-3.22 5.02"/><path d="M14.12 14.12a3 3 0 0 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+        }
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a11.13 11.13 0 0 1 19.88 0"/><path d="M21.94 11.65a11.13 11.13 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg>';
     }
 
     function resolveAuthTheme() {
@@ -132,6 +149,8 @@
         var submit = document.getElementById('operartis-auth-submit');
         var close = document.getElementById('operartis-auth-close');
         var logout = document.getElementById('operartis-auth-logout');
+        var passwordInput = document.getElementById('operartis-auth-password');
+        var passwordToggle = document.getElementById('operartis-auth-password-toggle');
 
         if (title) title.textContent = t('title');
         if (subtitle) subtitle.textContent = t('subtitle');
@@ -143,6 +162,11 @@
             close.setAttribute('title', t('closeLogin'));
         }
         if (logout) logout.textContent = t('logout');
+        if (passwordInput && passwordToggle) {
+            var visible = passwordInput.type === 'text';
+            passwordToggle.setAttribute('aria-label', visible ? t('hidePassword') : t('showPassword'));
+            passwordToggle.setAttribute('title', visible ? t('hidePassword') : t('showPassword'));
+        }
     }
 
     function observeLanguageChanges() {
@@ -171,7 +195,7 @@
             '<p class="op-auth-sub" id="operartis-auth-subtitle"></p>',
             '<div class="op-auth-error" id="operartis-auth-error" role="alert" aria-live="polite"></div>',
             '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-email-label-text"></span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
-            '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-password-label-text"></span><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required></label>',
+            '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-password-label-text"></span><span class="op-auth-password-wrap"><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required><button class="op-auth-password-toggle" id="operartis-auth-password-toggle" type="button" aria-pressed="false"></button></span></label>',
             '<button class="op-auth-button" id="operartis-auth-submit" type="submit"></button>',
             '</form>'
         ].join('');
@@ -186,6 +210,16 @@
         document.getElementById('operartis-auth-form').addEventListener('submit', async function (event) {
             event.preventDefault();
             await handleLogin();
+        });
+        document.getElementById('operartis-auth-password-toggle').addEventListener('click', function () {
+            var passwordInput = document.getElementById('operartis-auth-password');
+            var toggle = document.getElementById('operartis-auth-password-toggle');
+            var visible = passwordInput.type === 'password';
+            passwordInput.type = visible ? 'text' : 'password';
+            toggle.setAttribute('aria-pressed', visible ? 'true' : 'false');
+            toggle.innerHTML = passwordIcon(visible);
+            syncAuthLanguage();
+            passwordInput.focus();
         });
         if (dismissible) {
             document.getElementById('operartis-auth-close').addEventListener('click', hideUi);
@@ -204,6 +238,7 @@
         observeLanguageChanges();
         syncAuthTheme();
         syncAuthLanguage();
+        document.getElementById('operartis-auth-password-toggle').innerHTML = passwordIcon(false);
     }
 
     function setError(message) {
