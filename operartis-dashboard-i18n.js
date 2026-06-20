@@ -36,7 +36,7 @@
                 footer_slogan: 'Optimizing Today, Growing Tomorrow',
             },
             access: {
-                subtitle: 'Member Dashboard',
+                subtitle: 'Dashboard',
                 title: 'Sign In To Continue',
                 body: 'Sign in with your invited account to manage your profile, open modules, view retained reports, and change your password.',
                 sign_in: 'Sign In',
@@ -226,7 +226,7 @@
                 footer_slogan: 'Optimizing Today, Growing Tomorrow',
             },
             access: {
-                subtitle: 'Bảng điều khiển thành viên',
+                subtitle: 'Bảng điều khiển',
                 title: 'Đăng nhập để tiếp tục',
                 body: 'Đăng nhập bằng tài khoản được mời để quản lý hồ sơ, mở mô-đun, xem báo cáo được lưu và đổi mật khẩu.',
                 sign_in: 'Đăng nhập',
@@ -416,7 +416,7 @@
                 footer_slogan: 'Optimizing Today, Growing Tomorrow',
             },
             access: {
-                subtitle: 'Mitglieder-Dashboard',
+                subtitle: 'Dashboard',
                 title: 'Anmelden, um fortzufahren',
                 body: 'Melden Sie sich mit Ihrem eingeladenen Konto an, um Ihr Profil zu verwalten, Module zu öffnen, gespeicherte Berichte anzusehen und Ihr Passwort zu ändern.',
                 sign_in: 'Anmelden',
