@@ -6211,8 +6211,8 @@
 
             const handleDashboardOpen = useCallback(() => {
                 setAccountMenuOpen(false);
-                window.location.href = './admin.html';
-            }, []);
+                window.location.href = authUser?.role === 'admin' ? './admin.html' : './dashboard.html';
+            }, [authUser]);
 
             const handleLogout = useCallback(async () => {
                 setAccountMenuOpen(false);
@@ -6261,8 +6261,6 @@
                 document.addEventListener('touchstart', onOutsideTouch, { passive: true });
                 return () => document.removeEventListener('touchstart', onOutsideTouch);
             }, [resetMatrixBlocks]);
-
-            const canOpenDashboard = authUser?.role === 'admin';
 
             return (
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
@@ -6364,16 +6362,14 @@
                                             <p className="truncate text-xs font-black text-slate-900 dark:text-white">{authUser.email}</p>
                                             <p className="mt-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{authUser.role}</p>
                                         </div>
-                                        {canOpenDashboard && (
-                                            <button
-                                                type="button"
-                                                role="menuitem"
-                                                onClick={handleDashboardOpen}
-                                                className="w-full px-3 py-2.5 text-left text-sm font-black text-slate-800 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-100 dark:hover:bg-amber-400/10 dark:hover:text-amber-300"
-                                            >
-                                                {content.ui.nav_dashboard}
-                                            </button>
-                                        )}
+                                        <button
+                                            type="button"
+                                            role="menuitem"
+                                            onClick={handleDashboardOpen}
+                                            className="w-full px-3 py-2.5 text-left text-sm font-black text-slate-800 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-100 dark:hover:bg-amber-400/10 dark:hover:text-amber-300"
+                                        >
+                                            {content.ui.nav_dashboard}
+                                        </button>
                                         <button
                                             type="button"
                                             role="menuitem"

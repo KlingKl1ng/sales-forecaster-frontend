@@ -1631,6 +1631,7 @@
                     fd.append('end_col_idx', endColIdx);
                     fd.append('data_format', 'horizontal');
                     fd.append('cached_results', JSON.stringify(batchResults));
+                    fd.append('job_id', jobId);
 
                     try {
                         const res = await fetch(`${BASE_URL}/export-fast`, { method: 'POST', body: fd });
