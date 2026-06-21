@@ -40,7 +40,7 @@
         window.OPERARTIS_AUTH_FLOATING_ACCOUNT = false;
         window.OPERARTIS_AUTH_DISMISSIBLE = true;
     </script>
-    <script src="./operartis-auth-ui.js?v=20260621-forgot-position"></script>
+    <script src="./operartis-auth-ui.js?v=20260621-password-toggle-fix"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
@@ -530,8 +530,10 @@
             top: calc(100% + 8px);
             right: 0;
             z-index: 20;
-            min-width: 210px;
-            padding: 6px;
+            min-width: 240px;
+            width: 240px;
+            overflow: visible;
+            padding: 0;
             border: 1px solid var(--line);
             border-radius: var(--radius);
             background: var(--surface-elevated);
@@ -539,31 +541,120 @@
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
         }
+        .profile-dropdown::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            right: 22px;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            border-left: 1px solid rgba(148, 163, 184, 0.28);
+            border-top: 1px solid rgba(148, 163, 184, 0.28);
+            transform: rotate(45deg);
+            pointer-events: none;
+            z-index: 0;
+        }
+        html.dark .profile-dropdown::before {
+            background: rgba(15, 23, 42, 0.96);
+            border-left-color: rgba(148, 163, 184, 0.18);
+            border-top-color: rgba(148, 163, 184, 0.18);
+        }
         .profile-dropdown[hidden] { display: none; }
+        .profile-dropdown-head {
+            padding: 12px 14px 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, .28);
+            background: transparent;
+            position: relative;
+            z-index: 1;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+        html.dark .profile-dropdown-head {
+            border-bottom-color: rgba(148, 163, 184, .18);
+        }
+        .profile-dropdown-email {
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0;
+            color: #0f172a;
+        }
+        html.dark .profile-dropdown-email { color: #f8fafc; }
+        .profile-dropdown-role {
+            margin: 3px 0 0;
+            font-size: .65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #64748b;
+        }
+        html.dark .profile-dropdown-role { color: #94a3b8; }
+        .profile-dropdown-body { padding: 6px; position: relative; z-index: 1; border-radius: 0 0 var(--radius) var(--radius); }
         .profile-dropdown-item {
             display: flex;
             align-items: center;
+            gap: 10px;
             width: 100%;
-            min-height: 40px;
-            padding: 0 12px;
+            padding: 10px 12px;
             border: 0;
-            border-radius: 8px;
+            border-radius: 10px;
             background: transparent;
-            color: var(--soft);
-            font-size: 13px;
-            font-weight: 600;
+            color: #0f172a;
+            font-size: .65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
             text-align: left;
             text-decoration: none;
             cursor: pointer;
-            transition: background .18s var(--ease), color .18s var(--ease);
+            transition: background .15s ease, color .15s ease, transform .15s ease;
+        }
+        html.dark .profile-dropdown-item { color: #f8fafc; }
+        .profile-dropdown-item-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+            color: currentColor;
+            opacity: .88;
+            transition: color .15s ease, opacity .15s ease;
+        }
+        html.dark .profile-dropdown-item-icon { opacity: .92; }
+        .profile-dropdown-item-icon svg {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
         .profile-dropdown-item:hover {
-            background: rgba(148, 163, 184, .1);
-            color: var(--text);
+            background: rgba(245, 158, 11, .12);
+            color: #b45309;
+            transform: translateX(1px);
+        }
+        html.dark .profile-dropdown-item:hover {
+            background: rgba(245, 158, 11, .14);
+            color: #fbbf24;
         }
         .profile-dropdown-item.danger:hover {
-            background: rgba(239, 68, 68, .12);
-            color: var(--text-danger);
+            background: rgba(239, 68, 68, .1);
+            color: #b91c1c;
+            transform: translateX(1px);
+        }
+        html.dark .profile-dropdown-item.danger:hover {
+            background: rgba(248, 113, 113, .12);
+            color: #fca5a5;
+        }
+        .profile-dropdown-divider {
+            height: 1px;
+            margin: 4px 10px;
+            background: linear-gradient(90deg, transparent, rgba(148, 163, 184, .35), transparent);
+        }
+        html.dark .profile-dropdown-divider {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .14), transparent);
         }
         .avatar {
             width: 48px;
@@ -1305,10 +1396,12 @@
         .password-toggle {
             position: absolute;
             right: 7px;
-            top: 50%;
-            width: 32px;
+            top: 0;
+            bottom: 0;
             height: 32px;
-            transform: translateY(-50%);
+            width: 32px;
+            margin: auto 0;
+            transform: none;
             display: grid;
             place-items: center;
             border-radius: 8px;
@@ -1317,8 +1410,9 @@
             border: 0;
             padding: 0;
         }
+        .password-toggle:active { transform: none; }
         .password-toggle:hover { background: rgba(148, 163, 184, .12); color: var(--text); }
-        .password-toggle svg { width: 18px; height: 18px; stroke: currentColor; }
+        .password-toggle svg { display: block; flex-shrink: 0; width: 18px; height: 18px; stroke: currentColor; }
         @media (min-width: 861px) {
             .sidebar-collapse { display: inline-flex; align-items: center; justify-content: center; }
         }
@@ -1455,8 +1549,21 @@
                             <svg class="profile-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                         <div id="profile-dropdown" class="profile-dropdown" role="menu" hidden>
-                            <a class="profile-dropdown-item" role="menuitem" href="./index.html" data-i18n="chrome.back_to_operartis">Back to Operartis</a>
-                            <button id="profile-logout" class="profile-dropdown-item danger" type="button" role="menuitem" data-i18n="chrome.logout">Logout</button>
+                            <div class="profile-dropdown-head">
+                                <p class="profile-dropdown-email" id="profile-dropdown-email"></p>
+                                <p class="profile-dropdown-role" id="profile-dropdown-role"></p>
+                            </div>
+                            <div class="profile-dropdown-body">
+                                <a class="profile-dropdown-item" role="menuitem" href="./index.html">
+                                    <span class="profile-dropdown-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></span>
+                                    <span class="profile-dropdown-item-label" data-i18n="chrome.back_to_operartis">Back to Operartis</span>
+                                </a>
+                                <div class="profile-dropdown-divider" role="separator" aria-hidden="true"></div>
+                                <button id="profile-logout" class="profile-dropdown-item danger" type="button" role="menuitem">
+                                    <span class="profile-dropdown-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span>
+                                    <span class="profile-dropdown-item-label" data-i18n="chrome.logout">Logout</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2314,6 +2421,10 @@
             if (!isAdmin && isAdminSection(state.activeSection)) setSection('overview');
             document.getElementById('user-name').textContent = displayName;
             document.getElementById('user-email').textContent = state.user?.email || dt('chrome.signed_in');
+            const dropdownEmail = document.getElementById('profile-dropdown-email');
+            const dropdownRole = document.getElementById('profile-dropdown-role');
+            if (dropdownEmail) dropdownEmail.textContent = state.user?.email || dt('chrome.signed_in');
+            if (dropdownRole) dropdownRole.textContent = roleLabel(state.user?.role) || '';
             userProfile.classList.toggle('is-admin', isAdmin);
             document.getElementById('welcome-title').textContent = dt('chrome.welcome', { name: displayName });
             const retentionDays = state.overview?.retention_days || 180;

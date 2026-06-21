@@ -32,6 +32,16 @@
     };
 
     window.persistOperartisLang = function (lang) {
-        if (VALID[lang]) localStorage.setItem('lang', lang);
+        if (VALID[lang]) {
+            localStorage.setItem('lang', lang);
+            try {
+                document.documentElement.lang = lang;
+            } catch (e) { }
+            window.dispatchEvent(new CustomEvent('operartis:lang-change', { detail: { lang: lang } }));
+        }
     };
+
+    try {
+        document.documentElement.lang = window.getOperartisLang();
+    } catch (e) { }
 })();
