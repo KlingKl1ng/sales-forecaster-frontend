@@ -258,4 +258,15 @@ html:not(.dark) {
     .operartis-access-shell {
         padding: 24px;
     }
+
+    .operartis-access-shell .access-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .operartis-access-shell .access-sign-in,
+    .operartis-access-shell .access-actions .access-sign-in,
+    .operartis-access-shell .access-actions .button-ghost {
+        width: 100%;
+    }
 }

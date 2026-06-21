@@ -267,6 +267,12 @@
             margin-top: 8px;
             font-size: 14px;
         }
+        .access-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
         .button-link, .button-secondary, .button-danger, .button-ghost {
             display: inline-flex;
             align-items: center;
@@ -1451,6 +1457,14 @@
             .top-actions { justify-content: stretch; width: 100%; }
             .top-actions .button-secondary { flex: 1; }
             .hero { margin-bottom: 16px; }
+            .access-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .access-actions #access-login,
+            .access-actions .button-ghost {
+                width: 100%;
+            }
             .shortcut-compact {
                 grid-template-columns: 42px minmax(0, 1fr);
                 row-gap: 12px;
@@ -1482,7 +1496,7 @@
             </div>
             <h1 data-i18n="access.title">Sign In To Continue</h1>
             <p class="sub" data-i18n="access.body">Sign in with your invited account to manage your profile, open modules, view retained reports, and change your password.</p>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
+            <div class="access-actions">
                 <button id="access-login" type="button" style="height:42px;padding:0 18px" data-i18n="access.sign_in">Sign In</button>
                 <a class="button-ghost" href="./" data-i18n="access.back_to_site">Back To Site</a>
             </div>

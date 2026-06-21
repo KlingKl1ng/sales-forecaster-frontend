@@ -139,7 +139,7 @@
         var link = document.createElement('link');
         link.id = styleId;
         link.rel = 'stylesheet';
-        link.href = './operartis-access-shell.css?v=20260621-shell-design-c';
+        link.href = './operartis-access-shell.css?v=20260622-access-mobile-full';
         document.head.appendChild(link);
     }
 
