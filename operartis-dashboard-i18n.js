@@ -686,7 +686,7 @@
                     desc: 'Dự báo nhu cầu từ lịch sử bán hàng kiểu ERP.',
                 },
                 ML: {
-                    label: 'Dự Báo ML Nâng Cao',
+                    label: 'Dự Báo Học Máy Nâng Cao',
                     desc: 'Dự báo dựa trên yếu tố, tổng hợp và kịch bản.',
                 },
                 IO: {
@@ -700,7 +700,7 @@
             },
             module_names: {
                 sales_forecaster: 'Dự Báo Học Máy',
-                ml_forecaster: 'Dự Báo ML Nâng Cao',
+                ml_forecaster: 'Dự Báo Học Máy Nâng Cao',
                 inventory_optimizer: 'Tối Ưu Hóa Tồn Kho',
                 inventory: 'Tối Ưu Hóa Tồn Kho',
                 abcxyz: 'Phân tích ABC-XYZ',

@@ -1,6 +1,29 @@
 (function () {
     var originalFetch = window.fetch.bind(window);
     var csrfToken = sessionStorage.getItem('operartis_csrf_token') || '';
+    var AUTH_BROADCAST_KEY = 'operartis_auth_broadcast';
+
+    function broadcastAuthEvent(type) {
+        try {
+            localStorage.setItem(AUTH_BROADCAST_KEY, JSON.stringify({
+                type: type,
+                at: Date.now()
+            }));
+        } catch (error) { }
+    }
+
+    function handleAuthBroadcast(event) {
+        if (event.key !== AUTH_BROADCAST_KEY || !event.newValue) return;
+        try {
+            var payload = JSON.parse(event.newValue);
+            if (payload.type === 'logout') {
+                setCsrf('');
+                window.dispatchEvent(new CustomEvent('operartis:logged-out'));
+            }
+        } catch (error) { }
+    }
+
+    window.addEventListener('storage', handleAuthBroadcast);
 
     function isLocalHost(hostname) {
         return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
@@ -146,6 +169,7 @@
     async function logout() {
         await apiFetch('/auth/logout', { method: 'POST' }).catch(function () { });
         setCsrf('');
+        broadcastAuthEvent('logout');
         window.dispatchEvent(new CustomEvent('operartis:logged-out'));
     }
 
