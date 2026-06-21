@@ -126,6 +126,7 @@
             '.op-auth-sub{font-size:13px;color:var(--op-auth-muted);margin:0 0 22px;line-height:1.5}',
             '.op-auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}',
             '.op-auth-label{font-size:12px;font-weight:800;color:var(--op-auth-label);text-transform:uppercase;letter-spacing:.04em}',
+            '.op-auth-password-head{display:flex;align-items:center;justify-content:space-between;gap:12px}',
             '.op-auth-input{height:44px;width:100%;border-radius:8px;border:1px solid rgba(148,163,184,.32);background:var(--op-auth-input-bg);color:var(--op-auth-input-text);padding:0 12px;font-size:14px;outline:none}',
             '.op-auth-input:focus{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.18)}',
             '.op-auth-password-wrap{position:relative;display:flex;align-items:center;width:100%}',
@@ -136,6 +137,7 @@
             '.op-auth-password-toggle svg{width:18px;height:18px;stroke:currentColor}',
             '.op-auth-button{height:44px;width:100%;border:0;border-radius:8px;background:#f59e0b;color:#ffffff;font-weight:900;cursor:pointer}',
             '.op-auth-link{display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:#d97706;font-weight:900;font-size:12px;line-height:1.4;text-decoration:none;cursor:pointer;padding:0;margin:0 0 14px}',
+            '.op-auth-forgot-inline{margin:0;font-size:12px;white-space:nowrap;text-transform:none;letter-spacing:0}',
             '.op-auth-link:hover{text-decoration:underline}',
             '.op-auth-link:focus-visible{outline:2px solid rgba(245,158,11,.55);outline-offset:3px;border-radius:4px}',
             '.op-auth-contact{margin:12px 0 0;color:var(--op-auth-muted);font-size:12px;line-height:1.5;text-align:center}',
@@ -211,6 +213,7 @@
         var passwordInput = document.getElementById('operartis-auth-password');
         var passwordToggle = document.getElementById('operartis-auth-password-toggle');
         var forgot = document.getElementById('operartis-auth-forgot');
+        var forgotInline = document.getElementById('operartis-auth-forgot-inline');
         var contactPrompt = document.getElementById('operartis-auth-contact-prompt');
         var contactLink = document.getElementById('operartis-auth-contact-link');
         var isReset = state.mode === 'reset';
@@ -225,7 +228,14 @@
             passwordInput.disabled = isReset;
         }
         if (submit && !submit.disabled) submit.textContent = isReset ? t('resetSubmit') : t('signIn');
-        if (forgot) forgot.textContent = isReset ? t('backToLogin') : t('forgotPassword');
+        if (forgot) {
+            forgot.textContent = isReset ? t('backToLogin') : t('forgotPassword');
+            forgot.style.display = isReset ? 'inline-flex' : 'none';
+        }
+        if (forgotInline) {
+            forgotInline.textContent = t('forgotPassword');
+            forgotInline.style.display = isReset ? 'none' : 'inline-flex';
+        }
         if (close) {
             close.setAttribute('aria-label', t('closeLogin'));
             close.setAttribute('title', t('closeLogin'));
@@ -269,7 +279,7 @@
             '<p class="op-auth-sub" id="operartis-auth-subtitle"></p>',
             '<div class="op-auth-error" id="operartis-auth-error" role="alert" aria-live="polite"></div>',
             '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-email-label-text"></span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
-            '<label class="op-auth-field" id="operartis-auth-password-field"><span class="op-auth-label" id="operartis-auth-password-label-text"></span><span class="op-auth-password-wrap"><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required><button class="op-auth-password-toggle" id="operartis-auth-password-toggle" type="button" aria-pressed="false"></button></span></label>',
+            '<label class="op-auth-field" id="operartis-auth-password-field"><span class="op-auth-password-head"><span class="op-auth-label" id="operartis-auth-password-label-text"></span><button class="op-auth-link op-auth-forgot-inline" id="operartis-auth-forgot-inline" type="button"></button></span><span class="op-auth-password-wrap"><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required><button class="op-auth-password-toggle" id="operartis-auth-password-toggle" type="button" aria-pressed="false"></button></span></label>',
             '<button class="op-auth-link" id="operartis-auth-forgot" type="button"></button>',
             '<button class="op-auth-button" id="operartis-auth-submit" type="submit"></button>',
             '<p class="op-auth-contact"><span id="operartis-auth-contact-prompt"></span><a id="operartis-auth-contact-link" href="mailto:info@operartis.io"></a></p>',
@@ -290,6 +300,9 @@
         });
         document.getElementById('operartis-auth-forgot').addEventListener('click', function () {
             setAuthMode(state.mode === 'reset' ? 'login' : 'reset');
+        });
+        document.getElementById('operartis-auth-forgot-inline').addEventListener('click', function () {
+            setAuthMode('reset');
         });
         document.getElementById('operartis-auth-password-toggle').addEventListener('click', function () {
             var passwordInput = document.getElementById('operartis-auth-password');
