@@ -3945,7 +3945,6 @@
         const SupplyChainFlow = ({ content }) => {
             const steps = content.ui.sc_steps;
             const [activeIdx, setActiveIdx] = useState(0);
-            const [paused, setPaused] = useState(false);
             const [connectorGeom, setConnectorGeom] = useState(null);
             const flowTrackRef = useRef(null);
             const gridRef = useRef(null);
@@ -4028,12 +4027,11 @@
             };
 
             useEffect(() => {
-                if (paused) return undefined;
                 const timer = setInterval(() => {
                     setActiveIdx(prev => (prev + 1) % steps.length);
                 }, 3800);
                 return () => clearInterval(timer);
-            }, [paused, steps.length]);
+            }, [steps.length]);
 
             useLayoutEffect(() => {
                 measureConnectors();
@@ -4073,8 +4071,6 @@
                     id="supply-chain"
                     className="opus-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm"
                     aria-label={content.ui.sc_title}
-                    onMouseEnter={() => setPaused(true)}
-                    onMouseLeave={() => setPaused(false)}
                 >
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
                         <div className="absolute -top-8 left-1/4 w-64 h-32 bg-brand-gold/6 rounded-full blur-3xl" />
@@ -4307,7 +4303,6 @@
         const SystemIntegrationLoop = ({ content }) => {
             const ui = content.ui;
             const [phase, setPhase] = useState(0);
-            const [paused, setPaused] = useState(false);
             const [started, setStarted] = useState(false);
             const sectionRef = useRef(null);
             const apsVisible = phase === 1;
@@ -4326,10 +4321,10 @@
             }, []);
 
             useEffect(() => {
-                if (!started || paused) return undefined;
+                if (!started) return undefined;
                 const timer = setInterval(() => setPhase(p => (p + 1) % 2), 9500);
                 return () => clearInterval(timer);
-            }, [started, paused]);
+            }, [started]);
 
             const togglePhase = () => setPhase(p => (p + 1) % 2);
 
@@ -4339,8 +4334,6 @@
                     ref={sectionRef}
                     className="opus-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm overflow-hidden"
                     aria-label={ui.i4l_title}
-                    onMouseEnter={() => setPaused(true)}
-                    onMouseLeave={() => setPaused(false)}
                 >
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
                         <div className="absolute -top-10 left-1/3 w-72 h-36 bg-brand-gold/6 rounded-full blur-3xl" />
