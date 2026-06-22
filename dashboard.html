@@ -40,7 +40,7 @@
         window.OPERARTIS_AUTH_FLOATING_ACCOUNT = false;
         window.OPERARTIS_AUTH_DISMISSIBLE = true;
     </script>
-    <script src="./operartis-auth-ui.js?v=20260622-auth-input-normal"></script>
+    <script src="./operartis-auth-ui.js?v=20260622-avatar-sync"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
@@ -2994,6 +2994,11 @@
                 state.avatarDraft = null;
                 state.avatarChanged = false;
                 renderAll();
+                try {
+                    localStorage.setItem('operartis_user_updated', JSON.stringify({ at: Date.now() }));
+                } catch (error) {
+                    // Avatar sync still works in the current tab if storage is unavailable.
+                }
                 showMessage(dt('messages.profile_saved'), 'success');
             } catch (error) {
                 showMessage(error.message || dt('messages.profile_save_failed'), 'error');

@@ -145,6 +145,35 @@
         return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
     }
 
+    function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, function (character) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[character];
+        });
+    }
+
+    function userInitials(user) {
+        var name = (user && (user.full_name || user.email)) || '';
+        var base = name.replace(/@.*/, '');
+        var parts = base.split(/[.\s_-]+/).filter(Boolean);
+        var first = parts[0] && parts[0][0] ? parts[0][0] : 'M';
+        var second = parts[1] && parts[1][0] ? parts[1][0] : (parts[0] && parts[0][1] ? parts[0][1] : '');
+        return (first + second).toUpperCase();
+    }
+
+    function renderUserAvatarHtml(user) {
+        if (!user) return userIconSvg();
+        if (user.avatar_data_url) {
+            return '<img class="op-auth-avatar-img" src="' + escapeHtml(user.avatar_data_url) + '" alt="">';
+        }
+        return '<span class="op-auth-avatar-initials">' + escapeHtml(userInitials(user)) + '</span>';
+    }
+
     function dashboardIconSvg() {
         return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>';
     }
@@ -215,8 +244,10 @@
             '.op-auth-topbar-btn:hover{transform:scale(1.06);filter:brightness(1.1);box-shadow:0 8px 28px rgba(245,158,11,.5),0 0 0 2px rgba(251,191,36,.35)}',
             '.op-auth-topbar-btn:active{transform:scale(.94);filter:brightness(1)}',
             '.op-auth-topbar-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(245,158,11,.55)}',
-            '.op-auth-topbar-icon{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0}',
-            '.op-auth-topbar-icon svg{display:block;width:100%;height:100%}',
+            '.op-auth-topbar-icon{display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;flex-shrink:0;overflow:hidden;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:-.02em}',
+            '.op-auth-topbar-icon svg{display:block;width:20px;height:20px}',
+            '.op-auth-avatar-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:999px}',
+            '.op-auth-avatar-initials{display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;color:#08111f;background:radial-gradient(circle at 30% 25%,rgba(251,191,36,.98),rgba(217,119,6,.9));border-radius:999px}',
             '.op-auth-topbar-status{position:absolute;right:-2px;top:-2px;width:12px;height:12px;border-radius:999px;border:2px solid #020617}',
             '.op-auth-topbar-status[data-signed-in="true"]{background:#34d399;box-shadow:0 0 0 2px rgba(52,211,153,.28),0 0 12px rgba(52,211,153,.9)}',
             '.op-auth-topbar-status[data-signed-in="false"]{background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.45)}',
@@ -364,12 +395,14 @@
         var role = document.getElementById('operartis-auth-topbar-role');
         var status = document.querySelector('#operartis-auth-topbar .op-auth-topbar-status');
         var button = document.getElementById('operartis-auth-topbar-btn');
+        var icon = document.querySelector('#operartis-auth-topbar .op-auth-topbar-icon');
         var menu = document.getElementById('operartis-auth-topbar-menu');
         if (!topbar) return;
         topbar.style.display = 'flex';
         if (email) email.textContent = user && user.email ? user.email : '';
         if (role) role.textContent = user && user.role ? user.role : '';
         if (status) status.setAttribute('data-signed-in', user ? 'true' : 'false');
+        if (icon) icon.innerHTML = renderUserAvatarHtml(user);
         if (button) {
             button.setAttribute('aria-haspopup', user ? 'menu' : undefined);
             button.setAttribute('aria-label', user ? ('Account: ' + user.email) : t('login'));
@@ -618,6 +651,11 @@
         updatePasswordToggle();
     }
 
+    function syncExternalUser(user) {
+        if (!user) return;
+        showAccount(user);
+    }
+
     function setMessage(message, kind) {
         var error = document.getElementById('operartis-auth-error');
         if (!error) return;
@@ -777,12 +815,19 @@
         refresh: refresh,
         logout: logout,
         mountTopbar: buildTopbarAccount,
+        syncUser: syncExternalUser,
         getUser: function () { return state.user; }
     };
 
     window.addEventListener('operartis:unauthorized', handleUnauthenticated);
     window.addEventListener('operartis:logged-out', handleUnauthenticated);
     window.addEventListener('operartis:login-broadcast', function () { refresh().catch(function () { }); });
+    window.addEventListener('operartis:user-updated', function (event) {
+        syncExternalUser(event.detail && event.detail.user);
+    });
+    window.addEventListener('storage', function (event) {
+        if (event.key === 'operartis_user_updated') refresh().catch(function () { });
+    });
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { refresh().catch(function () { }); });
     else refresh().catch(function () { });
 })();
