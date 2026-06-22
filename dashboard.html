@@ -467,12 +467,12 @@
         .profile-menu { position: relative; }
         .topbar-profile {
             display: grid;
-            grid-template-columns: 40px minmax(0, 1fr) 14px;
+            grid-template-columns: 14px minmax(0, 1fr) 40px;
             gap: 10px;
             align-items: center;
             max-width: min(320px, 42vw);
             width: 100%;
-            padding: 6px 10px 6px 6px;
+            padding: 6px 6px 6px 10px;
             border: 1px solid rgba(148, 163, 184, .14);
             border-radius: 999px;
             background: var(--surface-profile);
@@ -1555,12 +1555,12 @@
                 <div class="top-actions">
                     <div id="profile-menu" class="profile-menu">
                         <button id="user-profile" class="topbar-profile" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="profile-dropdown">
-                            <div id="user-avatar" class="avatar"></div>
+                            <svg class="profile-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                             <div>
                                 <strong id="user-name">Member</strong>
                                 <span id="user-email">Signed in</span>
                             </div>
-                            <svg class="profile-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                            <div id="user-avatar" class="avatar"></div>
                         </button>
                         <div id="profile-dropdown" class="profile-dropdown" role="menu" hidden>
                             <div class="profile-dropdown-head">
