@@ -19,6 +19,8 @@
             if (payload.type === 'logout') {
                 setCsrf('');
                 window.dispatchEvent(new CustomEvent('operartis:logged-out'));
+            } else if (payload.type === 'login') {
+                window.dispatchEvent(new CustomEvent('operartis:login-broadcast'));
             }
         } catch (error) { }
     }
@@ -145,6 +147,7 @@
         });
         var data = await parseJsonResponse(response);
         setCsrf(data.csrf_token);
+        broadcastAuthEvent('login');
         return data.user;
     }
 

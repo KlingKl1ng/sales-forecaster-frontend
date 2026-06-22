@@ -2,6 +2,7 @@
     if (!window.OperartisApi) return;
 
     var state = { user: null, mode: 'login' };
+    var authMutationId = 0;
     var autoPrompt = window.OPERARTIS_AUTH_AUTO_PROMPT !== false;
     var dismissible = window.OPERARTIS_AUTH_DISMISSIBLE === true || !autoPrompt;
     var topbarSlotSelector = window.OPERARTIS_AUTH_TOPBAR_SLOT || '#operartis-auth-topbar-slot';
@@ -679,21 +680,31 @@
         window.dispatchEvent(new CustomEvent('operartis:authenticated', { detail: { user: user } }));
     }
 
+    function markAuthMutation() {
+        authMutationId += 1;
+        return authMutationId;
+    }
+
     async function handleLogin() {
         var email = document.getElementById('operartis-auth-email').value;
         var password = document.getElementById('operartis-auth-password').value;
         var button = document.getElementById('operartis-auth-submit');
+        var mutationId = markAuthMutation();
         button.disabled = true;
         button.textContent = t('signingIn');
         setError('');
         try {
             var user = await window.OperartisApi.login(email, password);
+            if (mutationId !== authMutationId) return;
             showAccount(user);
         } catch (error) {
+            if (mutationId !== authMutationId) return;
             setError(localizeError(error.message));
         } finally {
-            button.disabled = false;
-            button.textContent = t('signIn');
+            if (mutationId === authMutationId) {
+                button.disabled = false;
+                button.textContent = t('signIn');
+            }
         }
     }
 
@@ -742,18 +753,21 @@
 
     async function refresh() {
         buildUi();
+        var mutationId = authMutationId;
         try {
             var user = await window.OperartisApi.me();
+            if (mutationId !== authMutationId) return state.user;
             showAccount(user);
             window.dispatchEvent(new CustomEvent('operartis:auth-state', { detail: { user: user } }));
             return user;
         } catch (error) {
-            handleUnauthenticated();
+            if (mutationId === authMutationId) handleUnauthenticated();
             throw error;
         }
     }
 
     async function logout() {
+        markAuthMutation();
         await window.OperartisApi.logout();
         handleUnauthenticated();
     }
@@ -768,6 +782,7 @@
 
     window.addEventListener('operartis:unauthorized', handleUnauthenticated);
     window.addEventListener('operartis:logged-out', handleUnauthenticated);
+    window.addEventListener('operartis:login-broadcast', function () { refresh().catch(function () { }); });
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { refresh().catch(function () { }); });
     else refresh().catch(function () { });
 })();
