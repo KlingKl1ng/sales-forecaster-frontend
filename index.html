@@ -151,7 +151,7 @@
             position: absolute;
             right: 0;
             top: calc(100% + 10px);
-            z-index: 50;
+            z-index: 100;
             width: 240px;
             overflow: visible;
             border-radius: 10px;
@@ -162,6 +162,20 @@
             -webkit-backdrop-filter: blur(18px);
             font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             -webkit-font-smoothing: antialiased;
+            transform-origin: top right;
+            animation: indexAccountMenuIn 0.18s ease-out;
+        }
+
+        @keyframes indexAccountMenuIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .index-account-menu::before {
@@ -2383,6 +2397,7 @@
         const FactoryIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="17" y1="13" x2="17" y2="13.01"></line><line x1="7" y1="13" x2="7" y2="13.01"></line></svg>;
         const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
         const AccountDashboardIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>;
+        const AccountLoginIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>;
         const AccountLogoutIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>;
         const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>;
         const GitBranchIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>;
@@ -6299,7 +6314,9 @@
 
             useEffect(() => {
                 const handleAuthState = (event) => {
-                    setAuthUser(event.detail?.user || window.OperartisAuth?.getUser?.() || null);
+                    const user = event.detail?.user || window.OperartisAuth?.getUser?.() || null;
+                    setAuthUser(user);
+                    if (user) setAccountMenuOpen(false);
                 };
                 const handleLoggedOut = () => {
                     setAuthUser(null);
@@ -6374,17 +6391,18 @@
             }, []);
 
             const handleAuthButtonClick = useCallback(() => {
-                if (!authUser) {
-                    window.OperartisAuth?.showLogin?.();
-                    return;
-                }
                 setAccountMenuOpen(prev => !prev);
-            }, [authUser]);
+            }, []);
 
             const handleDashboardOpen = useCallback(() => {
                 setAccountMenuOpen(false);
                 window.location.href = authUser?.role === 'admin' ? './dashboard.html#admin-overview' : './dashboard.html';
             }, [authUser]);
+
+            const handleLoginOpen = useCallback(() => {
+                setAccountMenuOpen(false);
+                window.OperartisAuth?.showLogin?.();
+            }, []);
 
             const handleLogout = useCallback(async () => {
                 setAccountMenuOpen(false);
@@ -6514,8 +6532,8 @@
                                 <button
                                     type="button"
                                     onClick={handleAuthButtonClick}
-                                    aria-expanded={authUser ? accountMenuOpen : undefined}
-                                    aria-haspopup={authUser ? 'menu' : undefined}
+                                    aria-expanded={accountMenuOpen}
+                                    aria-haspopup="menu"
                                     aria-label={authUser ? `Account: ${authUser.email}` : content.ui.nav_login}
                                     title={authUser ? authUser.email : content.ui.nav_login}
                                     className="relative header-auth-btn header-auth-btn--gold h-9 w-9 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shrink-0"
@@ -6524,16 +6542,18 @@
                                     <span className={`absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#020617] ${authUser ? 'bg-emerald-400 shadow-[0_0_0_2px_rgba(52,211,153,0.28),0_0_12px_rgba(52,211,153,0.9)]' : 'bg-white shadow-[0_0_0_1px_rgba(255,255,255,0.45)]'}`} aria-hidden="true" />
                                 </button>
 
-                                {authUser && accountMenuOpen && (
+                                {accountMenuOpen && (
                                     <div
                                         role="menu"
                                         aria-label="Account menu"
                                         className="index-account-menu"
                                     >
-                                        <div className="index-account-menu-head">
-                                            <p className="index-account-menu-email">{authUser.email}</p>
-                                            <p className="index-account-menu-role">{authUser.role}</p>
-                                        </div>
+                                        {authUser && (
+                                            <div className="index-account-menu-head">
+                                                <p className="index-account-menu-email">{authUser.email}</p>
+                                                <p className="index-account-menu-role">{authUser.role}</p>
+                                            </div>
+                                        )}
                                         <div className="index-account-menu-body">
                                             <button
                                                 type="button"
@@ -6545,15 +6565,27 @@
                                                 <span>{content.ui.nav_dashboard}</span>
                                             </button>
                                             <div className="index-account-menu-divider" role="separator" aria-hidden="true" />
-                                            <button
-                                                type="button"
-                                                role="menuitem"
-                                                onClick={handleLogout}
-                                                className="index-account-menu-item index-account-menu-item--danger"
-                                            >
-                                                <span className="index-account-menu-item-icon" aria-hidden="true"><AccountLogoutIcon /></span>
-                                                <span>{content.ui.nav_logout}</span>
-                                            </button>
+                                            {authUser ? (
+                                                <button
+                                                    type="button"
+                                                    role="menuitem"
+                                                    onClick={handleLogout}
+                                                    className="index-account-menu-item index-account-menu-item--danger"
+                                                >
+                                                    <span className="index-account-menu-item-icon" aria-hidden="true"><AccountLogoutIcon /></span>
+                                                    <span>{content.ui.nav_logout}</span>
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    role="menuitem"
+                                                    onClick={handleLoginOpen}
+                                                    className="index-account-menu-item"
+                                                >
+                                                    <span className="index-account-menu-item-icon" aria-hidden="true"><AccountLoginIcon /></span>
+                                                    <span>{content.ui.nav_login}</span>
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 )}
