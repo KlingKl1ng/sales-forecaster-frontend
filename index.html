@@ -380,6 +380,71 @@
             gap: 0.25rem;
         }
 
+        .header-nav-glass-slab {
+            width: max-content;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .header-nav-glass-slab .header-nav-tab {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 1.5625rem;
+            padding: 0 0.75rem;
+            line-height: 1;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .header-nav-glass-slab .header-nav-tab-label {
+            display: block;
+            line-height: 1;
+            transform: translateY(1.5px);
+        }
+
+        .header-nav-tabs-track {
+            position: relative;
+        }
+
+        .header-nav-glass-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(180, 83, 9, 0.06));
+            box-shadow:
+                0 2px 8px rgba(245, 158, 11, 0.28),
+                0 1px 3px rgba(15, 23, 42, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.2s ease;
+            will-change: transform, width;
+        }
+
+        .header-nav-glass-indicator.is-animated {
+            transition:
+                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.2s ease;
+        }
+
+        .dark .header-nav-glass-indicator {
+            border-color: rgba(245, 158, 11, 0.28);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(15, 23, 42, 0.35));
+            box-shadow:
+                0 2px 10px rgba(245, 158, 11, 0.32),
+                0 1px 4px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
         /* Subtle Grid Animation */
         .bg-grid {
             background-size: 40px 40px;
@@ -481,25 +546,36 @@
         }
 
         .header-nav-tab {
+            position: relative;
+            z-index: 1;
             flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.375rem 0.75rem;
             border-radius: 0.75rem;
             border: 1px solid transparent;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             font-size: 0.625rem;
             font-weight: 700;
+            line-height: 1;
             letter-spacing: 0.06em;
             text-transform: uppercase;
+            text-align: center;
+            box-sizing: border-box;
             cursor: pointer;
-            transition: color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
             color: #64748b;
+            transition: color 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            margin: 0;
+            font-family: inherit;
         }
 
         .dark .header-nav-tab {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.35), rgba(15, 23, 42, 0.15));
             color: #94a3b8;
         }
 
@@ -512,13 +588,26 @@
         }
 
         .header-nav-tab-active {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(180, 83, 9, 0.06));
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18);
             color: #d97706;
         }
 
         .dark .header-nav-tab-active {
             color: #fbbf24;
+        }
+
+        .header-nav-aps-menu .header-nav-tab-active {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(180, 83, 9, 0.06));
+            box-shadow:
+                0 2px 8px rgba(245, 158, 11, 0.28),
+                0 1px 3px rgba(15, 23, 42, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .header-nav-aps-menu .header-nav-tab-active {
+            box-shadow:
+                0 2px 10px rgba(245, 158, 11, 0.32),
+                0 1px 4px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .header-nav-child {
@@ -4913,8 +5002,12 @@
             const slotRef = useRef(null);
             const rulerRef = useRef(null);
             const scrollRef = useRef(null);
+            const trackRef = useRef(null);
+            const tabRefs = useRef({});
             const apsTriggerRef = useRef(null);
             const [navFits, setNavFits] = useState(true);
+            const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+            const [indicatorAnimated, setIndicatorAnimated] = useState(false);
             const apsChildIds = useMemo(() => {
                 const aps = items.find(i => i.id === 'aps-group');
                 return (aps?.children || []).map(c => c.id);
@@ -4923,6 +5016,58 @@
             const isApsChildActive = apsChildIds.includes(activeId);
             const [apsOpen, setApsOpen] = useState(false);
             const [menuRect, setMenuRect] = useState(null);
+
+            const indicatorTargetId = useMemo(() => {
+                if (isApsChildActive || apsOpen) return 'aps-group';
+                const match = items.find(item => item.id === activeId);
+                return match ? match.id : items[0]?.id;
+            }, [activeId, apsOpen, isApsChildActive, items]);
+
+            const isTabActive = useCallback((item) => {
+                if (item.id === 'aps-group') return isApsChildActive || apsOpen;
+                return activeId === item.id;
+            }, [activeId, apsOpen, isApsChildActive]);
+
+            const updateIndicator = useCallback(() => {
+                const track = trackRef.current;
+                const target = tabRefs.current[indicatorTargetId];
+                if (!track || !target) {
+                    setIndicator(prev => (prev.ready ? { ...prev, ready: false } : prev));
+                    return;
+                }
+                const trackRect = track.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+                setIndicator({
+                    left: targetRect.left - trackRect.left,
+                    top: targetRect.top - trackRect.top,
+                    width: targetRect.width,
+                    height: targetRect.height,
+                    ready: true,
+                });
+                if (!indicatorAnimated) {
+                    requestAnimationFrame(() => setIndicatorAnimated(true));
+                }
+            }, [indicatorTargetId, indicatorAnimated]);
+
+            useLayoutEffect(() => {
+                if (!navFits) return undefined;
+                updateIndicator();
+                const ro = new ResizeObserver(updateIndicator);
+                if (trackRef.current) ro.observe(trackRef.current);
+                Object.values(tabRefs.current).forEach(el => {
+                    if (el) ro.observe(el);
+                });
+                window.addEventListener('resize', updateIndicator);
+                return () => {
+                    ro.disconnect();
+                    window.removeEventListener('resize', updateIndicator);
+                };
+            }, [indicatorTargetId, items, navFits, updateIndicator]);
+
+            const setTabRef = useCallback((id, el) => {
+                if (el) tabRefs.current[id] = el;
+                else delete tabRefs.current[id];
+            }, []);
 
             useEffect(() => {
                 if (navRef) navRef.current = slotRef.current;
@@ -5005,20 +5150,20 @@
                 return () => el.removeEventListener('wheel', onWheel);
             }, [items, navFits]);
 
-            const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active ring-1 ring-brand-gold/20' : 'ring-1 ring-white/30 dark:ring-white/5'}`;
+            const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active' : ''}`;
 
             const renderRulerTabs = () => items.map(item => {
                 if (item.id === 'aps-group') {
                     return (
                         <span key={item.id} className={`${tabClass(false)} inline-flex items-center`} aria-hidden="true">
-                            {item.label}
+                            <span className="header-nav-tab-label">{item.label}</span>
                             <ChevronDownIcon className="header-nav-chevron" />
                         </span>
                     );
                 }
                 return (
                     <span key={item.id} className={tabClass(false)} aria-hidden="true">
-                        {item.label}
+                        <span className="header-nav-tab-label">{item.label}</span>
                     </span>
                 );
             });
@@ -5060,43 +5205,62 @@
                 <div ref={slotRef} className="relative flex-1 min-w-0 overflow-hidden h-full flex items-center">
                     <div
                         ref={rulerRef}
-                        className="pointer-events-none absolute left-0 top-0 -z-10 flex gap-1.5 items-center w-max opacity-0"
+                        className="pointer-events-none absolute left-0 top-0 -z-10 w-max opacity-0"
                         aria-hidden="true"
                     >
-                        {renderRulerTabs()}
+                        <div className="header-nav-glass-slab header-glass-pill header-glass-pill--wide">
+                                {renderRulerTabs()}
+                        </div>
                     </div>
                     {navFits && (
                         <div ref={scrollRef} className="w-full overflow-hidden">
-                            <div className="flex gap-1.5 items-center w-max mx-auto py-0.5 px-1">
+                            <div
+                                ref={trackRef}
+                                className="header-nav-glass-slab header-glass-pill header-glass-pill--wide header-nav-tabs-track"
+                            >
+                                <div
+                                    className={`header-nav-glass-indicator${indicatorAnimated ? ' is-animated' : ''}`}
+                                    aria-hidden="true"
+                                    style={{
+                                        transform: `translate3d(${indicator.left}px, ${indicator.top}px, 0)`,
+                                        width: `${indicator.width}px`,
+                                        height: `${indicator.height}px`,
+                                        opacity: indicator.ready ? 1 : 0,
+                                    }}
+                                />
                                 {items.map(item => {
                                     if (item.id === 'aps-group') {
-                                        const apsHighlighted = isApsChildActive || apsOpen;
+                                        const apsHighlighted = isTabActive(item);
                                         return (
                                             <div key={item.id} className="header-nav-aps-wrap">
                                                 <button
-                                                    ref={apsTriggerRef}
+                                                    ref={(el) => {
+                                                        apsTriggerRef.current = el;
+                                                        setTabRef(item.id, el);
+                                                    }}
                                                     type="button"
                                                     aria-expanded={apsOpen}
                                                     aria-haspopup="menu"
                                                     onClick={() => setApsOpen(open => !open)}
                                                     className={`${tabClass(apsHighlighted)} flex items-center`}
                                                 >
-                                                    {item.label}
+                                                    <span className="header-nav-tab-label">{item.label}</span>
                                                     <ChevronDownIcon className={`header-nav-chevron ${apsOpen ? 'header-nav-chevron-open' : ''}`} />
                                                 </button>
                                             </div>
                                         );
                                     }
 
-                                    const isActive = activeId === item.id;
+                                    const isActive = isTabActive(item);
                                     return (
                                         <button
                                             key={item.id}
                                             type="button"
+                                            ref={(el) => setTabRef(item.id, el)}
                                             onClick={() => onNav(item.id)}
                                             className={tabClass(isActive)}
                                         >
-                                            {item.label}
+                                            <span className="header-nav-tab-label">{item.label}</span>
                                         </button>
                                     );
                                 })}
