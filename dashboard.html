@@ -466,71 +466,40 @@
         .side-brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; letter-spacing: .03em; line-height: 1.2; }
         .profile-menu { position: relative; }
         .topbar-profile {
-            display: grid;
-            grid-template-columns: 14px minmax(0, 1fr) 40px;
-            gap: 10px;
+            display: inline-flex;
             align-items: center;
-            max-width: min(320px, 42vw);
-            width: 100%;
-            padding: 6px 6px 6px 10px;
-            border: 1px solid rgba(148, 163, 184, .14);
-            border-radius: 999px;
-            background: var(--surface-profile);
+            justify-content: center;
+            width: auto;
+            max-width: none;
+            padding: 0;
+            border: none;
+            background: transparent;
             flex-shrink: 0;
             color: inherit;
             text-align: left;
             cursor: pointer;
-            transition: border-color .2s var(--ease), background .2s var(--ease);
+            transition: opacity .2s var(--ease);
         }
         .topbar-profile:hover,
-        .profile-menu.open .topbar-profile {
-            border-color: rgba(245, 158, 11, .32);
-            background: var(--surface-profile-hover);
-        }
-        .topbar-profile.is-admin {
-            border-color: rgba(245, 158, 11, .28);
-            background: rgba(245, 158, 11, .08);
-        }
+        .profile-menu.open .topbar-profile,
+        .topbar-profile.is-admin,
         .topbar-profile.is-admin:hover,
         .profile-menu.open .topbar-profile.is-admin {
-            border-color: rgba(245, 158, 11, .38);
-            background: rgba(245, 158, 11, .12);
+            border: none;
+            background: transparent;
         }
+        .topbar-profile .topbar-profile-meta,
+        .topbar-profile .profile-chevron { display: none; }
         .topbar-profile .avatar {
             width: 40px;
             height: 40px;
             font-size: 13px;
             box-shadow: 0 6px 18px rgba(245, 158, 11, .16);
         }
-        .topbar-profile strong {
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 13px;
-            font-weight: 700;
-            line-height: 1.2;
+        .topbar-profile.is-admin .avatar {
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, .42), 0 6px 18px rgba(245, 158, 11, .18);
         }
-        .topbar-profile span {
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: var(--muted);
-            font-size: 11px;
-            margin-top: 2px;
-            line-height: 1.2;
-        }
-        .profile-chevron {
-            width: 14px;
-            height: 14px;
-            color: var(--muted);
-            transition: transform .2s var(--ease), color .2s var(--ease);
-        }
-        .profile-menu.open .profile-chevron {
-            transform: rotate(180deg);
-            color: var(--gold-2);
-        }
+        .topbar-profile-meta { min-width: 0; }
         .profile-dropdown {
             position: absolute;
             top: calc(100% + 8px);
@@ -575,6 +544,17 @@
             z-index: 1;
             border-radius: var(--radius) var(--radius) 0 0;
         }
+        .profile-dropdown-name {
+            margin: 0 0 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0;
+            color: #0f172a;
+        }
+        html.dark .profile-dropdown-name { color: #f8fafc; }
         html.dark .profile-dropdown-head {
             border-bottom-color: rgba(148, 163, 184, .18);
         }
@@ -584,11 +564,11 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 500;
             letter-spacing: 0;
-            color: #0f172a;
+            color: #64748b;
         }
-        html.dark .profile-dropdown-email { color: #f8fafc; }
+        html.dark .profile-dropdown-email { color: #94a3b8; }
         .profile-dropdown-role {
             margin: 3px 0 0;
             font-size: .65rem;
@@ -801,7 +781,7 @@
         .topbar-heading { min-width: 0; line-height: 1.2; }
         .topbar-heading h2 { font-size: 17px; font-weight: 700; line-height: 1.2; }
         .topbar-heading .section-sub { margin-top: 2px; font-size: 12px; line-height: 1.25; }
-        .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; position: relative; }
+        .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; position: relative; }
         .mobile-menu {
             display: none;
             width: 42px;
@@ -1443,18 +1423,21 @@
             .mobile-menu { display: inline-flex; align-items: center; justify-content: center; }
             .main { padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
             .topbar {
-                align-items: flex-start;
+                align-items: center;
                 height: auto;
                 min-height: var(--shell-header-height);
                 padding: calc(12px + env(safe-area-inset-top, 0px)) clamp(16px, 3vw, 28px) 12px;
             }
             .hero { flex-direction: column; align-items: flex-start; }
             .form-grid, .metric-grid, .shortcut-grid, .admin-form-grid { grid-template-columns: 1fr; }
-            .topbar-profile { max-width: 100%; }
         }
         @media (max-width: 560px) {
-            .topbar { flex-direction: column; align-items: stretch; }
-            .top-actions { justify-content: stretch; width: 100%; }
+            .topbar {
+                flex-direction: row;
+                align-items: center;
+            }
+            .topbar > div:first-child { flex: 1; min-width: 0; }
+            .top-actions { justify-content: flex-end; width: auto; }
             .top-actions .button-secondary { flex: 1; }
             .hero { margin-bottom: 16px; }
             .access-actions {
@@ -1556,7 +1539,7 @@
                     <div id="profile-menu" class="profile-menu">
                         <button id="user-profile" class="topbar-profile" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="profile-dropdown">
                             <svg class="profile-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-                            <div>
+                            <div class="topbar-profile-meta">
                                 <strong id="user-name">Member</strong>
                                 <span id="user-email">Signed in</span>
                             </div>
@@ -1564,6 +1547,7 @@
                         </button>
                         <div id="profile-dropdown" class="profile-dropdown" role="menu" hidden>
                             <div class="profile-dropdown-head">
+                                <p class="profile-dropdown-name" id="profile-dropdown-name"></p>
                                 <p class="profile-dropdown-email" id="profile-dropdown-email"></p>
                                 <p class="profile-dropdown-role" id="profile-dropdown-role"></p>
                             </div>
@@ -2435,10 +2419,13 @@
             if (!isAdmin && isAdminSection(state.activeSection)) setSection('overview');
             document.getElementById('user-name').textContent = displayName;
             document.getElementById('user-email').textContent = state.user?.email || dt('chrome.signed_in');
+            const dropdownName = document.getElementById('profile-dropdown-name');
             const dropdownEmail = document.getElementById('profile-dropdown-email');
             const dropdownRole = document.getElementById('profile-dropdown-role');
+            if (dropdownName) dropdownName.textContent = displayName;
             if (dropdownEmail) dropdownEmail.textContent = state.user?.email || dt('chrome.signed_in');
             if (dropdownRole) dropdownRole.textContent = roleLabel(state.user?.role) || '';
+            userProfile.setAttribute('aria-label', `${displayName} — ${state.user?.email || dt('chrome.signed_in')}`);
             userProfile.classList.toggle('is-admin', isAdmin);
             document.getElementById('welcome-title').textContent = dt('chrome.welcome', { name: displayName });
             const retentionDays = state.overview?.retention_days || 180;
