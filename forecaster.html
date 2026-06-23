@@ -81,16 +81,7 @@
 
         @media (max-width: 639px) {
             .fc-kpi-bar {
-                min-height: auto;
-            }
-
-            .fc-kpi-metrics {
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-            }
-
-            .fc-kpi-metrics::-webkit-scrollbar {
-                display: none;
+                min-height: 3rem;
             }
         }
 
@@ -370,7 +361,7 @@
                     total_skus: "Total SKUs",
                     total_skus_short: "SKUs",
                     total_vol: "Total Forecast Vol",
-                    total_vol_short: "FC Vol",
+                    total_vol_short: "Forecast Vol",
                     avg_mae: "Avg. Validation MAE",
                     avg_mae_short: "MAE",
                     avg_mse: "Avg. Validation MSE",
@@ -459,7 +450,7 @@
                     total_skus: "Tổng SKU",
                     total_skus_short: "SKU",
                     total_vol: "Tổng lượng dự báo",
-                    total_vol_short: "Lượng FC",
+                    total_vol_short: "Tổng dự báo",
                     avg_mae: "MAE trung bình (Val)",
                     avg_mae_short: "MAE",
                     avg_mse: "MSE trung bình (Val)",
@@ -548,7 +539,7 @@
                     total_skus: "SKUs gesamt",
                     total_skus_short: "SKUs",
                     total_vol: "Gesamtprognosevolumen",
-                    total_vol_short: "FC-Vol.",
+                    total_vol_short: "Prognose",
                     avg_mae: "Ø Validierungs-MAE",
                     avg_mae_short: "MAE",
                     avg_mse: "Ø Validierungs-MSE",
@@ -642,15 +633,15 @@
             const mobileLabel = shortLabel || label;
             return (
                 <div
-                    className={`flex flex-col justify-center items-center px-2.5 sm:px-3 md:px-6 border-r border-white/20 dark:border-white/10 ${bgClass} backdrop-blur-md h-full min-w-[4.75rem] sm:min-w-[6.5rem] md:min-w-[140px] snap-start transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
+                    className={`flex flex-col justify-center items-center min-w-0 h-full border-r border-white/20 dark:border-white/10 last:border-r-0 ${bgClass} backdrop-blur-md px-1 py-1.5 sm:px-3 md:px-6 sm:min-w-[6.5rem] md:min-w-[140px] sm:snap-start transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
                     title={label}
                 >
-                    <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide sm:tracking-wider mb-0.5 text-center leading-tight">
+                    <span className="text-[7px] sm:text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide sm:tracking-wider mb-0.5 text-center leading-[1.1] line-clamp-2 max-sm:max-w-full">
                         <span className="sm:hidden">{mobileLabel}</span>
                         <span className="hidden sm:inline whitespace-nowrap">{label}</span>
                     </span>
-                    <div className="flex items-baseline gap-2 justify-center">
-                        <span className={`text-sm sm:text-base md:text-lg font-bold font-mono ${colorClass} drop-shadow-sm`}>{value}</span>
+                    <div className="flex items-baseline gap-1 justify-center">
+                        <span className={`text-xs sm:text-base md:text-lg font-bold font-mono leading-none ${colorClass} drop-shadow-sm`}>{value}</span>
                         {subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500">{subValue}</span>}
                     </div>
                 </div>
@@ -729,19 +720,20 @@
             }, [handleSkuSelect, localSku]);
 
             return (
-                <div className="fc-kpi-bar flex w-full min-h-14 sm:min-h-16 flex-col sm:flex-row items-stretch">
-                    <div className="fc-kpi-metrics flex min-w-0 flex-1 items-stretch overflow-x-auto overscroll-x-contain snap-x snap-mandatory">
+                <div className="fc-kpi-bar w-full min-h-12 sm:min-h-16 max-sm:grid max-sm:grid-cols-[1fr_auto] sm:grid sm:grid-cols-[1fr_auto_1fr] items-stretch">
+                    <div className="hidden sm:block" aria-hidden="true" />
+                    <div className="fc-kpi-metrics grid grid-cols-4 sm:flex sm:items-stretch sm:overflow-visible min-h-12 sm:min-h-16">
                         <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} />
                         <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
                         <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={fmtNumber(avgMae, 0, 0)} />
                         <MetricTile label={t('dashboard.avg_mse')} shortLabel={t('dashboard.avg_mse_short')} value={fmtNumber(avgMse, 0, 0)} />
                     </div>
 
-                    <div className="fc-kpi-search flex shrink-0 items-center justify-end gap-2 border-t border-white/20 dark:border-white/10 px-2 py-1.5 sm:border-t-0 sm:px-4 sm:py-0">
+                    <div className="fc-kpi-search flex shrink-0 items-center justify-center sm:justify-end border-l border-white/20 dark:border-white/10 px-2 sm:px-4 sm:justify-self-end">
                         <form
                             onSubmit={onSearchSubmit}
                             onClick={() => inputRef.current?.focus()}
-                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden ${searchActive || localSku ? 'w-full max-w-[12rem] sm:w-48 md:w-64 px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-8 h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden ${searchActive || localSku ? 'w-[7.5rem] sm:w-48 md:w-64 px-2 sm:px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-9 h-9 sm:w-8 sm:h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                         >
                             <SearchIcon className={`shrink-0 transition-colors ${searchActive || localSku ? 'text-brand-gold w-4 h-4' : 'text-slate-500 dark:text-slate-400 w-4 h-4'}`} />
                             <input
@@ -762,21 +754,54 @@
 
 
         const BatchOverview = memo(({ results, onSelectSku, t }) => {
-            // Memoize row rendering to prevent re-renders
+            const formatMetric = (value) => (value == null ? '-' : Number(value).toLocaleString());
+
+            const mobileCards = useMemo(() => results.map((r, i) => (
+                <button
+                    key={r.sku || i}
+                    type="button"
+                    onClick={() => onSelectSku(r.sku)}
+                    className="w-full text-left rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-3 shadow-sm active:scale-[0.99] transition-transform"
+                >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                        <span className="font-mono font-bold text-sm text-slate-800 dark:text-slate-100 break-all leading-tight">{r.sku}</span>
+                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_success')}</span>
+                    </div>
+                    <div className="mb-3">
+                        <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
+                        <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300">{r.best_ts_model || '-'}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                        <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                            <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
+                            <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mae_validation)}</span>
+                        </div>
+                        <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                            <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mse')}</span>
+                            <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mse_validation)}</span>
+                        </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold">{t('dashboard.view_details')}<span aria-hidden="true">→</span></span>
+                </button>
+            )), [results, onSelectSku, t]);
+
             const tableRows = useMemo(() => results.map((r, i) => (
                 <tr key={r.sku || i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
-                    <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">{t('dashboard.table_success')}</span></td>
+                    <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold">{t('dashboard.table_success')}</span></td>
                     <td className="p-3 text-slate-600 dark:text-slate-300 uppercase">{r.best_ts_model}</td>
-                    <td className="p-3 text-right font-mono dark:text-slate-300">{r.mae_validation?.toLocaleString() || '-'}</td>
-                    <td className="p-3 text-right font-mono dark:text-slate-300">{r.mse_validation?.toLocaleString() || '-'}</td>
-                    <td className="p-3 text-center"><button onClick={() => onSelectSku(r.sku)} className="text-brand-gold hover:underline font-bold">{t('dashboard.view_details')}</button></td>
+                    <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mae_validation)}</td>
+                    <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
+                    <td className="p-3 text-center"><button type="button" onClick={() => onSelectSku(r.sku)} className="text-brand-gold hover:underline font-bold">{t('dashboard.view_details')}</button></td>
                 </tr>
             )), [results, onSelectSku, t]);
 
             return (
-                <div className="w-full h-full overflow-auto border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 shadow-sm">
-                    <table className="w-full text-left text-xs">
+                <div className="w-full h-full overflow-auto max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm">
+                    <div className="md:hidden flex flex-col gap-2.5 p-2 pb-4">
+                        {mobileCards}
+                    </div>
+                    <table className="hidden md:table w-full text-left text-xs">
                         <thead className="bg-slate-50 dark:bg-slate-950 sticky top-0 z-10">
                             <tr>
                                 <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_sku')}</th>
@@ -2111,7 +2136,7 @@
                             </header>
 
                             {/* KPI BAR */}
-                            <div className="min-h-0 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex items-stretch shrink-0 shadow-sm overflow-hidden sm:overflow-x-auto relative">
+                            <div className="min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex items-stretch shrink-0 shadow-sm overflow-hidden sm:overflow-x-auto relative">
                                 <KPICards results={batchResults} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
                             </div>
                         </div >
