@@ -157,8 +157,56 @@
         });
     }
 
+    function readCachedProfile() {
+        try {
+            return JSON.parse(localStorage.getItem('operartis_user_profile') || 'null');
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function writeCachedProfile(user) {
+        if (!user) return;
+        try {
+            localStorage.setItem('operartis_user_profile', JSON.stringify({
+                email: user.email || '',
+                full_name: user.full_name || '',
+                role: user.role || '',
+                avatar_data_url: user.avatar_data_url || ''
+            }));
+        } catch (error) { }
+    }
+
+    function enrichUser(user) {
+        if (!user) return user;
+        var cached = readCachedProfile();
+        if (!cached) return user;
+        if (cached.email && user.email && cached.email !== user.email) return user;
+        return Object.assign({}, user, {
+            full_name: user.full_name || cached.full_name || '',
+            avatar_data_url: user.avatar_data_url || cached.avatar_data_url || ''
+        });
+    }
+
+    function formatNameFromEmail(email) {
+        if (!email) return '';
+        var local = String(email).split('@')[0] || '';
+        return local.split(/[._-]+/).filter(Boolean).map(function (part) {
+            return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+        }).join(' ');
+    }
+
+    function userDisplayName(user) {
+        user = enrichUser(user);
+        if (!user) return '';
+        if (user.full_name && String(user.full_name).trim()) return String(user.full_name).trim();
+        var fromEmail = formatNameFromEmail(user.email);
+        if (fromEmail) return fromEmail;
+        return 'Member';
+    }
+
     function userInitials(user) {
-        var name = (user && (user.full_name || user.email)) || '';
+        var name = userDisplayName(user);
         var base = name.replace(/@.*/, '');
         var parts = base.split(/[.\s_-]+/).filter(Boolean);
         var first = parts[0] && parts[0][0] ? parts[0][0] : 'M';
@@ -261,8 +309,8 @@
             '.op-auth-topbar-menu[data-open="false"]{display:none}',
             '.op-auth-topbar-menu-head{padding:12px 14px 10px;border-bottom:1px solid rgba(148,163,184,0.28);background:transparent;position:relative;z-index:1;border-radius:10px 10px 0 0}',
             '.op-auth-topbar-menu[data-auth-theme="dark"] .op-auth-topbar-menu-head{border-bottom-color:rgba(148,163,184,0.18)}',
-            '.op-auth-topbar-email{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700;letter-spacing:0;color:#0f172a}',
-            '.op-auth-topbar-menu[data-auth-theme="dark"] .op-auth-topbar-email{color:#f8fafc}',
+            '.op-auth-topbar-name{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700;letter-spacing:0;color:#0f172a}',
+            '.op-auth-topbar-menu[data-auth-theme="dark"] .op-auth-topbar-name{color:#f8fafc}',
             '.op-auth-topbar-role{margin:3px 0 0;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b}',
             '.op-auth-topbar-menu[data-auth-theme="dark"] .op-auth-topbar-role{color:#94a3b8}',
             '.op-auth-topbar-menu-body{padding:6px;position:relative;z-index:1;border-radius:0 0 10px 10px}',
@@ -391,7 +439,7 @@
 
     function updateTopbarAccount(user) {
         var topbar = document.getElementById('operartis-auth-topbar');
-        var email = document.getElementById('operartis-auth-topbar-email');
+        var nameEl = document.getElementById('operartis-auth-topbar-name');
         var role = document.getElementById('operartis-auth-topbar-role');
         var status = document.querySelector('#operartis-auth-topbar .op-auth-topbar-status');
         var button = document.getElementById('operartis-auth-topbar-btn');
@@ -399,14 +447,14 @@
         var menu = document.getElementById('operartis-auth-topbar-menu');
         if (!topbar) return;
         topbar.style.display = 'flex';
-        if (email) email.textContent = user && user.email ? user.email : '';
+        if (nameEl) nameEl.textContent = user ? userDisplayName(user) : '';
         if (role) role.textContent = user && user.role ? user.role : '';
         if (status) status.setAttribute('data-signed-in', user ? 'true' : 'false');
         if (icon) icon.innerHTML = renderUserAvatarHtml(user);
         if (button) {
             button.setAttribute('aria-haspopup', user ? 'menu' : undefined);
-            button.setAttribute('aria-label', user ? ('Account: ' + user.email) : t('login'));
-            button.title = user ? user.email : t('login');
+            button.setAttribute('aria-label', user ? ('Account: ' + userDisplayName(user)) : t('login'));
+            button.title = user ? userDisplayName(user) : t('login');
         }
         if (menu) menu.setAttribute('data-open', 'false');
         setTopbarMenuOpen(false);
@@ -423,8 +471,8 @@
         if (dashboard) dashboard.textContent = t('dashboard');
         if (logout) logout.textContent = t('logout');
         if (button && state.user) {
-            button.setAttribute('aria-label', 'Account: ' + state.user.email);
-            button.title = state.user.email;
+            button.setAttribute('aria-label', 'Account: ' + userDisplayName(state.user));
+            button.title = userDisplayName(state.user);
         } else if (button) {
             button.setAttribute('aria-label', t('login'));
             button.title = t('login');
@@ -445,7 +493,7 @@
             '</button>',
             '<div class="op-auth-topbar-menu" id="operartis-auth-topbar-menu" role="menu" aria-label="Account menu" data-open="false">',
             '<div class="op-auth-topbar-menu-head">',
-            '<p class="op-auth-topbar-email" id="operartis-auth-topbar-email"></p>',
+            '<p class="op-auth-topbar-name" id="operartis-auth-topbar-name"></p>',
             '<p class="op-auth-topbar-role" id="operartis-auth-topbar-role"></p>',
             '</div>',
             '<div class="op-auth-topbar-menu-body">',
@@ -703,7 +751,9 @@
         buildUi();
         syncAuthTheme();
         syncAuthLanguage();
+        user = enrichUser(user);
         state.user = user;
+        writeCachedProfile(user);
         document.getElementById('operartis-auth-overlay').removeAttribute('data-open');
         if (useTopbarAccountMode()) {
             buildTopbarAccount();
@@ -714,7 +764,7 @@
         } else {
             document.getElementById('operartis-auth-account').removeAttribute('data-open');
         }
-        document.getElementById('operartis-auth-email-label').textContent = user.email;
+        document.getElementById('operartis-auth-email-label').textContent = userDisplayName(user);
         window.dispatchEvent(new CustomEvent('operartis:authenticated', { detail: { user: user } }));
     }
 

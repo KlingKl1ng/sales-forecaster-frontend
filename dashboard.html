@@ -40,7 +40,7 @@
         window.OPERARTIS_AUTH_FLOATING_ACCOUNT = false;
         window.OPERARTIS_AUTH_DISMISSIBLE = true;
     </script>
-    <script src="./operartis-auth-ui.js?v=20260622-avatar-sync"></script>
+    <script src="./operartis-auth-ui.js?v=20260623-display-name"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
@@ -472,63 +472,138 @@
         .side-brand-logo:hover img { transform: scale(1.1); }
         .side-brand strong { display: block; letter-spacing: .12em; font-size: 16px; font-weight: 800; color: var(--gold-2); line-height: 1.15; }
         .side-brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; letter-spacing: .03em; line-height: 1.2; }
-        .profile-menu { position: relative; }
-        .topbar-profile {
+        .profile-menu {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .header-auth-btn {
+            position: relative;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: auto;
-            max-width: none;
+            width: 36px;
+            height: 36px;
             padding: 0;
-            border: none;
+            border: 0;
+            border-radius: 999px;
             background: transparent;
+            color: #fff;
             flex-shrink: 0;
-            color: inherit;
-            text-align: left;
             cursor: pointer;
-            transition: opacity .2s var(--ease);
+            overflow: visible;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
         }
-        .topbar-profile:hover,
-        .profile-menu.open .topbar-profile,
-        .topbar-profile.is-admin,
-        .topbar-profile.is-admin:hover,
-        .profile-menu.open .topbar-profile.is-admin {
-            border: none;
-            background: transparent;
+
+        .header-auth-btn:hover {
+            transform: scale(1.06);
+            filter: brightness(1.1);
         }
-        .topbar-profile .topbar-profile-meta,
-        .topbar-profile .profile-chevron { display: none; }
-        .topbar-profile .avatar {
-            width: 40px;
-            height: 40px;
-            font-size: 13px;
-            box-shadow: 0 6px 18px rgba(245, 158, 11, .16);
+
+        .header-auth-btn:active {
+            transform: scale(0.94);
+            filter: brightness(1);
         }
-        .topbar-profile.is-admin .avatar {
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, .42), 0 6px 18px rgba(245, 158, 11, .18);
+
+        .header-auth-btn--gold {
+            background: linear-gradient(to top right, #f59e0b, #b45309);
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
         }
-        .topbar-profile-meta { min-width: 0; }
-        .profile-dropdown {
+
+        .header-auth-btn--gold:hover {
+            box-shadow: 0 8px 28px rgba(245, 158, 11, 0.5), 0 0 0 2px rgba(251, 191, 36, 0.35);
+        }
+
+        .header-auth-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.55);
+        }
+
+        .dashboard-account-avatar-slot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .index-account-avatar-img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            object-fit: cover;
+        }
+
+        .index-account-avatar-initials {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            color: #08111f;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            background: radial-gradient(circle at 30% 25%, rgba(251, 191, 36, 0.98), rgba(217, 119, 6, 0.9));
+        }
+
+        .dashboard-account-status {
             position: absolute;
-            top: calc(100% + 8px);
+            right: -2px;
+            top: -2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 999px;
+            border: 2px solid #f8fafc;
+            background: #34d399;
+            box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.28), 0 0 12px rgba(52, 211, 153, 0.9);
+            pointer-events: none;
+        }
+
+        html.dark .dashboard-account-status {
+            border-color: #020617;
+        }
+
+        .index-account-menu {
+            position: absolute;
             right: 0;
-            z-index: 20;
-            min-width: 240px;
+            top: calc(100% + 10px);
+            z-index: 100;
             width: 240px;
             overflow: visible;
-            padding: 0;
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            background: var(--surface-elevated);
-            box-shadow: var(--shadow-sm);
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
+            transform-origin: top right;
+            animation: indexAccountMenuIn 0.18s ease-out;
         }
-        .profile-dropdown::before {
+
+        .index-account-menu[hidden] { display: none; }
+
+        @keyframes indexAccountMenuIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .index-account-menu::before {
             content: "";
             position: absolute;
             top: -6px;
-            right: 22px;
+            right: 13px;
             width: 12px;
             height: 12px;
             background: rgba(255, 255, 255, 0.98);
@@ -538,56 +613,68 @@
             pointer-events: none;
             z-index: 0;
         }
-        html.dark .profile-dropdown::before {
+
+        html.dark .index-account-menu {
+            border-color: rgba(148, 163, 184, 0.18);
+            background: rgba(15, 23, 42, 0.96);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+        }
+
+        html.dark .index-account-menu::before {
             background: rgba(15, 23, 42, 0.96);
             border-left-color: rgba(148, 163, 184, 0.18);
             border-top-color: rgba(148, 163, 184, 0.18);
         }
-        .profile-dropdown[hidden] { display: none; }
-        .profile-dropdown-head {
+
+        .index-account-menu-head {
             padding: 12px 14px 10px;
-            border-bottom: 1px solid rgba(148, 163, 184, .28);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.28);
             background: transparent;
             position: relative;
             z-index: 1;
-            border-radius: var(--radius) var(--radius) 0 0;
+            border-radius: 10px 10px 0 0;
         }
-        .profile-dropdown-name {
-            margin: 0 0 2px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 0;
-            color: #0f172a;
+
+        html.dark .index-account-menu-head {
+            border-bottom-color: rgba(148, 163, 184, 0.18);
         }
-        html.dark .profile-dropdown-name { color: #f8fafc; }
-        html.dark .profile-dropdown-head {
-            border-bottom-color: rgba(148, 163, 184, .18);
-        }
-        .profile-dropdown-email {
+
+        .index-account-menu-email {
             margin: 0;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 700;
             letter-spacing: 0;
-            color: #64748b;
+            color: #0f172a;
         }
-        html.dark .profile-dropdown-email { color: #94a3b8; }
-        .profile-dropdown-role {
+
+        html.dark .index-account-menu-email {
+            color: #f8fafc;
+        }
+
+        .index-account-menu-role {
             margin: 3px 0 0;
-            font-size: .65rem;
+            font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: .1em;
+            letter-spacing: 0.1em;
             color: #64748b;
         }
-        html.dark .profile-dropdown-role { color: #94a3b8; }
-        .profile-dropdown-body { padding: 6px; position: relative; z-index: 1; border-radius: 0 0 var(--radius) var(--radius); }
-        .profile-dropdown-item {
+
+        html.dark .index-account-menu-role {
+            color: #94a3b8;
+        }
+
+        .index-account-menu-body {
+            padding: 6px;
+            position: relative;
+            z-index: 1;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .index-account-menu-item {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -597,17 +684,21 @@
             border-radius: 10px;
             background: transparent;
             color: #0f172a;
-            font-size: .65rem;
+            font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: .1em;
+            letter-spacing: 0.1em;
             text-align: left;
             text-decoration: none;
             cursor: pointer;
-            transition: background .15s ease, color .15s ease, transform .15s ease;
+            transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
         }
-        html.dark .profile-dropdown-item { color: #f8fafc; }
-        .profile-dropdown-item-icon {
+
+        html.dark .index-account-menu-item {
+            color: #f8fafc;
+        }
+
+        .index-account-menu-item-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -615,41 +706,52 @@
             height: 15px;
             flex-shrink: 0;
             color: currentColor;
-            opacity: .88;
-            transition: color .15s ease, opacity .15s ease;
+            opacity: 0.88;
+            transition: color 0.15s ease, opacity 0.15s ease;
         }
-        html.dark .profile-dropdown-item-icon { opacity: .92; }
-        .profile-dropdown-item-icon svg {
+
+        html.dark .index-account-menu-item-icon {
+            opacity: 0.92;
+        }
+
+        .index-account-menu-item-icon svg {
             display: block;
             width: 100%;
             height: 100%;
         }
-        .profile-dropdown-item:hover {
-            background: rgba(245, 158, 11, .12);
+
+        .index-account-menu-item:hover {
+            background: rgba(245, 158, 11, 0.12);
             color: #b45309;
             transform: translateX(1px);
         }
-        html.dark .profile-dropdown-item:hover {
-            background: rgba(245, 158, 11, .14);
+
+        html.dark .index-account-menu-item:hover {
+            background: rgba(245, 158, 11, 0.14);
             color: #fbbf24;
         }
-        .profile-dropdown-item.danger:hover {
-            background: rgba(239, 68, 68, .1);
+
+        .index-account-menu-item--danger:hover {
+            background: rgba(239, 68, 68, 0.1);
             color: #b91c1c;
             transform: translateX(1px);
         }
-        html.dark .profile-dropdown-item.danger:hover {
-            background: rgba(248, 113, 113, .12);
+
+        html.dark .index-account-menu-item--danger:hover {
+            background: rgba(248, 113, 113, 0.12);
             color: #fca5a5;
         }
-        .profile-dropdown-divider {
+
+        .index-account-menu-divider {
             height: 1px;
             margin: 4px 10px;
-            background: linear-gradient(90deg, transparent, rgba(148, 163, 184, .35), transparent);
+            background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.35), transparent);
         }
-        html.dark .profile-dropdown-divider {
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .14), transparent);
+
+        html.dark .index-account-menu-divider {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
         }
+
         .avatar {
             width: 48px;
             height: 48px;
@@ -1572,29 +1674,24 @@
                 </div>
                 <div class="top-actions">
                     <div id="profile-menu" class="profile-menu">
-                        <button id="user-profile" class="topbar-profile" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="profile-dropdown">
-                            <svg class="profile-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-                            <div class="topbar-profile-meta">
-                                <strong id="user-name">Member</strong>
-                                <span id="user-email">Signed in</span>
-                            </div>
-                            <div id="user-avatar" class="avatar"></div>
+                        <button id="user-profile" class="header-auth-btn header-auth-btn--gold" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="profile-dropdown">
+                            <span id="user-avatar" class="dashboard-account-avatar-slot" aria-hidden="true"></span>
+                            <span class="dashboard-account-status" aria-hidden="true"></span>
                         </button>
-                        <div id="profile-dropdown" class="profile-dropdown" role="menu" hidden>
-                            <div class="profile-dropdown-head">
-                                <p class="profile-dropdown-name" id="profile-dropdown-name"></p>
-                                <p class="profile-dropdown-email" id="profile-dropdown-email"></p>
-                                <p class="profile-dropdown-role" id="profile-dropdown-role"></p>
+                        <div id="profile-dropdown" class="index-account-menu" role="menu" aria-label="Account menu" hidden>
+                            <div class="index-account-menu-head">
+                                <p class="index-account-menu-email" id="profile-dropdown-email"></p>
+                                <p class="index-account-menu-role" id="profile-dropdown-role"></p>
                             </div>
-                            <div class="profile-dropdown-body">
-                                <a class="profile-dropdown-item" role="menuitem" href="./index.html">
-                                    <span class="profile-dropdown-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></span>
-                                    <span class="profile-dropdown-item-label" data-i18n="chrome.back_to_operartis">Back to Operartis</span>
+                            <div class="index-account-menu-body">
+                                <a class="index-account-menu-item" role="menuitem" href="./index.html">
+                                    <span class="index-account-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></span>
+                                    <span data-i18n="chrome.back_to_operartis">Back to Operartis</span>
                                 </a>
-                                <div class="profile-dropdown-divider" role="separator" aria-hidden="true"></div>
-                                <button id="profile-logout" class="profile-dropdown-item danger" type="button" role="menuitem">
-                                    <span class="profile-dropdown-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span>
-                                    <span class="profile-dropdown-item-label" data-i18n="chrome.logout">Logout</span>
+                                <div class="index-account-menu-divider" role="separator" aria-hidden="true"></div>
+                                <button id="profile-logout" class="index-account-menu-item index-account-menu-item--danger" type="button" role="menuitem">
+                                    <span class="index-account-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span>
+                                    <span data-i18n="chrome.logout">Logout</span>
                                 </button>
                             </div>
                         </div>
@@ -2286,6 +2383,12 @@
             profileDropdown.hidden = !open;
         }
 
+        function handleProfileMenuOutside(event) {
+            if (!profileMenu.classList.contains('open')) return;
+            if (profileMenu.contains(event.target)) return;
+            setProfileMenuOpen(false);
+        }
+
         async function logoutUser() {
             setProfileMenuOpen(false);
             await window.OperartisAuth.logout();
@@ -2350,6 +2453,18 @@
             const name = user?.full_name || user?.email || 'Member';
             const parts = name.replace(/@.*/, '').split(/[.\s_-]+/).filter(Boolean);
             return (parts[0]?.[0] || 'M') + (parts[1]?.[0] || parts[0]?.[1] || '');
+        }
+
+        function renderTopbarAccountAvatar(user) {
+            const container = document.getElementById('user-avatar');
+            if (!container) return;
+            clear(container);
+            const avatar = state.avatarChanged ? state.avatarDraft : user?.avatar_data_url;
+            if (avatar) {
+                container.appendChild(el('img', { class: 'index-account-avatar-img', src: avatar, alt: '', 'aria-hidden': 'true' }));
+            } else {
+                container.appendChild(el('span', { class: 'index-account-avatar-initials', 'aria-hidden': 'true', text: initials(user).toUpperCase() }));
+            }
         }
 
         function renderAvatar(container, user, large = false) {
@@ -2448,25 +2563,21 @@
         }
 
         function renderChrome() {
-            const displayName = state.user?.full_name || dt('chrome.member');
+            const displayName = state.user?.full_name || state.user?.email || dt('chrome.member');
             const isAdmin = state.user?.role === 'admin';
             app.classList.toggle('is-admin', isAdmin);
             if (!isAdmin && isAdminSection(state.activeSection)) setSection('overview');
-            document.getElementById('user-name').textContent = displayName;
-            document.getElementById('user-email').textContent = state.user?.email || dt('chrome.signed_in');
-            const dropdownName = document.getElementById('profile-dropdown-name');
-            const dropdownEmail = document.getElementById('profile-dropdown-email');
+            const dropdownName = document.getElementById('profile-dropdown-email');
             const dropdownRole = document.getElementById('profile-dropdown-role');
             if (dropdownName) dropdownName.textContent = displayName;
-            if (dropdownEmail) dropdownEmail.textContent = state.user?.email || dt('chrome.signed_in');
-            if (dropdownRole) dropdownRole.textContent = roleLabel(state.user?.role) || '';
-            userProfile.setAttribute('aria-label', `${displayName} — ${state.user?.email || dt('chrome.signed_in')}`);
-            userProfile.classList.toggle('is-admin', isAdmin);
+            if (dropdownRole) dropdownRole.textContent = state.user?.role || '';
+            userProfile.setAttribute('aria-label', `Account: ${displayName}`);
+            userProfile.title = displayName;
             document.getElementById('welcome-title').textContent = dt('chrome.welcome', { name: displayName });
             const retentionDays = state.overview?.retention_days || 180;
             const retentionPill = document.getElementById('retention-pill');
             if (retentionPill) retentionPill.textContent = dt('sections.overview.retention', { days: retentionDays });
-            renderAvatar(document.getElementById('user-avatar'), state.user);
+            renderTopbarAccountAvatar(state.user);
             renderAvatar(document.getElementById('profile-avatar'), state.user, true);
         }
 
@@ -2896,12 +3007,13 @@
             applySidebarCollapsedUi();
             setProfileMenuOpen(false);
         });
-        userProfile.addEventListener('click', event => {
-            event.stopPropagation();
+        userProfile.addEventListener('click', () => {
             setProfileMenuOpen(!profileMenu.classList.contains('open'));
         });
-        document.addEventListener('click', () => setProfileMenuOpen(false));
+        document.addEventListener('mousedown', handleProfileMenuOutside);
+        document.addEventListener('touchstart', handleProfileMenuOutside, { passive: true });
         document.getElementById('profile-logout').addEventListener('click', logoutUser);
+        profileDropdown.querySelector('a.index-account-menu-item')?.addEventListener('click', () => setProfileMenuOpen(false));
         document.querySelectorAll('.nav-btn, .nav-jump').forEach(button => {
             button.addEventListener('click', () => setSection(button.dataset.section));
         });
@@ -3017,10 +3129,17 @@
                 state.avatarChanged = false;
                 renderAll();
                 try {
+                    localStorage.setItem('operartis_user_profile', JSON.stringify({
+                        email: state.user?.email || '',
+                        full_name: state.user?.full_name || '',
+                        role: state.user?.role || '',
+                        avatar_data_url: state.user?.avatar_data_url || ''
+                    }));
                     localStorage.setItem('operartis_user_updated', JSON.stringify({ at: Date.now() }));
                 } catch (error) {
                     // Avatar sync still works in the current tab if storage is unavailable.
                 }
+                window.dispatchEvent(new CustomEvent('operartis:user-updated', { detail: { user: state.user } }));
                 showMessage(dt('messages.profile_saved'), 'success');
             } catch (error) {
                 showMessage(error.message || dt('messages.profile_save_failed'), 'error');

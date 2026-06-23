@@ -56,6 +56,29 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
 
+        @media (min-width: 1024px) {
+            .fc-sidebar[data-collapsed="true"] .fc-sidebar-expanded {
+                display: none !important;
+            }
+
+            .fc-sidebar[data-collapsed="true"] {
+                overflow: visible;
+            }
+        }
+
+        .fc-sidebar-shell {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .fc-sidebar-toggle {
+            position: absolute;
+            right: -12px;
+            top: 2rem;
+            transform: translateY(-50%);
+            z-index: 60;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             height: 100vh;
@@ -251,7 +274,7 @@
     </script>
     <link rel="stylesheet" href="./operartis-access-shell.css?v=20260622-access-mobile-full">
     <script src="./operartis-api.js?v=20260622-auth-session-sync"></script>
-    <script src="./operartis-auth-ui.js?v=20260622-avatar-sync"></script>
+    <script src="./operartis-auth-ui.js?v=20260623-display-name"></script>
     <script src="./operartis-access-gate.js?v=20260622-access-mobile-full"></script>
     <script src="./vendor/react-17.0.2.production.min.js"></script>
     <script src="./vendor/react-dom-17.0.2.production.min.js"></script>
@@ -1408,6 +1431,8 @@
             const [currentSku, setCurrentSku] = useState(null);
             const [isSidebarOpen, setIsSidebarOpen] = useState(false);
             const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => localStorage.getItem('fc-sidebar-collapsed') === '1');
+            const [isLargeScreen, setIsLargeScreen] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
+            const showExpandedSidebarContent = !isLargeScreen || !isSidebarCollapsed;
             const [isFullScreen, setIsFullScreen] = useState(false);
             const [isSplitView, setIsSplitView] = useState(true); // For All-In-One
             const [activeTab, setActiveTab] = useState("overview"); // overview, details
@@ -1420,6 +1445,18 @@
                 const openSettings = () => setIsSettingsOpen(true);
                 window.addEventListener('operartis:open-settings', openSettings);
                 return () => window.removeEventListener('operartis:open-settings', openSettings);
+            }, []);
+
+            useEffect(() => {
+                const media = window.matchMedia('(min-width: 1024px)');
+                const syncLargeScreen = () => setIsLargeScreen(media.matches);
+                syncLargeScreen();
+                if (typeof media.addEventListener === 'function') {
+                    media.addEventListener('change', syncLargeScreen);
+                    return () => media.removeEventListener('change', syncLargeScreen);
+                }
+                media.addListener(syncLargeScreen);
+                return () => media.removeListener(syncLargeScreen);
             }, []);
 
             // API State
@@ -1781,15 +1818,16 @@
                     )}
 
                     {/* SIDEBAR */}
-                    <aside className={`${isFullScreen ? 'hidden' : 'flex'} fixed lg:relative inset-y-0 left-0 z-50 w-64 ${isSidebarCollapsed ? 'lg:w-[76px]' : 'lg:w-64'} bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-white/20 dark:border-white/10 flex flex-col h-full shadow-2xl lg:shadow-none transform transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-                        {/* Desktop collapse / expand edge toggle */}
+                    <div className={`fc-sidebar-shell ${isFullScreen ? 'hidden' : ''} fixed lg:relative inset-y-0 left-0 z-50 w-64 ${isSidebarCollapsed ? 'lg:w-[76px]' : 'lg:w-64'} transform transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
                         <button
                             onClick={() => setIsSidebarCollapsed(prev => !prev)}
-                            className="hidden lg:flex items-center justify-center absolute -right-3 top-8 -translate-y-1/2 z-30 h-6 w-6 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold shadow-md transition-colors"
+                            className="fc-sidebar-toggle hidden lg:flex items-center justify-center h-6 w-6 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold shadow-md transition-colors"
                             title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                         >
                             {isSidebarCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                         </button>
+                    <aside data-collapsed={isSidebarCollapsed ? 'true' : 'false'} className={`fc-sidebar flex w-full h-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-white/20 dark:border-white/10 flex-col shadow-2xl lg:shadow-none`}>
 
                         <div className="h-16 flex items-center justify-center px-4 border-b border-white/20 dark:border-white/10 shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md gap-2 relative sticky top-0 z-20">
                             <a href="./">
@@ -1799,10 +1837,11 @@
                             <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden absolute right-4 text-slate-400"><XIcon /></button>
                         </div>
 
-                        {/* COLLAPSED RAIL — desktop only */}
-                        <div className={`${isSidebarCollapsed ? 'hidden lg:flex' : 'hidden'} flex-1 flex-col items-center gap-3 pt-5 pb-4 min-h-0`}>
+                        {isLargeScreen && isSidebarCollapsed && (
+                        <div className="relative z-10 flex flex-1 flex-col items-center gap-3 pt-5 pb-4 min-h-0 pointer-events-auto">
                             <button
-                                onClick={() => fileInputRef.current.click()}
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
                                 className={`relative flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${file ? (skuCol && startCol && endCol ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500' : 'border-brand-gold/40 bg-amber-500/10 text-brand-gold') : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
                                 title={file ? file.name : t('sidebar.upload_label')}
                             >
@@ -1862,21 +1901,22 @@
                                 <RefreshIcon />
                             </button>
                         </div>
+                        )}
 
-                        <div className={`flex-1 overflow-y-auto scroller px-3 pt-3 pb-0 gap-6 min-h-0 flex flex-col ${isSidebarCollapsed ? 'lg:hidden' : ''}`}>
+                        {showExpandedSidebarContent && (
+                        <div className="fc-sidebar-expanded flex-1 overflow-y-auto scroller px-3 pt-3 pb-0 gap-6 min-h-0 flex flex-col">
                             {/* 1. Source Data */}
                             <div>
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
                                 <div className={`relative border border-dashed rounded px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
-                                    <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
-                                    <div onClick={() => !file && fileInputRef.current.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
+                                    <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
                                         {file ? (
                                             <div className="flex flex-col items-center gap-1">
-                                                <div onClick={() => fileInputRef.current.click()} className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 cursor-pointer hover:underline mb-1">{file.name}</div>
+                                                <div onClick={() => fileInputRef.current?.click()} className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 cursor-pointer hover:underline mb-1">{file.name}</div>
                                                 <div className="text-[10px] text-emerald-500 font-bold uppercase">{skuCol && startCol && endCol ? t('sidebar.uploaded_mapped') : t('sidebar.action_required')}</div>
                                                 <div className="flex gap-2 mt-2 justify-center">
                                                     <button
-                                                        onClick={(e) => { e.stopPropagation(); fileInputRef.current.click(); }}
+                                                        onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                                                         className="p-1.5 min-w-[28px] min-h-[28px] rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
                                                         title={t('sidebar.reupload_file')}
                                                     >
@@ -2004,16 +2044,19 @@
                                 </div>
                             </div>
                         </div>
+                        )}
 
 
-                        {/* Sticky Sidebar Footer */}
-                        <div className={`sticky bottom-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-white/20 dark:border-white/10 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] ${isSidebarCollapsed ? 'lg:hidden' : ''}`}>
+                        {showExpandedSidebarContent && (
+                        <div className="fc-sidebar-expanded sticky bottom-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-white/20 dark:border-white/10 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
                             <div className="p-4 text-center">
                                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">Operartis Analytics</p>
                                 <p className="text-[10px] text-brand-gold mt-1 font-medium italic">Optimizing Today, Growing Tomorrow</p>
                             </div>
                         </div>
-                    </aside >
+                        )}
+                    </aside>
+                    </div>
 
                     {/* MAIN CONTENT */}
                     < div className="flex flex-col flex-grow min-w-0 transition-all relative" >
