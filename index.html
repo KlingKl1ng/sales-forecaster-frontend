@@ -34,31 +34,7 @@
             }
         }
     </script>
-    <script>
-        window.getOperartisTheme = function () {
-            var session = null;
-            try { session = sessionStorage.getItem('theme'); } catch (e) { }
-            if (session === 'light' || session === 'dark') return session;
-            return 'system';
-        };
-        window.applyOperartisThemeClass = function (theme) {
-            var systemDark = false;
-            try { systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { }
-            var dark = theme === 'dark' || (theme === 'system' && systemDark);
-            document.documentElement.classList.toggle('dark', dark);
-            return dark;
-        };
-        window.persistOperartisTheme = function (theme) {
-            try { localStorage.setItem('theme', theme); } catch (e) { }
-            try {
-                if (theme === 'system') sessionStorage.removeItem('theme');
-                else sessionStorage.setItem('theme', theme);
-            } catch (e) { }
-        };
-        (function () {
-            try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
-        })();
-    </script>
+    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
     <script>
@@ -6372,7 +6348,24 @@
         };
 
         const App = () => {
-            const [theme, setTheme] = useState(() => window.getOperartisTheme());
+            const [theme, setThemeState] = useState(() => window.getOperartisTheme());
+            const setTheme = useCallback((next) => {
+                if (typeof window.setOperartisTheme === 'function') {
+                    window.setOperartisTheme(next);
+                } else {
+                    window.persistOperartisTheme?.(next);
+                    window.applyOperartisThemeClass?.(next);
+                    setThemeState(next);
+                }
+            }, []);
+
+            useEffect(() => {
+                const handler = (event) => {
+                    setThemeState((event.detail && event.detail.theme) || window.getOperartisTheme());
+                };
+                window.addEventListener('operartis:theme-change', handler);
+                return () => window.removeEventListener('operartis:theme-change', handler);
+            }, []);
             const [lang, setLang] = useState(() => window.getOperartisLang());
             const [selectedBlock, setSelectedBlock] = useState(null);
             const [activeQuickViewBlockId, setActiveQuickViewBlockId] = useState(null);
@@ -6487,18 +6480,6 @@
 
             const scrollToHorizon = useCallback((id) => scrollToNavItem(id), [scrollToNavItem]);
             const scrollToAbout = useCallback(() => scrollToNavItem('about'), [scrollToNavItem]);
-
-            useEffect(() => {
-                const applyTheme = () => {
-                    window.applyOperartisThemeClass(theme);
-                    window.persistOperartisTheme(theme);
-                };
-                applyTheme();
-                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                const handleSystemChange = () => { if (theme === 'system') applyTheme(); };
-                mediaQuery.addEventListener('change', handleSystemChange);
-                return () => mediaQuery.removeEventListener('change', handleSystemChange);
-            }, [theme]);
 
             useEffect(() => {
                 window.persistOperartisLang(lang);

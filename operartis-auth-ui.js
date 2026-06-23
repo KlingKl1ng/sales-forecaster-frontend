@@ -558,6 +558,9 @@
             observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
         }
         try {
+            window.addEventListener('operartis:theme-change', syncAuthTheme);
+        } catch (e) { }
+        try {
             var mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             if (mediaQuery.addEventListener) mediaQuery.addEventListener('change', syncAuthTheme);
             else if (mediaQuery.addListener) mediaQuery.addListener(syncAuthTheme);

@@ -128,6 +128,7 @@
         }
     </style>
 
+    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
     <script>
@@ -159,7 +160,28 @@
     <div id="root" class="h-full w-full flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
+        const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+        function useOperartisTheme() {
+            const [theme, setThemeState] = useState(() => window.getOperartisTheme());
+            const setTheme = useCallback((next) => {
+                if (typeof window.setOperartisTheme === 'function') {
+                    window.setOperartisTheme(next);
+                } else {
+                    window.persistOperartisTheme?.(next);
+                    window.applyOperartisThemeClass?.(next);
+                    setThemeState(next);
+                }
+            }, []);
+            useEffect(() => {
+                const handler = (event) => {
+                    setThemeState((event.detail && event.detail.theme) || window.getOperartisTheme());
+                };
+                window.addEventListener('operartis:theme-change', handler);
+                return () => window.removeEventListener('operartis:theme-change', handler);
+            }, []);
+            return [theme, setTheme];
+        }
         const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend, LineChart, Line, ReferenceLine } = window.Recharts;
         const _ = window._;
 
@@ -661,7 +683,7 @@
         };
 
         const MainApp = () => {
-            const [theme, setTheme] = useState(localStorage.getItem('theme') || 'system');
+            const [theme, setTheme] = useOperartisTheme();
             const [file, setFile] = useState(null);
             const [rawJson, setRawJson] = useState([]);
             const [headers, setHeaders] = useState([]);
@@ -710,26 +732,6 @@
             useEffect(() => {
                 window.persistOperartisLang(lang);
             }, [lang]);
-
-            // Theme Effect
-            useEffect(() => {
-                const applyTheme = () => {
-                    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    let effectiveDark = false;
-                    if (theme === 'dark') effectiveDark = true;
-                    else if (theme === 'light') effectiveDark = false;
-                    else effectiveDark = systemPrefersDark;
-
-                    if (effectiveDark) { document.documentElement.classList.add('dark'); }
-                    else { document.documentElement.classList.remove('dark'); }
-                    localStorage.setItem('theme', theme);
-                };
-                applyTheme();
-                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                const handleSystemChange = () => { if (theme === 'system') applyTheme(); };
-                mediaQuery.addEventListener('change', handleSystemChange);
-                return () => mediaQuery.removeEventListener('change', handleSystemChange);
-            }, [theme]);
 
             // File Handler
             const handleFileUpload = (e) => {

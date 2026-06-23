@@ -25,26 +25,7 @@
             };
         }
     </script>
-    <script>
-        window.getOperartisTheme = function () {
-            var session = sessionStorage.getItem('theme');
-            if (session === 'light' || session === 'dark') return session;
-            return 'system';
-        };
-        window.applyOperartisThemeClass = function (theme) {
-            var dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            document.documentElement.classList.toggle('dark', dark);
-            return dark;
-        };
-        window.persistOperartisTheme = function (theme) {
-            localStorage.setItem('theme', theme);
-            if (theme === 'system') sessionStorage.removeItem('theme');
-            else sessionStorage.setItem('theme', theme);
-        };
-        (function () {
-            try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
-        })();
-    </script>
+    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js?v=20260621-auth-lang-fix"></script>
     <script src="./operartis-security.js"></script>
     <script>
@@ -3811,8 +3792,27 @@
             const hasAllResults = skuList.length > 0 && skuList.every(sku => simResults[sku]);
 
             // UI State
-            const [theme, setTheme] = useState(() => window.getOperartisTheme());
-            const [isDark, setIsDark] = useState(false);
+            const [theme, setThemeState] = useState(() => window.getOperartisTheme());
+            const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+            const setTheme = useCallback((next) => {
+                if (typeof window.setOperartisTheme === 'function') {
+                    window.setOperartisTheme(next);
+                } else {
+                    window.persistOperartisTheme?.(next);
+                    window.applyOperartisThemeClass?.(next);
+                    setThemeState(next);
+                }
+            }, []);
+
+            useEffect(() => {
+                const handler = (event) => {
+                    const next = (event.detail && event.detail.theme) || window.getOperartisTheme();
+                    setThemeState(next);
+                    setIsDark(document.documentElement.classList.contains('dark'));
+                };
+                window.addEventListener('operartis:theme-change', handler);
+                return () => window.removeEventListener('operartis:theme-change', handler);
+            }, []);
             const [language, setLanguage] = useState(() => window.getOperartisLang());
             const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -3888,20 +3888,6 @@
             useEffect(() => {
                 window.persistOperartisLang(language);
             }, [language]);
-
-            // Theme Effect — default system (OS); synced with index.html in same tab
-            useEffect(() => {
-                const applyTheme = () => {
-                    const effectiveDark = window.applyOperartisThemeClass(theme);
-                    setIsDark(effectiveDark);
-                    window.persistOperartisTheme(theme);
-                };
-                applyTheme();
-                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                const handleSystemChange = () => { if (theme === 'system') applyTheme(); };
-                mediaQuery.addEventListener('change', handleSystemChange);
-                return () => mediaQuery.removeEventListener('change', handleSystemChange);
-            }, [theme]);
 
             // Track previous SKU for saving params before switch
             const prevSkuRef = React.useRef(null);

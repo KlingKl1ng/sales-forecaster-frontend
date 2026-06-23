@@ -313,6 +313,7 @@
         }
     </style>
 
+    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
     <script>
@@ -344,6 +345,27 @@
     <script type="text/babel">
         const { useState, useEffect, useRef, useMemo, useCallback, memo } = React;
         const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart, Bar, BarChart, Brush } = window.Recharts;
+
+        function useOperartisTheme() {
+            const [theme, setThemeState] = useState(() => window.getOperartisTheme());
+            const setTheme = useCallback((next) => {
+                if (typeof window.setOperartisTheme === 'function') {
+                    window.setOperartisTheme(next);
+                } else {
+                    window.persistOperartisTheme?.(next);
+                    window.applyOperartisThemeClass?.(next);
+                    setThemeState(next);
+                }
+            }, []);
+            useEffect(() => {
+                const handler = (event) => {
+                    setThemeState((event.detail && event.detail.theme) || window.getOperartisTheme());
+                };
+                window.addEventListener('operartis:theme-change', handler);
+                return () => window.removeEventListener('operartis:theme-change', handler);
+            }, []);
+            return [theme, setTheme];
+        }
 
         // --- TRANSLATIONS ---
         const TRANSLATIONS = {
@@ -1544,8 +1566,14 @@
             const [activeTab, setActiveTab] = useState("overview"); // overview, details
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [isMappingModalOpen, setIsMappingModalOpen] = useState(false);
-            const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
-            const [isDark, setIsDark] = useState(false);
+            const [theme, setTheme] = useOperartisTheme();
+            const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+
+            useEffect(() => {
+                const syncDark = () => setIsDark(document.documentElement.classList.contains('dark'));
+                window.addEventListener('operartis:theme-change', syncDark);
+                return () => window.removeEventListener('operartis:theme-change', syncDark);
+            }, []);
 
             useEffect(() => {
                 const openSettings = () => setIsSettingsOpen(true);
@@ -1617,19 +1645,6 @@
             //         document.body.classList.remove('mobile-result-scroll');
             //     }
             // }, [batchResults]);
-
-            useEffect(() => {
-                const applyTheme = () => {
-                    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    const isD = theme === 'dark' || (theme === 'system' && sysDark);
-                    setIsDark(isD);
-                    if (isD) document.documentElement.classList.add('dark');
-                    else document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', theme);
-                };
-                applyTheme();
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
-            }, [theme]);
 
             // Language State
             const [lang, setLang] = useState(() => window.getOperartisLang());

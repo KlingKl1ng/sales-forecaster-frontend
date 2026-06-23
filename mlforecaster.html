@@ -155,6 +155,7 @@
             background-color: #1e293b;
         }
     </style>
+    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
     <script>
@@ -184,7 +185,28 @@
     <div id="root" class="w-full flex flex-col min-h-[100dvh] lg:h-full"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
+        const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+        function useOperartisTheme() {
+            const [theme, setThemeState] = useState(() => window.getOperartisTheme());
+            const setTheme = useCallback((next) => {
+                if (typeof window.setOperartisTheme === 'function') {
+                    window.setOperartisTheme(next);
+                } else {
+                    window.persistOperartisTheme?.(next);
+                    window.applyOperartisThemeClass?.(next);
+                    setThemeState(next);
+                }
+            }, []);
+            useEffect(() => {
+                const handler = (event) => {
+                    setThemeState((event.detail && event.detail.theme) || window.getOperartisTheme());
+                };
+                window.addEventListener('operartis:theme-change', handler);
+                return () => window.removeEventListener('operartis:theme-change', handler);
+            }, []);
+            return [theme, setTheme];
+        }
         const { LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart, ReferenceLine } = window.Recharts;
 
         // --- ICONS ---
@@ -1432,8 +1454,14 @@
             const [activeTab, setActiveTab] = useState('all_in_one');
             const [viewMode, setViewMode] = useState('overview');
             const [sidebarTab, setSidebarTab] = useState('import');
-            const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
-            const [isDark, setIsDark] = useState(false);
+            const [theme, setTheme] = useOperartisTheme();
+            const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+
+            useEffect(() => {
+                const syncDark = () => setIsDark(document.documentElement.classList.contains('dark'));
+                window.addEventListener('operartis:theme-change', syncDark);
+                return () => window.removeEventListener('operartis:theme-change', syncDark);
+            }, []);
             const [lang, setLang] = useState(() => window.getOperartisLang());
 
             useEffect(() => {
@@ -1546,22 +1574,6 @@
                 if (!results || results.length === 0 || !currentSku) return null;
                 return results.find(r => r.sku === currentSku);
             }, [results, currentSku]);
-
-            // Theme Management
-            useEffect(() => {
-                const root = window.document.documentElement;
-                root.classList.remove('light', 'dark');
-
-                if (theme === 'system') {
-                    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                    root.classList.add(systemTheme);
-                    setIsDark(systemTheme === 'dark');
-                } else {
-                    root.classList.add(theme);
-                    setIsDark(theme === 'dark');
-                }
-                localStorage.setItem('theme', theme);
-            }, [theme]);
 
             useEffect(() => {
                 setForecastHorizon(testHorizon);

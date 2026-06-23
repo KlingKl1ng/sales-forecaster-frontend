@@ -6,31 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Operartis | Member Dashboard</title>
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
-    <script>
-        window.getOperartisTheme = function () {
-            var session = null;
-            try { session = sessionStorage.getItem('theme'); } catch (e) { }
-            if (session === 'light' || session === 'dark') return session;
-            return 'system';
-        };
-        window.applyOperartisThemeClass = function (theme) {
-            var systemDark = false;
-            try { systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { }
-            var dark = theme === 'dark' || (theme === 'system' && systemDark);
-            document.documentElement.classList.toggle('dark', dark);
-            return dark;
-        };
-        window.persistOperartisTheme = function (theme) {
-            try { localStorage.setItem('theme', theme); } catch (e) { }
-            try {
-                if (theme === 'system') sessionStorage.removeItem('theme');
-                else sessionStorage.setItem('theme', theme);
-            } catch (e) { }
-        };
-        (function () {
-            try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
-        })();
-    </script>
+    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-dashboard-i18n.js"></script>
     <script src="./operartis-security.js"></script>
@@ -2943,8 +2919,7 @@
 
         function selectDashboardTheme(theme) {
             if (!['light', 'dark', 'system'].includes(theme)) return;
-            window.persistOperartisTheme(theme);
-            window.applyOperartisThemeClass(theme);
+            window.setOperartisTheme(theme);
             renderSettings();
         }
 
@@ -3027,14 +3002,7 @@
             if (!button) return;
             selectDashboardLang(button.dataset.lang);
         });
-        try {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if (window.getOperartisTheme() === 'system') {
-                    window.applyOperartisThemeClass('system');
-                    renderSettings();
-                }
-            });
-        } catch (error) { }
+        window.addEventListener('operartis:theme-change', () => renderSettings());
         document.getElementById('admin-invite-form').addEventListener('submit', async event => {
             event.preventDefault();
             if (state.user?.role !== 'admin') return;
