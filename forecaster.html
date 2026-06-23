@@ -79,6 +79,21 @@
             z-index: 60;
         }
 
+        @media (max-width: 639px) {
+            .fc-kpi-bar {
+                min-height: auto;
+            }
+
+            .fc-kpi-metrics {
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .fc-kpi-metrics::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             height: 100vh;
@@ -353,9 +368,13 @@
                     batch_overview: "Batch Overview",
                     detailed_view: "Detailed View",
                     total_skus: "Total SKUs",
+                    total_skus_short: "SKUs",
                     total_vol: "Total Forecast Vol",
+                    total_vol_short: "FC Vol",
                     avg_mae: "Avg. Validation MAE",
+                    avg_mae_short: "MAE",
                     avg_mse: "Avg. Validation MSE",
+                    avg_mse_short: "MSE",
                     search_placeholder: "Search SKU...",
                     no_results: "No Results Loaded",
                     running_algo: "Running Analytics Algorithms",
@@ -438,9 +457,13 @@
                     batch_overview: "Tổng quan",
                     detailed_view: "Chi tiết",
                     total_skus: "Tổng SKU",
+                    total_skus_short: "SKU",
                     total_vol: "Tổng lượng dự báo",
+                    total_vol_short: "Lượng FC",
                     avg_mae: "MAE trung bình (Val)",
+                    avg_mae_short: "MAE",
                     avg_mse: "MSE trung bình (Val)",
+                    avg_mse_short: "MSE",
                     search_placeholder: "Tìm kiếm SKU...",
                     no_results: "Chưa có kết quả",
                     running_algo: "Đang chạy thuật toán phân tích",
@@ -523,9 +546,13 @@
                     batch_overview: "Batch-Übersicht",
                     detailed_view: "Detailansicht",
                     total_skus: "SKUs gesamt",
+                    total_skus_short: "SKUs",
                     total_vol: "Gesamtprognosevolumen",
+                    total_vol_short: "FC-Vol.",
                     avg_mae: "Ø Validierungs-MAE",
+                    avg_mae_short: "MAE",
                     avg_mse: "Ø Validierungs-MSE",
+                    avg_mse_short: "MSE",
                     search_placeholder: "SKU suchen...",
                     no_results: "Keine Ergebnisse geladen",
                     running_algo: "Analytik-Algorithmen laufen",
@@ -609,13 +636,23 @@
             return null;
         };
 
-        const MetricTile = memo(({ label, value, subValue, type, isDark, variant = 'default', highlight }) => {
+        const MetricTile = memo(({ label, shortLabel, value, subValue, type, isDark, variant = 'default', highlight }) => {
             const colorClass = type === 'pos' ? 'text-emerald-600 dark:text-emerald-400' : type === 'neg' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-white';
             const bgClass = highlight ? 'bg-amber-50/50 dark:bg-amber-900/20' : variant === 'validation' ? 'bg-amber-50/30 dark:bg-amber-900/10' : 'bg-white/40 dark:bg-white/5';
+            const mobileLabel = shortLabel || label;
             return (
-                <div className={`flex flex-col justify-center items-center px-3 md:px-6 border-r border-white/20 dark:border-white/10 ${bgClass} backdrop-blur-md h-full min-w-[100px] md:min-w-[140px] snap-start transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}>
-                    <span className="text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wider mb-0.5 whitespace-nowrap text-center">{label}</span>
-                    <div className="flex items-baseline gap-2 justify-center"><span className={`text-base md:text-lg font-bold font-mono ${colorClass} drop-shadow-sm`}>{value}</span>{subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500">{subValue}</span>}</div>
+                <div
+                    className={`flex flex-col justify-center items-center px-2.5 sm:px-3 md:px-6 border-r border-white/20 dark:border-white/10 ${bgClass} backdrop-blur-md h-full min-w-[4.75rem] sm:min-w-[6.5rem] md:min-w-[140px] snap-start transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
+                    title={label}
+                >
+                    <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide sm:tracking-wider mb-0.5 text-center leading-tight">
+                        <span className="sm:hidden">{mobileLabel}</span>
+                        <span className="hidden sm:inline whitespace-nowrap">{label}</span>
+                    </span>
+                    <div className="flex items-baseline gap-2 justify-center">
+                        <span className={`text-sm sm:text-base md:text-lg font-bold font-mono ${colorClass} drop-shadow-sm`}>{value}</span>
+                        {subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500">{subValue}</span>}
+                    </div>
                 </div>
             );
         });
@@ -692,21 +729,19 @@
             }, [handleSkuSelect, localSku]);
 
             return (
-                <div className="grid grid-cols-[1fr_auto_1fr] h-full w-full min-h-16 items-center">
-                    <div aria-hidden="true" />
-                    <div className="flex items-stretch h-full overflow-x-auto snap-x snap-mandatory">
-                        <MetricTile label={t('dashboard.total_skus')} value={totalSeries} />
-                        <MetricTile label={t('dashboard.total_vol')} value={fmtNumber(totalForecastVolume, 0, 0)} />
-                        <MetricTile label={t('dashboard.avg_mae')} value={fmtNumber(avgMae, 0, 0)} />
-                        <MetricTile label={t('dashboard.avg_mse')} value={fmtNumber(avgMse, 0, 0)} />
+                <div className="fc-kpi-bar flex w-full min-h-14 sm:min-h-16 flex-col sm:flex-row items-stretch">
+                    <div className="fc-kpi-metrics flex min-w-0 flex-1 items-stretch overflow-x-auto overscroll-x-contain snap-x snap-mandatory">
+                        <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} />
+                        <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
+                        <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={fmtNumber(avgMae, 0, 0)} />
+                        <MetricTile label={t('dashboard.avg_mse')} shortLabel={t('dashboard.avg_mse_short')} value={fmtNumber(avgMse, 0, 0)} />
                     </div>
 
-                    {/* Search Embedded */}
-                    <div className="flex items-center justify-end gap-2 pl-6 pr-4">
+                    <div className="fc-kpi-search flex shrink-0 items-center justify-end gap-2 border-t border-white/20 dark:border-white/10 px-2 py-1.5 sm:border-t-0 sm:px-4 sm:py-0">
                         <form
                             onSubmit={onSearchSubmit}
                             onClick={() => inputRef.current?.focus()}
-                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden ${searchActive || localSku ? 'w-48 md:w-64 px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-8 h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden ${searchActive || localSku ? 'w-full max-w-[12rem] sm:w-48 md:w-64 px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-8 h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                         >
                             <SearchIcon className={`shrink-0 transition-colors ${searchActive || localSku ? 'text-brand-gold w-4 h-4' : 'text-slate-500 dark:text-slate-400 w-4 h-4'}`} />
                             <input
@@ -2076,7 +2111,7 @@
                             </header>
 
                             {/* KPI BAR */}
-                            <div className="min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex items-center shrink-0 shadow-sm overflow-x-auto relative">
+                            <div className="min-h-0 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex items-stretch shrink-0 shadow-sm overflow-hidden sm:overflow-x-auto relative">
                                 <KPICards results={batchResults} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
                             </div>
                         </div >
