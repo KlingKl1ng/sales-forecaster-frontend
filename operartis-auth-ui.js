@@ -12,6 +12,8 @@
     var topbarObserverStarted = false;
     var topbarMenuOpen = false;
     var topbarMenuListenersBound = false;
+    var authUiListenersBound = false;
+    var authSubmitInFlight = false;
     var authCopy = {
         en: {
             title: 'Operartis Login',
@@ -629,50 +631,48 @@
         window.addEventListener('operartis:lang-change', syncAuthLanguage);
     }
 
-    function buildUi() {
-        addStyles();
-        if (document.getElementById('operartis-auth-overlay')) return;
+    function bindAuthUiListeners() {
+        if (authUiListenersBound) return;
+        var form = document.getElementById('operartis-auth-form');
+        var forgot = document.getElementById('operartis-auth-forgot');
+        var forgotInline = document.getElementById('operartis-auth-forgot-inline');
+        var passwordToggle = document.getElementById('operartis-auth-password-toggle');
+        var submitButton = document.getElementById('operartis-auth-submit');
+        var overlay = document.getElementById('operartis-auth-overlay');
+        var close = document.getElementById('operartis-auth-close');
+        var account = document.getElementById('operartis-auth-account');
+        var logoutButton = account && account.querySelector('button');
 
-        var overlay = document.createElement('div');
-        overlay.id = 'operartis-auth-overlay';
-        overlay.className = 'op-auth-overlay';
-        overlay.innerHTML = [
-            '<form class="op-auth-card" id="operartis-auth-form">',
-            dismissible ? '<button class="op-auth-close" id="operartis-auth-close" type="button">&times;</button>' : '',
-            '<h1 class="op-auth-title" id="operartis-auth-title"></h1>',
-            '<p class="op-auth-sub" id="operartis-auth-subtitle"></p>',
-            '<div class="op-auth-error" id="operartis-auth-error" role="alert" aria-live="polite"></div>',
-            '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-email-label-text"></span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
-            '<div class="op-auth-field" id="operartis-auth-password-field"><span class="op-auth-password-head"><label class="op-auth-label" id="operartis-auth-password-label-text" for="operartis-auth-password"></label><button class="op-auth-link op-auth-forgot-inline" id="operartis-auth-forgot-inline" type="button"></button></span><span class="op-auth-password-wrap"><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required><button class="op-auth-password-toggle" id="operartis-auth-password-toggle" type="button" aria-pressed="false"></button></span></div>',
-            '<button class="op-auth-link" id="operartis-auth-forgot" type="button"></button>',
-            '<button class="op-auth-button" id="operartis-auth-submit" type="submit"></button>',
-            '<p class="op-auth-contact"><span id="operartis-auth-contact-prompt"></span><a id="operartis-auth-contact-link" href="mailto:info@operartis.io"></a></p>',
-            '</form>'
-        ].join('');
-        document.body.appendChild(overlay);
+        if (!form || !forgot || !forgotInline || !passwordToggle || !submitButton || !overlay || !logoutButton) return;
+        authUiListenersBound = true;
 
-        var account = document.createElement('div');
-        account.id = 'operartis-auth-account';
-        account.className = 'op-auth-account';
-        account.innerHTML = '<span id="operartis-auth-email-label"></span><button class="op-auth-logout" id="operartis-auth-logout" type="button"></button>';
-        document.body.appendChild(account);
-
-        document.getElementById('operartis-auth-form').addEventListener('submit', async function (event) {
+        async function submitAuth(event) {
             event.preventDefault();
-            if (state.mode === 'reset') await handlePasswordResetRequest();
-            else await handleLogin();
-        });
-        document.getElementById('operartis-auth-forgot').addEventListener('click', function (event) {
+            event.stopPropagation();
+            if (authSubmitInFlight) return;
+            if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
+            authSubmitInFlight = true;
+            try {
+                if (state.mode === 'reset') await handlePasswordResetRequest();
+                else await handleLogin();
+            } finally {
+                authSubmitInFlight = false;
+            }
+        }
+
+        form.addEventListener('submit', submitAuth);
+        submitButton.addEventListener('click', submitAuth);
+        forgot.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
             setAuthMode(state.mode === 'reset' ? 'login' : 'reset');
         });
-        document.getElementById('operartis-auth-forgot-inline').addEventListener('click', function (event) {
+        forgotInline.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
             setAuthMode('reset');
         });
-        document.getElementById('operartis-auth-password-toggle').addEventListener('click', function (event) {
+        passwordToggle.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
             var passwordInput = document.getElementById('operartis-auth-password');
@@ -683,7 +683,7 @@
             passwordInput.focus();
         });
         if (dismissible) {
-            document.getElementById('operartis-auth-close').addEventListener('click', hideUi);
+            if (close) close.addEventListener('click', hideUi);
             overlay.addEventListener('click', function (event) {
                 if (event.target === overlay) hideUi();
             });
@@ -691,9 +691,42 @@
                 if (event.key === 'Escape') hideUi();
             });
         }
-        account.querySelector('button').addEventListener('click', async function () {
+        logoutButton.addEventListener('click', async function () {
             await logout();
         });
+    }
+
+    function buildUi() {
+        addStyles();
+        if (!document.getElementById('operartis-auth-overlay')) {
+            var overlay = document.createElement('div');
+            overlay.id = 'operartis-auth-overlay';
+            overlay.className = 'op-auth-overlay';
+            overlay.innerHTML = [
+                '<form class="op-auth-card" id="operartis-auth-form">',
+                dismissible ? '<button class="op-auth-close" id="operartis-auth-close" type="button">&times;</button>' : '',
+                '<h1 class="op-auth-title" id="operartis-auth-title"></h1>',
+                '<p class="op-auth-sub" id="operartis-auth-subtitle"></p>',
+                '<div class="op-auth-error" id="operartis-auth-error" role="alert" aria-live="polite"></div>',
+                '<label class="op-auth-field"><span class="op-auth-label" id="operartis-auth-email-label-text"></span><input class="op-auth-input" id="operartis-auth-email" type="email" autocomplete="email" required></label>',
+                '<div class="op-auth-field" id="operartis-auth-password-field"><span class="op-auth-password-head"><label class="op-auth-label" id="operartis-auth-password-label-text" for="operartis-auth-password"></label><button class="op-auth-link op-auth-forgot-inline" id="operartis-auth-forgot-inline" type="button"></button></span><span class="op-auth-password-wrap"><input class="op-auth-input" id="operartis-auth-password" type="password" autocomplete="current-password" required><button class="op-auth-password-toggle" id="operartis-auth-password-toggle" type="button" aria-pressed="false"></button></span></div>',
+                '<button class="op-auth-link" id="operartis-auth-forgot" type="button"></button>',
+                '<button class="op-auth-button" id="operartis-auth-submit" type="submit"></button>',
+                '<p class="op-auth-contact"><span id="operartis-auth-contact-prompt"></span><a id="operartis-auth-contact-link" href="mailto:info@operartis.io"></a></p>',
+                '</form>'
+            ].join('');
+            document.body.appendChild(overlay);
+        }
+
+        if (!document.getElementById('operartis-auth-account')) {
+            var account = document.createElement('div');
+            account.id = 'operartis-auth-account';
+            account.className = 'op-auth-account';
+            account.innerHTML = '<span id="operartis-auth-email-label"></span><button class="op-auth-logout" id="operartis-auth-logout" type="button"></button>';
+            document.body.appendChild(account);
+        }
+
+        bindAuthUiListeners();
         observeThemeChanges();
         observeLanguageChanges();
         observeTopbarSlot();
