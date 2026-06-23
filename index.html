@@ -34,7 +34,7 @@
             }
         }
     </script>
-    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
+    <script src="./operartis-theme.js?v=20260624-theme-jit-fix"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
     <script>
@@ -6350,12 +6350,12 @@
         const App = () => {
             const [theme, setThemeState] = useState(() => window.getOperartisTheme());
             const setTheme = useCallback((next) => {
+                setThemeState(next);
                 if (typeof window.setOperartisTheme === 'function') {
                     window.setOperartisTheme(next);
-                } else {
-                    window.persistOperartisTheme?.(next);
-                    window.applyOperartisThemeClass?.(next);
-                    setThemeState(next);
+                } else if (typeof window.persistOperartisTheme === 'function' && typeof window.applyOperartisThemeClass === 'function') {
+                    window.persistOperartisTheme(next);
+                    window.applyOperartisThemeClass(next);
                 }
             }, []);
 

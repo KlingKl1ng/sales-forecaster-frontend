@@ -8,22 +8,6 @@
     <title>Operartis | Advanced-ML Forecaster</title>
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
     <link rel="stylesheet" href="./operartis-tailwind-compat.css?v=20260622-safari-tailwind">
-    <script src="./vendor/tailwindcss-3.4.17.js"></script>
-    <script>
-        if (window.tailwind) {
-            tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: { brand: { gold: '#f59e0b', dark: '#b45309', gray: '#f8fafc', border: '#e2e8f0' } },
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['Roboto Mono', 'monospace'] },
-                    fontSize: { xxs: '0.65rem' },
-                    animation: { 'fade-in': 'fadeIn 0.2s ease-out', 'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite' },
-                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
-                }
-            };
-        }
-    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
 
@@ -155,7 +139,7 @@
             background-color: #1e293b;
         }
     </style>
-    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
+    <script src="./operartis-theme.js?v=20260624-theme-jit-fix"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
     <script>
@@ -190,12 +174,12 @@
         function useOperartisTheme() {
             const [theme, setThemeState] = useState(() => window.getOperartisTheme());
             const setTheme = useCallback((next) => {
+                setThemeState(next);
                 if (typeof window.setOperartisTheme === 'function') {
                     window.setOperartisTheme(next);
-                } else {
-                    window.persistOperartisTheme?.(next);
-                    window.applyOperartisThemeClass?.(next);
-                    setThemeState(next);
+                } else if (typeof window.persistOperartisTheme === 'function' && typeof window.applyOperartisThemeClass === 'function') {
+                    window.persistOperartisTheme(next);
+                    window.applyOperartisThemeClass(next);
                 }
             }, []);
             useEffect(() => {
@@ -1153,9 +1137,9 @@
             };
 
             return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 modal-backdrop transition-opacity" onClick={onClose}></div>
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-xl shadow-2xl relative flex flex-col overflow-hidden animate-slide-up border border-slate-200 dark:border-slate-700">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 isolate">
+                    <div className="absolute inset-0 z-0 bg-black/60 modal-backdrop transition-opacity" onClick={onClose}></div>
+                    <div className="relative z-10 pointer-events-auto bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-slide-up border border-slate-200 dark:border-slate-700">
                         {/* Header */}
                         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/50 shrink-0">
                             <div className="flex items-center gap-3">
@@ -1197,15 +1181,15 @@
                                         <div>
                                             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{t('settings.interface')}</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <button onClick={() => setTheme('light')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'light' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                <button type="button" data-operartis-theme="light" onClick={() => setTheme('light')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'light' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-white rounded-full shadow-sm"><SunIcon /></div>
                                                     <span className="text-sm font-bold">{t('settings.light')}</span>
                                                 </button>
-                                                <button onClick={() => setTheme('dark')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'dark' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                <button type="button" data-operartis-theme="dark" onClick={() => setTheme('dark')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'dark' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-slate-800 text-white rounded-full shadow-sm"><MoonIcon /></div>
                                                     <span className="text-sm font-bold">{t('settings.dark')}</span>
                                                 </button>
-                                                <button onClick={() => setTheme('system')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'system' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
+                                                <button type="button" data-operartis-theme="system" onClick={() => setTheme('system')} className={`p-4 rounded-lg border-2 flex flex-col items-center gap-3 transition-all ${theme === 'system' ? 'border-brand-gold bg-brand-gold/5 text-brand-dark dark:text-brand-gold' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-500'}`}>
                                                     <div className="p-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full shadow-sm"><SystemIcon /></div>
                                                     <span className="text-sm font-bold">{t('settings.system')}</span>
                                                 </button>
@@ -1828,13 +1812,13 @@
 
             const ThemeToggle = () => (
                 <div className="flex justify-center gap-2 mb-3">
-                    <button onClick={() => setTheme('light')} className={`p-1.5 rounded-lg ${theme === 'light' ? 'bg-slate-200 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="Light Mode">
+                    <button type="button" data-operartis-theme="light" onClick={() => setTheme('light')} className={`p-1.5 rounded-lg ${theme === 'light' ? 'bg-slate-200 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="Light Mode">
                         <SunIcon />
                     </button>
-                    <button onClick={() => setTheme('dark')} className={`p-1.5 rounded-lg ${theme === 'dark' ? 'bg-slate-800 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="Dark Mode">
+                    <button type="button" data-operartis-theme="dark" onClick={() => setTheme('dark')} className={`p-1.5 rounded-lg ${theme === 'dark' ? 'bg-slate-800 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="Dark Mode">
                         <MoonIcon />
                     </button>
-                    <button onClick={() => setTheme('system')} className={`p-1.5 rounded-lg ${theme === 'system' ? 'bg-slate-200 dark:bg-slate-800 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="System Default">
+                    <button type="button" data-operartis-theme="system" onClick={() => setTheme('system')} className={`p-1.5 rounded-lg ${theme === 'system' ? 'bg-slate-200 dark:bg-slate-800 text-brand-gold' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800'}`} title="System Default">
                         <MonitorIcon />
                     </button>
                 </div>
