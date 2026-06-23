@@ -66,9 +66,13 @@
             }
         }
 
-        .fc-sidebar-shell {
-            position: relative;
-            flex-shrink: 0;
+        /* Desktop only: on mobile the shell must stay `position: fixed` (Tailwind)
+           so it does not reserve w-64 in the flex row while translated off-screen. */
+        @media (min-width: 1024px) {
+            .fc-sidebar-shell {
+                position: relative;
+                flex-shrink: 0;
+            }
         }
 
         .fc-sidebar-toggle {
