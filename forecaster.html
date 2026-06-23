@@ -412,7 +412,7 @@
                     avg_mae_short: "MAE",
                     avg_mse: "Avg. Validation MSE",
                     avg_mse_short: "MSE",
-                    search_placeholder: "Search SKU...",
+                    search_placeholder: "Search",
                     no_results: "No Results Loaded",
                     running_algo: "Running Analytics Algorithms",
                     table_sku: "SKU",
@@ -501,7 +501,7 @@
                     avg_mae_short: "MAE",
                     avg_mse: "MSE trung bình (Val)",
                     avg_mse_short: "MSE",
-                    search_placeholder: "Tìm kiếm SKU...",
+                    search_placeholder: "Tìm kiếm",
                     no_results: "Chưa có kết quả",
                     running_algo: "Đang chạy thuật toán phân tích",
                     table_sku: "Mã hàng (SKU)",
@@ -784,7 +784,7 @@
                             <SearchIcon className={`shrink-0 transition-colors ${searchActive || localSku ? 'text-brand-gold w-4 h-4' : 'text-slate-500 dark:text-slate-400 w-4 h-4'}`} />
                             <input
                                 ref={inputRef}
-                                className={`bg-transparent border-none outline-none font-mono font-bold text-xs text-slate-700 dark:text-white placeholder-slate-400 transition-all duration-300 ${searchActive || localSku ? 'w-full ml-2 opacity-100' : 'w-0 opacity-0'}`}
+                                className={`bg-transparent border-none outline-none font-sans font-medium text-xs text-slate-700 dark:text-white placeholder-slate-400 transition-all duration-300 ${searchActive || localSku ? 'w-full ml-2 opacity-100' : 'w-0 opacity-0'}`}
                                 value={localSku}
                                 onChange={(e) => setLocalSku(e.target.value)}
                                 onFocus={() => setSearchActive(true)}
