@@ -1479,6 +1479,99 @@
             transition: background .2s var(--ease);
         }
         .download-btn:hover { background: rgba(16, 185, 129, .22); }
+        .reports-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+        .artifact-list {
+            display: none;
+            gap: 10px;
+        }
+        .artifact-list-empty {
+            border: 1px dashed rgba(148, 163, 184, .28);
+            border-radius: var(--radius);
+            background: var(--surface-inset);
+        }
+        .artifact-card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 14px;
+            background: var(--surface-inset);
+            display: grid;
+            gap: 12px;
+        }
+        .artifact-card-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .artifact-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .module-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            background: rgba(148, 163, 184, .12);
+            border: 1px solid rgba(148, 163, 184, .2);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .artifact-card-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 12px;
+        }
+        .artifact-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+        .artifact-meta-label {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+        .artifact-meta-value {
+            color: var(--text-table);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+        .status-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+            gap: 10px;
+        }
+        .status-stat {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 92px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface-inset);
+        }
+        .status-stat-count {
+            font-size: clamp(24px, 6vw, 30px);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -.02em;
+        }
+        .reports-table-wrap table {
+            min-width: 640px;
+        }
         .password-wrap { position: relative; }
         .password-wrap input { padding-right: 46px; }
         .password-toggle {
@@ -1543,6 +1636,23 @@
             }
             .hero { flex-direction: column; align-items: flex-start; }
             .form-grid, .metric-grid, .shortcut-grid, .admin-form-grid { grid-template-columns: 1fr; }
+            .reports-downloads-card .reports-table-wrap { display: none; }
+            .artifact-list { display: grid; }
+            .reports-downloads-card,
+            .reports-status-card {
+                padding: 14px;
+            }
+            .reports-downloads-card .section-head,
+            .reports-status-card .section-head {
+                margin-bottom: 12px;
+            }
+            .status-board {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .status-stat {
+                min-height: 80px;
+                padding: 12px;
+            }
         }
         @media (max-width: 560px) {
             .topbar {
@@ -1576,6 +1686,18 @@
             .button-link, .button-secondary, .button-danger, .button-ghost, .download-btn { width: 100%; }
             .section-head { flex-direction: column; }
             .section-head .button-ghost { align-self: flex-start; }
+            .reports-downloads-card h2,
+            .reports-status-card h2 {
+                font-size: 16px;
+            }
+        }
+        @media (max-width: 380px) {
+            .artifact-card-meta {
+                grid-template-columns: 1fr;
+            }
+            .status-board {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -1784,16 +1906,17 @@
                             <p class="sub">Download retained outputs before the automatic cleanup window ends.</p>
                         </div>
                     </div>
-                    <div class="grid">
-                        <div class="card">
+                    <div class="grid reports-grid">
+                        <div class="card reports-downloads-card">
                             <div class="section-head">
                                 <div>
                                     <h2 data-i18n="sections.reports.available_downloads">Available Downloads</h2>
                                     <p class="section-sub" data-i18n="sections.reports.available_downloads_sub">Reports and artifacts still available.</p>
                                 </div>
                             </div>
-                            <div class="table-wrap">
-                                <table>
+                            <div id="artifacts-list" class="artifact-list" aria-live="polite"></div>
+                            <div class="table-wrap reports-table-wrap">
+                                <table class="reports-table">
                                     <thead>
                                         <tr>
                                             <th data-i18n="table.file">File</th>
@@ -1807,14 +1930,14 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="card">
+                        <div class="card reports-status-card">
                             <div class="section-head">
                                 <div>
                                     <h2 data-i18n="sections.reports.run_status">Run Status</h2>
                                     <p class="section-sub" data-i18n="sections.reports.run_status_sub">Distribution of your current job history.</p>
                                 </div>
                             </div>
-                            <div id="status-list" class="kv-list"></div>
+                            <div id="status-list" class="status-board"></div>
                         </div>
                     </div>
                 </section>
@@ -2667,7 +2790,10 @@
                 return;
             }
             entries.forEach(([label, count]) => {
-                container.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: count })]));
+                container.appendChild(el('div', { class: 'status-stat' }, [
+                    badge(label),
+                    el('div', { class: 'status-stat-count', text: String(count) }),
+                ]));
             });
         }
 
@@ -2708,9 +2834,13 @@
 
         function renderArtifacts() {
             const tbody = document.getElementById('artifacts-body');
+            const list = document.getElementById('artifacts-list');
             clear(tbody);
+            clear(list);
             if (!state.artifacts.length) {
-                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '5', text: dt('empty.no_retained_downloads') })]));
+                const emptyText = dt('empty.no_retained_downloads');
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '5', text: emptyText })]));
+                list.appendChild(el('div', { class: 'empty artifact-list-empty', text: emptyText }));
                 return;
             }
             state.artifacts.forEach(artifact => {
@@ -2720,6 +2850,26 @@
                     el('td', { text: formatDate(artifact.created_at) }),
                     el('td', { text: formatDate(artifact.expires_at) }),
                     el('td', {}, [el('button', { class: 'download-btn', type: 'button', dataset: { artifactId: artifact.id }, text: dt('actions.download') })]),
+                ]));
+                list.appendChild(el('article', { class: 'artifact-card' }, [
+                    el('div', { class: 'artifact-card-head' }, [
+                        el('div', {}, [
+                            el('div', { class: 'artifact-card-title', text: artifact.filename }),
+                            el('div', { class: 'metric-note', text: formatBytes(artifact.byte_size) }),
+                        ]),
+                        el('span', { class: 'module-pill', text: moduleLabel(artifact.module) }),
+                    ]),
+                    el('div', { class: 'artifact-card-meta' }, [
+                        el('div', { class: 'artifact-meta-item' }, [
+                            el('span', { class: 'artifact-meta-label', text: dt('table.created') }),
+                            el('span', { class: 'artifact-meta-value', text: formatDate(artifact.created_at) }),
+                        ]),
+                        el('div', { class: 'artifact-meta-item' }, [
+                            el('span', { class: 'artifact-meta-label', text: dt('table.expires') }),
+                            el('span', { class: 'artifact-meta-value', text: formatDate(artifact.expires_at) }),
+                        ]),
+                    ]),
+                    el('button', { class: 'download-btn', type: 'button', dataset: { artifactId: artifact.id }, text: dt('actions.download') }),
                 ]));
             });
         }
