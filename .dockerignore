@@ -2,5 +2,8 @@
 .DS_Store
 ~$*.xlsx
 vercel.json
+COOLIFY_DEPLOYMENT.md
 DESIGN_SYSTEM.md
 ABC-XYZ-Generator.py
+.coolify/
+*nginx*.conf

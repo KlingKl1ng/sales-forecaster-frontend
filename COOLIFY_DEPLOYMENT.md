@@ -45,7 +45,14 @@ The backend defaults now allow only the three Operartis HTTPS origins. Add local
 
 ## Security Headers
 
-For the frontend Coolify Static app, paste the directives from `coolify-nginx-security.conf` into the Coolify custom Nginx configuration/server context.
+For the frontend Coolify Static app, paste the full Nginx configuration for the matching environment:
+
+- Staging frontend: `.coolify/nginx-staging.conf`
+- Production frontend: `.coolify/nginx-production.conf`
+
+The staging configuration includes `X-Robots-Tag: noindex, nofollow` and allows `https://api-staging.operartis.io` in the CSP. The production configuration does not include `noindex` and allows `https://api.operartis.io`.
+
+These `.coolify/` helper files are intentionally listed in `.dockerignore` so they stay in Git for deployment operations but are not copied into the public static site when the build pack honors `.dockerignore`.
 
 The current CSP is intentionally temporary/relaxed because the static frontend still uses inline scripts and runtime Babel. After the future React/Vite rebuild, remove `'unsafe-inline'` and `'unsafe-eval'`.
 
