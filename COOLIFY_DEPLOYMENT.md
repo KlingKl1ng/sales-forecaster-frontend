@@ -37,8 +37,8 @@ Recommended backend abuse-protection variables:
 ```text
 MAX_REQUEST_BYTES=26214400
 RATE_LIMIT_WINDOW_SECONDS=60
-RATE_LIMIT_REQUESTS=120
-HEAVY_RATE_LIMIT_REQUESTS=30
+RATE_LIMIT_REQUESTS=600
+HEAVY_RATE_LIMIT_REQUESTS=20
 ```
 
 The backend defaults now allow only the three Operartis HTTPS origins. Add local origins to `ALLOWED_ORIGINS` only while actively testing from your Mac.
