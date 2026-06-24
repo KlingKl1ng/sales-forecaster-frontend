@@ -12,8 +12,8 @@
 
     <script src="./vendor/tailwindcss-3.4.17.js"></script>
     <script>
-        if (window.tailwind) {
-            tailwind.config = {
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
@@ -22,8 +22,8 @@
                     },
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['Roboto Mono', 'monospace'] }
                 }
-            };
-        }
+            }
+        };
     </script>
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js?v=20260621-auth-lang-fix"></script>

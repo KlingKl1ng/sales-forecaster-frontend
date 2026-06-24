@@ -11,8 +11,8 @@
 
     <script src="./vendor/tailwindcss-3.4.17.js"></script>
     <script>
-        if (window.tailwind) {
-            tailwind.config = {
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
@@ -47,8 +47,8 @@
                         }
                     }
                 }
-            };
-        }
+            }
+        };
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
