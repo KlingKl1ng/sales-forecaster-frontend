@@ -870,6 +870,64 @@
         .topbar-heading h2 { font-size: 17px; font-weight: 700; line-height: 1.2; }
         .topbar-heading .section-sub { margin-top: 2px; font-size: 12px; line-height: 1.25; }
         .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; position: relative; }
+        .dashboard-refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            min-height: 2.5rem;
+            padding: 0.25rem;
+            flex-shrink: 0;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background-color: transparent;
+            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--muted);
+            transition: background-image .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease), transform .15s var(--ease);
+        }
+        html.dark .dashboard-refresh-btn {
+            border-color: rgba(255, 255, 255, 0.1);
+            background-image: linear-gradient(to bottom right, rgba(30, 41, 59, 0.3), rgba(15, 23, 42, 0.1));
+            color: #cbd5e1;
+        }
+        .dashboard-refresh-btn:hover:not(:disabled) {
+            color: var(--gold);
+            border-color: rgba(245, 158, 11, 0.3);
+            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.28), rgba(245, 158, 11, 0.08));
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
+        }
+        html.dark .dashboard-refresh-btn:hover:not(:disabled) {
+            border-color: rgba(245, 158, 11, 0.26);
+            background-image: linear-gradient(to bottom right, rgba(30, 41, 59, 0.42), rgba(245, 158, 11, 0.12));
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+        }
+        .dashboard-refresh-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+        .dashboard-refresh-btn:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+        .dashboard-refresh-icon {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            transition: transform .25s var(--ease);
+        }
+        .dashboard-refresh-btn:hover:not(:disabled):not(.is-loading) .dashboard-refresh-icon {
+            transform: rotate(-28deg);
+        }
+        .dashboard-refresh-btn.is-loading .dashboard-refresh-icon {
+            animation: dashboard-refresh-spin .75s linear infinite;
+        }
+        @keyframes dashboard-refresh-spin {
+            to { transform: rotate(360deg); }
+        }
         .mobile-menu {
             display: none;
             width: 42px;
@@ -1661,7 +1719,7 @@
             }
             .topbar > div:first-child { flex: 1; min-width: 0; }
             .top-actions { justify-content: flex-end; width: auto; }
-            .top-actions .button-secondary { flex: 1; }
+            .top-actions .button-secondary:not(.dashboard-refresh-btn) { flex: 1; }
             .hero { margin-bottom: 16px; }
             .access-actions {
                 flex-direction: column;
@@ -1683,7 +1741,7 @@
             .avatar-editor .avatar { margin: 0 auto; }
             .avatar-actions { justify-content: center; }
             .form-actions { align-items: stretch; flex-direction: column; }
-            .button-link, .button-secondary, .button-danger, .button-ghost, .download-btn { width: 100%; }
+            .button-link, .button-secondary:not(.dashboard-refresh-btn), .button-danger, .button-ghost, .download-btn { width: 100%; }
             .section-head { flex-direction: column; }
             .section-head .button-ghost { align-self: flex-start; }
             .reports-downloads-card h2,
@@ -1771,8 +1829,13 @@
                     </div>
                 </div>
                 <div class="top-actions">
-                    <button id="dashboard-refresh" class="button-secondary dashboard-refresh-btn" type="button" data-i18n="actions.refresh" title="Refresh dashboard data">
-                        Refresh
+                    <button id="dashboard-refresh" class="dashboard-refresh-btn" type="button" data-i18n-aria="actions.refresh" data-i18n-title="actions.refresh" aria-label="Refresh dashboard data" title="Refresh dashboard data">
+                        <svg class="dashboard-refresh-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                            <path d="M16 16h5v5"></path>
+                        </svg>
                     </button>
                     <div id="profile-menu" class="profile-menu">
                         <button id="user-profile" class="header-auth-btn header-auth-btn--gold" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="profile-dropdown">
@@ -2641,6 +2704,7 @@
             if (!dashboardRefresh) return;
             dashboardRefresh.disabled = busy;
             dashboardRefresh.classList.toggle('is-loading', busy);
+            dashboardRefresh.setAttribute('aria-busy', busy ? 'true' : 'false');
         }
 
         async function loadDashboard(options = {}) {

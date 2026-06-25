@@ -1189,6 +1189,9 @@
         document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
             el.setAttribute('aria-label', t(el.dataset.i18nAria));
         });
+        document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+            el.setAttribute('title', t(el.dataset.i18nTitle));
+        });
         document.querySelectorAll('[data-theme]').forEach(function (button) {
             const label = button.querySelector('[data-i18n-theme]');
             if (label) label.textContent = t('theme.' + button.dataset.theme);
