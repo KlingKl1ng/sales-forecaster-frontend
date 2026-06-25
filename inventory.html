@@ -1869,7 +1869,7 @@
 
         // --- API CONFIGURATION ---
         const API_ENDPOINTS = {
-            LOCAL: 'http://localhost:8000',
+            LOCAL: 'http://127.0.0.1:8000',
             PROD: window.OperartisApi ? window.OperartisApi.getDefaultApiBase() : 'https://api.operartis.io'
         };
 
@@ -1899,7 +1899,7 @@
         };
 
         // --- API CALL: Timeline Simulation (Single Run for Animation) ---
-        const callTimelineSimulation = async (skuId, forecastData, params, apiUrl) => {
+        const callTimelineSimulation = async (skuId, forecastData, params, apiUrl, inputFilename = null) => {
             // Build lead_time_config for API
             const ltConfig = params.leadTimeConfig || { type: 'deterministic', deterministicValue: 14 };
             const apiLeadTimeConfig = {
@@ -1915,6 +1915,7 @@
 
             const requestBody = {
                 sku_id: skuId,
+                input_filename: inputFilename,
                 initial_stock: params.initialStock,
                 lead_time_config: apiLeadTimeConfig,
                 // Legacy fields for backward compatibility
@@ -1953,6 +1954,7 @@
 
             // Transform backend response to match frontend expected format
             return {
+                jobId: result.job_id,
                 timeline: result.timeline.map(t => ({
                     day: t.day,
                     date: t.date,
@@ -1994,7 +1996,7 @@
         };
 
         // --- API CALL: Monte Carlo Simulation (500 runs for robust stats) ---
-        const callMonteCarloSimulation = async (skuId, forecastData, params, numRuns = 500, apiUrl) => {
+        const callMonteCarloSimulation = async (skuId, forecastData, params, numRuns = 500, apiUrl, inputFilename = null) => {
             // Build lead_time_config for API
             const ltConfig = params.leadTimeConfig || { type: 'deterministic', deterministicValue: 14 };
             const apiLeadTimeConfig = {
@@ -2010,6 +2012,7 @@
 
             const requestBody = {
                 sku_id: skuId,
+                input_filename: inputFilename,
                 initial_stock: params.initialStock,
                 lead_time_config: apiLeadTimeConfig,
                 lead_time_days: ltConfig.deterministicValue || 14,
@@ -2047,6 +2050,7 @@
 
             // Return in format expected by frontend
             return {
+                jobId: result.job_id,
                 numRuns: result.num_runs,
                 alpha: result.alpha,
                 beta: result.beta,
@@ -2056,7 +2060,7 @@
         };
 
         // --- API CALL: Policy Optimization (Find optimal safety factor for target α) ---
-        const callPolicyOptimization = async (skuId, forecastData, params, apiUrl) => {
+        const callPolicyOptimization = async (skuId, forecastData, params, apiUrl, inputFilename = null) => {
             // Build lead_time_config for API
             const ltConfig = params.leadTimeConfig || { type: 'deterministic', deterministicValue: 14 };
             const apiLeadTimeConfig = {
@@ -2072,6 +2076,7 @@
 
             const requestBody = {
                 sku_id: skuId,
+                input_filename: inputFilename,
                 initial_stock: params.initialStock,  // Use the actual initial stock from input
                 lead_time_config: apiLeadTimeConfig,
                 lead_time_days: ltConfig.deterministicValue || 14,
@@ -2111,6 +2116,7 @@
 
             // Return mapped result
             return {
+                jobId: result.job_id,
                 skuId: result.sku_id,
                 targetAlpha: result.target_alpha,
                 achievedAlpha: result.achieved_alpha,
@@ -3778,6 +3784,7 @@
 
             // Export State
             const [isExporting, setIsExporting] = useState(false);
+            const [latestInventoryJobId, setLatestInventoryJobId] = useState(null);
 
             // Toast Notification State
             const [toast, setToast] = useState({ isVisible: false, message: '', type: 'error' });
@@ -4675,13 +4682,15 @@
                 try {
                     // Phase 1: Quick deterministic preview via API
                     setIsRunningMC(true);
-                    const result = await callTimelineSimulation(currentSku, data, params, apiUrl);
+                    const result = await callTimelineSimulation(currentSku, data, params, apiUrl, file?.name || null);
+                    if (result.jobId) setLatestInventoryJobId(result.jobId);
                     setSimResults(prev => ({ ...prev, [currentSku]: result }));
                     setCurrentDay(0);
                     setIsPlaying(false);
 
                     // Phase 2: Monte Carlo in background
-                    const mcResult = await callMonteCarloSimulation(currentSku, data, params, 500, apiUrl);
+                    const mcResult = await callMonteCarloSimulation(currentSku, data, params, 500, apiUrl, file?.name || null);
+                    if (mcResult.jobId) setLatestInventoryJobId(mcResult.jobId);
                     setMcResults(prev => ({ ...prev, [currentSku]: mcResult }));
                     console.log(`Simulation complete for ${currentSku}:`, { timeline: result.metrics, mc: mcResult });
                 } catch (error) {
@@ -4721,7 +4730,8 @@
                     }
 
                     // Run single simulation (fast - no Monte Carlo)
-                    const result = await callTimelineSimulation(currentSku, data, effectiveParams, apiUrl);
+                    const result = await callTimelineSimulation(currentSku, data, effectiveParams, apiUrl, file?.name || null);
+                    if (result.jobId) setLatestInventoryJobId(result.jobId);
                     setSimResults(prev => ({ ...prev, [currentSku]: result }));
                     setCurrentDay(0);
 
@@ -4743,7 +4753,8 @@
                     setIsOptimizing(true);
                     console.log(`Starting optimization for ${currentSku}, target α = ${params.serviceLevel}`);
 
-                    const result = await callPolicyOptimization(currentSku, data, params, apiUrl);
+                    const result = await callPolicyOptimization(currentSku, data, params, apiUrl, file?.name || null);
+                    if (result.jobId) setLatestInventoryJobId(result.jobId);
 
                     // Store optimization result
                     setOptimizationResults(prev => ({ ...prev, [currentSku]: result }));
@@ -4844,6 +4855,7 @@
 
                             skuParamsList.push({
                                 sku_id: sku,
+                                input_filename: file?.name || null,
                                 initial_stock: skuParams.initialStock,
                                 lead_time_config: apiLeadTimeConfig,
                                 lead_time_days: ltConfig.deterministicValue || 14,
@@ -4869,7 +4881,10 @@
                     const response = await fetch(`${apiUrl}/inventory/optimize-batch`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ sku_params: skuParamsList })
+                        body: JSON.stringify({
+                            input_filename: file?.name || 'Inventory_Data',
+                            sku_params: skuParamsList
+                        })
                     });
 
                     if (!response.ok) {
@@ -4878,6 +4893,7 @@
                     }
 
                     const batchResult = await response.json();
+                    if (batchResult.job_id) setLatestInventoryJobId(batchResult.job_id);
                     console.log(`Batch optimization complete: ${batchResult.successful}/${batchResult.total_skus} successful (${batchResult.workers_used} workers)`);
 
                     // Process results
@@ -5012,7 +5028,8 @@
                         if (skuDataMap[sku]) {
                             const skuParams = getSkuParams(sku);
                             console.log(`Simulating ${sku} with params:`, skuParams);
-                            const result = await callTimelineSimulation(sku, skuDataMap[sku], skuParams);
+                            const result = await callTimelineSimulation(sku, skuDataMap[sku], skuParams, apiUrl, file?.name || null);
+                            if (result.jobId) setLatestInventoryJobId(result.jobId);
                             newResults[sku] = result;
                         }
                     }
@@ -5026,7 +5043,8 @@
                     for (const sku of skuList) {
                         if (skuDataMap[sku]) {
                             const skuParams = getSkuParams(sku);
-                            const mcResult = await callMonteCarloSimulation(sku, skuDataMap[sku], skuParams, 500, apiUrl);
+                            const mcResult = await callMonteCarloSimulation(sku, skuDataMap[sku], skuParams, 500, apiUrl, file?.name || null);
+                            if (mcResult.jobId) setLatestInventoryJobId(mcResult.jobId);
                             newMcResults[sku] = mcResult;
                         }
                     }
@@ -5142,6 +5160,7 @@
                     }).filter(r => r.achieved_alpha > 0 || r.timeline); // Only include SKUs with results
 
                     const exportRequest = {
+                        source_job_id: latestInventoryJobId,
                         input_filename: file?.name || 'Inventory_Data',
                         sku_results: skuResultsList,
                         simulation_mode: simulationMode,

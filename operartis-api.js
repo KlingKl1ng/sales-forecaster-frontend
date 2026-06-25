@@ -2,6 +2,7 @@
     var originalFetch = window.fetch.bind(window);
     var csrfToken = sessionStorage.getItem('operartis_csrf_token') || '';
     var AUTH_BROADCAST_KEY = 'operartis_auth_broadcast';
+    var csrfRefreshPromise = null;
 
     function broadcastAuthEvent(type) {
         try {
@@ -68,6 +69,28 @@
         return String((init && init.method) || 'GET').toUpperCase();
     }
 
+    function isUnsafeMethod(init) {
+        var method = methodOf(init);
+        return method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS';
+    }
+
+    function pathOf(input) {
+        var raw = typeof input === 'string' ? input : input && input.url;
+        if (!raw) return '';
+        try {
+            return new URL(raw, window.location.href).pathname;
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function isCsrfBootstrapExempt(input) {
+        var path = pathOf(input);
+        return path === '/auth/login' ||
+            path === '/auth/invites/accept' ||
+            path.indexOf('/auth/password/reset') === 0;
+    }
+
     function setCsrf(token) {
         csrfToken = token || '';
         if (csrfToken) sessionStorage.setItem('operartis_csrf_token', csrfToken);
@@ -87,20 +110,67 @@
         return options;
     }
 
-    window.fetch = function (input, init) {
-        var options = isApiRequest(input) ? withAuthOptions(init) : init;
-        return originalFetch(input, options).then(function (response) {
-            if (isApiRequest(input) && response.status === 401 && shouldDispatchUnauthorized(input)) {
-                window.dispatchEvent(new CustomEvent('operartis:unauthorized'));
+    async function refreshCsrfToken() {
+        if (csrfRefreshPromise) return csrfRefreshPromise;
+        csrfRefreshPromise = (async function () {
+            try {
+                var response = await originalFetch(getDefaultApiBase() + '/auth/me', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (!response.ok) {
+                    if (response.status === 401) setCsrf('');
+                    return false;
+                }
+                var data = await response.json().catch(function () { return {}; });
+                if (data && data.csrf_token) {
+                    setCsrf(data.csrf_token);
+                    if (data.user) {
+                        window.dispatchEvent(new CustomEvent('operartis:auth-state', { detail: { user: data.user } }));
+                    }
+                    return true;
+                }
+            } catch (error) { }
+            return false;
+        })();
+        try {
+            return await csrfRefreshPromise;
+        } finally {
+            csrfRefreshPromise = null;
+        }
+    }
+
+    async function fetchWithAuth(input, init) {
+        var apiRequest = isApiRequest(input);
+        var unsafe = isUnsafeMethod(init);
+        if (apiRequest && unsafe && !isCsrfBootstrapExempt(input) && !csrfToken) {
+            await refreshCsrfToken();
+        }
+
+        var options = apiRequest ? withAuthOptions(init) : init;
+        var response = await originalFetch(input, options);
+
+        if (apiRequest && unsafe && response.status === 403 && !isCsrfBootstrapExempt(input)) {
+            var refreshed = await refreshCsrfToken();
+            if (refreshed) {
+                response = await originalFetch(input, withAuthOptions(init));
             }
-            return response;
-        });
+        }
+
+        if (apiRequest && response.status === 401 && shouldDispatchUnauthorized(input)) {
+            window.dispatchEvent(new CustomEvent('operartis:unauthorized'));
+        }
+        return response;
+    }
+
+    window.fetch = function (input, init) {
+        return fetchWithAuth(input, init);
     };
 
     async function apiFetch(path, init) {
         var base = getDefaultApiBase();
         var url = path.indexOf('http') === 0 ? path : base + path;
-        var response = await originalFetch(url, withAuthOptions(init));
+        var response = await fetchWithAuth(url, init);
         if (response.status === 401 && shouldDispatchUnauthorized(url)) {
             window.dispatchEvent(new CustomEvent('operartis:unauthorized'));
         }
