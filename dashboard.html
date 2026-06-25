@@ -2577,9 +2577,18 @@
             }
         }
 
+        function parseBackendDate(value) {
+            if (!value) return null;
+            if (value instanceof Date) return value;
+            const text = String(value);
+            const hasExplicitTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(text);
+            const looksLikeIsoDateTime = /^\d{4}-\d{2}-\d{2}T/.test(text);
+            return new Date(looksLikeIsoDateTime && !hasExplicitTimezone ? `${text}Z` : text);
+        }
+
         function formatDate(value) {
             if (!value) return '-';
-            const date = new Date(value);
+            const date = parseBackendDate(value);
             if (Number.isNaN(date.getTime())) return value;
             return date.toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
         }
