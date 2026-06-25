@@ -1465,6 +1465,15 @@
             const [lang, setLang] = useState(() => window.getOperartisLang());
 
             useEffect(() => {
+                const handler = (event) => {
+                    const nextLang = (event.detail && event.detail.lang) || window.getOperartisLang();
+                    setLang(prev => prev === nextLang ? prev : nextLang);
+                };
+                window.addEventListener('operartis:lang-change', handler);
+                return () => window.removeEventListener('operartis:lang-change', handler);
+            }, []);
+
+            useEffect(() => {
                 window.persistOperartisLang(lang);
             }, [lang]);
 
@@ -1751,6 +1760,7 @@
                                 setCurrentSku(resArr[0].sku);
                             }
                             setStatus('completed');
+                            window.OperartisApi?.broadcastDashboardDataChanged?.('mlforecaster-completed');
                             setSidebarTab('batch');
                             clearInterval(interval);
                         } else if (data.status === 'failed') {

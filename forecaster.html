@@ -1648,6 +1648,14 @@
 
             // Language State
             const [lang, setLang] = useState(() => window.getOperartisLang());
+            useEffect(() => {
+                const handler = (event) => {
+                    const nextLang = (event.detail && event.detail.lang) || window.getOperartisLang();
+                    setLang(prev => prev === nextLang ? prev : nextLang);
+                };
+                window.addEventListener('operartis:lang-change', handler);
+                return () => window.removeEventListener('operartis:lang-change', handler);
+            }, []);
             useEffect(() => { window.persistOperartisLang(lang); }, [lang]);
 
             const t = (key) => {
@@ -1676,6 +1684,7 @@
                             if (data.status === 'completed') {
                                 setIsPolling(false);
                                 setBatchResults(data.result.results);
+                                window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-completed');
                                 if (data.result.results.length > 0) {
                                     setCurrentSku(data.result.results[0].sku);
                                 }

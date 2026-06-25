@@ -6367,6 +6367,14 @@
                 return () => window.removeEventListener('operartis:theme-change', handler);
             }, []);
             const [lang, setLang] = useState(() => window.getOperartisLang());
+            useEffect(() => {
+                const handler = (event) => {
+                    const nextLang = (event.detail && event.detail.lang) || window.getOperartisLang();
+                    setLang(prev => prev === nextLang ? prev : nextLang);
+                };
+                window.addEventListener('operartis:lang-change', handler);
+                return () => window.removeEventListener('operartis:lang-change', handler);
+            }, []);
             const [selectedBlock, setSelectedBlock] = useState(null);
             const [activeQuickViewBlockId, setActiveQuickViewBlockId] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);

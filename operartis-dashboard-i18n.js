@@ -318,7 +318,7 @@
                 queued: 'Queued',
                 processing: 'Processing',
             },
-            actions: { open: 'Open', open_module: 'Open Module', available: 'available', download: 'Download', save: 'Save', copy: 'Copy', revoke: 'Revoke' },
+            actions: { open: 'Open', open_module: 'Open Module', available: 'available', download: 'Download', save: 'Save', copy: 'Copy', revoke: 'Revoke', refresh: 'Refresh' },
             module_cards: {
                 SF: {
                     label: 'ML Forecaster',
@@ -348,6 +348,8 @@
                 lang_saved: 'Language preference saved.',
                 request_failed: 'Request failed.',
                 dashboard_load_failed: 'Dashboard could not be loaded.',
+                dashboard_refreshed: 'Dashboard refreshed.',
+                dashboard_refresh_failed: 'Dashboard could not be refreshed.',
                 invite_created: 'Invite created.',
                 invite_create_failed: 'Invite could not be created.',
                 invite_copied: 'Invite link copied.',
@@ -679,7 +681,7 @@
                 queued: 'Đang xếp hàng',
                 processing: 'Đang xử lý',
             },
-            actions: { open: 'Mở', open_module: 'Mở mô-đun', available: 'khả dụng', download: 'Tải xuống', save: 'Lưu', copy: 'Sao chép', revoke: 'Thu hồi' },
+            actions: { open: 'Mở', open_module: 'Mở mô-đun', available: 'khả dụng', download: 'Tải xuống', save: 'Lưu', copy: 'Sao chép', revoke: 'Thu hồi', refresh: 'Làm mới' },
             module_cards: {
                 SF: {
                     label: 'Dự Báo Học Máy',
@@ -709,6 +711,8 @@
                 lang_saved: 'Đã lưu tùy chọn ngôn ngữ.',
                 request_failed: 'Yêu cầu thất bại.',
                 dashboard_load_failed: 'Không thể tải bảng điều khiển.',
+                dashboard_refreshed: 'Đã làm mới bảng điều khiển.',
+                dashboard_refresh_failed: 'Không thể làm mới bảng điều khiển.',
                 invite_created: 'Đã tạo lời mời.',
                 invite_create_failed: 'Không thể tạo lời mời.',
                 invite_copied: 'Đã sao chép liên kết mời.',
@@ -1040,7 +1044,7 @@
                 queued: 'In Warteschlange',
                 processing: 'In Bearbeitung',
             },
-            actions: { open: 'Öffnen', open_module: 'Modul öffnen', available: 'verfügbar', download: 'Herunterladen', save: 'Speichern', copy: 'Kopieren', revoke: 'Widerrufen' },
+            actions: { open: 'Öffnen', open_module: 'Modul öffnen', available: 'verfügbar', download: 'Herunterladen', save: 'Speichern', copy: 'Kopieren', revoke: 'Widerrufen', refresh: 'Aktualisieren' },
             module_cards: {
                 SF: {
                     label: 'ML-Prognose',
@@ -1070,6 +1074,8 @@
                 lang_saved: 'Spracheinstellung gespeichert.',
                 request_failed: 'Anfrage fehlgeschlagen.',
                 dashboard_load_failed: 'Dashboard konnte nicht geladen werden.',
+                dashboard_refreshed: 'Dashboard aktualisiert.',
+                dashboard_refresh_failed: 'Dashboard konnte nicht aktualisiert werden.',
                 invite_created: 'Einladung erstellt.',
                 invite_create_failed: 'Einladung konnte nicht erstellt werden.',
                 invite_copied: 'Einladungslink kopiert.',

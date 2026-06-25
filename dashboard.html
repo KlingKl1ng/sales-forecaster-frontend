@@ -1771,6 +1771,9 @@
                     </div>
                 </div>
                 <div class="top-actions">
+                    <button id="dashboard-refresh" class="button-secondary dashboard-refresh-btn" type="button" data-i18n="actions.refresh" title="Refresh dashboard data">
+                        Refresh
+                    </button>
                     <div id="profile-menu" class="profile-menu">
                         <button id="user-profile" class="header-auth-btn header-auth-btn--gold" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="profile-dropdown">
                             <span id="user-avatar" class="dashboard-account-avatar-slot" aria-hidden="true"></span>
@@ -2348,9 +2351,13 @@
         let sidebarCollapsed = false;
         try { sidebarCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1'; } catch (error) { }
         const mobileMenu = document.getElementById('mobile-menu');
+        const dashboardRefresh = document.getElementById('dashboard-refresh');
         const topTitle = document.getElementById('top-title');
         const topSubtitle = document.getElementById('top-subtitle');
         let messageHideTimer = null;
+        let dashboardRefreshTimer = null;
+        let dashboardRefreshInFlight = false;
+        const DASHBOARD_BROADCAST_KEY = 'operartis_dashboard_data_changed';
         const GERMAN_LANG_ENABLED = false;
         const state = {
             activeSection: 'overview',
@@ -2630,8 +2637,15 @@
             setSidebarOpen(false);
         }
 
-        async function loadDashboard() {
-            showMessage('');
+        function setRefreshBusy(busy) {
+            if (!dashboardRefresh) return;
+            dashboardRefresh.disabled = busy;
+            dashboardRefresh.classList.toggle('is-loading', busy);
+        }
+
+        async function loadDashboard(options = {}) {
+            const silent = options.silent === true;
+            if (!silent) showMessage('');
             const [user, overview, jobs, artifacts] = await Promise.all([
                 window.OperartisApi.me(),
                 api('/auth/dashboard/overview'),
@@ -2646,6 +2660,30 @@
                 await loadAdminDashboard(false);
             }
             renderAll();
+        }
+
+        async function refreshDashboard(options = {}) {
+            if (!state.user || dashboardRefreshInFlight) return;
+            dashboardRefreshInFlight = true;
+            setRefreshBusy(true);
+            try {
+                await loadDashboard({ silent: options.silent === true });
+                if (!options.silent) showMessage(dt('messages.dashboard_refreshed'), 'success');
+            } catch (error) {
+                showMessage(error.message || dt('messages.dashboard_refresh_failed'), 'error');
+            } finally {
+                dashboardRefreshInFlight = false;
+                setRefreshBusy(false);
+            }
+        }
+
+        function scheduleDashboardRefresh() {
+            if (!state.user) return;
+            if (dashboardRefreshTimer) clearTimeout(dashboardRefreshTimer);
+            dashboardRefreshTimer = setTimeout(() => {
+                dashboardRefreshTimer = null;
+                refreshDashboard({ silent: true });
+            }, 1500);
         }
 
         async function loadAdminDashboard(shouldRender = true) {
@@ -3162,6 +3200,16 @@
             selectDashboardLang(button.dataset.lang);
         });
         window.addEventListener('operartis:theme-change', () => renderSettings());
+        window.addEventListener('operartis:lang-change', () => {
+            syncDashboardI18n();
+            renderAll();
+            renderSettings();
+        });
+        dashboardRefresh.addEventListener('click', () => refreshDashboard());
+        window.addEventListener('operartis:dashboard-data-changed', scheduleDashboardRefresh);
+        window.addEventListener('storage', event => {
+            if (event.key === DASHBOARD_BROADCAST_KEY && event.newValue) scheduleDashboardRefresh();
+        });
         document.getElementById('admin-invite-form').addEventListener('submit', async event => {
             event.preventDefault();
             if (state.user?.role !== 'admin') return;

@@ -2,6 +2,7 @@
     var originalFetch = window.fetch.bind(window);
     var csrfToken = sessionStorage.getItem('operartis_csrf_token') || '';
     var AUTH_BROADCAST_KEY = 'operartis_auth_broadcast';
+    var DASHBOARD_BROADCAST_KEY = 'operartis_dashboard_data_changed';
     var csrfRefreshPromise = null;
 
     function broadcastAuthEvent(type) {
@@ -27,6 +28,19 @@
     }
 
     window.addEventListener('storage', handleAuthBroadcast);
+
+    function broadcastDashboardDataChanged(source) {
+        var payload = {
+            source: source || 'module',
+            at: Date.now()
+        };
+        try {
+            localStorage.setItem(DASHBOARD_BROADCAST_KEY, JSON.stringify(payload));
+        } catch (error) { }
+        try {
+            window.dispatchEvent(new CustomEvent('operartis:dashboard-data-changed', { detail: payload }));
+        } catch (error) { }
+    }
 
     function isLocalHost(hostname) {
         return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
@@ -82,6 +96,34 @@
         } catch (e) {
             return '';
         }
+    }
+
+    function requestJsonBody(init) {
+        if (!init || typeof init.body !== 'string') return null;
+        try {
+            return JSON.parse(init.body);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function shouldBroadcastDashboardDataChanged(input, init) {
+        if (!isUnsafeMethod(init)) return false;
+        var path = pathOf(input);
+
+        if (path === '/abcxyz/analyze') {
+            var body = requestJsonBody(init);
+            return !body || body.record_job !== false;
+        }
+
+        return path === '/batch_init' ||
+            path === '/export' ||
+            path === '/export-fast' ||
+            path === '/synthesis/init' ||
+            path === '/synthesis/scenario' ||
+            path === '/synthesis/export' ||
+            path === '/synthesis/export-fast' ||
+            path.indexOf('/inventory/') === 0;
     }
 
     function isCsrfBootstrapExempt(input) {
@@ -159,6 +201,9 @@
 
         if (apiRequest && response.status === 401 && shouldDispatchUnauthorized(input)) {
             window.dispatchEvent(new CustomEvent('operartis:unauthorized'));
+        }
+        if (apiRequest && response.ok && shouldBroadcastDashboardDataChanged(input, options)) {
+            broadcastDashboardDataChanged(pathOf(input));
         }
         return response;
     }
@@ -248,6 +293,7 @@
 
     window.OperartisApi = {
         apiFetch: apiFetch,
+        broadcastDashboardDataChanged: broadcastDashboardDataChanged,
         getDefaultApiBase: getDefaultApiBase,
         getCsrf: function () { return csrfToken; },
         setCsrf: setCsrf,

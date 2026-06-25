@@ -3821,6 +3821,14 @@
                 return () => window.removeEventListener('operartis:theme-change', handler);
             }, []);
             const [language, setLanguage] = useState(() => window.getOperartisLang());
+            useEffect(() => {
+                const handler = (event) => {
+                    const nextLang = (event.detail && event.detail.lang) || window.getOperartisLang();
+                    setLanguage(prev => prev === nextLang ? prev : nextLang);
+                };
+                window.addEventListener('operartis:lang-change', handler);
+                return () => window.removeEventListener('operartis:lang-change', handler);
+            }, []);
             const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 

@@ -706,6 +706,15 @@
             // I18n State
             const [lang, setLang] = useState(() => window.getOperartisLang());
 
+            useEffect(() => {
+                const handler = (event) => {
+                    const nextLang = (event.detail && event.detail.lang) || window.getOperartisLang();
+                    setLang(prev => prev === nextLang ? prev : nextLang);
+                };
+                window.addEventListener('operartis:lang-change', handler);
+                return () => window.removeEventListener('operartis:lang-change', handler);
+            }, []);
+
             const t = (key) => {
                 const keys = key.split('.');
                 let val = TRANSLATIONS[lang] || TRANSLATIONS.en;
