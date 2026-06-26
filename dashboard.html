@@ -928,6 +928,179 @@
         @keyframes dashboard-refresh-spin {
             to { transform: rotate(360deg); }
         }
+        .notification-menu {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .notification-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            min-height: 2.5rem;
+            padding: 0.25rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background-color: transparent;
+            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            color: var(--muted);
+            transition: background-image .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease), transform .15s var(--ease);
+        }
+        html.dark .notification-btn {
+            border-color: rgba(255, 255, 255, 0.1);
+            background-image: linear-gradient(to bottom right, rgba(30, 41, 59, 0.3), rgba(15, 23, 42, 0.1));
+            color: #cbd5e1;
+        }
+        .notification-btn:hover {
+            color: var(--gold);
+            border-color: rgba(245, 158, 11, 0.3);
+            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.28), rgba(245, 158, 11, 0.08));
+        }
+        .notification-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+        }
+        .notification-count {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            border: 2px solid var(--surface-topbar);
+            background: #ef4444;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .notification-panel {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: min(420px, calc(100vw - 28px));
+            max-height: min(560px, calc(100vh - 96px));
+            overflow: hidden;
+            border-radius: 20px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            box-shadow: var(--shadow-lg);
+            z-index: 40;
+        }
+        .notification-panel[hidden] { display: none; }
+        .notification-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 16px 12px;
+            border-bottom: 1px solid var(--line);
+        }
+        .notification-panel-head strong {
+            color: var(--text);
+            font-size: 14px;
+        }
+        .notification-panel-head button {
+            min-height: 30px;
+            padding: 0 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: var(--surface-secondary);
+            color: var(--soft);
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .notification-list {
+            display: grid;
+            gap: 10px;
+            max-height: min(470px, calc(100vh - 172px));
+            overflow: auto;
+            padding: 12px;
+        }
+        .notification-item {
+            display: grid;
+            grid-template-columns: 8px minmax(0, 1fr);
+            gap: 10px;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: var(--panel-soft);
+        }
+        .notification-item.unread {
+            border-color: rgba(245, 158, 11, .34);
+            background: rgba(245, 158, 11, .08);
+        }
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            margin-top: 6px;
+            border-radius: 999px;
+            background: var(--muted);
+        }
+        .notification-item.info .notification-dot { background: #38bdf8; }
+        .notification-item.success .notification-dot { background: #22c55e; }
+        .notification-item.warning .notification-dot { background: #f59e0b; }
+        .notification-item.error .notification-dot { background: #ef4444; }
+        .notification-title {
+            margin: 0;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+        .notification-body {
+            margin: 4px 0 0;
+            color: var(--soft);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+        .notification-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .notification-link {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        .notification-mark {
+            min-height: 28px;
+            padding: 0 9px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--soft);
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .announcement-form {
+            display: grid;
+            grid-template-columns: minmax(220px, 1fr) 160px 140px;
+            gap: 12px;
+            align-items: end;
+        }
+        .announcement-form textarea,
+        .announcement-form .announcement-wide {
+            grid-column: 1 / -1;
+        }
+        .announcement-form textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
         .mobile-menu {
             display: none;
             width: 42px;
@@ -1657,7 +1830,7 @@
         }
         @media (max-width: 1180px) {
             .metric-grid, .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .two-col, .panel-grid, .admin-form-grid { grid-template-columns: 1fr; }
+            .two-col, .panel-grid, .admin-form-grid, .announcement-form { grid-template-columns: 1fr; }
         }
         @media (max-width: 860px) {
             .shell {
@@ -1693,7 +1866,7 @@
                 padding: calc(12px + env(safe-area-inset-top, 0px)) clamp(16px, 3vw, 28px) 12px;
             }
             .hero { flex-direction: column; align-items: flex-start; }
-            .form-grid, .metric-grid, .shortcut-grid, .admin-form-grid { grid-template-columns: 1fr; }
+            .form-grid, .metric-grid, .shortcut-grid, .admin-form-grid, .announcement-form { grid-template-columns: 1fr; }
             .reports-downloads-card .reports-table-wrap { display: none; }
             .artifact-list { display: grid; }
             .reports-downloads-card,
@@ -1837,6 +2010,22 @@
                             <path d="M16 16h5v5"></path>
                         </svg>
                     </button>
+                    <div id="notification-menu" class="notification-menu">
+                        <button id="notification-bell" class="notification-btn" type="button" aria-expanded="false" aria-haspopup="dialog" aria-controls="notification-panel" data-i18n-aria="notifications.open" data-i18n-title="notifications.open" aria-label="Open notifications" title="Open notifications">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M10.27 21a2 2 0 0 0 3.46 0"></path>
+                                <path d="M3.26 15.33A1.5 1.5 0 0 0 4.5 17.7h15a1.5 1.5 0 0 0 1.24-2.37C19.45 13.46 18.5 12.7 18.5 8.5a6.5 6.5 0 0 0-13 0c0 4.2-.95 4.96-2.24 6.83Z"></path>
+                            </svg>
+                            <span id="notification-count" class="notification-count" hidden>0</span>
+                        </button>
+                        <section id="notification-panel" class="notification-panel" hidden aria-live="polite">
+                            <div class="notification-panel-head">
+                                <strong data-i18n="notifications.title">Notifications</strong>
+                                <button id="notifications-mark-all" type="button" data-i18n="notifications.mark_all">Mark all read</button>
+                            </div>
+                            <div id="notification-list" class="notification-list"></div>
+                        </section>
+                    </div>
                     <div id="profile-menu" class="profile-menu">
                         <button id="user-profile" class="header-auth-btn header-auth-btn--gold" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="profile-dropdown">
                             <span id="user-avatar" class="dashboard-account-avatar-slot" aria-hidden="true"></span>
@@ -2244,6 +2433,28 @@
                             <div id="admin-job-statuses" class="kv-list"></div>
                         </div>
                     </div>
+                    <div class="card" style="margin-top:16px">
+                        <div class="section-head">
+                            <div>
+                                <h2 data-i18n="notifications.announcement_title">Send Announcement</h2>
+                                <p class="section-sub" data-i18n="notifications.announcement_sub">Create an in-app notification for all active users in this organization.</p>
+                            </div>
+                        </div>
+                        <form id="admin-announcement-form" class="announcement-form">
+                            <label><span data-i18n="notifications.announcement_subject">Title</span><input id="admin-announcement-title" maxlength="255" required></label>
+                            <label><span data-i18n="notifications.severity">Severity</span>
+                                <select id="admin-announcement-severity">
+                                    <option value="info" data-i18n="notifications.severity_info">Info</option>
+                                    <option value="success" data-i18n="notifications.severity_success">Success</option>
+                                    <option value="warning" data-i18n="notifications.severity_warning">Warning</option>
+                                    <option value="error" data-i18n="notifications.severity_error">Error</option>
+                                </select>
+                            </label>
+                            <button id="admin-announcement-submit" type="submit" data-i18n="notifications.send">Send</button>
+                            <label class="announcement-wide"><span data-i18n="notifications.announcement_body">Message</span><textarea id="admin-announcement-body" maxlength="4000"></textarea></label>
+                            <label class="announcement-wide"><span data-i18n="notifications.announcement_action_url">Optional action URL</span><input id="admin-announcement-action-url" maxlength="1000" placeholder="/dashboard#activity"></label>
+                        </form>
+                    </div>
                 </section>
 
                 <section id="section-admin-users" class="section admin-only">
@@ -2417,12 +2628,20 @@
         try { sidebarCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1'; } catch (error) { }
         const mobileMenu = document.getElementById('mobile-menu');
         const dashboardRefresh = document.getElementById('dashboard-refresh');
+        const notificationMenu = document.getElementById('notification-menu');
+        const notificationBell = document.getElementById('notification-bell');
+        const notificationPanel = document.getElementById('notification-panel');
+        const notificationList = document.getElementById('notification-list');
+        const notificationCount = document.getElementById('notification-count');
+        const notificationsMarkAll = document.getElementById('notifications-mark-all');
         const topTitle = document.getElementById('top-title');
         const topSubtitle = document.getElementById('top-subtitle');
         let messageHideTimer = null;
         let dashboardRefreshTimer = null;
+        let notificationPollTimer = null;
         let dashboardRefreshInFlight = false;
         const DASHBOARD_BROADCAST_KEY = 'operartis_dashboard_data_changed';
+        const NOTIFICATION_POLL_MS = 60000;
         const GERMAN_LANG_ENABLED = false;
         const state = {
             activeSection: 'overview',
@@ -2430,6 +2649,8 @@
             overview: null,
             jobs: [],
             artifacts: [],
+            notifications: [],
+            unreadNotifications: 0,
             adminOverview: null,
             adminUsers: [],
             adminInvites: [],
@@ -2571,6 +2792,17 @@
             setProfileMenuOpen(false);
         }
 
+        function setNotificationPanelOpen(open) {
+            notificationBell.setAttribute('aria-expanded', open ? 'true' : 'false');
+            notificationPanel.hidden = !open;
+        }
+
+        function handleNotificationOutside(event) {
+            if (notificationPanel.hidden) return;
+            if (notificationMenu.contains(event.target)) return;
+            setNotificationPanelOpen(false);
+        }
+
         async function logoutUser() {
             setProfileMenuOpen(false);
             await window.OperartisAuth.logout();
@@ -2697,6 +2929,23 @@
             return data;
         }
 
+        async function loadNotifications(shouldRender = true) {
+            if (!state.user) return;
+            const data = await api('/auth/notifications');
+            state.notifications = data.notifications || [];
+            state.unreadNotifications = data.unread_count || 0;
+            if (shouldRender) renderNotifications();
+        }
+
+        async function markNotificationsRead(notificationIds = [], markAll = false) {
+            await api('/auth/notifications/read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notification_ids: notificationIds, mark_all: markAll }),
+            });
+            await loadNotifications(true);
+        }
+
         function isAdminSection(section) {
             return String(section || '').indexOf('admin-') === 0;
         }
@@ -2723,20 +2972,24 @@
         async function loadDashboard(options = {}) {
             const silent = options.silent === true;
             if (!silent) showMessage('');
-            const [user, overview, jobs, artifacts] = await Promise.all([
+            const [user, overview, jobs, artifacts, notifications] = await Promise.all([
                 window.OperartisApi.me(),
                 api('/auth/dashboard/overview'),
                 api('/auth/dashboard/jobs'),
                 api('/auth/dashboard/artifacts'),
+                api('/auth/notifications'),
             ]);
             state.user = user;
             state.overview = overview;
             state.jobs = jobs;
             state.artifacts = artifacts;
+            state.notifications = notifications.notifications || [];
+            state.unreadNotifications = notifications.unread_count || 0;
             if (canUseAdminDashboard(user.role)) {
                 await loadAdminDashboard(false);
             }
             renderAll();
+            scheduleNotificationPoll();
         }
 
         async function refreshDashboard(options = {}) {
@@ -2761,6 +3014,26 @@
                 dashboardRefreshTimer = null;
                 refreshDashboard({ silent: true });
             }, 1500);
+        }
+
+        function scheduleNotificationPoll() {
+            if (notificationPollTimer) clearTimeout(notificationPollTimer);
+            if (!state.user) return;
+            notificationPollTimer = setTimeout(async () => {
+                notificationPollTimer = null;
+                try {
+                    await loadNotifications(true);
+                } catch (error) {
+                    // Silent polling should never interrupt the user's current dashboard task.
+                } finally {
+                    scheduleNotificationPoll();
+                }
+            }, NOTIFICATION_POLL_MS);
+        }
+
+        function stopNotificationPoll() {
+            if (notificationPollTimer) clearTimeout(notificationPollTimer);
+            notificationPollTimer = null;
         }
 
         async function loadAdminDashboard(shouldRender = true) {
@@ -2903,6 +3176,42 @@
                 [dt(s + 'modules_available'), shortcuts.length],
                 [dt(s + 'other_sessions'), dt(s + 'sessions_closed')],
             ].forEach(([label, value]) => access.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })])));
+        }
+
+        function renderNotifications() {
+            const unread = Number(state.unreadNotifications || 0);
+            notificationCount.hidden = unread <= 0;
+            notificationCount.textContent = unread > 99 ? '99+' : String(unread);
+            notificationsMarkAll.disabled = unread <= 0;
+            clear(notificationList);
+            if (!state.notifications.length) {
+                notificationList.appendChild(el('div', { class: 'empty', text: dt('notifications.empty') }));
+                return;
+            }
+            state.notifications.forEach(notification => {
+                const item = el('article', {
+                    class: `notification-item ${notification.severity || 'info'} ${notification.read_at ? '' : 'unread'}`.trim(),
+                }, [
+                    el('span', { class: 'notification-dot', 'aria-hidden': 'true' }),
+                    el('div', {}, [
+                        el('p', { class: 'notification-title', text: notification.title }),
+                        notification.body ? el('p', { class: 'notification-body', text: notification.body }) : document.createTextNode(''),
+                        el('div', { class: 'notification-meta' }, [
+                            el('span', { text: formatDate(notification.created_at) }),
+                            el('div', { class: 'row-actions' }, [
+                                notification.action_url ? el('a', { class: 'notification-link', href: notification.action_url, text: dt('notifications.open_link') }) : document.createTextNode(''),
+                                notification.read_at ? document.createTextNode('') : el('button', {
+                                    class: 'notification-mark',
+                                    type: 'button',
+                                    dataset: { notificationId: notification.id },
+                                    text: dt('notifications.mark_read'),
+                                }),
+                            ]),
+                        ]),
+                    ]),
+                ]);
+                notificationList.appendChild(item);
+            });
         }
 
         function renderStatusList() {
@@ -3239,6 +3548,7 @@
             renderShortcuts();
             renderSummary();
             renderAccount();
+            renderNotifications();
             renderStatusList();
             renderJobs();
             renderArtifacts();
@@ -3250,6 +3560,7 @@
         function showDashboard(user) {
             state.user = user;
             if (!user) {
+                stopNotificationPoll();
                 app.classList.add('hidden');
                 app.classList.remove('is-admin');
                 accessPanel.classList.remove('hidden');
@@ -3275,18 +3586,48 @@
             if (event.key === 'Escape') {
                 setSidebarOpen(false);
                 setProfileMenuOpen(false);
+                setNotificationPanelOpen(false);
             }
         });
         window.addEventListener('resize', () => {
             if (window.innerWidth > 860) setSidebarOpen(false);
             applySidebarCollapsedUi();
             setProfileMenuOpen(false);
+            setNotificationPanelOpen(false);
         });
         userProfile.addEventListener('click', () => {
             setProfileMenuOpen(!profileMenu.classList.contains('open'));
+            setNotificationPanelOpen(false);
         });
         document.addEventListener('mousedown', handleProfileMenuOutside);
         document.addEventListener('touchstart', handleProfileMenuOutside, { passive: true });
+        notificationBell.addEventListener('click', () => {
+            setProfileMenuOpen(false);
+            setNotificationPanelOpen(notificationPanel.hidden);
+        });
+        document.addEventListener('mousedown', handleNotificationOutside);
+        document.addEventListener('touchstart', handleNotificationOutside, { passive: true });
+        notificationsMarkAll.addEventListener('click', async () => {
+            notificationsMarkAll.disabled = true;
+            try {
+                await markNotificationsRead([], true);
+                showMessage(dt('messages.notifications_marked_read'), 'success');
+            } catch (error) {
+                showMessage(error.message || dt('messages.notifications_mark_read_failed'), 'error');
+            } finally {
+                notificationsMarkAll.disabled = state.unreadNotifications <= 0;
+            }
+        });
+        notificationList.addEventListener('click', async event => {
+            const button = event.target.closest('[data-notification-id]');
+            if (!button) return;
+            button.disabled = true;
+            try {
+                await markNotificationsRead([button.dataset.notificationId], false);
+            } catch (error) {
+                showMessage(error.message || dt('messages.notifications_mark_read_failed'), 'error');
+            }
+        });
         document.getElementById('profile-logout').addEventListener('click', logoutUser);
         profileDropdown.querySelector('a.index-account-menu-item')?.addEventListener('click', () => setProfileMenuOpen(false));
         document.querySelectorAll('.nav-btn, .nav-jump').forEach(button => {
@@ -3312,6 +3653,33 @@
         window.addEventListener('operartis:dashboard-data-changed', scheduleDashboardRefresh);
         window.addEventListener('storage', event => {
             if (event.key === DASHBOARD_BROADCAST_KEY && event.newValue) scheduleDashboardRefresh();
+        });
+        document.getElementById('admin-announcement-form').addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!canUseAdminDashboard(state.user?.role)) return;
+            const button = document.getElementById('admin-announcement-submit');
+            button.disabled = true;
+            try {
+                const payload = {
+                    title: document.getElementById('admin-announcement-title').value,
+                    body: document.getElementById('admin-announcement-body').value,
+                    severity: document.getElementById('admin-announcement-severity').value,
+                    action_url: document.getElementById('admin-announcement-action-url').value,
+                };
+                await api('/auth/admin/announcements', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                event.target.reset();
+                await loadDashboard({ silent: true });
+                setSection('admin-overview');
+                showMessage(dt('messages.announcement_sent'), 'success');
+            } catch (error) {
+                showMessage(error.message || dt('messages.announcement_failed'), 'error');
+            } finally {
+                button.disabled = false;
+            }
         });
         document.getElementById('admin-invite-form').addEventListener('submit', async event => {
             event.preventDefault();
@@ -3529,6 +3897,11 @@
         window.addEventListener('operartis:auth-state', event => showDashboard(event.detail.user));
         window.addEventListener('operartis:logged-out', () => {
             state.user = null;
+            state.notifications = [];
+            state.unreadNotifications = 0;
+            stopNotificationPoll();
+            setNotificationPanelOpen(false);
+            renderNotifications();
             app.classList.add('hidden');
             app.classList.remove('is-admin');
             accessPanel.classList.remove('hidden');
