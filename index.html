@@ -6579,7 +6579,8 @@
 
             const handleDashboardOpen = useCallback(() => {
                 setAccountMenuOpen(false);
-                window.location.href = authUser?.role === 'admin' ? './dashboard.html#admin-overview' : './dashboard.html';
+                const canUseAdminDashboard = authUser?.role === 'owner' || authUser?.role === 'admin';
+                window.location.href = canUseAdminDashboard ? './dashboard.html#admin-overview' : './dashboard.html';
             }, [authUser]);
 
             const handleLoginOpen = useCallback(() => {

@@ -154,8 +154,10 @@
                     other_sessions: 'Other Sessions',
                     status_active: 'Active',
                     sessions_closed: 'Closed after password change',
+                    role_owner: 'Owner',
                     role_admin: 'Admin',
                     role_member: 'Member',
+                    role_user: 'User',
                 },
                 settings: {
                     title: 'Settings',
@@ -517,8 +519,10 @@
                     other_sessions: 'Phiên khác',
                     status_active: 'Hoạt động',
                     sessions_closed: 'Đã đóng sau khi đổi mật khẩu',
+                    role_owner: 'Chủ sở hữu',
                     role_admin: 'Quản trị viên',
                     role_member: 'Thành viên',
+                    role_user: 'Người dùng',
                 },
                 settings: {
                     title: 'Cài đặt',
@@ -880,8 +884,10 @@
                     other_sessions: 'Andere Sitzungen',
                     status_active: 'Aktiv',
                     sessions_closed: 'Nach Passwortänderung geschlossen',
+                    role_owner: 'Eigentümer',
                     role_admin: 'Administrator',
                     role_member: 'Mitglied',
+                    role_user: 'Nutzer',
                 },
                 settings: {
                     title: 'Einstellungen',

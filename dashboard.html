@@ -2299,7 +2299,9 @@
                             <label><span data-i18n="table.role">Role</span>
                                 <select id="admin-invite-role">
                                     <option value="member" data-i18n="sections.security.role_member">Member</option>
+                                    <option value="user" data-i18n="sections.security.role_user">User</option>
                                     <option value="admin" data-i18n="sections.security.role_admin">Admin</option>
+                                    <option value="owner" data-i18n="sections.security.role_owner">Owner</option>
                                 </select>
                             </label>
                             <button id="admin-invite-submit" type="submit" data-i18n="sections.admin-invites.create_invite">Create Invite</button>
@@ -2455,9 +2457,20 @@
         }
         function roleLabel(role) {
             const s = 'sections.security.';
+            if (role === 'owner') return dt(s + 'role_owner');
             if (role === 'admin') return dt(s + 'role_admin');
             if (role === 'member') return dt(s + 'role_member');
+            if (role === 'user') return dt(s + 'role_user');
             return role || '-';
+        }
+        function isPrivilegedRole(role) {
+            return role === 'owner' || role === 'admin';
+        }
+        function canUseAdminDashboard(role) {
+            return isPrivilegedRole(role);
+        }
+        function isPrimaryOwner(user = state.user) {
+            return Boolean(user?.is_primary_owner);
         }
         function statusLabel(key) {
             if (!key) return '-';
@@ -2481,7 +2494,7 @@
             if (state.user) {
                 renderAccount();
                 renderSummary();
-                if (state.user.role === 'admin') renderAdminAll();
+                if (canUseAdminDashboard(state.user.role)) renderAdminAll();
             }
             applySidebarCollapsedUi();
         }
@@ -2690,7 +2703,7 @@
 
         function setSection(section) {
             if (!sectionCopy[section]) section = 'overview';
-            if (isAdminSection(section) && state.user && state.user.role !== 'admin') section = 'overview';
+            if (isAdminSection(section) && state.user && !canUseAdminDashboard(state.user.role)) section = 'overview';
             state.activeSection = section;
             document.querySelectorAll('.section').forEach(item => item.classList.toggle('active', item.id === `section-${section}`));
             document.querySelectorAll('.nav-btn').forEach(item => item.classList.toggle('active', item.dataset.section === section));
@@ -2720,7 +2733,7 @@
             state.overview = overview;
             state.jobs = jobs;
             state.artifacts = artifacts;
-            if (user.role === 'admin') {
+            if (canUseAdminDashboard(user.role)) {
                 await loadAdminDashboard(false);
             }
             renderAll();
@@ -2774,7 +2787,7 @@
 
         function renderChrome() {
             const displayName = state.user?.full_name || state.user?.email || dt('chrome.member');
-            const isAdmin = state.user?.role === 'admin';
+            const isAdmin = canUseAdminDashboard(state.user?.role);
             app.classList.toggle('is-admin', isAdmin);
             if (!isAdmin && isAdminSection(state.activeSection)) setSection('overview');
             const dropdownName = document.getElementById('profile-dropdown-email');
@@ -3028,17 +3041,38 @@
                 tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: dt('empty.no_users') })]));
                 return;
             }
+            const currentUserRole = state.user?.role;
+            const currentUserIsOwner = currentUserRole === 'owner';
+            const currentUserIsPrimaryOwner = isPrimaryOwner();
+            const ownerRoleOptions = currentUserIsPrimaryOwner
+                ? ['owner', 'admin', 'member', 'user']
+                : ['admin', 'member', 'user'];
+            const adminRoleOptions = ['member', 'user'];
             state.adminUsers.forEach(user => {
-                const role = el('select', { class: 'select-small', dataset: { field: 'role', userId: user.id } }, [
-                    el('option', { value: 'member', text: roleLabel('member') }),
-                    el('option', { value: 'admin', text: roleLabel('admin') }),
-                ]);
+                const isSelf = user.id === state.user?.id;
+                const canEditUser = !isSelf && (currentUserIsPrimaryOwner
+                    || (currentUserIsOwner && user.role !== 'owner')
+                    || (canUseAdminDashboard(currentUserRole) && !isPrivilegedRole(user.role)));
+                const roleOptions = currentUserIsOwner ? ownerRoleOptions.slice() : adminRoleOptions.slice();
+                if (!roleOptions.includes(user.role)) roleOptions.unshift(user.role);
+                const role = el('select', { class: 'select-small', dataset: { field: 'role', userId: user.id } },
+                    roleOptions.map(value => el('option', { value, text: roleLabel(value) }))
+                );
                 role.value = user.role;
                 const status = el('select', { class: 'select-small', dataset: { field: 'status', userId: user.id } }, [
                     el('option', { value: 'active', text: statusLabel('active') }),
                     el('option', { value: 'suspended', text: statusLabel('suspended') }),
                 ]);
                 status.value = user.status;
+                role.disabled = !canEditUser;
+                status.disabled = !canEditUser;
+                const saveButton = el('button', {
+                    class: 'button-secondary',
+                    type: 'button',
+                    dataset: { action: 'save-user', userId: user.id },
+                    text: dt('actions.save'),
+                });
+                saveButton.disabled = !canEditUser;
                 tbody.appendChild(el('tr', {}, [
                     el('td', {}, [
                         el('strong', { text: user.email }),
@@ -3050,7 +3084,7 @@
                     el('td', { text: formatDate(user.last_login_at) }),
                     el('td', {}, [
                         el('div', { class: 'row-actions' }, [
-                            el('button', { class: 'button-secondary', type: 'button', dataset: { action: 'save-user', userId: user.id }, text: dt('actions.save') }),
+                            saveButton,
                         ]),
                     ]),
                 ]));
@@ -3065,9 +3099,14 @@
             const roleSelect = document.getElementById('admin-invite-role');
             if (roleSelect) {
                 Array.from(roleSelect.options).forEach(option => {
+                    if (option.value === 'owner') option.textContent = roleLabel('owner');
                     if (option.value === 'member') option.textContent = roleLabel('member');
+                    if (option.value === 'user') option.textContent = roleLabel('user');
                     if (option.value === 'admin') option.textContent = roleLabel('admin');
+                    option.disabled = (option.value === 'owner' && !isPrimaryOwner())
+                        || (option.value === 'admin' && state.user?.role !== 'owner');
                 });
+                if (roleSelect.selectedOptions[0]?.disabled) roleSelect.value = 'member';
             }
         }
 
@@ -3136,7 +3175,7 @@
         }
 
         function renderAdminAll() {
-            if (state.user?.role !== 'admin') return;
+            if (!canUseAdminDashboard(state.user?.role)) return;
             renderAdminMetrics();
             renderAdminStatusList('admin-user-statuses', state.adminOverview?.user_statuses || {});
             renderAdminStatusList('admin-invite-statuses', state.adminOverview?.invite_statuses || {});
@@ -3276,7 +3315,7 @@
         });
         document.getElementById('admin-invite-form').addEventListener('submit', async event => {
             event.preventDefault();
-            if (state.user?.role !== 'admin') return;
+            if (!canUseAdminDashboard(state.user?.role)) return;
             const button = document.getElementById('admin-invite-submit');
             const result = document.getElementById('admin-invite-result');
             button.disabled = true;
@@ -3450,7 +3489,7 @@
             const actionButton = event.target.closest('[data-action]');
             if (!actionButton) return;
             event.preventDefault();
-            if (state.user?.role !== 'admin') return;
+            if (!canUseAdminDashboard(state.user?.role)) return;
 
             if (actionButton.dataset.action === 'save-user') {
                 const userId = actionButton.dataset.userId;
