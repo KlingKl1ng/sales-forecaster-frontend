@@ -6,75 +6,365 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Operartis | Accept Invite</title>
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
+    <script src="./operartis-theme.js?v=20260624-theme-sync"></script>
     <script src="./operartis-api.js?v=20260622-auth-session-sync"></script>
     <style>
+        :root {
+            --invite-bg: #f8fafc;
+            --invite-page-bg:
+                linear-gradient(rgba(148, 163, 184, .06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, .06) 1px, transparent 1px),
+                radial-gradient(circle at 10% 8%, rgba(245, 158, 11, .08), transparent 28rem),
+                radial-gradient(circle at 88% 2%, rgba(56, 189, 248, .06), transparent 30rem),
+                radial-gradient(circle at 50% 100%, rgba(226, 232, 240, .9), transparent 50%),
+                var(--invite-bg);
+            --invite-card-bg: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 250, 252, .95));
+            --invite-text: #0f172a;
+            --invite-muted: #64748b;
+            --invite-label: #334155;
+            --invite-border: rgba(245, 158, 11, .22);
+            --invite-input-bg: rgba(255, 255, 255, .98);
+            --invite-input-text: #0f172a;
+            --invite-input-border: rgba(148, 163, 184, .35);
+            --invite-readonly-bg: rgba(248, 250, 252, .94);
+            --invite-close-bg: rgba(15, 23, 42, .08);
+            --invite-close-text: #475569;
+            --invite-close-hover-bg: rgba(15, 23, 42, .14);
+            --invite-close-hover-text: #0f172a;
+            --invite-error-text: #991b1b;
+            --invite-error-bg: rgba(254, 226, 226, .92);
+            --invite-error-border: rgba(248, 113, 113, .48);
+            --invite-success-text: #166534;
+            --invite-success-bg: rgba(220, 252, 231, .95);
+            --invite-success-border: rgba(34, 197, 94, .35);
+            --invite-info-text: #1d4ed8;
+            --invite-info-bg: rgba(219, 234, 254, .92);
+            --invite-info-border: rgba(96, 165, 250, .48);
+            --invite-gold: #f59e0b;
+            --invite-gold-2: #fbbf24;
+            --invite-radius: 10px;
+            --invite-radius-lg: 14px;
+            --invite-shadow: 0 24px 80px rgba(15, 23, 42, .18);
+        }
+        :root.dark {
+            --invite-bg: #020617;
+            --invite-page-bg:
+                linear-gradient(rgba(148, 163, 184, .04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, .04) 1px, transparent 1px),
+                radial-gradient(circle at 10% 8%, rgba(245, 158, 11, .12), transparent 28rem),
+                radial-gradient(circle at 88% 2%, rgba(56, 189, 248, .1), transparent 30rem),
+                radial-gradient(circle at 50% 100%, rgba(15, 23, 42, .8), transparent 50%),
+                var(--invite-bg);
+            --invite-card-bg: linear-gradient(180deg, rgba(15, 23, 42, .94), rgba(15, 23, 42, .82));
+            --invite-text: #f8fafc;
+            --invite-muted: #94a3b8;
+            --invite-label: #cbd5e1;
+            --invite-border: rgba(245, 158, 11, .22);
+            --invite-input-bg: rgba(2, 6, 23, .72);
+            --invite-input-text: #f8fafc;
+            --invite-input-border: rgba(148, 163, 184, .22);
+            --invite-readonly-bg: rgba(15, 23, 42, .72);
+            --invite-close-bg: rgba(148, 163, 184, .16);
+            --invite-close-text: #cbd5e1;
+            --invite-close-hover-bg: rgba(148, 163, 184, .28);
+            --invite-close-hover-text: #f8fafc;
+            --invite-error-text: #fecaca;
+            --invite-error-bg: rgba(239, 68, 68, .14);
+            --invite-error-border: rgba(248, 113, 113, .35);
+            --invite-success-text: #bbf7d0;
+            --invite-success-bg: rgba(34, 197, 94, .14);
+            --invite-success-border: rgba(74, 222, 128, .35);
+            --invite-info-text: #bfdbfe;
+            --invite-info-bg: rgba(59, 130, 246, .14);
+            --invite-info-border: rgba(96, 165, 250, .35);
+            --invite-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+        }
         * { box-sizing: border-box; }
         body {
             margin: 0;
             min-height: 100vh;
-            display: grid;
-            place-items: center;
-            background: #020617;
-            color: #f8fafc;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--invite-page-bg);
+            background-size: 72px 72px, 72px 72px, auto, auto, auto, auto;
+            background-attachment: fixed;
+            color: var(--invite-text);
             font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            -webkit-font-smoothing: antialiased;
             padding: 24px;
+            transition: background .2s ease, color .2s ease;
         }
         main {
-            width: min(440px, 100%);
-            border: 1px solid rgba(148, 163, 184, .28);
-            border-radius: 10px;
-            background: #0f172a;
-            padding: 28px;
-            box-shadow: 0 24px 80px rgba(0, 0, 0, .42);
+            position: relative;
+            width: min(420px, 100%);
+            border: 1px solid var(--invite-border);
+            border-radius: var(--invite-radius-lg);
+            background: var(--invite-card-bg);
+            padding: 28px 26px;
+            box-shadow: var(--invite-shadow);
+            overflow: hidden;
+            margin: 0;
         }
-        h1 { margin: 0 0 8px; font-size: 24px; }
-        p { margin: 0 0 22px; color: #94a3b8; line-height: 1.5; }
-        label { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #cbd5e1; }
-        input { height: 44px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, .32); background: #020617; color: #f8fafc; padding: 0 12px; font-size: 14px; }
-        button { height: 44px; width: 100%; border: 0; border-radius: 8px; background: #f59e0b; color: #111827; font-weight: 900; cursor: pointer; }
+        main::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--invite-gold), var(--invite-gold-2), var(--invite-gold));
+            pointer-events: none;
+        }
+        h1 {
+            margin: 0 34px 6px 0;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            line-height: 1.15;
+        }
+        p {
+            margin: 0 0 22px;
+            color: var(--invite-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-bottom: 14px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--invite-label);
+        }
+        input {
+            height: 42px;
+            width: 100%;
+            border-radius: var(--invite-radius);
+            border: 1px solid var(--invite-input-border);
+            background: var(--invite-input-bg);
+            color: var(--invite-input-text);
+            padding: 0 12px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: normal;
+            outline: none;
+            transition: border-color .2s cubic-bezier(.4,0,.2,1), box-shadow .2s cubic-bezier(.4,0,.2,1);
+        }
+        input:focus {
+            border-color: rgba(245, 158, 11, .7);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, .12);
+        }
+        button {
+            height: 42px;
+            width: 100%;
+            border: 0;
+            border-radius: var(--invite-radius);
+            background: var(--invite-gold);
+            color: #fff;
+            font: inherit;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: filter .2s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1);
+        }
+        button:hover:not(:disabled) { filter: brightness(1.06); }
+        button:active:not(:disabled) { transform: translateY(1px); }
         button:disabled { cursor: not-allowed; opacity: .68; }
-        input[readonly] { color: #cbd5e1; background: rgba(15, 23, 42, .72); }
-        .message { display: none; border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 14px; }
-        .error { color: #fecaca; background: rgba(239, 68, 68, .14); border: 1px solid rgba(248, 113, 113, .35); }
-        .success { color: #bbf7d0; background: rgba(34, 197, 94, .14); border: 1px solid rgba(74, 222, 128, .35); }
-        .info { color: #bfdbfe; background: rgba(59, 130, 246, .14); border: 1px solid rgba(96, 165, 250, .35); }
+        input[readonly] {
+            color: var(--invite-muted);
+            background: var(--invite-readonly-bg);
+        }
+        .message {
+            display: none;
+            border-radius: var(--invite-radius);
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+        .error { color: var(--invite-error-text); background: var(--invite-error-bg); border: 1px solid var(--invite-error-border); }
+        .success { color: var(--invite-success-text); background: var(--invite-success-bg); border: 1px solid var(--invite-success-border); }
+        .info { color: var(--invite-info-text); background: var(--invite-info-bg); border: 1px solid var(--invite-info-border); }
         .hidden { display: none; }
+        .invite-close {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--invite-close-bg);
+            color: var(--invite-close-text);
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 1;
+            text-decoration: none;
+        }
+        .invite-close:hover {
+            background: var(--invite-close-hover-bg);
+            color: var(--invite-close-hover-text);
+        }
+        .password-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .password-wrap input { padding-right: 46px; }
+        .password-toggle {
+            position: absolute;
+            right: 7px;
+            top: 0;
+            bottom: 0;
+            height: 32px;
+            margin: auto 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--invite-muted);
+            cursor: pointer;
+            padding: 0;
+            transform: none;
+        }
+        .password-toggle:hover {
+            background: var(--invite-close-bg);
+            color: var(--invite-text);
+            filter: none;
+        }
+        .password-toggle svg {
+            display: block;
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+        }
         .home-link {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 44px;
+            height: 42px;
             margin-top: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(148, 163, 184, .34);
-            color: #cbd5e1;
+            border-radius: var(--invite-radius);
+            border: 1px solid var(--invite-input-border);
+            color: var(--invite-muted);
             text-decoration: none;
             font-weight: 800;
+            font-size: 13px;
         }
     </style>
 </head>
 
 <body>
     <main>
-        <h1>Accept Operartis Invite</h1>
-        <p>Create your password to activate your invited account.</p>
+        <a class="invite-close" href="./" aria-label="Back to Operartis" data-i18n-aria="back_aria">&times;</a>
+        <h1 data-i18n="title">Accept Operartis Invite</h1>
+        <p data-i18n="subtitle">Create your password to activate your invited account.</p>
         <div id="message" class="message"></div>
         <form id="invite-form" class="hidden">
-            <label>Email<input id="email" type="email" autocomplete="email" required></label>
-            <label>Full Name<input id="full-name" type="text" autocomplete="name"></label>
-            <label>Password<input id="password" type="password" autocomplete="new-password" minlength="8" required></label>
-            <button id="submit" type="submit">Activate Account</button>
+            <label><span data-i18n="email">Email</span><input id="email" type="email" autocomplete="email" required></label>
+            <label><span data-i18n="full_name">Full Name</span><input id="full-name" type="text" autocomplete="name"></label>
+            <label><span data-i18n="password">Password</span>
+                <span class="password-wrap">
+                    <input id="password" type="password" autocomplete="new-password" minlength="8" required>
+                    <button class="password-toggle" id="password-toggle" type="button" aria-label="Show password" aria-pressed="false" data-i18n-aria="show_password">
+                        <svg id="password-toggle-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </span>
+            </label>
+            <button id="submit" type="submit" data-i18n="activate">Activate Account</button>
         </form>
-        <a id="home-link" class="home-link hidden" href="./">Back to Operartis</a>
+        <a id="home-link" class="home-link hidden" href="./" data-i18n="back">Back to Operartis</a>
     </main>
     <script>
+        const INVITE_COPY = {
+            en: {
+                page_title: 'Operartis | Accept Invite',
+                title: 'Accept Operartis Invite',
+                subtitle: 'Create your password to activate your invited account.',
+                email: 'Email',
+                full_name: 'Full Name',
+                password: 'Password',
+                activate: 'Activate Account',
+                activating: 'Activating...',
+                back: 'Back to Operartis',
+                back_aria: 'Back to Operartis',
+                show_password: 'Show password',
+                hide_password: 'Hide password',
+                checking: 'Checking invite link...',
+                invalid_invite: 'This invite is no longer valid. Please contact Operartis for a new invite.',
+                accept_failed: 'Invite could not be accepted.',
+                activated: 'Account activated. Redirecting...'
+            },
+            vi: {
+                page_title: 'Operartis | Kich hoat loi moi',
+                title: 'Chấp Nhận Lời Mời Operartis',
+                subtitle: 'Tạo mật khẩu để kích hoạt tài khoản đã được mời của bạn.',
+                email: 'Email',
+                full_name: 'Họ Và Tên',
+                password: 'Mật Khẩu',
+                activate: 'Kích Hoạt Tài Khoản',
+                activating: 'Đang kích hoạt...',
+                back: 'Quay lại Operartis',
+                back_aria: 'Quay lại Operartis',
+                show_password: 'Hiển thị mật khẩu',
+                hide_password: 'Ẩn mật khẩu',
+                checking: 'Đang kiểm tra liên kết mời...',
+                invalid_invite: 'Lời mời này không còn hợp lệ. Vui lòng liên hệ Operartis để nhận lời mời mới.',
+                accept_failed: 'Không thể chấp nhận lời mời.',
+                activated: 'Tài khoản đã được kích hoạt. Đang chuyển hướng...'
+            }
+        };
+
+        function detectInviteLang() {
+            const languages = Array.isArray(navigator.languages) ? navigator.languages : [navigator.language || 'en'];
+            return languages.some(code => String(code || '').toLowerCase().split('-')[0] === 'vi') ? 'vi' : 'en';
+        }
+
+        const inviteLang = detectInviteLang();
+        const inviteCopy = INVITE_COPY[inviteLang] || INVITE_COPY.en;
+        document.documentElement.lang = inviteLang;
+        document.title = inviteCopy.page_title;
+
+        function t(key) {
+            return inviteCopy[key] || INVITE_COPY.en[key] || key;
+        }
+
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            element.textContent = t(element.dataset.i18n);
+        });
+        document.querySelectorAll('[data-i18n-aria]').forEach(element => {
+            element.setAttribute('aria-label', t(element.dataset.i18nAria));
+        });
+
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token') || '';
         const form = document.getElementById('invite-form');
         const message = document.getElementById('message');
         const submit = document.getElementById('submit');
         const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('password-toggle');
+        const passwordToggleIcon = document.getElementById('password-toggle-icon');
         const homeLink = document.getElementById('home-link');
 
         function showMessage(text, type) {
@@ -89,33 +379,41 @@
             showMessage(text, 'error');
         }
 
+        async function readJson(response) {
+            try {
+                return await response.json();
+            } catch (error) {
+                return {};
+            }
+        }
+
         async function validateInvite() {
             if (!token) {
-                blockInvite('Invite link is missing a token. Please ask your Operartis admin for a new invite.');
+                blockInvite(t('invalid_invite'));
                 return;
             }
 
-            showMessage('Checking invite link...', 'info');
+            showMessage(t('checking'), 'info');
             try {
                 const response = await window.OperartisApi.apiFetch(`/auth/invites/validate?token=${encodeURIComponent(token)}`, {
                     method: 'GET'
                 });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.detail || 'Invite is invalid or expired.');
+                const data = await readJson(response);
+                if (!response.ok) throw new Error(t('invalid_invite'));
                 emailInput.value = data.email || '';
                 emailInput.readOnly = true;
                 form.classList.remove('hidden');
                 homeLink.classList.add('hidden');
                 message.style.display = 'none';
             } catch (error) {
-                blockInvite(error.message || 'This invite is no longer valid. It may have been revoked, accepted, or expired.');
+                blockInvite(error.message || t('invalid_invite'));
             }
         }
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             submit.disabled = true;
-            submit.textContent = 'Activating...';
+            submit.textContent = t('activating');
             try {
                 const response = await window.OperartisApi.apiFetch('/auth/invites/accept', {
                     method: 'POST',
@@ -127,17 +425,27 @@
                         password: document.getElementById('password').value
                     })
                 });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.detail || 'Invite could not be accepted.');
+                const data = await readJson(response);
+                if (!response.ok) throw new Error(t('invalid_invite'));
                 window.OperartisApi.setCsrf(data.csrf_token);
-                showMessage('Account activated. Redirecting...', 'success');
+                showMessage(t('activated'), 'success');
                 window.setTimeout(() => { window.location.href = './'; }, 900);
             } catch (error) {
-                showMessage(error.message || 'Invite could not be accepted.', 'error');
+                showMessage(error.message || t('accept_failed'), 'error');
             } finally {
                 submit.disabled = false;
-                submit.textContent = 'Activate Account';
+                submit.textContent = t('activate');
             }
+        });
+
+        passwordToggle.addEventListener('click', () => {
+            const visible = passwordInput.type === 'text';
+            passwordInput.type = visible ? 'password' : 'text';
+            passwordToggle.setAttribute('aria-pressed', String(!visible));
+            passwordToggle.setAttribute('aria-label', visible ? t('show_password') : t('hide_password'));
+            passwordToggleIcon.innerHTML = visible
+                ? '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle>'
+                : '<path d="m2 2 20 20"></path><path d="M10.58 10.58A2 2 0 0 0 12 14a2 2 0 0 0 1.42-.58"></path><path d="M9.88 4.24A10.8 10.8 0 0 1 12 4c7 0 10 8 10 8a18.5 18.5 0 0 1-2.16 3.19"></path><path d="M6.61 6.61C3.54 8.68 2 12 2 12s3 8 10 8a10.9 10.9 0 0 0 5.39-1.41"></path>';
         });
 
         validateInvite();
