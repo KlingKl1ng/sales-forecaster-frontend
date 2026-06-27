@@ -1134,6 +1134,63 @@
             background: rgba(245, 158, 11, .1);
             color: var(--text-pill-accent);
         }
+        .filter-tabs {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 0 16px;
+            padding: 5px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--panel-soft);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+        }
+        .filter-tab {
+            min-height: 34px;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--soft);
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .filter-tab.active {
+            background: var(--gold);
+            color: #111827;
+            box-shadow: 0 10px 24px rgba(245, 158, 11, .2);
+        }
+        .notification-detail {
+            display: grid;
+            gap: 4px;
+        }
+        .notification-detail strong {
+            color: var(--text);
+            font-size: 13px;
+        }
+        .notification-detail span {
+            color: var(--soft);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+        #section-notifications.single-filter th:first-child,
+        #section-notifications.single-filter td:first-child {
+            display: none;
+        }
+        #section-notifications tr.notification-focus-row {
+            animation: notification-row-focus 2.8s ease-out;
+        }
+        @keyframes notification-row-focus {
+            0%, 45% {
+                background: rgba(245, 158, 11, .22);
+                box-shadow: inset 3px 0 0 var(--gold);
+            }
+            100% {
+                background: transparent;
+                box-shadow: inset 0 0 0 transparent;
+            }
+        }
         .main {
             flex: 1;
             min-height: 0;
@@ -1971,7 +2028,7 @@
                 <div class="side-label admin-only">Member Dashboard</div>
                 <button class="nav-btn active" type="button" data-section="overview"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span><span>Overview</span></button>
                 <button class="nav-btn" type="button" data-section="modules"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Modules</span></button>
-                <button class="nav-btn" type="button" data-section="activity"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><span>Activity</span></button>
+                <button class="nav-btn" type="button" data-section="notifications"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.27 21a2 2 0 0 0 3.46 0"/><path d="M3.26 15.33A1.5 1.5 0 0 0 4.5 17.7h15a1.5 1.5 0 0 0 1.24-2.37C19.45 13.46 18.5 12.7 18.5 8.5a6.5 6.5 0 0 0-13 0c0 4.2-.95 4.96-2.24 6.83Z"/></svg></span><span>Notifications</span></button>
                 <button class="nav-btn" type="button" data-section="reports"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 18v-2"/><path d="M12 18v-4"/><path d="M16 18v-6"/></svg></span><span>Reports</span></button>
                 <button class="nav-btn" type="button" data-section="profile"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Profile</span></button>
                 <button class="nav-btn" type="button" data-section="security"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><span>Security</span></button>
@@ -2094,7 +2151,7 @@
                                 <h2 data-i18n="sections.overview.recent_runs">Recent Module Runs</h2>
                                 <p class="section-sub" data-i18n="sections.overview.recent_runs_sub">Latest work linked to your member account.</p>
                             </div>
-                            <button class="button-ghost nav-jump" type="button" data-section="activity" data-i18n="sections.overview.view_activity">View Activity</button>
+                            <button class="button-ghost nav-jump" type="button" data-section="notifications" data-i18n="sections.overview.view_notifications">View Notifications</button>
                         </div>
                         <div class="table-wrap">
                             <table>
@@ -2125,29 +2182,32 @@
                     <div id="module-shortcuts" class="grid shortcut-grid"></div>
                 </section>
 
-                <section id="section-activity" class="section">
+                <section id="section-notifications" class="section">
                     <div class="hero">
                         <div>
-                            <div class="hero-eyebrow">Run History</div>
-                            <h1>Activity</h1>
-                            <p class="sub">Review uploads, processing status, and retained module activity.</p>
+                            <div class="hero-eyebrow">Event Center</div>
+                            <h1>Notifications</h1>
+                            <p class="sub">Review module runs and system notifications in one place.</p>
                         </div>
+                    </div>
+                    <div id="notification-filter-controls" class="filter-tabs" role="tablist" aria-label="Notification filters">
+                        <button class="filter-tab active" type="button" data-notification-filter="all" data-i18n="sections.notifications.filter_all">All</button>
+                        <button class="filter-tab" type="button" data-notification-filter="module-runs" data-i18n="sections.notifications.filter_module_runs">Module Runs</button>
+                        <button class="filter-tab" type="button" data-notification-filter="system" data-i18n="sections.notifications.filter_system">System</button>
                     </div>
                     <div class="card">
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th data-i18n="table.module">Module</th>
                                         <th data-i18n="table.type">Type</th>
+                                        <th data-i18n="table.event">Event</th>
                                         <th data-i18n="table.status">Status</th>
-                                        <th data-i18n="table.progress">Progress</th>
-                                        <th data-i18n="table.input">Input</th>
-                                        <th data-i18n="table.reports">Reports</th>
+                                        <th data-i18n="table.details">Details</th>
                                         <th data-i18n="table.updated">Updated</th>
                                     </tr>
                                 </thead>
-                                <tbody id="jobs-body"></tbody>
+                                <tbody id="notification-events-body"></tbody>
                             </table>
                         </div>
                     </div>
@@ -2452,7 +2512,7 @@
                             </label>
                             <button id="admin-announcement-submit" type="submit" data-i18n="notifications.send">Send</button>
                             <label class="announcement-wide"><span data-i18n="notifications.announcement_body">Message</span><textarea id="admin-announcement-body" maxlength="4000"></textarea></label>
-                            <label class="announcement-wide"><span data-i18n="notifications.announcement_action_url">Optional action URL</span><input id="admin-announcement-action-url" maxlength="1000" placeholder="/dashboard#activity"></label>
+                            <label class="announcement-wide"><span data-i18n="notifications.announcement_action_url">Optional action URL</span><input id="admin-announcement-action-url" maxlength="1000" placeholder="/dashboard#notifications?filter=system"></label>
                         </form>
                     </div>
                 </section>
@@ -2642,6 +2702,7 @@
         let dashboardRefreshInFlight = false;
         const DASHBOARD_BROADCAST_KEY = 'operartis_dashboard_data_changed';
         const NOTIFICATION_POLL_MS = 60000;
+        const NOTIFICATION_PREVIEW_WORDS = 12;
         const GERMAN_LANG_ENABLED = false;
         const state = {
             activeSection: 'overview',
@@ -2651,6 +2712,8 @@
             artifacts: [],
             notifications: [],
             unreadNotifications: 0,
+            notificationFilter: 'all',
+            notificationFocus: null,
             adminOverview: null,
             adminUsers: [],
             adminInvites: [],
@@ -2662,7 +2725,7 @@
         const sectionCopy = {
             overview: ['Overview', 'Your optimization workspace.'],
             modules: ['Modules', 'Open the tools available to your account.'],
-            activity: ['Activity', 'Review your module runs and upload history.'],
+            notifications: ['Notifications', 'Review module runs and system events.'],
             reports: ['Reports', 'Download retained outputs before cleanup.'],
             profile: ['Profile', 'Manage your member information.'],
             security: ['Security', 'Update your password and account access.'],
@@ -2915,6 +2978,12 @@
             return `${(value / 1024 / 1024).toFixed(1)} MB`;
         }
 
+        function previewWords(value, maxWords = NOTIFICATION_PREVIEW_WORDS) {
+            const words = String(value || '').trim().split(/\s+/).filter(Boolean);
+            if (words.length <= maxWords) return words.join(' ');
+            return `${words.slice(0, maxWords).join(' ')}...`;
+        }
+
         function readError(data, fallback) {
             if (!data) return fallback;
             if (typeof data.detail === 'string') return data.detail;
@@ -2950,7 +3019,42 @@
             return String(section || '').indexOf('admin-') === 0;
         }
 
+        function parseSectionRequest(value) {
+            const text = String(value || '').replace(/^#/, '');
+            const [rawSection, rawQuery = ''] = text.split('?');
+            const params = new URLSearchParams(rawQuery);
+            let filter = params.get('filter');
+            const jobId = params.get('job');
+            const notificationId = params.get('notification');
+            const focus = jobId
+                ? { kind: 'job', id: jobId, filter: 'module-runs' }
+                : notificationId
+                    ? { kind: 'notification', id: notificationId, filter: 'system' }
+                    : null;
+            if (focus) filter = focus.filter;
+            return {
+                section: rawSection === 'activity' ? 'notifications' : rawSection,
+                filter: ['all', 'module-runs', 'system'].includes(filter) ? filter : null,
+                focus,
+            };
+        }
+
+        function sectionHash(section) {
+            if (section === 'notifications' && state.notificationFilter !== 'all') {
+                const params = new URLSearchParams({ filter: state.notificationFilter });
+                if (state.notificationFocus?.id && state.notificationFocus.filter === state.notificationFilter) {
+                    params.set(state.notificationFocus.kind, state.notificationFocus.id);
+                }
+                return `notifications?${params.toString()}`;
+            }
+            return section;
+        }
+
         function setSection(section) {
+            const request = parseSectionRequest(section);
+            section = request.section;
+            if (section === 'notifications') state.notificationFilter = request.filter || 'all';
+            state.notificationFocus = section === 'notifications' ? request.focus : null;
             if (!sectionCopy[section]) section = 'overview';
             if (isAdminSection(section) && state.user && !canUseAdminDashboard(state.user.role)) section = 'overview';
             state.activeSection = section;
@@ -2958,7 +3062,8 @@
             document.querySelectorAll('.nav-btn').forEach(item => item.classList.toggle('active', item.dataset.section === section));
             topTitle.textContent = sectionCopy[section][0];
             topSubtitle.textContent = sectionCopy[section][1];
-            window.location.hash = section;
+            window.location.hash = sectionHash(section);
+            if (section === 'notifications') renderNotificationEvents();
             setSidebarOpen(false);
         }
 
@@ -3034,6 +3139,18 @@
         function stopNotificationPoll() {
             if (notificationPollTimer) clearTimeout(notificationPollTimer);
             notificationPollTimer = null;
+        }
+
+        function syncSectionFromHash() {
+            const hash = String(window.location.hash || '#overview').replace('#', '');
+            const request = parseSectionRequest(hash);
+            const targetSection = sectionCopy[request.section] ? request.section : 'overview';
+            const targetFilter = targetSection === 'notifications' ? (request.filter || 'all') : state.notificationFilter;
+            const currentFocusKey = state.notificationFocus ? `${state.notificationFocus.kind}:${state.notificationFocus.id}` : '';
+            const targetFocusKey = request.focus ? `${request.focus.kind}:${request.focus.id}` : '';
+            if (targetSection !== state.activeSection || targetFilter !== state.notificationFilter || currentFocusKey !== targetFocusKey) {
+                setSection(hash);
+            }
         }
 
         async function loadAdminDashboard(shouldRender = true) {
@@ -3195,11 +3312,16 @@
                     el('span', { class: 'notification-dot', 'aria-hidden': 'true' }),
                     el('div', {}, [
                         el('p', { class: 'notification-title', text: notification.title }),
-                        notification.body ? el('p', { class: 'notification-body', text: notification.body }) : document.createTextNode(''),
+                        notification.body ? el('p', { class: 'notification-body', text: previewWords(notification.body) }) : document.createTextNode(''),
                         el('div', { class: 'notification-meta' }, [
                             el('span', { text: formatDate(notification.created_at) }),
                             el('div', { class: 'row-actions' }, [
-                                notification.action_url ? el('a', { class: 'notification-link', href: notification.action_url, text: dt('notifications.open_link') }) : document.createTextNode(''),
+                                el('a', {
+                                    class: 'notification-link',
+                                    href: notificationDeepLink(notification),
+                                    dataset: { notificationOpenId: notification.id },
+                                    text: dt('notifications.open_link'),
+                                }),
                                 notification.read_at ? document.createTextNode('') : el('button', {
                                     class: 'notification-mark',
                                     type: 'button',
@@ -3250,19 +3372,150 @@
             return el('tr', {}, cells);
         }
 
+        function notificationStatusBadge(severity) {
+            const safeSeverity = ['info', 'success', 'warning', 'error'].includes(severity) ? severity : 'info';
+            return el('span', {
+                class: `badge ${safeSeverity}`,
+                text: dt('notifications.severity_' + safeSeverity),
+            });
+        }
+
+        function notificationFilterLabel(filter) {
+            if (filter === 'module-runs') return dt('sections.notifications.type_module_run');
+            if (filter === 'system') return dt('sections.notifications.type_system');
+            return dt('sections.notifications.type_all');
+        }
+
+        function notificationDeepLink(notification) {
+            const details = notification.details || {};
+            if (notification.category === 'job') {
+                const params = new URLSearchParams({ filter: 'module-runs' });
+                const jobId = details.job_id || details.jobId;
+                if (jobId) params.set('job', jobId);
+                return `/dashboard#notifications?${params.toString()}`;
+            }
+            const params = new URLSearchParams({ filter: 'system', notification: notification.id });
+            return `/dashboard#notifications?${params.toString()}`;
+        }
+
+        function notificationHashTarget(notification) {
+            const link = notificationDeepLink(notification);
+            const hashIndex = link.indexOf('#');
+            return hashIndex >= 0 ? link.slice(hashIndex + 1) : 'notifications';
+        }
+
+        async function openNotificationDetail(notificationId) {
+            const notification = state.notifications.find(item => item.id === notificationId);
+            if (!notification) return;
+            const targetHash = notificationHashTarget(notification);
+            setNotificationPanelOpen(false);
+            setSection(targetHash);
+            if (notification.read_at) return;
+            try {
+                await markNotificationsRead([notification.id], false);
+            } catch (error) {
+                showMessage(error.message || dt('messages.notifications_mark_read_failed'), 'error');
+            }
+        }
+
+        function systemNotifications() {
+            return state.notifications.filter(notification => notification.category !== 'job');
+        }
+
+        function notificationEventItems() {
+            const moduleItems = state.jobs.map(job => ({
+                kind: 'module-runs',
+                at: job.updated_at || job.created_at,
+                row: el('tr', { dataset: { notificationTarget: `job:${job.id}` } }, [
+                    el('td', { text: dt('sections.notifications.type_module_run') }),
+                    el('td', { text: moduleLabel(job.module) }),
+                    el('td', {}, [badge(job.status)]),
+                    el('td', {}, [
+                        el('div', { class: 'notification-detail' }, [
+                            el('strong', { text: job.job_type || '-' }),
+                            el('span', { text: job.input_filename || dt('sections.notifications.no_input') }),
+                        ]),
+                    ]),
+                    el('td', { text: formatDate(job.updated_at || job.created_at) }),
+                ]),
+            }));
+            const systemItems = systemNotifications().map(notification => ({
+                kind: 'system',
+                at: notification.created_at,
+                row: el('tr', { dataset: { notificationTarget: `notification:${notification.id}` } }, [
+                    el('td', { text: dt('sections.notifications.type_system') }),
+                    el('td', { text: notification.title || '-' }),
+                    el('td', {}, [notificationStatusBadge(notification.severity)]),
+                    el('td', {}, [
+                        el('div', { class: 'notification-detail' }, [
+                            el('strong', { text: notification.category || '-' }),
+                            el('span', { text: notification.body || '-' }),
+                        ]),
+                    ]),
+                    el('td', { text: formatDate(notification.created_at) }),
+                ]),
+            }));
+            return moduleItems.concat(systemItems).sort((left, right) => {
+                const leftDate = parseBackendDate(left.at);
+                const rightDate = parseBackendDate(right.at);
+                return (rightDate?.getTime?.() || 0) - (leftDate?.getTime?.() || 0);
+            });
+        }
+
+        function focusNotificationRow(tbody) {
+            if (!state.notificationFocus) return;
+            if (state.notificationFilter !== state.notificationFocus.filter) return;
+            const targetKey = `${state.notificationFocus.kind}:${state.notificationFocus.id}`;
+            const row = Array.from(tbody.querySelectorAll('[data-notification-target]'))
+                .find(item => item.dataset.notificationTarget === targetKey);
+            if (!row) return;
+            requestAnimationFrame(() => {
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                row.classList.remove('notification-focus-row');
+                void row.offsetWidth;
+                row.classList.add('notification-focus-row');
+            });
+        }
+
+        function renderNotificationEvents() {
+            const tbody = document.getElementById('notification-events-body');
+            if (!tbody) return;
+            clear(tbody);
+            const notificationsSection = document.getElementById('section-notifications');
+            notificationsSection?.classList.toggle('single-filter', state.notificationFilter !== 'all');
+            document.querySelectorAll('[data-notification-filter]').forEach(button => {
+                const active = button.dataset.notificationFilter === state.notificationFilter;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+            const items = notificationEventItems().filter(item => (
+                state.notificationFilter === 'all' || item.kind === state.notificationFilter
+            ));
+            if (!items.length) {
+                tbody.appendChild(el('tr', {}, [
+                    el('td', {
+                        class: 'empty',
+                        colspan: state.notificationFilter === 'all' ? '5' : '4',
+                        text: dt('empty.no_notifications_for_filter', { filter: notificationFilterLabel(state.notificationFilter) }),
+                    }),
+                ]));
+                return;
+            }
+            items.forEach(item => tbody.appendChild(item.row));
+            focusNotificationRow(tbody);
+        }
+
         function renderJobs() {
             const recentBody = document.getElementById('recent-jobs-body');
-            const jobsBody = document.getElementById('jobs-body');
             clear(recentBody);
-            clear(jobsBody);
             if (!state.jobs.length) {
                 const emptyText = dt('empty.no_module_runs');
                 recentBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: emptyText })]));
-                jobsBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '7', text: emptyText })]));
+                renderNotificationEvents();
                 return;
             }
             state.jobs.slice(0, 5).forEach(job => recentBody.appendChild(jobRow(job, true)));
-            state.jobs.forEach(job => jobsBody.appendChild(jobRow(job, false)));
+            renderNotificationEvents();
         }
 
         function renderArtifacts() {
@@ -3619,6 +3872,12 @@
             }
         });
         notificationList.addEventListener('click', async event => {
+            const link = event.target.closest('[data-notification-open-id]');
+            if (link) {
+                event.preventDefault();
+                await openNotificationDetail(link.dataset.notificationOpenId);
+                return;
+            }
             const button = event.target.closest('[data-notification-id]');
             if (!button) return;
             button.disabled = true;
@@ -3632,6 +3891,16 @@
         profileDropdown.querySelector('a.index-account-menu-item')?.addEventListener('click', () => setProfileMenuOpen(false));
         document.querySelectorAll('.nav-btn, .nav-jump').forEach(button => {
             button.addEventListener('click', () => setSection(button.dataset.section));
+        });
+        document.getElementById('notification-filter-controls')?.addEventListener('click', event => {
+            const button = event.target.closest('[data-notification-filter]');
+            if (!button) return;
+            state.notificationFilter = button.dataset.notificationFilter;
+            state.notificationFocus = null;
+            renderNotificationEvents();
+            if (state.activeSection === 'notifications') {
+                window.location.hash = sectionHash('notifications');
+            }
         });
         document.getElementById('theme-options').addEventListener('click', event => {
             const button = event.target.closest('[data-theme]');
@@ -3654,6 +3923,7 @@
         window.addEventListener('storage', event => {
             if (event.key === DASHBOARD_BROADCAST_KEY && event.newValue) scheduleDashboardRefresh();
         });
+        window.addEventListener('hashchange', syncSectionFromHash);
         document.getElementById('admin-announcement-form').addEventListener('submit', async event => {
             event.preventDefault();
             if (!canUseAdminDashboard(state.user?.role)) return;

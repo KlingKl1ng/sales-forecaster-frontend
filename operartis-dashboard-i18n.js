@@ -1,6 +1,6 @@
 (function () {
     const SECTION_IDS = [
-        'overview', 'modules', 'activity', 'reports', 'profile', 'security', 'settings',
+        'overview', 'modules', 'notifications', 'reports', 'profile', 'security', 'settings',
         'admin-overview', 'admin-users', 'admin-invites', 'admin-jobs', 'admin-audit',
     ];
 
@@ -13,7 +13,7 @@
                 configuration: 'Configuration',
                 overview: 'Overview',
                 modules: 'Modules',
-                activity: 'Activity',
+                notifications: 'Notifications',
                 reports: 'Reports',
                 profile: 'Profile',
                 security: 'Security',
@@ -60,7 +60,7 @@
                     edit: 'Edit',
                     recent_runs: 'Recent Module Runs',
                     recent_runs_sub: 'Latest work linked to your member account.',
-                    view_activity: 'View Activity',
+                    view_notifications: 'View Notifications',
                 },
                 modules: {
                     title: 'Modules',
@@ -69,12 +69,19 @@
                     h1: 'Module Shortcuts',
                     sub: 'Open the operational modules available to your account.',
                 },
-                activity: {
-                    title: 'Activity',
-                    subtitle: 'Review your module runs and upload history.',
-                    eyebrow: 'Run History',
-                    h1: 'Activity',
-                    sub: 'Review uploads, processing status, and retained module activity.',
+                notifications: {
+                    title: 'Notifications',
+                    subtitle: 'Review module runs and system events.',
+                    eyebrow: 'Event Center',
+                    h1: 'Notifications',
+                    sub: 'Review module runs and system notifications in one place.',
+                    filter_all: 'All',
+                    filter_module_runs: 'Module Runs',
+                    filter_system: 'System',
+                    type_all: 'All',
+                    type_module_run: 'Module Run',
+                    type_system: 'System',
+                    no_input: 'No input file',
                 },
                 reports: {
                     title: 'Reports',
@@ -305,6 +312,7 @@
                 no_invites: 'No invites yet.',
                 no_jobs: 'No jobs yet.',
                 no_audit_events: 'No audit events yet.',
+                no_notifications_for_filter: 'No {filter} events yet.',
             },
             audit_events: {
                 login_success: 'Login success',
@@ -402,7 +410,7 @@
                 configuration: 'Cấu hình',
                 overview: 'Tổng quan',
                 modules: 'Mô-đun',
-                activity: 'Hoạt động',
+                notifications: 'Thông báo',
                 reports: 'Báo cáo',
                 profile: 'Hồ sơ',
                 security: 'Bảo mật',
@@ -449,7 +457,7 @@
                     edit: 'Chỉnh sửa',
                     recent_runs: 'Lần chạy mô-đun gần đây',
                     recent_runs_sub: 'Công việc mới nhất liên kết với tài khoản thành viên của bạn.',
-                    view_activity: 'Xem hoạt động',
+                    view_notifications: 'Xem thông báo',
                 },
                 modules: {
                     title: 'Mô-đun',
@@ -458,12 +466,19 @@
                     h1: 'Lối tắt mô-đun',
                     sub: 'Mở các mô-đun vận hành khả dụng cho tài khoản của bạn.',
                 },
-                activity: {
-                    title: 'Hoạt động',
-                    subtitle: 'Xem lịch sử chạy mô-đun và tải lên.',
-                    eyebrow: 'Lịch sử chạy',
-                    h1: 'Hoạt động',
-                    sub: 'Xem lại tải lên, trạng thái xử lý và hoạt động mô-đun được lưu.',
+                notifications: {
+                    title: 'Thông báo',
+                    subtitle: 'Xem các lần chạy mô-đun và sự kiện hệ thống.',
+                    eyebrow: 'Trung tâm sự kiện',
+                    h1: 'Thông báo',
+                    sub: 'Xem các lần chạy mô-đun và thông báo hệ thống ở một nơi.',
+                    filter_all: 'Tất cả',
+                    filter_module_runs: 'Lần chạy mô-đun',
+                    filter_system: 'Hệ thống',
+                    type_all: 'Tất cả',
+                    type_module_run: 'Lần chạy mô-đun',
+                    type_system: 'Hệ thống',
+                    no_input: 'Không có tệp đầu vào',
                 },
                 reports: {
                     title: 'Báo cáo',
@@ -694,6 +709,7 @@
                 no_invites: 'Chưa có lời mời nào.',
                 no_jobs: 'Chưa có tác vụ nào.',
                 no_audit_events: 'Chưa có sự kiện kiểm toán nào.',
+                no_notifications_for_filter: 'Chưa có sự kiện {filter}.',
             },
             audit_events: {
                 login_success: 'Đăng nhập thành công',
@@ -791,7 +807,7 @@
                 configuration: 'Konfiguration',
                 overview: 'Übersicht',
                 modules: 'Module',
-                activity: 'Aktivität',
+                notifications: 'Benachrichtigungen',
                 reports: 'Berichte',
                 profile: 'Profil',
                 security: 'Sicherheit',
@@ -838,7 +854,7 @@
                     edit: 'Bearbeiten',
                     recent_runs: 'Letzte Modul-Läufe',
                     recent_runs_sub: 'Neueste Arbeiten, die mit Ihrem Mitgliedskonto verknüpft sind.',
-                    view_activity: 'Aktivität anzeigen',
+                    view_notifications: 'Benachrichtigungen anzeigen',
                 },
                 modules: {
                     title: 'Module',
@@ -847,12 +863,19 @@
                     h1: 'Modul-Verknüpfungen',
                     sub: 'Öffnen Sie die für Ihr Konto verfügbaren operativen Module.',
                 },
-                activity: {
-                    title: 'Aktivität',
-                    subtitle: 'Modul-Läufe und Upload-Verlauf prüfen.',
-                    eyebrow: 'Laufverlauf',
-                    h1: 'Aktivität',
-                    sub: 'Uploads, Verarbeitungsstatus und gespeicherte Modulaktivität prüfen.',
+                notifications: {
+                    title: 'Benachrichtigungen',
+                    subtitle: 'Modul-Läufe und Systemereignisse prüfen.',
+                    eyebrow: 'Ereigniszentrum',
+                    h1: 'Benachrichtigungen',
+                    sub: 'Prüfen Sie Modul-Läufe und Systembenachrichtigungen an einem Ort.',
+                    filter_all: 'Alle',
+                    filter_module_runs: 'Modul-Läufe',
+                    filter_system: 'System',
+                    type_all: 'Alle',
+                    type_module_run: 'Modul-Lauf',
+                    type_system: 'System',
+                    no_input: 'Keine Eingabedatei',
                 },
                 reports: {
                     title: 'Berichte',
@@ -1083,6 +1106,7 @@
                 no_invites: 'Noch keine Einladungen.',
                 no_jobs: 'Noch keine Jobs.',
                 no_audit_events: 'Noch keine Audit-Ereignisse.',
+                no_notifications_for_filter: 'Noch keine Ereignisse für {filter}.',
             },
             audit_events: {
                 login_success: 'Anmeldung erfolgreich',
@@ -1177,7 +1201,7 @@
     const NAV_SECTION_KEYS = {
         overview: 'nav.overview',
         modules: 'nav.modules',
-        activity: 'nav.activity',
+        notifications: 'nav.notifications',
         reports: 'nav.reports',
         profile: 'nav.profile',
         security: 'nav.security',
