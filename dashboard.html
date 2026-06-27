@@ -1974,6 +1974,64 @@
                 min-height: 80px;
                 padding: 12px;
             }
+            .notification-panel {
+                position: fixed;
+                top: calc(var(--shell-header-height) + env(safe-area-inset-top, 0px) + 8px);
+                left: max(12px, env(safe-area-inset-left, 0px));
+                right: max(12px, env(safe-area-inset-right, 0px));
+                width: auto;
+                max-height: calc(100dvh - var(--shell-header-height) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px);
+                border-radius: 18px;
+                background: var(--surface-elevated);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+            }
+            .notification-panel-head {
+                gap: 10px;
+                padding: 12px;
+            }
+            .notification-panel-head button {
+                white-space: normal;
+                line-height: 1.2;
+                text-align: center;
+            }
+            .notification-list {
+                max-height: calc(100dvh - var(--shell-header-height) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 92px);
+                padding: 10px;
+            }
+            .notification-item {
+                border-radius: 14px;
+                padding: 11px;
+                background: var(--surface-inset-strong);
+            }
+            .notification-item.unread {
+                background: rgba(245, 158, 11, .12);
+            }
+            html.dark .notification-panel,
+            html.dark .notification-list {
+                background: #0f172a;
+            }
+            html:not(.dark) .notification-panel,
+            html:not(.dark) .notification-list {
+                background: #ffffff;
+            }
+            html.dark .notification-item {
+                background: #111c30;
+            }
+            html.dark .notification-item.unread {
+                background: #241d17;
+            }
+            .notification-meta {
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+            .notification-meta .row-actions {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                gap: 8px;
+                margin-left: auto;
+            }
         }
         @media (max-width: 560px) {
             .topbar {
@@ -2010,6 +2068,48 @@
             .reports-downloads-card h2,
             .reports-status-card h2 {
                 font-size: 16px;
+            }
+            .notification-panel {
+                top: calc(var(--shell-header-height) + env(safe-area-inset-top, 0px) + 6px);
+                left: max(10px, env(safe-area-inset-left, 0px));
+                right: max(10px, env(safe-area-inset-right, 0px));
+                border-radius: 16px;
+            }
+            .notification-panel-head {
+                align-items: flex-start;
+            }
+            .notification-panel-head strong {
+                padding-top: 5px;
+            }
+            .notification-panel-head button {
+                min-height: 34px;
+                max-width: 180px;
+                padding: 0 11px;
+                flex-shrink: 0;
+            }
+            .notification-list {
+                gap: 8px;
+                padding: 8px;
+            }
+            .notification-item {
+                grid-template-columns: 7px minmax(0, 1fr);
+                gap: 8px;
+                padding: 10px;
+            }
+            .notification-title {
+                font-size: 12px;
+            }
+            .notification-body {
+                font-size: 11px;
+            }
+            .notification-meta {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 8px;
+            }
+            .notification-mark {
+                min-height: 30px;
+                padding: 0 8px;
             }
         }
         @media (max-width: 380px) {
