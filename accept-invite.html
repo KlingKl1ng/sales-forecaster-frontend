@@ -32,9 +32,26 @@
         label { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #cbd5e1; }
         input { height: 44px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, .32); background: #020617; color: #f8fafc; padding: 0 12px; font-size: 14px; }
         button { height: 44px; width: 100%; border: 0; border-radius: 8px; background: #f59e0b; color: #111827; font-weight: 900; cursor: pointer; }
+        button:disabled { cursor: not-allowed; opacity: .68; }
+        input[readonly] { color: #cbd5e1; background: rgba(15, 23, 42, .72); }
         .message { display: none; border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 14px; }
         .error { color: #fecaca; background: rgba(239, 68, 68, .14); border: 1px solid rgba(248, 113, 113, .35); }
         .success { color: #bbf7d0; background: rgba(34, 197, 94, .14); border: 1px solid rgba(74, 222, 128, .35); }
+        .info { color: #bfdbfe; background: rgba(59, 130, 246, .14); border: 1px solid rgba(96, 165, 250, .35); }
+        .hidden { display: none; }
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 44px;
+            margin-top: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, .34);
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 800;
+        }
     </style>
 </head>
 
@@ -43,12 +60,13 @@
         <h1>Accept Operartis Invite</h1>
         <p>Create your password to activate your invited account.</p>
         <div id="message" class="message"></div>
-        <form id="invite-form">
+        <form id="invite-form" class="hidden">
             <label>Email<input id="email" type="email" autocomplete="email" required></label>
             <label>Full Name<input id="full-name" type="text" autocomplete="name"></label>
             <label>Password<input id="password" type="password" autocomplete="new-password" minlength="8" required></label>
             <button id="submit" type="submit">Activate Account</button>
         </form>
+        <a id="home-link" class="home-link hidden" href="./">Back to Operartis</a>
     </main>
     <script>
         const params = new URLSearchParams(window.location.search);
@@ -56,11 +74,42 @@
         const form = document.getElementById('invite-form');
         const message = document.getElementById('message');
         const submit = document.getElementById('submit');
+        const emailInput = document.getElementById('email');
+        const homeLink = document.getElementById('home-link');
 
         function showMessage(text, type) {
             message.textContent = text;
             message.className = `message ${type}`;
             message.style.display = 'block';
+        }
+
+        function blockInvite(text) {
+            form.classList.add('hidden');
+            homeLink.classList.remove('hidden');
+            showMessage(text, 'error');
+        }
+
+        async function validateInvite() {
+            if (!token) {
+                blockInvite('Invite link is missing a token. Please ask your Operartis admin for a new invite.');
+                return;
+            }
+
+            showMessage('Checking invite link...', 'info');
+            try {
+                const response = await window.OperartisApi.apiFetch(`/auth/invites/validate?token=${encodeURIComponent(token)}`, {
+                    method: 'GET'
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'Invite is invalid or expired.');
+                emailInput.value = data.email || '';
+                emailInput.readOnly = true;
+                form.classList.remove('hidden');
+                homeLink.classList.add('hidden');
+                message.style.display = 'none';
+            } catch (error) {
+                blockInvite(error.message || 'This invite is no longer valid. It may have been revoked, accepted, or expired.');
+            }
         }
 
         form.addEventListener('submit', async (event) => {
@@ -73,7 +122,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         token,
-                        email: document.getElementById('email').value,
+                        email: emailInput.value,
                         full_name: document.getElementById('full-name').value,
                         password: document.getElementById('password').value
                     })
@@ -90,6 +139,8 @@
                 submit.textContent = 'Activate Account';
             }
         });
+
+        validateInvite();
     </script>
 </body>
 
