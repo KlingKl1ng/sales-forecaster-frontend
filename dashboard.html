@@ -946,6 +946,8 @@
             background-color: transparent;
             background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             color: var(--muted);
             transition: background-image .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease), transform .15s var(--ease);
         }
@@ -958,12 +960,43 @@
             color: var(--gold);
             border-color: rgba(245, 158, 11, 0.3);
             background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.28), rgba(245, 158, 11, 0.08));
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
+        }
+        html.dark .notification-btn:hover {
+            color: var(--gold);
+            border-color: rgba(245, 158, 11, 0.42);
+            background-image: linear-gradient(to bottom right, rgba(30, 41, 59, 0.42), rgba(245, 158, 11, 0.12));
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.14), inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+        }
+        .notification-btn:active {
+            transform: translateY(1px);
         }
         .notification-btn svg {
             width: 18px;
             height: 18px;
             stroke: currentColor;
             fill: none;
+        }
+        .notification-icon {
+            transform-origin: 50% 12%;
+            transition: transform .25s var(--ease);
+        }
+        .notification-btn:hover .notification-icon {
+            animation: notification-bell-ring .72s ease-in-out;
+        }
+        @keyframes notification-bell-ring {
+            0%, 100% { transform: rotate(0deg); }
+            15% { transform: rotate(15deg); }
+            30% { transform: rotate(-13deg); }
+            45% { transform: rotate(9deg); }
+            60% { transform: rotate(-6deg); }
+            75% { transform: rotate(3deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .notification-btn:hover .notification-icon {
+                animation: none;
+                transform: rotate(-10deg);
+            }
         }
         .notification-count {
             position: absolute;
@@ -2069,7 +2102,7 @@
                     </button>
                     <div id="notification-menu" class="notification-menu">
                         <button id="notification-bell" class="notification-btn" type="button" aria-expanded="false" aria-haspopup="dialog" aria-controls="notification-panel" data-i18n-aria="notifications.open" data-i18n-title="notifications.open" aria-label="Open notifications" title="Open notifications">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg class="notification-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M10.27 21a2 2 0 0 0 3.46 0"></path>
                                 <path d="M3.26 15.33A1.5 1.5 0 0 0 4.5 17.7h15a1.5 1.5 0 0 0 1.24-2.37C19.45 13.46 18.5 12.7 18.5 8.5a6.5 6.5 0 0 0-13 0c0 4.2-.95 4.96-2.24 6.83Z"></path>
                             </svg>
