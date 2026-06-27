@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operartis | Member Dashboard</title>
+    <title>Operartis | User Dashboard</title>
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
@@ -131,7 +131,8 @@
                 var(--bg);
         }
         html:not(.dark) input,
-        html:not(.dark) select {
+        html:not(.dark) select,
+        html:not(.dark) textarea {
             background: var(--surface-input);
             border-color: rgba(148, 163, 184, .35);
             color: var(--text);
@@ -164,18 +165,25 @@
         button:active:not(:disabled):not(.sidebar-collapse):not(.password-toggle):not(.mobile-menu) { transform: translateY(1px); }
         button:focus-visible { outline: 2px solid rgba(245, 158, 11, .55); outline-offset: 2px; }
         button:disabled { opacity: .55; cursor: not-allowed; }
-        input, select {
+        input, select, textarea {
             width: 100%;
-            height: 42px;
             border: 1px solid rgba(148, 163, 184, .22);
             border-radius: var(--radius);
             background: var(--surface-input);
             color: var(--text);
-            padding: 0 12px;
             outline: none;
             transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
         }
-        input:focus, select:focus {
+        input, select {
+            height: 42px;
+            padding: 0 12px;
+        }
+        textarea {
+            min-height: 96px;
+            padding: 12px;
+            resize: vertical;
+        }
+        input:focus, select:focus, textarea:focus {
             border-color: rgba(245, 158, 11, .7);
             box-shadow: 0 0 0 3px rgba(245, 158, 11, .12);
         }
@@ -1129,13 +1137,18 @@
             gap: 12px;
             align-items: end;
         }
+        .announcement-form button[type="submit"] {
+            width: 100%;
+            height: 42px;
+            padding: 0 16px;
+            font-size: 15px;
+        }
+        .announcement-form .announcement-action > span {
+            visibility: hidden;
+        }
         .announcement-form textarea,
         .announcement-form .announcement-wide {
             grid-column: 1 / -1;
-        }
-        .announcement-form textarea {
-            min-height: 96px;
-            resize: vertical;
         }
         .mobile-menu {
             display: none;
@@ -1616,8 +1629,10 @@
             align-items: end;
         }
         .admin-form-grid button[type="submit"] {
+            width: 100%;
             height: 42px;
             padding: 0 16px;
+            font-size: 15px;
         }
         .panel-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         .toolbar {
@@ -2161,7 +2176,7 @@
                 </div>
             </div>
             <nav class="side-nav" aria-label="Dashboard">
-                <div class="side-label admin-only">Member Dashboard</div>
+                <div class="side-label admin-only">User Dashboard</div>
                 <button class="nav-btn active" type="button" data-section="overview"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span><span>Overview</span></button>
                 <button class="nav-btn" type="button" data-section="modules"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Modules</span></button>
                 <button class="nav-btn" type="button" data-section="notifications"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.27 21a2 2 0 0 0 3.46 0"/><path d="M3.26 15.33A1.5 1.5 0 0 0 4.5 17.7h15a1.5 1.5 0 0 0 1.24-2.37C19.45 13.46 18.5 12.7 18.5 8.5a6.5 6.5 0 0 0-13 0c0 4.2-.95 4.96-2.24 6.83Z"/></svg></span><span>Notifications</span></button>
@@ -2169,7 +2184,7 @@
                 <button class="nav-btn" type="button" data-section="profile"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Profile</span></button>
                 <button class="nav-btn" type="button" data-section="security"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><span>Security</span></button>
                 <div class="side-label admin-only">Admin Dashboard</div>
-                <button class="nav-btn admin-only" type="button" data-section="admin-overview"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span><span>Overview</span></button>
+                <button class="nav-btn admin-only" type="button" data-section="admin-overview"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span><span>Overview</span></button>
                 <button class="nav-btn admin-only" type="button" data-section="admin-users"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Users</span></button>
                 <button class="nav-btn admin-only" type="button" data-section="admin-invites"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg></span><span>Invites</span></button>
                 <button class="nav-btn admin-only" type="button" data-section="admin-jobs"><span class="nav-ico" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg></span><span>All Jobs</span></button>
@@ -2251,7 +2266,7 @@
                 <section id="section-overview" class="section active">
                     <div class="hero">
                         <div>
-                            <div class="hero-eyebrow">Member Workspace</div>
+                            <div class="hero-eyebrow">User Workspace</div>
                             <h1 id="welcome-title">Your Dashboard</h1>
                             <p class="sub">Track optimization activity, manage your account, and reopen frequently used modules from one place.</p>
                         </div>
@@ -2646,7 +2661,10 @@
                                     <option value="error" data-i18n="notifications.severity_error">Error</option>
                                 </select>
                             </label>
-                            <button id="admin-announcement-submit" type="submit" data-i18n="notifications.send">Send</button>
+                            <label class="announcement-action">
+                                <span aria-hidden="true">&nbsp;</span>
+                                <button id="admin-announcement-submit" type="submit" data-i18n="notifications.send">Send</button>
+                            </label>
                             <label class="announcement-wide"><span data-i18n="notifications.announcement_body">Message</span><textarea id="admin-announcement-body" maxlength="4000"></textarea></label>
                             <label class="announcement-wide"><span data-i18n="notifications.announcement_action_url">Optional action URL</span><input id="admin-announcement-action-url" maxlength="1000" placeholder="/dashboard#notifications?filter=system"></label>
                         </form>

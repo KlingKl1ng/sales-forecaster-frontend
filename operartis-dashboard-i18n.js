@@ -6,9 +6,9 @@
 
     const TRANSLATIONS = {
         en: {
-            page_title: 'Operartis | Member Dashboard',
+            page_title: 'Operartis | User Dashboard',
             nav: {
-                member_dashboard: 'Member Dashboard',
+                member_dashboard: 'User Dashboard',
                 admin_dashboard: 'Admin Dashboard',
                 configuration: 'Configuration',
                 overview: 'Overview',
@@ -48,7 +48,7 @@
                 overview: {
                     title: 'Overview',
                     subtitle: 'Your optimization workspace.',
-                    eyebrow: 'Member Workspace',
+                    eyebrow: 'User Workspace',
                     h1: 'Your Dashboard',
                     sub: 'Track optimization activity, manage your account, and reopen frequently used modules from one place.',
                     retention: 'Retention: {days} days',
@@ -403,9 +403,9 @@
             },
         },
         vi: {
-            page_title: 'Operartis | Bảng điều khiển thành viên',
+            page_title: 'Operartis | Bảng điều khiển người dùng',
             nav: {
-                member_dashboard: 'Bảng điều khiển thành viên',
+                member_dashboard: 'Bảng điều khiển người dùng',
                 admin_dashboard: 'Bảng điều khiển quản trị',
                 configuration: 'Cấu hình',
                 overview: 'Tổng quan',
@@ -445,7 +445,7 @@
                 overview: {
                     title: 'Tổng quan',
                     subtitle: 'Không gian tối ưu hóa của bạn.',
-                    eyebrow: 'Không gian thành viên',
+                    eyebrow: 'Không gian người dùng',
                     h1: 'Bảng điều khiển của bạn',
                     sub: 'Theo dõi hoạt động tối ưu hóa, quản lý tài khoản và mở lại các mô-đun thường dùng từ một nơi.',
                     retention: 'Lưu giữ: {days} ngày',
@@ -800,9 +800,9 @@
             },
         },
         de: {
-            page_title: 'Operartis | Mitglieder-Dashboard',
+            page_title: 'Operartis | Benutzer-Dashboard',
             nav: {
-                member_dashboard: 'Mitglieder-Dashboard',
+                member_dashboard: 'Benutzer-Dashboard',
                 admin_dashboard: 'Admin-Dashboard',
                 configuration: 'Konfiguration',
                 overview: 'Übersicht',
@@ -842,7 +842,7 @@
                 overview: {
                     title: 'Übersicht',
                     subtitle: 'Ihr Optimierungs-Arbeitsbereich.',
-                    eyebrow: 'Mitglieder-Arbeitsbereich',
+                    eyebrow: 'Benutzer-Arbeitsbereich',
                     h1: 'Ihr Dashboard',
                     sub: 'Verfolgen Sie Optimierungsaktivitäten, verwalten Sie Ihr Konto und öffnen Sie häufig genutzte Module an einem Ort.',
                     retention: 'Aufbewahrung: {days} Tage',
