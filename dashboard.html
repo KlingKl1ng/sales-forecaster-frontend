@@ -162,7 +162,7 @@
             transition: background .2s var(--ease), transform .15s var(--ease), box-shadow .2s var(--ease), opacity .2s var(--ease);
         }
         button:hover:not(:disabled) { filter: brightness(1.06); }
-        button:active:not(:disabled):not(.sidebar-collapse):not(.password-toggle):not(.mobile-menu) { transform: translateY(1px); }
+        button:active:not(:disabled):not(.sidebar-collapse):not(.password-toggle):not(.mobile-menu):not(.filter-tab) { transform: translateY(1px); }
         button:focus-visible { outline: 2px solid rgba(245, 158, 11, .55); outline-offset: 2px; }
         button:disabled { opacity: .55; cursor: not-allowed; }
         input, select, textarea {
@@ -1190,6 +1190,7 @@
             color: var(--text-pill-accent);
         }
         .filter-tabs {
+            position: relative;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -1200,8 +1201,36 @@
             background: var(--panel-soft);
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
         }
+        .filter-tab-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 999px;
+            background: var(--gold);
+            box-shadow: 0 10px 24px rgba(245, 158, 11, .2);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            will-change: transform, width, height;
+        }
+        .filter-tab-indicator.is-ready {
+            opacity: 1;
+        }
+        .filter-tab-indicator.is-animated {
+            transition:
+                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.2s ease;
+        }
         .filter-tab {
-            min-height: 34px;
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            height: 34px;
             padding: 0 14px;
             border: 0;
             border-radius: 999px;
@@ -1209,12 +1238,19 @@
             color: var(--soft);
             font-size: 12px;
             font-weight: 800;
+            line-height: 1;
+            text-align: center;
             white-space: nowrap;
         }
+        .filter-tab-label {
+            display: block;
+            line-height: 1;
+            transform: translateY(1.5px);
+        }
         .filter-tab.active {
-            background: var(--gold);
+            background: transparent;
             color: #111827;
-            box-shadow: 0 10px 24px rgba(245, 158, 11, .2);
+            box-shadow: none;
         }
         .notification-detail {
             display: grid;
@@ -2348,9 +2384,10 @@
                         </div>
                     </div>
                     <div id="notification-filter-controls" class="filter-tabs" role="tablist" aria-label="Notification filters">
-                        <button class="filter-tab active" type="button" data-notification-filter="all" data-i18n="sections.notifications.filter_all">All</button>
-                        <button class="filter-tab" type="button" data-notification-filter="module-runs" data-i18n="sections.notifications.filter_module_runs">Module Runs</button>
-                        <button class="filter-tab" type="button" data-notification-filter="system" data-i18n="sections.notifications.filter_system">System</button>
+                        <span id="notification-filter-indicator" class="filter-tab-indicator" aria-hidden="true"></span>
+                        <button class="filter-tab active" type="button" data-notification-filter="all" aria-pressed="true"><span class="filter-tab-label" data-i18n="sections.notifications.filter_all">All</span></button>
+                        <button class="filter-tab" type="button" data-notification-filter="module-runs" aria-pressed="false"><span class="filter-tab-label" data-i18n="sections.notifications.filter_module_runs">Module Runs</span></button>
+                        <button class="filter-tab" type="button" data-notification-filter="system" aria-pressed="false"><span class="filter-tab-label" data-i18n="sections.notifications.filter_system">System</span></button>
                     </div>
                     <div class="card">
                         <div class="table-wrap">
@@ -2860,6 +2897,7 @@
         let dashboardRefreshTimer = null;
         let notificationPollTimer = null;
         let dashboardRefreshInFlight = false;
+        let notificationFilterIndicatorAnimated = false;
         const DASHBOARD_BROADCAST_KEY = 'operartis_dashboard_data_changed';
         const NOTIFICATION_POLL_MS = 60000;
         const NOTIFICATION_PREVIEW_WORDS = 12;
@@ -3637,6 +3675,31 @@
             });
         }
 
+        function updateNotificationFilterIndicator() {
+            const track = document.getElementById('notification-filter-controls');
+            const indicator = document.getElementById('notification-filter-indicator');
+            if (!track || !indicator) return;
+            const active = track.querySelector('.filter-tab.active');
+            if (!active) {
+                indicator.classList.remove('is-ready');
+                return;
+            }
+            const trackRect = track.getBoundingClientRect();
+            const activeRect = active.getBoundingClientRect();
+            const left = Math.round(activeRect.left - trackRect.left);
+            const top = Math.round(activeRect.top - trackRect.top);
+            indicator.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+            indicator.style.width = `${Math.round(activeRect.width)}px`;
+            indicator.style.height = `${Math.round(activeRect.height)}px`;
+            indicator.classList.add('is-ready');
+            if (!notificationFilterIndicatorAnimated) {
+                requestAnimationFrame(() => {
+                    indicator.classList.add('is-animated');
+                    notificationFilterIndicatorAnimated = true;
+                });
+            }
+        }
+
         function renderNotificationEvents() {
             const tbody = document.getElementById('notification-events-body');
             if (!tbody) return;
@@ -3659,10 +3722,12 @@
                         text: dt('empty.no_notifications_for_filter', { filter: notificationFilterLabel(state.notificationFilter) }),
                     }),
                 ]));
+                requestAnimationFrame(updateNotificationFilterIndicator);
                 return;
             }
             items.forEach(item => tbody.appendChild(item.row));
             focusNotificationRow(tbody);
+            requestAnimationFrame(updateNotificationFilterIndicator);
         }
 
         function renderJobs() {
@@ -4068,6 +4133,15 @@
                 window.location.hash = sectionHash('notifications');
             }
         });
+        (function bindNotificationFilterIndicator() {
+            const track = document.getElementById('notification-filter-controls');
+            if (!track) return;
+            const observer = new ResizeObserver(() => updateNotificationFilterIndicator());
+            observer.observe(track);
+            track.querySelectorAll('.filter-tab').forEach(button => observer.observe(button));
+            window.addEventListener('resize', updateNotificationFilterIndicator);
+            requestAnimationFrame(updateNotificationFilterIndicator);
+        })();
         document.getElementById('theme-options').addEventListener('click', event => {
             const button = event.target.closest('[data-theme]');
             if (!button) return;
