@@ -275,6 +275,12 @@
         return parseJsonResponse(response);
     }
 
+    async function validatePasswordReset(email, token) {
+        var query = '?email=' + encodeURIComponent(email || '') + '&token=' + encodeURIComponent(token || '');
+        var response = await apiFetch('/auth/password/reset/validate' + query, { method: 'GET' });
+        return parseJsonResponse(response);
+    }
+
     async function confirmPasswordReset(email, token, newPassword) {
         var response = await apiFetch('/auth/password/reset/confirm', {
             method: 'POST',
@@ -300,6 +306,7 @@
         me: me,
         login: login,
         requestPasswordReset: requestPasswordReset,
+        validatePasswordReset: validatePasswordReset,
         confirmPasswordReset: confirmPasswordReset,
         logout: logout
     };
