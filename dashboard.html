@@ -278,6 +278,12 @@
         .button-link:hover { filter: brightness(1.05); }
         .button-secondary { background: var(--surface-secondary); color: var(--text); border: 1px solid var(--line); }
         .button-secondary:hover { background: var(--surface-secondary-hover); }
+        .button-secondary:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            filter: grayscale(.2);
+        }
+        .button-secondary:disabled:hover { background: var(--surface-secondary); }
         .button-danger { background: rgba(239, 68, 68, .12); color: var(--text-danger); border: 1px solid rgba(239, 68, 68, .32); }
         .button-danger:hover { background: rgba(239, 68, 68, .18); }
         .button-ghost { border: 1px solid var(--line); background: var(--surface-ghost-btn); color: var(--soft); }
@@ -3788,7 +3794,13 @@
                     dataset: { action: 'save-user', userId: user.id },
                     text: dt('actions.save'),
                 });
-                saveButton.disabled = !canEditUser;
+                const syncSaveButton = () => {
+                    const hasChanges = role.value !== user.role || status.value !== user.status;
+                    saveButton.disabled = !canEditUser || !hasChanges;
+                };
+                role.addEventListener('change', syncSaveButton);
+                status.addEventListener('change', syncSaveButton);
+                syncSaveButton();
                 tbody.appendChild(el('tr', {}, [
                     el('td', {}, [
                         el('strong', { text: user.email }),
