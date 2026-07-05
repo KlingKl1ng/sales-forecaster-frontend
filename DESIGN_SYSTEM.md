@@ -171,6 +171,8 @@ tailwind.config = {
 
 The most recognizable Operartis trait is **frosted glass**: translucent surfaces, backdrop blur, a soft inner top-highlight, and a thin ring. Apply it to *chrome and elevated/interactive surfaces* (nav, sidebar, header, module blocks, pills), **not** to dense data surfaces (tables, chart bodies) which stay solid for legibility.
 
+For **segmented navigation and single-selection pill bars**, use the specialized **Liquid Glass** pattern (§4.1) instead of per-item glass chips.
+
 **Base glass recipe:**
 ```html
 <div class="
@@ -202,6 +204,360 @@ Helper class (in `<style>`):
 4. Inset top highlight inside the box-shadow (`inset_0_1px_0_0_rgba(255,255,255,...)`).
 5. Soft drop shadow for float.
 
+### 4.1 Liquid Glass (signature interactive chrome)
+
+**Liquid Glass** is Operartis’s premium glass variant: a **single outer glass vessel** holding **plain labels**, with **one inner glass highlight** that **slides** to the active item. It reads as one continuous, luminous surface — not a row of separate frosted chips.
+
+> **Reference:** Terminal header nav (`index.html` → `HeaderNav`). Classes: `header-glass-pill`, `header-nav-glass-slab`, `header-nav-glass-indicator`, `header-nav-tab`.
+
+#### Concept
+
+| Layer | Role | User perception |
+|---|---|---|
+| **Outer vessel** | Fixed capsule that frames the control group | One shared “tray” of frosted glass |
+| **Tab labels** | Inactive = text only; active = gold text | Options float on the tray, not inside individual boxes |
+| **Liquid indicator** | Single absolutely positioned inner pill | Warm gold “droplet” that flows between selections |
+
+**Use Liquid Glass for:** segmented nav, pill tab bars, toggle groups where **one** item is selected at a time and motion reinforces focus.
+
+**Use base glass (§4) for:** static panels, cards, sidebars, utility chips without a sliding selection.
+
+**Do not use Liquid Glass for:** tables, chart areas, dense forms, or anywhere legibility needs a solid surface.
+
+#### Anatomy (three layers)
+
+```
+┌──────────────────────────────────────────────────────────── outer vessel (.header-glass-pill--wide)
+│  CHUỖI CUNG ỨNG   CÔNG NGHIỆP 4.0   ┌──────────┐   QUY TRÌNH   VỀ CHÚNG TÔI
+│                                      │ PHÂN TÍCH │  ← liquid indicator (slides)
+│                                      └──────────┘
+└────────────────────────────────────────────────────────────
+     ↑ plain text labels (.header-nav-tab)     ↑ gold text when active (.header-nav-tab-active)
+```
+
+1. **Outer vessel** — full pill (`border-radius: 9999px`), fixed height `2.5rem` (`40px`), groups all items.
+2. **Labels** — transparent buttons/spans on top (`z-index: 1`); no per-item glass when inactive.
+3. **Liquid indicator** — one element behind labels (`z-index: 0`); sized and positioned to the active control; animates `transform` + `width` + `height`.
+
+#### Outer vessel recipe (`.header-glass-pill`)
+
+Shared by nav slab, theme/lang utility pill, and mobile menu button.
+
+```css
+.header-glass-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;              /* 40px — aligns with h-16 header chrome */
+  padding: 0.25rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dark .header-glass-pill {
+  border-color: rgba(255, 255, 255, 0.1);
+  background-image: linear-gradient(to bottom right, rgba(30, 41, 59, 0.3), rgba(15, 23, 42, 0.1));
+}
+
+.header-glass-pill--wide {
+  width: auto;
+  gap: 0.25rem;                /* space between tab labels inside */
+}
+```
+
+**Tailwind equivalent (outer vessel):**
+```html
+<div class="flex items-center h-10 px-1 gap-1 rounded-full
+            border border-white/40 dark:border-white/10
+            bg-gradient-to-br from-white/20 to-white/5
+            dark:from-slate-800/30 dark:to-slate-900/10
+            shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)]
+            backdrop-blur-md">
+```
+
+Nav track adds `position: relative` via `.header-nav-tabs-track` so the indicator can anchor inside the vessel.
+
+#### Tab labels (`.header-nav-tab`)
+
+Inactive tabs are **intentionally flat** — only typography, no glass fill:
+
+```css
+.header-nav-tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5625rem;           /* 25px — fits inside 40px vessel with padding */
+  padding: 0 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  font-size: 0.625rem;         /* 10px */
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;              /* slate-500 */
+  transition: color 0.2s ease;
+}
+
+.header-nav-tab:hover { color: #d97706; }           /* amber-600 */
+.dark .header-nav-tab { color: #94a3b8; }           /* slate-400 */
+.dark .header-nav-tab:hover { color: #fbbf24; }    /* amber-400 */
+
+.header-nav-tab-active { color: #d97706; }
+.dark .header-nav-tab-active { color: #fbbf24; }
+```
+
+Active state = **gold text only**. The glass highlight comes from the sliding indicator, not from the button background.
+
+#### Liquid indicator (`.header-nav-glass-indicator`)
+
+The “liquid” layer — warm gold-tinted inner pill with luminous glow:
+
+```css
+.header-nav-glass-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  border-radius: 0.75rem;      /* matches tab corner radius — not full pill */
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(180, 83, 9, 0.06));
+  box-shadow:
+    0 2px 8px rgba(245, 158, 11, 0.28),    /* gold outer glow — the “liquid” read */
+    0 1px 3px rgba(15, 23, 42, 0.1),       /* depth */
+    inset 0 1px 0 rgba(255, 255, 255, 0.2); /* top edge highlight */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, width;
+}
+
+.dark .header-nav-glass-indicator {
+  border-color: rgba(245, 158, 11, 0.28);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(15, 23, 42, 0.35));
+  box-shadow:
+    0 2px 10px rgba(245, 158, 11, 0.32),
+    0 1px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+```
+
+**Indicator vs outer vessel:**
+
+| Property | Outer vessel | Liquid indicator |
+|---|---|---|
+| Radius | `9999px` (capsule) | `0.75rem` (rounded rect inside capsule) |
+| Border | Neutral white/slate | Gold-tinted `brand-gold` at ~22–28% opacity |
+| Fill | Cool white/slate gradient | Warm gold → `brand-dark` gradient |
+| Shadow | Soft neutral float | **Gold diffuse glow** (signature) |
+| Blur | `12px` | `16px` (slightly stronger frost on active) |
+
+#### Flexbox layout
+
+Liquid Glass relies on a **stacked flex hierarchy** so the outer vessel, labels, and indicator stay aligned inside `h-16` header chrome.
+
+**Header row (Terminal `nav`):**
+```html
+<!-- h-16 bar — flex cross-axis centers all chrome to 64px -->
+<div class="max-w-7xl mx-auto w-full h-16 flex items-center gap-2 md:gap-4">
+  {brand pill}
+  <HeaderNav />   <!-- flex-1 min-w-0 — grows between brand and utilities -->
+  {utility pills}
+</div>
+```
+
+**`HeaderNav` slot** — fills remaining width and vertically centers the nav vessel:
+```html
+<div class="relative flex-1 min-w-0 overflow-hidden h-full flex items-center">
+  {hidden ruler for width measurement}
+  <div class="w-full overflow-hidden">
+    {liquid glass track}
+  </div>
+</div>
+```
+
+**Track (outer vessel + tabs)** — one horizontal flex row:
+
+| Element | Display | Alignment | Size | z-index |
+|---|---|---|---|---|
+| `.header-glass-pill--wide` (track) | `flex` | `items-center justify-center` | `height: 2.5rem`, `gap: 0.25rem` | — |
+| `.header-nav-glass-indicator` | absolute | positioned via `translate3d` | measured from active tab | `0` |
+| `.header-nav-tab` | `inline-flex` | `items-center justify-center` | `height: 1.5625rem`, `padding: 0 0.75rem` | `1` |
+
+```text
+header-glass-pill--wide  (flex row, h-40px, pill radius)
+├── header-nav-glass-indicator  (absolute, z-0, behind)
+├── button.header-nav-tab       (inline-flex, z-1)
+├── button.header-nav-tab
+└── …
+```
+
+**Why flex on both levels:**
+- **Outer vessel** (`display: flex`) — keeps tab buttons in a single row with even `gap`, vertically centered inside the 40px capsule (`align-items: center`).
+- **Each tab** (`inline-flex` + `align-items: center` + `justify-content: center`) — centers label text inside the 25px hit target the indicator will measure.
+- **`flex-1 min-w-0` on the nav slot** — lets the track shrink on narrow viewports; triggers collapse-to-hamburger when a hidden ruler exceeds slot width.
+
+**Flexbox vs optical centering (important):**  
+`align-items: center` centers the font **line box** (typographic metrics), not the **visual** middle of glyphs. Inter reserves descender space below the baseline even for all-caps copy; Vietnamese diacritics (e.g. `Ì` in **QUY TRÌNH**) extend above the cap height. The result: text can look slightly high inside the indicator even when flex math is correct.
+
+**Fix:** wrap copy in `.header-nav-tab-label` and apply an optical nudge on the **label only** (not the button), so indicator `getBoundingClientRect()` stays stable:
+
+```css
+.header-nav-glass-slab .header-nav-tab-label {
+  display: block;
+  line-height: 1;
+  transform: translateY(1.5px);   /* tune 1px–2px per locale */
+}
+```
+
+Never `translateY` the tab button itself — that would desync the indicator from the label bounds.
+
+#### Sliding animation
+
+The “liquid” feel comes from **one** indicator element that **slides and morphs** between tabs instead of fading in/out per item.
+
+**1. Measurement (before every slide)**
+
+Run in `useLayoutEffect` so geometry is correct before paint:
+
+```js
+const trackRect = trackRef.current.getBoundingClientRect();
+const targetRect = tabRefs.current[indicatorTargetId].getBoundingClientRect();
+
+setIndicator({
+  left:   targetRect.left   - trackRect.left,
+  top:    targetRect.top    - trackRect.top,
+  width:  targetRect.width,
+  height: targetRect.height,
+  ready:  true,
+});
+```
+
+- **Track** = `.header-nav-tabs-track` (the outer vessel).
+- **Target** = the active tab button (or `aps-group` trigger when an APS child is selected / menu is open).
+- Use **`transform: translate3d(left, top, 0)`** for position (GPU-friendly); set `width` / `height` explicitly so the pill **morphs** when moving between labels of different lengths.
+
+**2. When to re-measure**
+
+| Trigger | Why |
+|---|---|
+| `indicatorTargetId` changes | User selected a new tab — slide to it |
+| `ResizeObserver` on track + every tab | Font load, i18n string length, viewport resize |
+| `window` `resize` | Header padding / breakpoints |
+| `items` / `navFits` change | Nav collapse, language swap |
+
+**3. Active target resolution (`indicatorTargetId`)**
+
+```js
+// APS parent owns the indicator when a child is active or menu is open
+if (isApsChildActive || apsOpen) return 'aps-group';
+return items.find(item => item.id === activeId)?.id ?? items[0]?.id;
+```
+
+**4. First mount — no slide from origin**
+
+On initial load, do **not** animate from `(0, 0)`:
+
+1. Render indicator at `opacity: 0` until first measure (`ready: false`).
+2. Apply position/size **without** transition classes.
+3. After first successful measure, `requestAnimationFrame(() => setIndicatorAnimated(true))` to add `.is-animated`.
+4. Subsequent selection changes use the CSS transitions below.
+
+```css
+/* Default: only opacity fades in on first reveal */
+.header-nav-glass-indicator {
+  transition: opacity 0.2s ease;
+  will-change: transform, width;
+}
+
+/* After first paint: enable slide + morph */
+.header-nav-glass-indicator.is-animated {
+  transition:
+    transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    width     0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    height    0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity   0.2s ease;
+}
+```
+
+**5. Motion spec**
+
+| Property | Value | Notes |
+|---|---|---|
+| Duration | `0.38s` | Position + size; feels fluid, not snappy |
+| Easing | `cubic-bezier(0.16, 1, 0.3, 1)` | Operartis standard ease-out (§6) |
+| Animated props | `transform`, `width`, `height` | Width morph = liquid stretch between tabs |
+| Not animated | `border-radius`, `background`, `box-shadow` | Stay constant; only position/size change |
+| First reveal | `opacity` `0 → 1` over `0.2s` | Avoids flash at wrong coordinates |
+
+**6. Hidden ruler (collapse)**
+
+A duplicate off-screen track (`opacity: 0`, `pointer-events: none`) uses the same vessel + tab classes to measure total nav width. When `ruler.scrollWidth > slot.clientWidth`, the liquid nav hides and a hamburger `header-glass-pill` takes over — indicator logic is disabled (`navFits === false`).
+
+#### DOM structure (React pattern)
+
+```jsx
+<div className="header-nav-glass-slab header-glass-pill header-glass-pill--wide header-nav-tabs-track" ref={trackRef}>
+  <div
+    className={`header-nav-glass-indicator${animated ? ' is-animated' : ''}`}
+    aria-hidden="true"
+    style={{
+      transform: `translate3d(${left}px, ${top}px, 0)`,
+      width: `${width}px`,
+      height: `${height}px`,
+      opacity: ready ? 1 : 0,
+    }}
+  />
+  {items.map(item => (
+    <button
+      ref={el => tabRefs[item.id] = el}
+      className={`header-nav-tab ${isActive ? 'header-nav-tab-active' : ''}`}
+    >
+      <span className="header-nav-tab-label">{item.label}</span>
+    </button>
+  ))}
+</div>
+```
+
+- One indicator element for the whole group — **never** duplicate glass on each tab.
+- Store refs per tab id; resolve active target (including dropdown parents e.g. `aps-group` when a child is selected).
+- Hidden measurement ruler duplicates the same vessel + tab classes for collapse-to-mobile behavior.
+
+#### Light / dark on grid backgrounds
+
+Liquid Glass is designed to sit on the Terminal’s **grid canvas** (`bg-slate-50` / `dark:bg-[#020617]` + `.bg-grid`). The outer vessel stays cool and neutral; the indicator carries the warm gold accent. On busy backgrounds, the outer `blur(12px)` + inset highlight separates the tray from content behind it.
+
+#### Checklist — building a new Liquid Glass control
+
+1. **One outer** `.header-glass-pill` (or `--wide`) vessel — fixed `2.5rem` height, full pill radius.
+2. **Plain labels** — transparent tabs, gold text only when active.
+3. **One sliding** `.header-nav-glass-indicator` — gold gradient + gold glow shadow.
+4. **Measure + animate** — `useLayoutEffect` + `getBoundingClientRect`; `translate3d` + width/height morph; gate `.is-animated` after first paint (see **Sliding animation**).
+5. **Flex layout** — outer vessel `flex` row; tabs `inline-flex` centered; indicator `z-index: 0` behind labels (see **Flexbox layout**).
+6. **Optical label nudge** — `.header-nav-tab-label` with `translateY(1.5px)` on the span, not the button.
+7. **Do not** put frosted backgrounds on inactive items — that breaks the liquid read.
+
+#### Relationship to base glass (§4)
+
+| | Base glass | Liquid glass |
+|---|---|---|
+| **Surface count** | Each element is its own glass panel | One vessel + one moving highlight |
+| **Selection** | Ring, border, or fill on the active item | Sliding inner pill + gold text |
+| **Motion** | Optional hover lift | **Required** slide between items |
+| **Accent** | Often neutral white ring | **Gold luminous glow** on indicator |
+| **Example** | Sidebar, modals, module blocks | Terminal header nav, segmented controls |
+
 ---
 
 ## 5. Core Components & Patterns
@@ -211,8 +567,9 @@ Helper class (in `<style>`):
 Both are `h-16` glass bars with a left brand cluster and right utility cluster.
 
 - **Brand cluster:** logo (`icononly_transparent_nobuffer.png`, `h-8 w-8 md:h-10 md:w-10`) linking to Terminal + wordmark `OPERARTIS` with gold `APS` suffix.
+- **Terminal center nav:** **Liquid Glass** segmented control (§4.1) — outer `header-glass-pill--wide` vessel, plain uppercase tab labels, single sliding `header-nav-glass-indicator` on selection. Collapses to hamburger when viewport is too narrow.
 - **Module header title:** centered, absolutely positioned, `font-black uppercase tracking-widest` gold-gradient, truncated.
-- **Right utilities:** status pill, mono clock, theme toggle, language toggle, settings gear, user avatar — grouped in a glass pill (`rounded-full` glass container).
+- **Right utilities:** status pill, mono clock, theme toggle, language toggle, settings gear, user avatar — grouped in a glass pill (`header-glass-pill`, same outer vessel recipe as §4.1).
 
 **Status pill** (operational / connection):
 ```html
@@ -390,8 +747,9 @@ View-mode labels live under `TRANSLATIONS.*.dashboard`: `batch_overview`, `detai
 | **Primary** | `bg-brand-gold text-white font-bold rounded-lg shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all` | The one main action (Execute, Run, Optimize) |
 | **Success** | `bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20` | Export / confirm / download |
 | **Secondary / icon** | `p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-brand-gold transition-colors` | Settings, toolbar icons |
-| **Ghost / tab (inactive)** | `text-slate-600 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-white/10` | Tabs, nav items |
-| **Tab (active)** | `bg-brand-gold/90 text-white shadow-lg ring-1 ring-white/20` | Active tab |
+| **Ghost / tab (inactive)** | `text-slate-600 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-white/10` | Tabs, nav items (modules) |
+| **Tab (active, modules)** | `bg-brand-gold/90 text-white shadow-lg ring-1 ring-white/20` | Active tab in module workspaces |
+| **Tab (active, Terminal liquid nav)** | Gold text only on transparent tab + sliding `header-nav-glass-indicator` (§4.1) | Terminal `HeaderNav` — no per-tab glass fill |
 | **Destructive** | `text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20` | Reset / remove |
 
 **Disabled:** `disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`.
@@ -527,6 +885,7 @@ Subtle, physical, never flashy. Use the easing curve `cubic-bezier(0.16, 1, 0.3,
 | **Modal** | `modalFadeIn` (backdrop blur 0→12px) + `modalContentSlideUp` (`translateY(20px) scale(0.95)`→0) | All modals |
 | **Blob** (Terminal) | `blob 7s infinite` translating/scaling; offset with `.animation-delay-2000/4000` | Ambient background color blobs |
 | Hover lift | `hover:-translate-y-1/2 hover:scale-[1.02]` + shadow growth | Cards/blocks |
+| **Liquid indicator slide** | `transform` + `width`/`height` morph over `0.38s cubic-bezier(0.16, 1, 0.3, 1)`; first mount skips slide (opacity only) | Terminal nav selection (§4.1 — **Sliding animation**) |
 | `animate-pulse` / `animate-ping` | Tailwind built-ins | Live dots, status indicators |
 | `animate-spin` | Tailwind built-in | Button loading spinner |
 
@@ -657,6 +1016,7 @@ When you build the next module, follow this so it stays consistent:
 **Do**
 - Keep gold as a scarce, intentional accent.
 - Use glass for chrome + interactive surfaces; solid for data.
+- Use **Liquid Glass** (§4.1) for segmented nav / single-selection pill bars on the Terminal.
 - Author light *and* dark for every element.
 - Ship EN + VI for all copy.
 - Reuse existing components, tokens, and icon conventions.
@@ -665,6 +1025,7 @@ When you build the next module, follow this so it stays consistent:
 **Don't**
 - Don't flood the UI with gold or heavy gradients on data.
 - Don't blur dense tables/charts (hurts legibility).
+- Don't put individual glass backgrounds on every item in a Liquid Glass control — use one sliding indicator (§4.1).
 - Don't hardcode strings or skip a language.
 - Don't introduce new fonts, new accent colors, or a different radius/shadow scale.
 - Don't switch React versions or add a build step — these are portable single-file apps.

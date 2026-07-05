@@ -37,15 +37,22 @@ Recommended backend abuse-protection variables:
 ```text
 MAX_REQUEST_BYTES=26214400
 RATE_LIMIT_WINDOW_SECONDS=60
-RATE_LIMIT_REQUESTS=120
-HEAVY_RATE_LIMIT_REQUESTS=30
+RATE_LIMIT_REQUESTS=600
+HEAVY_RATE_LIMIT_REQUESTS=20
 ```
 
 The backend defaults now allow only the three Operartis HTTPS origins. Add local origins to `ALLOWED_ORIGINS` only while actively testing from your Mac.
 
 ## Security Headers
 
-For the frontend Coolify Static app, paste the directives from `coolify-nginx-security.conf` into the Coolify custom Nginx configuration/server context.
+For the frontend Coolify Static app, paste the full Nginx configuration for the matching environment:
+
+- Staging frontend: `.coolify/nginx-staging.conf`
+- Production frontend: `.coolify/nginx-production.conf`
+
+The staging configuration includes `X-Robots-Tag: noindex, nofollow` and allows `https://api-staging.operartis.io` in the CSP. The production configuration does not include `noindex` and allows `https://api.operartis.io`.
+
+These `.coolify/` helper files are intentionally listed in `.dockerignore` so they stay in Git for deployment operations but are not copied into the public static site when the build pack honors `.dockerignore`.
 
 The current CSP is intentionally temporary/relaxed because the static frontend still uses inline scripts and runtime Babel. After the future React/Vite rebuild, remove `'unsafe-inline'` and `'unsafe-eval'`.
 

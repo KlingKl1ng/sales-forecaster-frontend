@@ -34,33 +34,15 @@
             }
         }
     </script>
-    <script>
-        window.getOperartisTheme = function () {
-            var session = null;
-            try { session = sessionStorage.getItem('theme'); } catch (e) { }
-            if (session === 'light' || session === 'dark') return session;
-            return 'system';
-        };
-        window.applyOperartisThemeClass = function (theme) {
-            var systemDark = false;
-            try { systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { }
-            var dark = theme === 'dark' || (theme === 'system' && systemDark);
-            document.documentElement.classList.toggle('dark', dark);
-            return dark;
-        };
-        window.persistOperartisTheme = function (theme) {
-            try { localStorage.setItem('theme', theme); } catch (e) { }
-            try {
-                if (theme === 'system') sessionStorage.removeItem('theme');
-                else sessionStorage.setItem('theme', theme);
-            } catch (e) { }
-        };
-        (function () {
-            try { window.applyOperartisThemeClass(window.getOperartisTheme()); } catch (e) { }
-        })();
-    </script>
+    <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
+    <script>
+        window.OPERARTIS_AUTH_AUTO_PROMPT = false;
+        window.OPERARTIS_AUTH_FLOATING_ACCOUNT = false;
+    </script>
+    <script src="./operartis-api.js?v=20260622-auth-session-sync"></script>
+    <script src="./operartis-auth-ui.js?v=20260623-display-name"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
 
@@ -114,6 +96,239 @@
             height: 100%;
         }
 
+        .header-auth-btn {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        .header-auth-btn:hover {
+            transform: scale(1.06);
+            filter: brightness(1.1);
+        }
+
+        .header-auth-btn:active {
+            transform: scale(0.94);
+            filter: brightness(1);
+        }
+
+        .header-auth-btn--gold {
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
+        }
+
+        .header-auth-btn--gold:hover {
+            box-shadow: 0 8px 28px rgba(245, 158, 11, 0.5), 0 0 0 2px rgba(251, 191, 36, 0.35);
+        }
+
+        .header-auth-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.55);
+        }
+
+        .index-account-avatar-img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            object-fit: cover;
+        }
+
+        .index-account-avatar-initials {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            color: #08111f;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            background: radial-gradient(circle at 30% 25%, rgba(251, 191, 36, 0.98), rgba(217, 119, 6, 0.9));
+        }
+
+        .index-account-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            z-index: 100;
+            width: 240px;
+            overflow: visible;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            transform-origin: top right;
+            animation: indexAccountMenuIn 0.18s ease-out;
+        }
+
+        @keyframes indexAccountMenuIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .index-account-menu::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            right: 13px;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            border-left: 1px solid rgba(148, 163, 184, 0.28);
+            border-top: 1px solid rgba(148, 163, 184, 0.28);
+            transform: rotate(45deg);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dark .index-account-menu {
+            border-color: rgba(148, 163, 184, 0.18);
+            background: rgba(15, 23, 42, 0.96);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+        }
+
+        .dark .index-account-menu::before {
+            background: rgba(15, 23, 42, 0.96);
+            border-left-color: rgba(148, 163, 184, 0.18);
+            border-top-color: rgba(148, 163, 184, 0.18);
+        }
+
+        .index-account-menu-head {
+            padding: 12px 14px 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+            background: transparent;
+            position: relative;
+            z-index: 1;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .dark .index-account-menu-head {
+            border-bottom-color: rgba(148, 163, 184, 0.18);
+        }
+
+        .index-account-menu-email {
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0;
+            color: #0f172a;
+        }
+
+        .dark .index-account-menu-email {
+            color: #f8fafc;
+        }
+
+        .index-account-menu-role {
+            margin: 3px 0 0;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+        }
+
+        .dark .index-account-menu-role {
+            color: #94a3b8;
+        }
+
+        .index-account-menu-body {
+            padding: 6px;
+            position: relative;
+            z-index: 1;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .index-account-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #0f172a;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-align: left;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+        }
+
+        .dark .index-account-menu-item {
+            color: #f8fafc;
+        }
+
+        .index-account-menu-item-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+            color: currentColor;
+            opacity: 0.88;
+            transition: color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .dark .index-account-menu-item-icon {
+            opacity: 0.92;
+        }
+
+        .index-account-menu-item-icon svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .index-account-menu-item:hover {
+            background: rgba(245, 158, 11, 0.12);
+            color: #b45309;
+            transform: translateX(1px);
+        }
+
+        .dark .index-account-menu-item:hover {
+            background: rgba(245, 158, 11, 0.14);
+            color: #fbbf24;
+        }
+
+        .index-account-menu-item--danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #b91c1c;
+            transform: translateX(1px);
+        }
+
+        .dark .index-account-menu-item--danger:hover {
+            background: rgba(248, 113, 113, 0.12);
+            color: #fca5a5;
+        }
+
+        .index-account-menu-divider {
+            height: 1px;
+            margin: 4px 10px;
+            background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.35), transparent);
+        }
+
+        .dark .index-account-menu-divider {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+        }
+
         .header-glass-pill {
             display: flex;
             align-items: center;
@@ -139,6 +354,71 @@
             width: auto;
             height: 2.5rem;
             gap: 0.25rem;
+        }
+
+        .header-nav-glass-slab {
+            width: max-content;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .header-nav-glass-slab .header-nav-tab {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 1.5625rem;
+            padding: 0 0.75rem;
+            line-height: 1;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .header-nav-glass-slab .header-nav-tab-label {
+            display: block;
+            line-height: 1;
+            transform: translateY(1.5px);
+        }
+
+        .header-nav-tabs-track {
+            position: relative;
+        }
+
+        .header-nav-glass-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(180, 83, 9, 0.06));
+            box-shadow:
+                0 2px 8px rgba(245, 158, 11, 0.28),
+                0 1px 3px rgba(15, 23, 42, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.2s ease;
+            will-change: transform, width;
+        }
+
+        .header-nav-glass-indicator.is-animated {
+            transition:
+                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.2s ease;
+        }
+
+        .dark .header-nav-glass-indicator {
+            border-color: rgba(245, 158, 11, 0.28);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(15, 23, 42, 0.35));
+            box-shadow:
+                0 2px 10px rgba(245, 158, 11, 0.32),
+                0 1px 4px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         /* Subtle Grid Animation */
@@ -242,25 +522,36 @@
         }
 
         .header-nav-tab {
+            position: relative;
+            z-index: 1;
             flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.375rem 0.75rem;
             border-radius: 0.75rem;
             border: 1px solid transparent;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             font-size: 0.625rem;
             font-weight: 700;
+            line-height: 1;
             letter-spacing: 0.06em;
             text-transform: uppercase;
+            text-align: center;
+            box-sizing: border-box;
             cursor: pointer;
-            transition: color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
             color: #64748b;
+            transition: color 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            margin: 0;
+            font-family: inherit;
         }
 
         .dark .header-nav-tab {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.35), rgba(15, 23, 42, 0.15));
             color: #94a3b8;
         }
 
@@ -273,13 +564,26 @@
         }
 
         .header-nav-tab-active {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(180, 83, 9, 0.06));
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18);
             color: #d97706;
         }
 
         .dark .header-nav-tab-active {
             color: #fbbf24;
+        }
+
+        .header-nav-aps-menu .header-nav-tab-active {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(180, 83, 9, 0.06));
+            box-shadow:
+                0 2px 8px rgba(245, 158, 11, 0.28),
+                0 1px 3px rgba(15, 23, 42, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .header-nav-aps-menu .header-nav-tab-active {
+            box-shadow:
+                0 2px 10px rgba(245, 158, 11, 0.32),
+                0 1px 4px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .header-nav-child {
@@ -2178,6 +2482,25 @@
         const GlobeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>;
         // NEW ICONS
         const FactoryIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="17" y1="13" x2="17" y2="13.01"></line><line x1="7" y1="13" x2="7" y2="13.01"></line></svg>;
+        const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
+        const accountDisplayName = (user) => user?.full_name || user?.email || 'Member';
+        const accountInitials = (user) => {
+            const name = accountDisplayName(user);
+            const parts = name.replace(/@.*/, '').split(/[.\s_-]+/).filter(Boolean);
+            return `${parts[0]?.[0] || 'M'}${parts[1]?.[0] || parts[0]?.[1] || ''}`.toUpperCase();
+        };
+        const AccountAvatar = ({ user }) => {
+            if (user?.avatar_data_url) {
+                return <img className="index-account-avatar-img" src={user.avatar_data_url} alt="" aria-hidden="true" />;
+            }
+            if (user) {
+                return <span className="index-account-avatar-initials" aria-hidden="true">{accountInitials(user)}</span>;
+            }
+            return <span className="header-util-icon" aria-hidden="true"><UserIcon /></span>;
+        };
+        const AccountDashboardIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>;
+        const AccountLoginIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>;
+        const AccountLogoutIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>;
         const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>;
         const GitBranchIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>;
         // STRATEGIC ICONS
@@ -2281,6 +2604,9 @@
                     invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
                     contact_operartis: "Contact Operartis",
                     nav_contact: "Contact",
+                    nav_login: "Login",
+                    nav_dashboard: "Dashboard",
+                    nav_logout: "Logout",
                     analytics_eyebrow: "Analytics Evolvement",
                     analytics_title: "Four Levels of Analytics",
                     analytics_subtitle: "Each step increases business value and problem complexity — shifting from retrospective information to forward-looking models that guide optimized action.",
@@ -2578,6 +2904,9 @@
                     invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
                     contact_operartis: "Liên hệ Operartis",
                     nav_contact: "Liên hệ",
+                    nav_login: "Đăng nhập",
+                    nav_dashboard: "Bảng điều khiển",
+                    nav_logout: "Đăng xuất",
                     analytics_eyebrow: "Sự phát triển của Phân tích dữ liệu",
                     analytics_title: "Bốn Cấp độ Phân tích Dữ liệu",
                     analytics_subtitle: "Mỗi bước tăng giá trị kinh doanh và độ phức tạp vấn đề — chuyển từ thông tin hồi cố sang mô hình hướng tới tối ưu hành động.",
@@ -2875,6 +3204,9 @@
                     invite_text: "Wir laden Unternehmen ein, die ihre Abläufe transformieren, ihre Supply Chain optimieren und einen Wettbewerbsvorteil aufbauen wollen, mit Operartis zusammenzuarbeiten.",
                     contact_operartis: "Operartis kontaktieren",
                     nav_contact: "Kontakt",
+                    nav_login: "Anmelden",
+                    nav_dashboard: "Ihr Dashboard",
+                    nav_logout: "Abmelden",
                     analytics_eyebrow: "Analytics-Reifegrad",
                     analytics_title: "Vier Stufen der Analytics",
                     analytics_subtitle: "Jede Stufe steigert den Geschäftsnutzen und die Problemkomplexität — vom rückblickenden Informationszugriff zu vorausschauenden Modellen für optimiertes Handeln.",
@@ -3715,7 +4047,6 @@
         const SupplyChainFlow = ({ content }) => {
             const steps = content.ui.sc_steps;
             const [activeIdx, setActiveIdx] = useState(0);
-            const [paused, setPaused] = useState(false);
             const [connectorGeom, setConnectorGeom] = useState(null);
             const flowTrackRef = useRef(null);
             const gridRef = useRef(null);
@@ -3798,12 +4129,11 @@
             };
 
             useEffect(() => {
-                if (paused) return undefined;
                 const timer = setInterval(() => {
                     setActiveIdx(prev => (prev + 1) % steps.length);
                 }, 3800);
                 return () => clearInterval(timer);
-            }, [paused, steps.length]);
+            }, [steps.length]);
 
             useLayoutEffect(() => {
                 measureConnectors();
@@ -3843,8 +4173,6 @@
                     id="supply-chain"
                     className="opus-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm"
                     aria-label={content.ui.sc_title}
-                    onMouseEnter={() => setPaused(true)}
-                    onMouseLeave={() => setPaused(false)}
                 >
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
                         <div className="absolute -top-8 left-1/4 w-64 h-32 bg-brand-gold/6 rounded-full blur-3xl" />
@@ -4077,7 +4405,6 @@
         const SystemIntegrationLoop = ({ content }) => {
             const ui = content.ui;
             const [phase, setPhase] = useState(0);
-            const [paused, setPaused] = useState(false);
             const [started, setStarted] = useState(false);
             const sectionRef = useRef(null);
             const apsVisible = phase === 1;
@@ -4096,10 +4423,10 @@
             }, []);
 
             useEffect(() => {
-                if (!started || paused) return undefined;
+                if (!started) return undefined;
                 const timer = setInterval(() => setPhase(p => (p + 1) % 2), 9500);
                 return () => clearInterval(timer);
-            }, [started, paused]);
+            }, [started]);
 
             const togglePhase = () => setPhase(p => (p + 1) % 2);
 
@@ -4109,8 +4436,6 @@
                     ref={sectionRef}
                     className="opus-scroll-target relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm overflow-hidden"
                     aria-label={ui.i4l_title}
-                    onMouseEnter={() => setPaused(true)}
-                    onMouseLeave={() => setPaused(false)}
                 >
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
                         <div className="absolute -top-10 left-1/3 w-72 h-36 bg-brand-gold/6 rounded-full blur-3xl" />
@@ -4654,8 +4979,12 @@
             const slotRef = useRef(null);
             const rulerRef = useRef(null);
             const scrollRef = useRef(null);
+            const trackRef = useRef(null);
+            const tabRefs = useRef({});
             const apsTriggerRef = useRef(null);
             const [navFits, setNavFits] = useState(true);
+            const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+            const [indicatorAnimated, setIndicatorAnimated] = useState(false);
             const apsChildIds = useMemo(() => {
                 const aps = items.find(i => i.id === 'aps-group');
                 return (aps?.children || []).map(c => c.id);
@@ -4664,6 +4993,58 @@
             const isApsChildActive = apsChildIds.includes(activeId);
             const [apsOpen, setApsOpen] = useState(false);
             const [menuRect, setMenuRect] = useState(null);
+
+            const indicatorTargetId = useMemo(() => {
+                if (isApsChildActive || apsOpen) return 'aps-group';
+                const match = items.find(item => item.id === activeId);
+                return match ? match.id : items[0]?.id;
+            }, [activeId, apsOpen, isApsChildActive, items]);
+
+            const isTabActive = useCallback((item) => {
+                if (item.id === 'aps-group') return isApsChildActive || apsOpen;
+                return activeId === item.id;
+            }, [activeId, apsOpen, isApsChildActive]);
+
+            const updateIndicator = useCallback(() => {
+                const track = trackRef.current;
+                const target = tabRefs.current[indicatorTargetId];
+                if (!track || !target) {
+                    setIndicator(prev => (prev.ready ? { ...prev, ready: false } : prev));
+                    return;
+                }
+                const trackRect = track.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+                setIndicator({
+                    left: targetRect.left - trackRect.left,
+                    top: targetRect.top - trackRect.top,
+                    width: targetRect.width,
+                    height: targetRect.height,
+                    ready: true,
+                });
+                if (!indicatorAnimated) {
+                    requestAnimationFrame(() => setIndicatorAnimated(true));
+                }
+            }, [indicatorTargetId, indicatorAnimated]);
+
+            useLayoutEffect(() => {
+                if (!navFits) return undefined;
+                updateIndicator();
+                const ro = new ResizeObserver(updateIndicator);
+                if (trackRef.current) ro.observe(trackRef.current);
+                Object.values(tabRefs.current).forEach(el => {
+                    if (el) ro.observe(el);
+                });
+                window.addEventListener('resize', updateIndicator);
+                return () => {
+                    ro.disconnect();
+                    window.removeEventListener('resize', updateIndicator);
+                };
+            }, [indicatorTargetId, items, navFits, updateIndicator]);
+
+            const setTabRef = useCallback((id, el) => {
+                if (el) tabRefs.current[id] = el;
+                else delete tabRefs.current[id];
+            }, []);
 
             useEffect(() => {
                 if (navRef) navRef.current = slotRef.current;
@@ -4746,20 +5127,20 @@
                 return () => el.removeEventListener('wheel', onWheel);
             }, [items, navFits]);
 
-            const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active ring-1 ring-brand-gold/20' : 'ring-1 ring-white/30 dark:ring-white/5'}`;
+            const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active' : ''}`;
 
             const renderRulerTabs = () => items.map(item => {
                 if (item.id === 'aps-group') {
                     return (
                         <span key={item.id} className={`${tabClass(false)} inline-flex items-center`} aria-hidden="true">
-                            {item.label}
+                            <span className="header-nav-tab-label">{item.label}</span>
                             <ChevronDownIcon className="header-nav-chevron" />
                         </span>
                     );
                 }
                 return (
                     <span key={item.id} className={tabClass(false)} aria-hidden="true">
-                        {item.label}
+                        <span className="header-nav-tab-label">{item.label}</span>
                     </span>
                 );
             });
@@ -4801,43 +5182,62 @@
                 <div ref={slotRef} className="relative flex-1 min-w-0 overflow-hidden h-full flex items-center">
                     <div
                         ref={rulerRef}
-                        className="pointer-events-none absolute left-0 top-0 -z-10 flex gap-1.5 items-center w-max opacity-0"
+                        className="pointer-events-none absolute left-0 top-0 -z-10 w-max opacity-0"
                         aria-hidden="true"
                     >
-                        {renderRulerTabs()}
+                        <div className="header-nav-glass-slab header-glass-pill header-glass-pill--wide">
+                                {renderRulerTabs()}
+                        </div>
                     </div>
                     {navFits && (
                         <div ref={scrollRef} className="w-full overflow-hidden">
-                            <div className="flex gap-1.5 items-center w-max mx-auto py-0.5 px-1">
+                            <div
+                                ref={trackRef}
+                                className="header-nav-glass-slab header-glass-pill header-glass-pill--wide header-nav-tabs-track"
+                            >
+                                <div
+                                    className={`header-nav-glass-indicator${indicatorAnimated ? ' is-animated' : ''}`}
+                                    aria-hidden="true"
+                                    style={{
+                                        transform: `translate3d(${indicator.left}px, ${indicator.top}px, 0)`,
+                                        width: `${indicator.width}px`,
+                                        height: `${indicator.height}px`,
+                                        opacity: indicator.ready ? 1 : 0,
+                                    }}
+                                />
                                 {items.map(item => {
                                     if (item.id === 'aps-group') {
-                                        const apsHighlighted = isApsChildActive || apsOpen;
+                                        const apsHighlighted = isTabActive(item);
                                         return (
                                             <div key={item.id} className="header-nav-aps-wrap">
                                                 <button
-                                                    ref={apsTriggerRef}
+                                                    ref={(el) => {
+                                                        apsTriggerRef.current = el;
+                                                        setTabRef(item.id, el);
+                                                    }}
                                                     type="button"
                                                     aria-expanded={apsOpen}
                                                     aria-haspopup="menu"
                                                     onClick={() => setApsOpen(open => !open)}
                                                     className={`${tabClass(apsHighlighted)} flex items-center`}
                                                 >
-                                                    {item.label}
+                                                    <span className="header-nav-tab-label">{item.label}</span>
                                                     <ChevronDownIcon className={`header-nav-chevron ${apsOpen ? 'header-nav-chevron-open' : ''}`} />
                                                 </button>
                                             </div>
                                         );
                                     }
 
-                                    const isActive = activeId === item.id;
+                                    const isActive = isTabActive(item);
                                     return (
                                         <button
                                             key={item.id}
                                             type="button"
+                                            ref={(el) => setTabRef(item.id, el)}
                                             onClick={() => onNav(item.id)}
                                             className={tabClass(isActive)}
                                         >
-                                            {item.label}
+                                            <span className="header-nav-tab-label">{item.label}</span>
                                         </button>
                                     );
                                 })}
@@ -5948,14 +6348,42 @@
         };
 
         const App = () => {
-            const [theme, setTheme] = useState(() => window.getOperartisTheme());
+            const [theme, setThemeState] = useState(() => window.getOperartisTheme());
+            const setTheme = useCallback((next) => {
+                if (typeof window.setOperartisTheme === 'function') {
+                    window.setOperartisTheme(next);
+                } else {
+                    window.persistOperartisTheme?.(next);
+                    window.applyOperartisThemeClass?.(next);
+                    setThemeState(next);
+                }
+            }, []);
+
+            useEffect(() => {
+                const handler = (event) => {
+                    setThemeState((event.detail && event.detail.theme) || window.getOperartisTheme());
+                };
+                window.addEventListener('operartis:theme-change', handler);
+                return () => window.removeEventListener('operartis:theme-change', handler);
+            }, []);
             const [lang, setLang] = useState(() => window.getOperartisLang());
+            useEffect(() => {
+                const handler = (event) => {
+                    const nextLang = (event.detail && event.detail.lang) || window.getOperartisLang();
+                    setLang(prev => prev === nextLang ? prev : nextLang);
+                };
+                window.addEventListener('operartis:lang-change', handler);
+                return () => window.removeEventListener('operartis:lang-change', handler);
+            }, []);
             const [selectedBlock, setSelectedBlock] = useState(null);
             const [activeQuickViewBlockId, setActiveQuickViewBlockId] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [navCollapsed, setNavCollapsed] = useState(false);
             const [activeNavId, setActiveNavId] = useState('supply-chain');
+            const [authUser, setAuthUser] = useState(() => window.OperartisAuth?.getUser?.() || null);
+            const [accountMenuOpen, setAccountMenuOpen] = useState(false);
             const headerNavRef = useRef(null);
+            const accountMenuRef = useRef(null);
             const scrollLockRef = useRef(false);
             const scrollEndTimerRef = useRef(null);
             const scrollAnimListenerRef = useRef(null);
@@ -6062,22 +6490,31 @@
             const scrollToAbout = useCallback(() => scrollToNavItem('about'), [scrollToNavItem]);
 
             useEffect(() => {
-                const applyTheme = () => {
-                    window.applyOperartisThemeClass(theme);
-                    window.persistOperartisTheme(theme);
-                };
-                applyTheme();
-                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                const handleSystemChange = () => { if (theme === 'system') applyTheme(); };
-                mediaQuery.addEventListener('change', handleSystemChange);
-                return () => mediaQuery.removeEventListener('change', handleSystemChange);
-            }, [theme]);
-
-            useEffect(() => {
                 window.persistOperartisLang(lang);
                 document.documentElement.lang = lang;
                 document.title = content.ui.page_title || TRANSLATIONS.en.ui.page_title;
             }, [lang, content]);
+
+            useEffect(() => {
+                const handleAuthState = (event) => {
+                    const user = event.detail?.user || window.OperartisAuth?.getUser?.() || null;
+                    setAuthUser(user);
+                    if (user) setAccountMenuOpen(false);
+                };
+                const handleLoggedOut = () => {
+                    setAuthUser(null);
+                    setAccountMenuOpen(false);
+                };
+                window.addEventListener('operartis:authenticated', handleAuthState);
+                window.addEventListener('operartis:auth-state', handleAuthState);
+                window.addEventListener('operartis:logged-out', handleLoggedOut);
+                window.OperartisAuth?.refresh?.().catch(() => setAuthUser(null));
+                return () => {
+                    window.removeEventListener('operartis:authenticated', handleAuthState);
+                    window.removeEventListener('operartis:auth-state', handleAuthState);
+                    window.removeEventListener('operartis:logged-out', handleLoggedOut);
+                };
+            }, []);
 
             // Scroll-spy: sync header nav highlight with section position in main scroll container
             useEffect(() => {
@@ -6135,6 +6572,48 @@
             const handleNavCollapse = useCallback((collapsed) => {
                 setNavCollapsed(collapsed);
             }, []);
+
+            const handleAuthButtonClick = useCallback(() => {
+                setAccountMenuOpen(prev => !prev);
+            }, []);
+
+            const handleDashboardOpen = useCallback(() => {
+                setAccountMenuOpen(false);
+                const canUseAdminDashboard = authUser?.role === 'owner' || authUser?.role === 'admin';
+                window.location.href = canUseAdminDashboard ? './dashboard.html#admin-overview' : './dashboard.html';
+            }, [authUser]);
+
+            const handleLoginOpen = useCallback(() => {
+                setAccountMenuOpen(false);
+                window.OperartisAuth?.showLogin?.();
+            }, []);
+
+            const handleLogout = useCallback(async () => {
+                setAccountMenuOpen(false);
+                await window.OperartisAuth?.logout?.();
+                setAuthUser(null);
+            }, []);
+
+            useEffect(() => {
+                if (!accountMenuOpen) return undefined;
+
+                const handleOutsideClick = (event) => {
+                    if (!accountMenuRef.current || accountMenuRef.current.contains(event.target)) return;
+                    setAccountMenuOpen(false);
+                };
+                const handleEscape = (event) => {
+                    if (event.key === 'Escape') setAccountMenuOpen(false);
+                };
+
+                document.addEventListener('mousedown', handleOutsideClick);
+                document.addEventListener('touchstart', handleOutsideClick, { passive: true });
+                document.addEventListener('keydown', handleEscape);
+                return () => {
+                    document.removeEventListener('mousedown', handleOutsideClick);
+                    document.removeEventListener('touchstart', handleOutsideClick);
+                    document.removeEventListener('keydown', handleEscape);
+                };
+            }, [accountMenuOpen]);
 
             useEffect(() => {
                 if (!navCollapsed) setMobileNavOpen(false);
@@ -6233,12 +6712,68 @@
                                 </div>
                             </div>
 
-                            <a
-                                href="mailto:info@operartis.io"
-                                className="h-8 px-3 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white text-xs font-bold shadow-md hover:scale-[1.02] active:scale-95 transition-all shrink-0"
-                            >
-                                {content.ui.nav_contact}
-                            </a>
+                            <div ref={accountMenuRef} className="relative shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={handleAuthButtonClick}
+                                    aria-expanded={accountMenuOpen}
+                                    aria-haspopup="menu"
+                                    aria-label={authUser ? `Account: ${accountDisplayName(authUser)}` : content.ui.nav_login}
+                                    title={authUser ? accountDisplayName(authUser) : content.ui.nav_login}
+                                    className="relative header-auth-btn header-auth-btn--gold h-9 w-9 rounded-full bg-gradient-to-tr from-brand-gold to-brand-dark flex items-center justify-center text-white shrink-0"
+                                >
+                                    <AccountAvatar user={authUser} />
+                                    <span className={`absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#020617] ${authUser ? 'bg-emerald-400 shadow-[0_0_0_2px_rgba(52,211,153,0.28),0_0_12px_rgba(52,211,153,0.9)]' : 'bg-white shadow-[0_0_0_1px_rgba(255,255,255,0.45)]'}`} aria-hidden="true" />
+                                </button>
+
+                                {accountMenuOpen && (
+                                    <div
+                                        role="menu"
+                                        aria-label="Account menu"
+                                        className="index-account-menu"
+                                    >
+                                        {authUser && (
+                                            <div className="index-account-menu-head">
+                                                <p className="index-account-menu-email">{accountDisplayName(authUser)}</p>
+                                                <p className="index-account-menu-role">{authUser.role}</p>
+                                            </div>
+                                        )}
+                                        <div className="index-account-menu-body">
+                                            <button
+                                                type="button"
+                                                role="menuitem"
+                                                onClick={handleDashboardOpen}
+                                                className="index-account-menu-item"
+                                            >
+                                                <span className="index-account-menu-item-icon" aria-hidden="true"><AccountDashboardIcon /></span>
+                                                <span>{content.ui.nav_dashboard}</span>
+                                            </button>
+                                            <div className="index-account-menu-divider" role="separator" aria-hidden="true" />
+                                            {authUser ? (
+                                                <button
+                                                    type="button"
+                                                    role="menuitem"
+                                                    onClick={handleLogout}
+                                                    className="index-account-menu-item index-account-menu-item--danger"
+                                                >
+                                                    <span className="index-account-menu-item-icon" aria-hidden="true"><AccountLogoutIcon /></span>
+                                                    <span>{content.ui.nav_logout}</span>
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    role="menuitem"
+                                                    onClick={handleLoginOpen}
+                                                    className="index-account-menu-item"
+                                                >
+                                                    <span className="index-account-menu-item-icon" aria-hidden="true"><AccountLoginIcon /></span>
+                                                    <span>{content.ui.nav_login}</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         </div>
                         <div className="horizon-nav-session-track shrink-0" aria-hidden="true">
