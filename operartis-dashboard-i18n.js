@@ -418,7 +418,7 @@
                 users: 'Người dùng',
                 invites: 'Lời mời',
                 all_jobs: 'Tất cả tác vụ',
-                audit_log: 'Nhật ký kiểm toán',
+                audit_log: 'Nhật ký hoạt động',
                 dashboard: 'Bảng điều khiển',
             },
             chrome: {
@@ -629,10 +629,10 @@
                     sub: 'Xem lại các lần chạy mô-đun trên toàn tổ chức.',
                 },
                 'admin-audit': {
-                    title: 'Nhật ký kiểm toán',
+                    title: 'Nhật ký hoạt động',
                     subtitle: 'Xem các sự kiện bảo mật và quản trị gần đây.',
                     eyebrow: 'Dấu vết bảo mật',
-                    h1: 'Nhật ký kiểm toán',
+                    h1: 'Nhật ký hoạt động',
                     sub: 'Các sự kiện quản trị và bảo mật gần đây của tổ chức.',
                 },
             },
