@@ -265,8 +265,8 @@
                     matrix_title: "Inventory Matrix",
                     matrix_subtitle: "SKU Count & Value %",
                     pareto_title: "Pareto Curve",
-                    pareto_xlabel: "% of SKUs",
-                    pareto_ylabel: "Cumulative Value %",
+                    pareto_xlabel: "Cumulative SKUs (%)",
+                    pareto_ylabel: "Cumulative Value (%)",
                     pareto_caption: "Cumulative Value Distribution",
                     legend_stable: "Stable (X)",
                     legend_fluctuating: "Fluctuating (Y)",
@@ -350,8 +350,8 @@
                     matrix_title: "Ma trận tồn kho",
                     matrix_subtitle: "Số lượng SKU & % Giá trị",
                     pareto_title: "Đường cong Pareto",
-                    pareto_xlabel: "% số lượng SKU",
-                    pareto_ylabel: "% Giá trị tích lũy",
+                    pareto_xlabel: "SKU tích lũy (%)",
+                    pareto_ylabel: "Giá trị tích lũy (%)",
                     pareto_caption: "Phân phối giá trị tích lũy",
                     legend_stable: "Ổn định (X)",
                     legend_fluctuating: "Biến động (Y)",
@@ -431,8 +431,8 @@
                     matrix_title: "Bestandsmatrix",
                     matrix_subtitle: "SKU-Anzahl & Wert %",
                     pareto_title: "Pareto-Kurve",
-                    pareto_xlabel: "% der SKUs",
-                    pareto_ylabel: "Kumulierter Wert %",
+                    pareto_xlabel: "Kumulierte SKUs (%)",
+                    pareto_ylabel: "Kumulierter Wert (%)",
                     pareto_caption: "Kumulative Wertverteilung",
                     legend_stable: "Stabil (X)",
                     legend_fluctuating: "Schwankend (Y)",
@@ -480,9 +480,70 @@
 
         // --- COMPONENTS ---
 
+        // Build Pareto series split at A/B limits so color joins sit on the dashed reference lines.
+        const buildParetoChartData = (data, aThresh, bThresh) => {
+            if (!data || data.length === 0) return [];
+
+            const step = Math.max(1, Math.ceil(data.length / 50));
+            const indexSet = new Set([0, data.length - 1]);
+            for (let i = 0; i < data.length; i += step) indexSet.add(i);
+            for (let i = 1; i < data.length; i++) {
+                const prev = data[i - 1].cumPct;
+                const curr = data[i].cumPct;
+                if ((prev < aThresh && curr > aThresh) || (prev < bThresh && curr > bThresh)
+                    || prev === aThresh || curr === aThresh || prev === bThresh || curr === bThresh) {
+                    indexSet.add(i - 1);
+                    indexSet.add(i);
+                }
+            }
+
+            const sampled = [...indexSet].sort((a, b) => a - b).map((i) => data[i]);
+
+            // Exact threshold points are shared by both adjacent series so the join sits on the dashed line.
+            const seriesFor = (cumPct) => {
+                if (cumPct < aThresh) return 'A';
+                if (cumPct === aThresh) return 'AB';
+                if (cumPct < bThresh) return 'B';
+                if (cumPct === bThresh) return 'BC';
+                return 'C';
+            };
+
+            const makePoint = (itemPct, cumPct, series) => ({
+                itemPct,
+                cumPct,
+                cumA: (series === 'A' || series === 'AB') ? cumPct : null,
+                cumB: (series === 'B' || series === 'AB' || series === 'BC') ? cumPct : null,
+                cumC: (series === 'C' || series === 'BC') ? cumPct : null,
+            });
+
+            const result = [];
+            for (let i = 0; i < sampled.length; i++) {
+                const curr = sampled[i];
+                const prev = i > 0 ? sampled[i - 1] : null;
+
+                if (prev && curr.cumPct > prev.cumPct) {
+                    if (prev.cumPct < aThresh && curr.cumPct > aThresh) {
+                        const t = (aThresh - prev.cumPct) / (curr.cumPct - prev.cumPct);
+                        const itemPct = prev.itemPct + t * (curr.itemPct - prev.itemPct);
+                        result.push(makePoint(itemPct, aThresh, 'AB'));
+                    }
+                    if (prev.cumPct < bThresh && curr.cumPct > bThresh) {
+                        const t = (bThresh - prev.cumPct) / (curr.cumPct - prev.cumPct);
+                        const itemPct = prev.itemPct + t * (curr.itemPct - prev.itemPct);
+                        result.push(makePoint(itemPct, bThresh, 'BC'));
+                    }
+                }
+
+                result.push(makePoint(curr.itemPct, curr.cumPct, seriesFor(curr.cumPct)));
+            }
+            return result;
+        };
+
         // Custom Tooltip for Pareto Chart
         const CustomParetoTooltip = ({ active, payload, label }) => {
             if (active && payload && payload.length) {
+                const entry = payload.find((p) => p.value != null);
+                if (!entry) return null;
                 return (
                     <div className="bg-white/95 dark:bg-slate-800/95 p-3 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl backdrop-blur-sm">
                         <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">
@@ -494,7 +555,7 @@
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-brand-gold"></div>
                             <span className="text-xs text-slate-600 dark:text-slate-300">
-                                Value: <span className="font-mono font-bold text-slate-900 dark:text-white">{fmtNum(payload[0].value, 2)}%</span>
+                                Value: <span className="font-mono font-bold text-slate-900 dark:text-white">{fmtNum(entry.value, 2)}%</span>
                             </span>
                         </div>
                     </div>
@@ -720,6 +781,14 @@
 
         const MainApp = () => {
             const [theme, setTheme] = useOperartisTheme();
+            const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+            useEffect(() => {
+                const syncDark = () => setIsDark(document.documentElement.classList.contains('dark'));
+                syncDark();
+                const observer = new MutationObserver(syncDark);
+                observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                return () => observer.disconnect();
+            }, [theme]);
             const [file, setFile] = useState(null);
             const [rawJson, setRawJson] = useState([]);
             const [headers, setHeaders] = useState([]);
@@ -770,6 +839,11 @@
             const [searchTerm, setSearchTerm] = useState('');
             const [filterClass, setFilterClass] = useState(null);
             const fileInputRef = useRef(null);
+
+            const paretoChartData = useMemo(
+                () => buildParetoChartData(analysisData, abcThresholds.a, abcThresholds.b),
+                [analysisData, abcThresholds.a, abcThresholds.b]
+            );
 
             // I18n State
             const [lang, setLang] = useState(() => window.getOperartisLang());
@@ -1343,7 +1417,7 @@
                                         type="button"
                                         onClick={handleRunEngine}
                                         disabled={!mappingConfig || rawJson.length === 0 || isAnalyzing}
-                                        className={`w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!mappingConfig || rawJson.length === 0 || isAnalyzing ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
+                                        className={`w-full h-10 rounded-lg text-xs font-bold uppercase tracking-wide leading-none transition-all shadow-sm flex items-center justify-center gap-2 ${!mappingConfig || rawJson.length === 0 || isAnalyzing ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
                                     >
                                         {isAnalyzing ? (
                                             <span className="animate-spin inline-flex"><RefreshIcon /></span>
@@ -1356,9 +1430,9 @@
                                         type="button"
                                         onClick={handleExport}
                                         disabled={analysisData.length === 0}
-                                        className={`w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${analysisData.length === 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
+                                        className={`w-full h-10 rounded-lg text-xs font-bold uppercase tracking-wide leading-none transition-all shadow-sm flex items-center justify-center gap-2 ${analysisData.length === 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
                                     >
-                                        <DownloadIcon /> {t('sidebar.export_btn')}
+                                        <DownloadIcon width="16" height="16" /> {t('sidebar.export_btn')}
                                     </button>
 
                                 </div>
@@ -1530,20 +1604,10 @@
                                                 <div className="flex-1 w-full min-h-[300px]">
                                                     <ResponsiveContainer width="100%" height="100%">
                                                         <LineChart
-                                                            data={analysisData.filter((_, i) => i % Math.ceil(analysisData.length / 50) === 0)}
+                                                            data={paretoChartData}
                                                             margin={{ top: 5, right: 5, bottom: 20, left: 10 }}
                                                         >
-                                                            <defs>
-                                                                <linearGradient id="paretoGradient" x1="0" y1="0" x2="0" y2="1">
-                                                                    <stop offset="0%" stopColor="#64748b" />
-                                                                    <stop offset={`${100 - abcThresholds.b}%`} stopColor="#64748b" />
-                                                                    <stop offset={`${100 - abcThresholds.b}%`} stopColor="#3b82f6" />
-                                                                    <stop offset={`${100 - abcThresholds.a}%`} stopColor="#3b82f6" />
-                                                                    <stop offset={`${100 - abcThresholds.a}%`} stopColor="#10b981" />
-                                                                    <stop offset="100%" stopColor="#10b981" />
-                                                                </linearGradient>
-                                                            </defs>
-                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? '#334155' : '#e2e8f0'} strokeOpacity={isDark ? 0.55 : 0.9} />
                                                             <XAxis
                                                                 dataKey="itemPct"
                                                                 type="number"
@@ -1552,16 +1616,34 @@
                                                                 label={{ value: t('dashboard.pareto_xlabel'), position: 'insideBottom', offset: -10, fontSize: 10, fill: '#64748b' }}
                                                             />
                                                             <YAxis
-                                                                dataKey="cumPct"
                                                                 domain={[0, 100]}
                                                                 tick={{ fontSize: 10 }}
-                                                                unit="%"
-                                                                label={{ value: t('dashboard.pareto_ylabel'), angle: -90, position: 'insideLeft', offset: 10, fontSize: 10, fill: '#64748b' }}
+                                                                width={56}
+                                                                label={({ viewBox }) => {
+                                                                    if (!viewBox) return null;
+                                                                    const cx = (viewBox.x ?? 0) + 12;
+                                                                    const cy = (viewBox.y ?? 0) + (viewBox.height ?? 0) / 2;
+                                                                    return (
+                                                                        <text
+                                                                            x={cx}
+                                                                            y={cy}
+                                                                            transform={`rotate(-90, ${cx}, ${cy})`}
+                                                                            textAnchor="middle"
+                                                                            dominantBaseline="middle"
+                                                                            fontSize={10}
+                                                                            fill="#64748b"
+                                                                        >
+                                                                            {t('dashboard.pareto_ylabel')}
+                                                                        </text>
+                                                                    );
+                                                                }}
                                                             />
                                                             <Tooltip content={<CustomParetoTooltip />} cursor={{ stroke: '#64748b', strokeWidth: 1 }} />
                                                             <ReferenceLine y={abcThresholds.a} stroke="#10b981" strokeDasharray="3 3" label={{ value: 'A Limit', fill: '#10b981', fontSize: 10, position: 'insideTopLeft' }} />
                                                             <ReferenceLine y={abcThresholds.b} stroke="#3b82f6" strokeDasharray="3 3" label={{ value: 'B Limit', fill: '#3b82f6', fontSize: 10, position: 'insideTopLeft' }} />
-                                                            <Line type="monotone" dataKey="cumPct" stroke="url(#paretoGradient)" strokeWidth={3} dot={false} />
+                                                            <Line type="linear" dataKey="cumA" stroke="#10b981" strokeWidth={3} dot={false} connectNulls={false} isAnimationActive={false} />
+                                                            <Line type="linear" dataKey="cumB" stroke="#3b82f6" strokeWidth={3} dot={false} connectNulls={false} isAnimationActive={false} />
+                                                            <Line type="linear" dataKey="cumC" stroke="#64748b" strokeWidth={3} dot={false} connectNulls={false} isAnimationActive={false} />
                                                         </LineChart>
                                                     </ResponsiveContainer>
                                                 </div>
