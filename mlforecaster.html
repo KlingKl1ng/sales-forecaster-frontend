@@ -78,9 +78,10 @@
         }
 
         .mlf-module-header {
-            display: grid;
-            grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+            position: relative;
+            display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 0.5rem;
             padding-left: 1rem;
             padding-right: 1rem;
@@ -94,20 +95,27 @@
         }
 
         .mlf-module-title {
-            min-width: 0;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
             margin: 0;
+            max-width: min(70%, 36rem);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             text-align: center;
+            pointer-events: none;
+            z-index: 1;
             font-size: 0.625rem;
             line-height: 1.2;
             letter-spacing: 0.06em;
-            white-space: normal;
         }
 
         @media (min-width: 640px) {
             .mlf-module-title {
                 font-size: 0.875rem;
                 letter-spacing: 0.1em;
-                white-space: nowrap;
             }
         }
 
@@ -377,7 +385,7 @@
                 }
             },
             vi: {
-                appTitle: "Dự báo ML Nâng cao",
+                appTitle: "DỰ BÁO HỌC MÁY NÂNG CAO",
                 upload: {
                     title: "Tải dữ liệu",
                     dragDrop: "Kéo & thả tập dữ liệu vào đây",
@@ -2013,13 +2021,13 @@
                     <main className="flex-1 min-w-0 flex flex-col overflow-hidden bg-transparent">
                         {/* Header */}
                         <div className="mlf-module-header h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border-b border-white/50 dark:border-white/10 flex-none z-10 sticky top-0 lg:static shadow-sm ring-1 ring-white/20 dark:ring-white/5">
-                            <div className="flex items-center justify-start">
+                            <div className="flex items-center justify-start min-h-[2.5rem]">
                                 <button onClick={() => setSidebarOpen(true)} className="md:hidden text-slate-500 hover:text-brand-gold"><MenuIcon /></button>
                             </div>
                             <h2 className="mlf-module-title font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase">
-                                ADVANCED-ML FORECASTER
+                                {t('appTitle')}
                             </h2>
-                            <div className="flex items-center justify-end gap-4 shrink-0">
+                            <div className="flex items-center justify-end gap-4 shrink-0 relative z-10">
                                 <div className="hidden md:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
                                     {environmentBadge && (
                                         <div className={`hidden lg:flex items-center gap-1 px-1.5 py-0.5 rounded border bg-transparent text-[10px] font-bold uppercase tracking-wide ${environmentBadge.className}`} title={environmentBadge.title} aria-label={environmentBadge.title}>
