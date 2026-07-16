@@ -172,6 +172,87 @@
             background: #0f172a;
         }
 
+        /* Interface tab buttons — match dashboard .nav-btn / .nav-btn.active */
+        .fc-iface-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 44px;
+            padding: 0 12px 0 8px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            background: transparent;
+            color: #64748b;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background .18s ease, border-color .18s ease, color .18s ease;
+        }
+
+        .dark .fc-iface-btn {
+            color: #94a3b8;
+        }
+
+        .fc-iface-btn:hover:not(:disabled) {
+            background: rgba(148, 163, 184, .08);
+            color: #334155;
+        }
+
+        .dark .fc-iface-btn:hover:not(:disabled) {
+            color: #cbd5e1;
+        }
+
+        .fc-iface-btn-ico {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: rgba(148, 163, 184, .1);
+            color: inherit;
+            flex-shrink: 0;
+            transition: background .18s ease, color .18s ease;
+        }
+
+        .fc-iface-btn.active {
+            border-color: rgba(245, 158, 11, .35);
+            background: linear-gradient(90deg, rgba(245, 158, 11, .14), rgba(245, 158, 11, .06));
+            color: #0f172a;
+        }
+
+        .dark .fc-iface-btn.active {
+            color: #f8fafc;
+        }
+
+        .fc-iface-btn.active .fc-iface-btn-ico {
+            background: rgba(245, 158, 11, .22);
+            color: #b45309;
+        }
+
+        .dark .fc-iface-btn.active .fc-iface-btn-ico {
+            color: #fde68a;
+        }
+
+        .fc-iface-btn:disabled,
+        .fc-iface-btn.is-disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .dark .fc-iface-btn:disabled,
+        .dark .fc-iface-btn.is-disabled {
+            background: #1e293b;
+            color: #64748b;
+        }
+
+        .fc-iface-btn:disabled .fc-iface-btn-ico,
+        .fc-iface-btn.is-disabled .fc-iface-btn-ico {
+            background: rgba(148, 163, 184, .12);
+            color: inherit;
+        }
+
         /* Modal Backdrop Blur */
         .modal-backdrop {
             backdrop-filter: blur(4px);
@@ -1478,19 +1559,19 @@
                                         type="button"
                                         onClick={() => interfaceReady && setActiveTab('dashboard')}
                                         disabled={!interfaceReady}
-                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border border-transparent ${!interfaceReady ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'dashboard' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`}
+                                        className={`fc-iface-btn ${!interfaceReady ? 'is-disabled' : activeTab === 'dashboard' ? 'active' : ''}`}
                                     >
-                                        <GridIcon />
-                                        {t('tabs.dashboard')}
+                                        <span className="fc-iface-btn-ico" aria-hidden="true"><GridIcon /></span>
+                                        <span>{t('tabs.dashboard')}</span>
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => interfaceReady && setActiveTab('list')}
                                         disabled={!interfaceReady}
-                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border border-transparent ${!interfaceReady ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'list' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`}
+                                        className={`fc-iface-btn ${!interfaceReady ? 'is-disabled' : activeTab === 'list' ? 'active' : ''}`}
                                     >
-                                        <EyeIcon />
-                                        {t('tabs.list')}
+                                        <span className="fc-iface-btn-ico" aria-hidden="true"><EyeIcon /></span>
+                                        <span>{t('tabs.list')}</span>
                                     </button>
                                 </div>
                             </div>
