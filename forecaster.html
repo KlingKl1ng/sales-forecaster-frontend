@@ -131,12 +131,39 @@
             white-space: nowrap;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             overflow: hidden;
             margin: 0;
+        }
+
+        /* Safari: flex item <img> ignores max-width and expands to intrinsic size */
+        .fc-empty-watermark {
+            display: block;
+            width: 320px;
+            max-width: 100%;
+            height: auto;
+            flex: none;
+            opacity: 0.12;
+            filter: grayscale(1);
+            -webkit-filter: grayscale(1);
+        }
+
+        .dark .fc-empty-watermark {
+            opacity: 0.14;
+        }
+
+        @media (min-width: 768px) {
+            .fc-empty-watermark {
+                width: 420px;
+            }
         }
 
         .scroller {
@@ -665,6 +692,7 @@
         const LayoutDashboardIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></svg>;
         const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>;
         const ListIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>;
+        const EyeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>;
         const SearchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>;
         const ChevronLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>;
         const ChevronRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>;
@@ -1897,6 +1925,7 @@
                 setSkuCol(""); setStartCol(""); setEndCol("");
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
                 setTotalTimeSeries(0); setAvailableCols([]);
+                setActiveTab("overview");
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
 
@@ -1923,6 +1952,7 @@
             };
 
             const skuData = getCurrentSkuData();
+            const interfaceReady = !!(batchResults && batchResults.length > 0);
 
             // Synchronize Validation Data with Forecast Data Timeline
             const alignedValidationData = useMemo(() => {
@@ -1941,7 +1971,7 @@
             }, [skuData]);
 
             return (
-                <div className="flex h-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
+                <div className="flex h-full min-h-0 bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
                     <MappingModal headers={availableCols} isOpen={isMappingModalOpen} onClose={() => setIsMappingModalOpen(false)} onConfirm={handleMappingConfirm} t={t} />
                     {/* Mobile Sidebar Backdrop */}
                     {isSidebarOpen && (
@@ -1993,18 +2023,22 @@
                             )}
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
-                                onClick={() => setActiveTab('overview')}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${activeTab === 'overview' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
+                                type="button"
+                                onClick={() => interfaceReady && setActiveTab('overview')}
+                                disabled={!interfaceReady}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!interfaceReady ? 'border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-50' : activeTab === 'overview' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
                                 title={t('dashboard.batch_overview')}
                             >
                                 <GridIcon />
                             </button>
                             <button
-                                onClick={() => setActiveTab('details')}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${activeTab === 'details' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
+                                type="button"
+                                onClick={() => interfaceReady && setActiveTab('details')}
+                                disabled={!interfaceReady}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!interfaceReady ? 'border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-50' : activeTab === 'details' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
                                 title={t('dashboard.detailed_view')}
                             >
-                                <ListIcon />
+                                <EyeIcon />
                             </button>
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
@@ -2038,7 +2072,7 @@
                             {/* 1. Source Data */}
                             <div>
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                <div className={`relative border border-dashed rounded px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
+                                <div className={`relative border border-dashed rounded-lg px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
                                     <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
                                         {file ? (
                                             <div className="flex flex-col items-center gap-1">
@@ -2077,18 +2111,20 @@
                                 <div className="flex flex-col gap-2">
                                     <button
                                         type="button"
-                                        onClick={() => setActiveTab('overview')}
-                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border border-transparent ${activeTab === 'overview' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                        onClick={() => interfaceReady && setActiveTab('overview')}
+                                        disabled={!interfaceReady}
+                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border border-transparent ${!interfaceReady ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-50' : activeTab === 'overview' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                     >
                                         <GridIcon />
                                         {t('dashboard.batch_overview')}
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setActiveTab('details')}
-                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border border-transparent ${activeTab === 'details' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                        onClick={() => interfaceReady && setActiveTab('details')}
+                                        disabled={!interfaceReady}
+                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border border-transparent ${!interfaceReady ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-50' : activeTab === 'details' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                     >
-                                        <ListIcon />
+                                        <EyeIcon />
                                         {t('dashboard.detailed_view')}
                                     </button>
                                 </div>
@@ -2187,9 +2223,9 @@
                     </div>
 
                     {/* MAIN CONTENT */}
-                    < div className="flex flex-col flex-grow min-w-0 transition-all relative" >
+                    <div className="flex flex-col flex-grow min-w-0 min-h-0 transition-all relative">
                         {/* Combined Header & Metrics Bar */}
-                        < div className={`flex flex-col sticky top-0 z-30 ${isFullScreen ? 'hidden' : ''}`}>
+                        <div className={`flex flex-col sticky top-0 z-30 shrink-0 ${isFullScreen ? 'hidden' : ''}`}>
                             <header className="fc-module-header h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-b border-white/20 dark:border-white/10 shrink-0 shadow-sm">
                                 <div className="flex items-center justify-start">
                                     <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden text-slate-500"><MenuIcon /></button>
@@ -2209,19 +2245,24 @@
                             <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden sm:overflow-x-auto relative">
                                 <KPICards results={batchResults} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
                             </div>
-                        </div >
+                        </div>
 
-                        <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full h-full overflow-hidden mobile-landscape-main ${isFullScreen ? 'hidden' : 'flex'}`}>
+                        <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full min-h-0 overflow-hidden mobile-landscape-main ${isFullScreen ? 'hidden' : 'flex'}`}>
 
                             {/* CONTENT AREA */}
-                            <div className="flex-1 p-2 md:p-4 relative overflow-y-auto scroller md:min-h-0 mobile-landscape-content">
+                            <div className="flex-1 min-h-0 p-2 md:p-4 relative overflow-y-auto scroller mobile-landscape-content">
                                 {!batchResults && (
                                     isPolling ? (
                                         <ForecastingLoader t={t} validationMethod={validationMethod} testHorizon={testHorizon} />
                                     ) : (
-                                        <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600">
-                                            <div className="w-16 h-16 border-2 border-dashed rounded flex items-center justify-center mb-2"><LayoutDashboardIcon /></div>
-                                            <span className="text-xs font-bold uppercase tracking-widest">{t('dashboard.no_results')}</span>
+                                        <div className="h-full min-h-0 min-w-0 flex flex-col items-center justify-center pointer-events-none select-none" aria-hidden="true">
+                                            <img
+                                                src="./fulllogo_transparent_nobuffer.png"
+                                                alt=""
+                                                width="420"
+                                                height="117"
+                                                className="fc-empty-watermark object-contain"
+                                            />
                                         </div>
                                     )
                                 )}
@@ -2263,13 +2304,13 @@
                                 )}
                             </div>
                         </main>
-                    </div >
+                    </div>
 
                     {/* FULL SCREEN */}
 
 
-                    < SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} t={t} />
-                </div >
+                    <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} t={t} />
+                </div>
             );
         };
         ReactDOM.render(<App />, document.getElementById('root'));
