@@ -1056,38 +1056,35 @@
 
             const handleWheel = (e) => {
                 e.preventDefault();
-                const { start, end } = zoomDomain;
-                const range = end - start;
-                const minRange = Math.max(5, Math.floor(dataLength * 0.05)); // Min 5% of data or 5 points
-
-                // Get cursor position ratio within chart
                 const rect = containerRef.current?.getBoundingClientRect();
-                const cursorRatio = rect ? (e.clientX - rect.left) / rect.width : 0.5;
-
-                // Determine zoom direction (pinch gesture sends ctrlKey with deltaY)
+                const cursorRatio = rect ? Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)) : 0.5;
                 const delta = e.deltaY || e.deltaX;
-                const zoomIn = delta < 0;
-                const zoomFactor = 0.1; // 10% zoom per scroll
+                const wantZoomIn = delta < 0;
 
-                if (zoomIn && range > minRange) {
-                    // Zoom in - reduce range centered on cursor
-                    const reduction = Math.max(1, Math.floor(range * zoomFactor));
-                    const leftReduction = Math.floor(reduction * cursorRatio);
-                    const rightReduction = reduction - leftReduction;
-                    setZoomDomain({
-                        start: Math.min(start + leftReduction, end - minRange),
-                        end: Math.max(end - rightReduction, start + minRange)
-                    });
-                } else if (!zoomIn && range < dataLength - 1) {
-                    // Zoom out - increase range
-                    const expansion = Math.max(1, Math.floor(range * zoomFactor));
-                    const leftExpansion = Math.floor(expansion * cursorRatio);
-                    const rightExpansion = expansion - leftExpansion;
-                    setZoomDomain({
-                        start: Math.max(0, start - leftExpansion),
-                        end: Math.min(dataLength - 1, end + rightExpansion)
-                    });
-                }
+                setZoomDomain((prev) => {
+                    const last = Math.max(0, dataLength - 1);
+                    const minRange = Math.min(last, Math.max(5, Math.floor(dataLength * 0.05)));
+                    let start = Math.max(0, Math.min(prev.start, last));
+                    let end = Math.max(start, Math.min(prev.end, last));
+                    const range = end - start;
+                    const zoomFactor = 0.1;
+
+                    if (wantZoomIn && range > minRange) {
+                        const reduction = Math.max(1, Math.floor(range * zoomFactor));
+                        const leftReduction = Math.floor(reduction * cursorRatio);
+                        const rightReduction = reduction - leftReduction;
+                        start = Math.min(start + leftReduction, end - minRange);
+                        end = Math.max(end - rightReduction, start + minRange);
+                    } else if (!wantZoomIn && range < last) {
+                        const expansion = Math.max(1, Math.floor(range * zoomFactor));
+                        const leftExpansion = Math.floor(expansion * cursorRatio);
+                        const rightExpansion = expansion - leftExpansion;
+                        start = Math.max(0, start - leftExpansion);
+                        end = Math.min(last, end + rightExpansion);
+                    }
+                    if (end < start) end = start;
+                    return { start, end };
+                });
             };
 
             const handleMouseDown = (e) => {
@@ -1124,29 +1121,40 @@
                 setZoomDomain({ start: 0, end: dataLength - 1 });
             };
 
-            // Explicit Zoom Helpers
+            // Explicit Zoom Helpers — functional updates so rapid +/- clicks never use stale domain
             const zoomIn = () => {
-                const { start, end } = zoomDomain;
-                const range = end - start;
-                const minRange = Math.max(5, Math.floor(dataLength * 0.05));
-                if (range <= minRange) return;
+                setZoomDomain((prev) => {
+                    const last = Math.max(0, dataLength - 1);
+                    const minRange = Math.min(last, Math.max(5, Math.floor(dataLength * 0.05)));
+                    let start = Math.max(0, Math.min(prev.start, last));
+                    let end = Math.max(start, Math.min(prev.end, last));
+                    const range = end - start;
+                    if (range <= minRange) return { start, end };
 
-                const reduction = Math.max(1, Math.floor(range * 0.25)); // 25% zoom
-                setZoomDomain({
-                    start: Math.min(start + Math.floor(reduction / 2), end - minRange),
-                    end: Math.max(end - Math.floor(reduction / 2), start + minRange)
+                    const reduction = Math.max(1, Math.floor(range * 0.25));
+                    const half = Math.floor(reduction / 2);
+                    start = Math.min(start + half, end - minRange);
+                    end = Math.max(end - (reduction - half), start + minRange);
+                    if (end - start < minRange) end = Math.min(last, start + minRange);
+                    start = Math.max(0, Math.min(start, end));
+                    end = Math.min(last, Math.max(end, start));
+                    return { start, end };
                 });
             };
 
             const zoomOut = () => {
-                const { start, end } = zoomDomain;
-                const range = end - start;
-                if (start <= 0 && end >= dataLength - 1) return;
+                setZoomDomain((prev) => {
+                    const last = Math.max(0, dataLength - 1);
+                    let start = Math.max(0, Math.min(prev.start, last));
+                    let end = Math.max(start, Math.min(prev.end, last));
+                    if (start <= 0 && end >= last) return { start: 0, end: last };
 
-                const expansion = Math.max(1, Math.floor(range * 0.25)); // 25% zoom out
-                setZoomDomain({
-                    start: Math.max(0, start - Math.floor(expansion / 2)),
-                    end: Math.min(dataLength - 1, end + Math.floor(expansion / 2))
+                    const range = Math.max(1, end - start);
+                    const expansion = Math.max(1, Math.floor(range * 0.25));
+                    const half = Math.floor(expansion / 2);
+                    start = Math.max(0, start - half);
+                    end = Math.min(last, end + (expansion - half));
+                    return { start, end };
                 });
             };
 
@@ -1271,19 +1279,21 @@
                     {...handlers}
                     style={{ touchAction: 'none' }}
                 >
-                    <div className="absolute top-14 right-2 z-10 flex items-center gap-1">
-                        {/* Zoom Controls */}
-                        <div className="flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm mr-1">
-                            <button onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom In">+</button>
-                            <button onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom Out">-</button>
-                        </div>
-
+                    <div
+                        className="absolute top-14 right-2 z-10 flex items-center gap-1"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onDoubleClick={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Pts/Reset grows to the left; zoom +/- stays pinned on the right */}
                         {isZoomed && (
                             <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-900/80 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
                                 <span className="text-[10px] text-slate-500 dark:text-slate-400">
                                     {zoomDomain.end - zoomDomain.start + 1} / {data.length} pts
                                 </span>
                                 <button
+                                    type="button"
                                     onClick={(e) => { e.stopPropagation(); handlers.onDoubleClick(); }}
                                     className="text-[10px] text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 px-1.5 py-0.5 rounded transition-colors"
                                 >
@@ -1291,6 +1301,10 @@
                                 </button>
                             </div>
                         )}
+                        <div className="flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
+                            <button type="button" onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom In">+</button>
+                            <button type="button" onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom Out">-</button>
+                        </div>
                     </div>
                     <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={visibleData} syncId={syncId} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
@@ -1341,19 +1355,21 @@
                     {...handlers}
                     style={{ touchAction: 'none' }}
                 >
-                    <div className="absolute top-14 right-2 z-10 flex items-center gap-1">
-                        {/* Zoom Controls */}
-                        <div className="flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm mr-1">
-                            <button onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom In">+</button>
-                            <button onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom Out">-</button>
-                        </div>
-
+                    <div
+                        className="absolute top-14 right-2 z-10 flex items-center gap-1"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onDoubleClick={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Pts/Reset grows to the left; zoom +/- stays pinned on the right */}
                         {isZoomed && (
                             <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-900/80 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
                                 <span className="text-[10px] text-slate-500 dark:text-slate-400">
                                     {zoomDomain.end - zoomDomain.start + 1} / {data.length} pts
                                 </span>
                                 <button
+                                    type="button"
                                     onClick={(e) => { e.stopPropagation(); handlers.onDoubleClick(); }}
                                     className="text-[10px] text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 px-1.5 py-0.5 rounded transition-colors"
                                 >
@@ -1361,6 +1377,10 @@
                                 </button>
                             </div>
                         )}
+                        <div className="flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
+                            <button type="button" onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom In">+</button>
+                            <button type="button" onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom Out">-</button>
+                        </div>
                     </div>
 
                     <ResponsiveContainer width="100%" height="100%">
