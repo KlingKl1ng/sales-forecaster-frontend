@@ -76,6 +76,59 @@
             z-index: 60;
         }
 
+        .fc-kpi-bar {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+            min-width: 0;
+        }
+
+        @media (max-width: 639px) {
+            .fc-kpi-bar {
+                min-height: 3rem;
+            }
+        }
+
+        .fc-kpi-metrics {
+            flex: 1 1 0%;
+            min-width: 0;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            align-items: stretch;
+        }
+
+        .fc-kpi-metric {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .fc-kpi-search {
+            flex: 0 0 auto;
+        }
+
+        .fc-module-header {
+            display: grid;
+            grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 0.5rem;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        @media (min-width: 640px) {
+            .fc-module-header {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+
+        .fc-module-title {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             height: 100vh;
@@ -182,7 +235,7 @@
     <div id="root" class="h-full w-full flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo, useCallback } = React;
+        const { useState, useEffect, useRef, useMemo, useCallback, memo } = React;
 
         function useOperartisTheme() {
             const [theme, setThemeState] = useState(() => window.getOperartisTheme());
@@ -224,10 +277,53 @@
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
         const DownloadIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>;
         const PlayIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
+        const SearchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>;
+        const ServerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>;
+
+        const getDeploymentEnvironment = () => {
+            const host = window.location.hostname;
+            if (host === 'localhost' || host === '127.0.0.1' || host === '::1' || window.location.protocol === 'file:') return 'local';
+            if (host.indexOf('staging') !== -1) return 'staging';
+            return 'production';
+        };
+
+        const getEnvironmentBadgeConfig = (environment) => {
+            if (environment === 'local') {
+                return {
+                    label: 'LOCAL',
+                    title: 'Local frontend environment',
+                    className: 'text-emerald-600 border-emerald-300/50 dark:text-emerald-400 dark:border-emerald-500/30'
+                };
+            }
+            if (environment === 'staging') {
+                return {
+                    label: 'STAGING',
+                    title: 'Staging frontend environment',
+                    className: 'text-amber-600 border-amber-300/50 dark:text-amber-400 dark:border-amber-500/30'
+                };
+            }
+            return null;
+        };
 
         // --- UTILS ---
         const fmtCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
         const fmtNum = (val, d = 2) => new Intl.NumberFormat('en-US', { maximumFractionDigits: d }).format(val);
+
+        const MetricTile = memo(({ label, shortLabel, value }) => {
+            const mobileLabel = shortLabel || label;
+            return (
+                <div
+                    className="fc-kpi-metric flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 bg-white/40 dark:bg-white/5 backdrop-blur-md px-1 py-1.5 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
+                    title={label}
+                >
+                    <span className="sm:hidden text-[7px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide mb-0.5 text-center leading-[1.1] w-full min-w-0 truncate px-0.5">{mobileLabel}</span>
+                    <span className="hidden sm:block text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wider mb-0.5 text-center leading-[1.1] w-full min-w-0 truncate px-0.5">{label}</span>
+                    <div className="flex items-baseline gap-1 justify-center min-w-0 max-w-full">
+                        <span className="text-xs sm:text-base md:text-lg font-bold font-mono leading-none truncate text-slate-700 dark:text-white drop-shadow-sm">{value}</span>
+                    </div>
+                </div>
+            );
+        });
 
         const TRANSLATIONS = {
             en: {
@@ -260,9 +356,11 @@
                 tabs: {
                     dashboard: "Overview",
                     list: "Detailed View",
-                    search_placeholder: "Search SKU...",
+                    search_placeholder: "Search",
                     total_skus: "Total SKUs",
-                    total_val: "Total Inventory Value"
+                    total_skus_short: "SKUs",
+                    total_val: "Total Inventory Value",
+                    total_val_short: "Value"
                 },
                 dashboard: {
                     empty_title: "Ready to Analyze",
@@ -349,9 +447,11 @@
                 tabs: {
                     dashboard: "Tổng quan",
                     list: "Chi tiết",
-                    search_placeholder: "Tìm kiếm SKU...",
+                    search_placeholder: "Tìm kiếm",
                     total_skus: "Tổng số SKU",
-                    total_val: "Tổng giá trị tồn kho"
+                    total_skus_short: "SKU",
+                    total_val: "Tổng giá trị tồn kho",
+                    total_val_short: "Giá trị"
                 },
                 dashboard: {
                     empty_title: "Sẵn sàng phân tích",
@@ -434,9 +534,11 @@
                 tabs: {
                     dashboard: "Übersicht",
                     list: "Detailansicht",
-                    search_placeholder: "SKU suchen...",
+                    search_placeholder: "Suchen",
                     total_skus: "Gesamte SKUs",
-                    total_val: "Gesamter Bestandswert"
+                    total_skus_short: "SKUs",
+                    total_val: "Gesamter Bestandswert",
+                    total_val_short: "Wert"
                 },
                 dashboard: {
                     empty_title: "Bereit zur Analyse",
@@ -850,6 +952,8 @@
             // UI State
             const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, list
             const [searchTerm, setSearchTerm] = useState('');
+            const [searchActive, setSearchActive] = useState(false);
+            const searchInputRef = useRef(null);
             const [filterClass, setFilterClass] = useState(null);
             const fileInputRef = useRef(null);
 
@@ -884,6 +988,8 @@
                 }
                 return fallback || key;
             };
+
+            const environmentBadge = getEnvironmentBadgeConfig(getDeploymentEnvironment());
 
             useEffect(() => {
                 window.persistOperartisLang(lang);
@@ -1492,59 +1598,78 @@
                     {/* MAIN CONTENT */}
                     <main className="flex-1 flex flex-col overflow-hidden relative">
                         {/* TOP Header - Always Visible */}
-                        <div className="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm shrink-0 relative z-20">
-                            <div className="flex gap-4 items-center">
-                                {/* Mobile Menu Button */}
-                                <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden p-1 text-slate-500 hover:text-brand-gold focus:outline-none dark:text-slate-400">
-                                    <MenuIcon />
-                                </button>
+                        <header className="fc-module-header h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-b border-white/20 dark:border-white/10 shrink-0 shadow-sm relative z-20">
+                            <div className="flex items-center justify-start">
+                                <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden text-slate-500"><MenuIcon /></button>
                             </div>
-
-                            {/* Centered Title */}
-                            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm md:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest drop-shadow-sm whitespace-nowrap">
-                                {t('header.title')}
-                            </div>
-
-                            <div className="flex items-center gap-2 md:gap-4">
-                                <div id="operartis-auth-topbar-slot"></div>
-                            </div>
-                        </div>
-
-                        {/* SECONDARY Navigation Bar (Search & Metrics) — sized like forecaster KPI bar */}
-                        <div className="min-h-12 sm:min-h-16 border-b border-white/20 dark:border-white/10 flex items-center justify-between px-4 md:px-8 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl shrink-0 relative z-10 overflow-x-auto no-scrollbar gap-4 shadow-sm">
-                            <div className="flex gap-4 items-center h-full shrink-0">
-                                {/* Search SKU Input */}
-                                <div className="h-8 flex items-center shrink-0 gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder={t('tabs.search_placeholder')}
-                                        value={searchTerm}
-                                        onChange={e => { setSearchTerm(e.target.value); if (interfaceReady && activeTab !== 'list') setActiveTab('list'); }}
-                                        className="bg-slate-100 dark:bg-slate-800 border-none rounded-md px-3 py-1.5 text-xs w-48 md:w-64 focus:ring-1 focus:ring-brand-gold outline-none transition-all placeholder-slate-400"
-                                    />
-                                    {filterClass && (
-                                        <div className="flex items-center gap-1 bg-brand-gold/10 text-brand-gold px-2 py-1 rounded text-[10px] font-bold uppercase cursor-pointer hover:bg-rose-50 hover:text-rose-500 transition-colors" onClick={() => setFilterClass(null)}>
-                                            <span>Class: {filterClass}</span>
-                                            <XIcon />
-                                        </div>
+                            <div className="fc-module-title text-center text-[11px] sm:text-sm md:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest">{t('header.title')}</div>
+                            <div className="flex items-center justify-end gap-4 shrink-0">
+                                <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
+                                    {environmentBadge && (
+                                        <div className={`hidden lg:flex items-center gap-1 px-1.5 py-0.5 rounded border bg-transparent text-[10px] font-bold uppercase tracking-wide ${environmentBadge.className}`} title={environmentBadge.title} aria-label={environmentBadge.title}><span className="w-3 h-3 flex shrink-0 [&_svg]:w-full [&_svg]:h-full"><ServerIcon /></span><span>{environmentBadge.label}</span></div>
                                     )}
                                 </div>
+                                <div id="operartis-auth-topbar-slot"></div>
                             </div>
+                        </header>
 
-                            {/* Conditional Total Metrics */}
-                            {analysisData.length > 0 && (
-                                <div className="flex items-center gap-6 shrink-0 ml-auto">
-                                    <div className="text-right">
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('tabs.total_skus')}</div>
-                                        <div className="font-mono font-bold text-sm md:text-base text-slate-800 dark:text-slate-200">{summary.totalSkus ?? analysisData.length}</div>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('tabs.total_val')}</div>
-                                        <div className="font-mono font-bold text-sm md:text-base text-slate-800 dark:text-slate-200">{fmtNum(summary.totalValue, 0)}</div>
-                                    </div>
+                        {/* KPI BAR — only after analysis finishes with results */}
+                        {interfaceReady && (
+                        <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden relative z-10">
+                            <div className="fc-kpi-bar min-h-12 sm:min-h-16">
+                                <div className="fc-kpi-metrics min-h-12 sm:min-h-16">
+                                    <MetricTile
+                                        label={t('tabs.total_skus')}
+                                        shortLabel={t('tabs.total_skus_short')}
+                                        value={summary.totalSkus ?? analysisData.length}
+                                    />
+                                    <MetricTile
+                                        label={t('tabs.total_val')}
+                                        shortLabel={t('tabs.total_val_short')}
+                                        value={fmtNum(summary.totalValue, 0)}
+                                    />
                                 </div>
-                            )}
+
+                                <div className="fc-kpi-search flex items-center justify-center sm:justify-end gap-2 border-l border-white/20 dark:border-white/10 px-2 sm:px-4">
+                                    {filterClass && (
+                                        <button
+                                            type="button"
+                                            className="hidden sm:flex items-center gap-1 bg-brand-gold/10 text-brand-gold px-2 py-1 rounded text-[10px] font-bold uppercase hover:bg-rose-50 hover:text-rose-500 transition-colors shrink-0"
+                                            onClick={() => setFilterClass(null)}
+                                            title={`Class: ${filterClass}`}
+                                        >
+                                            <span className="truncate max-w-[4.5rem]">{filterClass}</span>
+                                            <XIcon />
+                                        </button>
+                                    )}
+                                    <form
+                                        onSubmit={(e) => {
+                                            e.preventDefault();
+                                            if (activeTab !== 'list') setActiveTab('list');
+                                            searchInputRef.current?.blur();
+                                        }}
+                                        onClick={() => searchInputRef.current?.focus()}
+                                        className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden shrink-0 ${searchActive || searchTerm ? 'w-[7.5rem] sm:w-48 md:w-64 px-2 sm:px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-9 h-9 sm:w-8 sm:h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                    >
+                                        <SearchIcon className={`shrink-0 transition-colors ${searchActive || searchTerm ? 'text-brand-gold w-4 h-4' : 'text-slate-500 dark:text-slate-400 w-4 h-4'}`} />
+                                        <input
+                                            ref={searchInputRef}
+                                            type="text"
+                                            className={`bg-transparent border-none outline-none font-sans font-medium text-xs text-slate-700 dark:text-white placeholder-slate-400 transition-all duration-300 ${searchActive || searchTerm ? 'w-full ml-2 opacity-100' : 'w-0 opacity-0'}`}
+                                            value={searchTerm}
+                                            onChange={(e) => {
+                                                setSearchTerm(e.target.value);
+                                                if (activeTab !== 'list') setActiveTab('list');
+                                            }}
+                                            onFocus={() => setSearchActive(true)}
+                                            onBlur={() => setSearchActive(false)}
+                                            placeholder={t('tabs.search_placeholder')}
+                                        />
+                                    </form>
+                                </div>
+                            </div>
                         </div>
+                        )}
 
                         {analysisData.length === 0 ? (
                             <div className="flex-1 flex flex-col items-center justify-center pointer-events-none select-none" aria-hidden="true">

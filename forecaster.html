@@ -83,29 +83,34 @@
             z-index: 60;
         }
 
+        .fc-kpi-bar {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+            min-width: 0;
+        }
+
         @media (max-width: 639px) {
             .fc-kpi-bar {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr) auto;
-                align-items: stretch;
                 min-height: 3rem;
-            }
-
-            .fc-kpi-spacer {
-                display: none;
             }
         }
 
-        @media (min-width: 640px) {
-            .fc-kpi-bar {
-                display: grid;
-                grid-template-columns: 1fr auto 1fr;
-                align-items: stretch;
-            }
+        .fc-kpi-metrics {
+            flex: 1 1 0%;
+            min-width: 0;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: stretch;
+        }
 
-            .fc-kpi-spacer {
-                display: block;
-            }
+        .fc-kpi-metric {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .fc-kpi-search {
+            flex: 0 0 auto;
         }
 
         .fc-module-header {
@@ -733,16 +738,14 @@
             const mobileLabel = shortLabel || label;
             return (
                 <div
-                    className={`flex flex-col justify-center items-center min-w-0 h-full border-r border-white/20 dark:border-white/10 last:border-r-0 ${bgClass} backdrop-blur-md px-1 py-1.5 sm:px-3 md:px-6 sm:min-w-[6.5rem] md:min-w-[140px] sm:snap-start transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
+                    className={`fc-kpi-metric flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 ${bgClass} backdrop-blur-md px-1 py-1.5 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
                     title={label}
                 >
-                    <span className="text-[7px] sm:text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide sm:tracking-wider mb-0.5 text-center leading-[1.1] line-clamp-2 max-sm:max-w-full">
-                        <span className="sm:hidden">{mobileLabel}</span>
-                        <span className="hidden sm:inline whitespace-nowrap">{label}</span>
-                    </span>
-                    <div className="flex items-baseline gap-1 justify-center">
-                        <span className={`text-xs sm:text-base md:text-lg font-bold font-mono leading-none ${colorClass} drop-shadow-sm`}>{value}</span>
-                        {subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500">{subValue}</span>}
+                    <span className="sm:hidden text-[7px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide mb-0.5 text-center leading-[1.1] w-full min-w-0 truncate px-0.5">{mobileLabel}</span>
+                    <span className="hidden sm:block text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wider mb-0.5 text-center leading-[1.1] w-full min-w-0 truncate px-0.5">{label}</span>
+                    <div className="flex items-baseline gap-1 justify-center min-w-0 max-w-full">
+                        <span className={`text-xs sm:text-base md:text-lg font-bold font-mono leading-none truncate ${colorClass} drop-shadow-sm`}>{value}</span>
+                        {subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500 shrink-0">{subValue}</span>}
                     </div>
                 </div>
             );
@@ -820,20 +823,19 @@
             }, [handleSkuSelect, localSku]);
 
             return (
-                <div className="fc-kpi-bar w-full min-h-12 sm:min-h-16 items-stretch">
-                    <div className="fc-kpi-spacer" aria-hidden="true" />
-                    <div className="fc-kpi-metrics grid grid-cols-4 sm:flex sm:items-stretch sm:overflow-visible min-h-12 sm:min-h-16 min-w-0">
+                <div className="fc-kpi-bar min-h-12 sm:min-h-16">
+                    <div className="fc-kpi-metrics min-h-12 sm:min-h-16">
                         <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} />
                         <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
                         <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={fmtNumber(avgMae, 0, 0)} />
                         <MetricTile label={t('dashboard.avg_mse')} shortLabel={t('dashboard.avg_mse_short')} value={fmtNumber(avgMse, 0, 0)} />
                     </div>
 
-                    <div className="fc-kpi-search flex shrink-0 items-center justify-center sm:justify-end border-l border-white/20 dark:border-white/10 px-2 sm:px-4 sm:justify-self-end">
+                    <div className="fc-kpi-search flex items-center justify-center sm:justify-end border-l border-white/20 dark:border-white/10 px-2 sm:px-4">
                         <form
                             onSubmit={onSearchSubmit}
                             onClick={() => inputRef.current?.focus()}
-                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden ${searchActive || localSku ? 'w-[7.5rem] sm:w-48 md:w-64 px-2 sm:px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-9 h-9 sm:w-8 sm:h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden shrink-0 ${searchActive || localSku ? 'w-[7.5rem] sm:w-48 md:w-64 px-2 sm:px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-9 h-9 sm:w-8 sm:h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                         >
                             <SearchIcon className={`shrink-0 transition-colors ${searchActive || localSku ? 'text-brand-gold w-4 h-4' : 'text-slate-500 dark:text-slate-400 w-4 h-4'}`} />
                             <input
@@ -2241,10 +2243,12 @@
                                 </div>
                             </header>
 
-                            {/* KPI BAR */}
-                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden sm:overflow-x-auto relative">
+                            {/* KPI BAR — only after a run finishes with results */}
+                            {interfaceReady && (
+                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden relative">
                                 <KPICards results={batchResults} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
                             </div>
+                            )}
                         </div>
 
                         <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full min-h-0 overflow-hidden mobile-landscape-main ${isFullScreen ? 'hidden' : 'flex'}`}>
