@@ -316,6 +316,8 @@
         // --- UTILS ---
         const fmtCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
         const fmtNum = (val, d = 2) => new Intl.NumberFormat('en-US', { maximumFractionDigits: d }).format(val);
+        const clampPct = (val) => Math.min(100, Math.max(0, Number(val) || 0));
+        const fmtAxisPct = (val) => String(Math.round(clampPct(val)));
 
         const MetricTile = memo(({ label, shortLabel, value }) => {
             const mobileLabel = shortLabel || label;
@@ -634,13 +636,17 @@
                 return 'C';
             };
 
-            const makePoint = (itemPct, cumPct, series) => ({
-                itemPct,
-                cumPct,
-                cumA: (series === 'A' || series === 'AB') ? cumPct : null,
-                cumB: (series === 'B' || series === 'AB' || series === 'BC') ? cumPct : null,
-                cumC: (series === 'C' || series === 'BC') ? cumPct : null,
-            });
+            const makePoint = (itemPct, cumPct, series) => {
+                const pct = clampPct(cumPct);
+                const skuPct = clampPct(itemPct);
+                return {
+                    itemPct: skuPct,
+                    cumPct: pct,
+                    cumA: (series === 'A' || series === 'AB') ? pct : null,
+                    cumB: (series === 'B' || series === 'AB' || series === 'BC') ? pct : null,
+                    cumC: (series === 'C' || series === 'BC') ? pct : null,
+                };
+            };
 
             const result = [];
             for (let i = 0; i < sampled.length; i++) {
@@ -1783,11 +1789,18 @@
                                                                 dataKey="itemPct"
                                                                 type="number"
                                                                 domain={[0, 100]}
+                                                                allowDecimals={false}
+                                                                ticks={[0, 20, 40, 60, 80, 100]}
+                                                                tickFormatter={fmtAxisPct}
                                                                 tick={{ fontSize: 10 }}
                                                                 label={{ value: t('dashboard.pareto_xlabel'), position: 'insideBottom', offset: -10, fontSize: 10, fill: '#64748b' }}
                                                             />
                                                             <YAxis
                                                                 domain={[0, 100]}
+                                                                allowDataOverflow
+                                                                allowDecimals={false}
+                                                                ticks={[0, 20, 40, 60, 80, 100]}
+                                                                tickFormatter={fmtAxisPct}
                                                                 tick={{ fontSize: 10 }}
                                                                 width={56}
                                                                 label={({ viewBox }) => {
