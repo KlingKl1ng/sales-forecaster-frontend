@@ -1694,10 +1694,35 @@
             }
 
             .i4l-flow-tag-recording {
-                top: 72% !important;
+                top: 83.5% !important;
                 max-width: 9rem;
             }
         }
+
+        @media (min-width: 640px) and (max-width: 767px) {
+            .i4l-flow-tag-recording {
+                top: 83.5% !important;
+                max-width: 9rem;
+            }
+        }
+
+        .i4l-baseline-path-lg,
+        .i4l-mes-erp-path-lg {
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .i4l-baseline-path-sm,
+            .i4l-mes-erp-path-sm {
+                display: none;
+            }
+
+            .i4l-baseline-path-lg,
+            .i4l-mes-erp-path-lg {
+                display: inline;
+            }
+        }
+
         .aa-maturity-chart {
             position: relative;
             overflow: hidden;
@@ -4313,18 +4338,32 @@
             const apsMesStart = { x: aps.right - pad - 4, y: aps.bottom - pad };
             const apsMesEnd = { x: mes.left + pad, y: mes.top + pad + 4 };
             const apsMesEndTrimmed = i4lTrimEnd(apsMesStart.x, apsMesStart.y, apsMesEnd.x, apsMesEnd.y, arrowGap);
+            const mesErpStart = { x: mes.left + pad + 6, y: mes.bottom - pad - 10 };
+            const mesErpEnd = { x: erp.right - pad - 6, y: erp.bottom - pad - 10 };
+            const mesErpCtrl = { x: I4L_VB.w / 2, y: mes.bottom + pad + 8 };
+            const mesErpTrim = 22;
+            const mesErpStartTrimmed = i4lTrimEnd(mesErpCtrl.x, mesErpCtrl.y, mesErpStart.x, mesErpStart.y, mesErpTrim);
+            const mesErpEndTrimmed = i4lTrimEnd(mesErpCtrl.x, mesErpCtrl.y, mesErpEnd.x, mesErpEnd.y, mesErpTrim);
+            const mesErpCtrlLg = { x: I4L_VB.w / 2, y: mes.bottom + pad + 14 };
+            const mesErpTrimLg = 6;
+            const mesErpStartTrimmedLg = i4lTrimEnd(mesErpCtrlLg.x, mesErpCtrlLg.y, mesErpStart.x, mesErpStart.y, mesErpTrimLg);
+            const mesErpEndTrimmedLg = i4lTrimEnd(mesErpCtrlLg.x, mesErpCtrlLg.y, mesErpEnd.x, mesErpEnd.y, mesErpTrimLg);
+            const mesToErpPath = `M ${mesErpStartTrimmed.x} ${mesErpStartTrimmed.y} Q ${mesErpCtrl.x} ${mesErpCtrl.y} ${mesErpEndTrimmed.x} ${mesErpEndTrimmed.y}`;
+            const mesToErpLgPath = `M ${mesErpStartTrimmedLg.x} ${mesErpStartTrimmedLg.y} Q ${mesErpCtrlLg.x} ${mesErpCtrlLg.y} ${mesErpEndTrimmedLg.x} ${mesErpEndTrimmedLg.y}`;
             return {
                 gap: {
                     erpToBreak: `M ${erp.right - pad} ${erp.top + pad + 4} L ${aps.left + 8} ${aps.bottom + 14}`,
                     mesToBreak: `M ${mes.left + pad} ${mes.top + pad + 4} L ${aps.right - 8} ${aps.bottom + 14}`,
                     breakLeft: { x: aps.left + 5, y: aps.bottom + 12 },
                     breakRight: { x: aps.right - 5, y: aps.bottom + 12 },
-                    baseline: `M ${mes.left - 14} ${mes.bottom + pad - 6} Q ${I4L_VB.w / 2} ${erp.bottom + pad + 8} ${erp.right + 14} ${erp.bottom + pad - 6}`,
+                    baseline: mesToErpPath,
+                    baselineLg: mesToErpLgPath,
                 },
                 loop: {
                     erpToAps: `M ${erp.right - pad} ${erp.top + pad + 4} L ${aps.left + pad + 4} ${aps.bottom - pad}`,
                     apsToMes: `M ${apsMesStart.x} ${apsMesStart.y} L ${apsMesEndTrimmed.x} ${apsMesEndTrimmed.y}`,
-                    mesToErp: `M ${mes.left + pad + 6} ${mes.bottom - pad - 10} Q ${I4L_VB.w / 2} ${mes.bottom + pad + 8} ${erp.right - pad - 6} ${erp.bottom - pad - 10}`,
+                    mesToErp: mesToErpPath,
+                    mesToErpLg: mesToErpLgPath,
                 },
                 tags: {
                     input: i4lMidTag(erpApsStart.x, erpApsStart.y, erpApsEnd.x, erpApsEnd.y, 46, true, -22, 10),
@@ -4490,20 +4529,22 @@
                                                     <path d={`M ${I4L_PATHS.gap.breakLeft.x - 5} ${I4L_PATHS.gap.breakLeft.y} l 10 10 M ${I4L_PATHS.gap.breakLeft.x + 5} ${I4L_PATHS.gap.breakLeft.y} l -10 10`} />
                                                     <path d={`M ${I4L_PATHS.gap.breakRight.x - 5} ${I4L_PATHS.gap.breakRight.y} l 10 10 M ${I4L_PATHS.gap.breakRight.x + 5} ${I4L_PATHS.gap.breakRight.y} l -10 10`} />
                                                 </g>
-                                                <path d={I4L_PATHS.gap.baseline} fill="none" stroke="#94a3b8" strokeOpacity="0.35" strokeWidth="1.4" strokeDasharray="5 6" markerStart="url(#i4l-arrow-slate-start)" markerEnd="url(#i4l-arrow-slate-end)" />
+                                                <path d={I4L_PATHS.gap.baseline} fill="none" stroke="#94a3b8" strokeOpacity="0.35" strokeWidth="1.4" strokeDasharray="5 6" markerStart="url(#i4l-arrow-slate-start)" markerEnd="url(#i4l-arrow-slate-end)" className="i4l-baseline-path-sm" />
+                                                <path d={I4L_PATHS.gap.baselineLg} fill="none" stroke="#94a3b8" strokeOpacity="0.35" strokeWidth="1.4" strokeDasharray="5 6" markerStart="url(#i4l-arrow-slate-start)" markerEnd="url(#i4l-arrow-slate-end)" className="i4l-baseline-path-lg" />
                                             </g>
 
                                             <g className={`i4l-phase-layer${apsVisible ? '' : ' i4l-phase-hidden'}`}>
                                                 <path d={I4L_PATHS.loop.erpToAps} fill="none" stroke="url(#i4l-gold-grad)" strokeWidth="2.3" markerEnd="url(#i4l-arrow-gold)" className="i4l-flow-arrow" />
                                                 <path d={I4L_PATHS.loop.apsToMes} fill="none" stroke="url(#i4l-gold-grad)" strokeWidth="2.3" markerEnd="url(#i4l-arrow-gold)" className="i4l-flow-arrow i4l-flow-arrow-2" />
-                                                <path d={I4L_PATHS.loop.mesToErp} fill="none" stroke="url(#i4l-gold-grad)" strokeWidth="2.3" markerEnd="url(#i4l-arrow-gold)" className="i4l-flow-arrow i4l-flow-arrow-3" />
+                                                <path d={I4L_PATHS.loop.mesToErp} fill="none" stroke="url(#i4l-gold-grad)" strokeWidth="2.3" markerEnd="url(#i4l-arrow-gold)" className="i4l-flow-arrow i4l-flow-arrow-3 i4l-mes-erp-path-sm" />
+                                                <path d={I4L_PATHS.loop.mesToErpLg} fill="none" stroke="url(#i4l-gold-grad)" strokeWidth="2.3" markerEnd="url(#i4l-arrow-gold)" className="i4l-flow-arrow i4l-flow-arrow-3 i4l-mes-erp-path-lg" />
                                             </g>
                                         </svg>
 
                                         {I4L_FLOW_TAGS.filter(tag => apsVisible || !tag.apsOnly).map(tag => (
                                             <span
                                                 key={tag.key}
-                                                className={`i4l-flow-tag i4l-phase-layer ${tag.key === 'i4l_flow_recording' ? 'i4l-flow-tag-recording' : ''} ${tag.gold ? 'i4l-flow-tag-gold' : ''}${apsVisible ? '' : ' i4l-phase-hidden'}`}
+                                                className={`i4l-flow-tag i4l-phase-layer ${tag.key === 'i4l_flow_recording' ? 'i4l-flow-tag-recording' : ''} ${tag.gold || (apsVisible && tag.key === 'i4l_flow_recording') ? 'i4l-flow-tag-gold' : ''}${apsVisible ? '' : ' i4l-phase-hidden'}`}
                                                 style={{ left: tag.left, top: tag.top }}
                                             >
                                                 {ui[tag.key]}
