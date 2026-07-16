@@ -157,6 +157,39 @@
             margin: 0;
         }
 
+        /* Safari: native <select> paints shorter than number inputs with the same padding */
+        .fc-sidebar-control {
+            box-sizing: border-box;
+            height: 2.25rem;
+            min-height: 2.25rem;
+            line-height: 1.25rem;
+        }
+
+        select.fc-sidebar-control {
+            -webkit-appearance: none;
+            appearance: none;
+            padding-right: 1.75rem;
+        }
+
+        .fc-sidebar-select-wrap {
+            position: relative;
+        }
+
+        .fc-sidebar-select-wrap > .fc-sidebar-select-chevron {
+            position: absolute;
+            top: 50%;
+            right: 0.6rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #64748b;
+        }
+
+        .dark .fc-sidebar-select-wrap > .fc-sidebar-select-chevron {
+            color: #94a3b8;
+        }
+
         /* Safari: flex item <img> ignores max-width and expands to intrinsic size */
         .fc-empty-watermark {
             display: block;
@@ -511,7 +544,7 @@
                     action: "Hành động",
                     val_method: "Phương pháp kiểm định",
                     train_h: "Chu kỳ H.luyện",
-                    test_h: "Chu kỳ T.nghiệm",
+                    test_h: "Chu kỳ K.định",
                     fc_h: "Chu kỳ dự báo",
                     total_periods: "Tổng số chu kỳ",
                     horizon_mismatch: "Huấn luyện + Thử nghiệm phải bằng",
@@ -2149,29 +2182,34 @@
                                 <form className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800" onSubmit={(e) => e.preventDefault()}>
                                     <div>
                                         <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.val_method')}</label>
-                                        <select
-                                            value={validationMethod}
-                                            onChange={(e) => setValidationMethod(e.target.value)}
-                                            className="w-full text-xxs p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors"
-                                        >
-                                            <option value="simple">Simple Split (Fast)</option>
-                                            <option value="walk_forward">Walk-Forward (Adaptive)</option>
-                                            <option value="rolling_window">Rolling Window (Adaptive)</option>
-                                        </select>
+                                        <div className="fc-sidebar-select-wrap">
+                                            <select
+                                                value={validationMethod}
+                                                onChange={(e) => setValidationMethod(e.target.value)}
+                                                className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
+                                            >
+                                                <option value="simple">Simple Split (Fast)</option>
+                                                <option value="walk_forward">Walk-Forward (Adaptive)</option>
+                                                <option value="rolling_window">Rolling Window (Adaptive)</option>
+                                            </select>
+                                            <svg className="fc-sidebar-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9" />
+                                            </svg>
+                                        </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="min-w-0 flex flex-col">
-                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end" title={t('sidebar.train_h')}>{t('sidebar.train_h')}</label>
+                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase leading-4 whitespace-nowrap overflow-hidden text-ellipsis" title={t('sidebar.train_h')}>{t('sidebar.train_h')}</label>
                                             <input
                                                 type="number"
                                                 value={trainHorizon}
                                                 onChange={(e) => setTrainHorizon(e.target.value)}
                                                 onBlur={() => setTrainHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
-                                                className={`w-full text-xxs p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
+                                                className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                         <div className="min-w-0 flex flex-col">
-                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end" title={t('sidebar.test_h')}>{t('sidebar.test_h')}</label>
+                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase leading-4 whitespace-nowrap overflow-hidden text-ellipsis" title={t('sidebar.test_h')}>{t('sidebar.test_h')}</label>
                                             <input
                                                 type="number"
                                                 value={testHorizon}
@@ -2184,7 +2222,7 @@
                                                 }}
                                                 onBlur={() => setTestHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
                                                 min="1"
-                                                className={`w-full text-xxs p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
+                                                className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                     </div>
@@ -2204,7 +2242,7 @@
                                             onChange={(e) => setForecastSteps(e.target.value)}
                                             onBlur={() => setForecastSteps(prev => Math.max(1, parseInt(prev) || 1).toString())}
                                             min="1"
-                                            className="w-full text-xxs p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
+                                            className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
                                 </form>
