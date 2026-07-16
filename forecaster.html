@@ -600,9 +600,9 @@
                     configuration: "Konfiguration",
                     action: "Aktion",
                     val_method: "Validierungsmethode",
-                    train_h: "Trainingshorizont",
-                    test_h: "Testhorizont",
-                    fc_h: "Prognosehorizont",
+                    train_h: "Train-Horizont",
+                    test_h: "Test-Horizont",
+                    fc_h: "Prognose-Horizont",
                     total_periods: "Gesamtzeiträume",
                     horizon_mismatch: "Training + Test muss gleich sein",
                     execute_btn: "Prognose ausführen",
@@ -2084,7 +2084,7 @@
                         <div className="fc-sidebar-expanded flex-1 overflow-y-auto scroller px-3 pt-3 pb-0 gap-6 min-h-0 flex flex-col">
                             {/* 1. Source Data */}
                             <div>
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
                                 <div className={`relative border border-dashed rounded-lg px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
                                     <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
                                         {file ? (
@@ -2120,7 +2120,7 @@
 
                             {/* 2. Interface — always visible, above Configuration */}
                             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.interface')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.interface')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
                                 <div className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
                                     <button
                                         type="button"
@@ -2145,7 +2145,7 @@
 
                             {/* 3. Configuration */}
                             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
                                 <form className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800" onSubmit={(e) => e.preventDefault()}>
                                     <div>
                                         <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.val_method')}</label>
@@ -2212,7 +2212,7 @@
 
                             {/* 4. Action */}
                             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.action')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.action')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
                                 <div className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
                                     <button
                                         type="button"

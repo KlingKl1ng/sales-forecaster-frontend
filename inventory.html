@@ -5332,7 +5332,7 @@
                             <div>
                                 <div className="flex items-center gap-2 mb-3">
                                     <h3 className={`text-xs font-bold uppercase tracking-widest ${simulationMode === 'optimize' ? 'text-brand-gold' : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500'}`}>{t('dataSource')}</h3>
-                                    <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-brand-gold/50' : 'bg-gradient-to-r from-emerald-500/50 to-teal-500/50'}`}></div>
+                                    <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-gradient-to-r from-brand-gold to-transparent' : 'bg-gradient-to-r from-emerald-500 to-transparent'}`}></div>
                                 </div>
 
                                 <div className={`relative border border-dashed rounded-lg px-3 py-4 text-center transition-colors ${file ? 'border-emerald-500 bg-emerald-50/10' : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
@@ -5425,7 +5425,7 @@
                             <div className="mb-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <h3 className={`text-xs font-bold uppercase tracking-widest ${simulationMode === 'optimize' ? 'text-brand-gold' : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500'}`}>{t('interface')}</h3>
-                                    <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-brand-gold/50' : 'bg-gradient-to-r from-emerald-500/50 to-teal-500/50'}`}></div>
+                                    <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-gradient-to-r from-brand-gold to-transparent' : 'bg-gradient-to-r from-emerald-500 to-transparent'}`}></div>
                                 </div>
                                 <div className="flex bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl p-1 gap-1 border border-white/30 dark:border-white/5 ring-1 ring-white/10">
                                     <button
@@ -5456,7 +5456,7 @@
                             <div className="mb-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <h3 className={`text-xs font-bold uppercase tracking-widest ${simulationMode === 'optimize' ? 'text-brand-gold' : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500'}`}>{t('inventoryPolicy')}</h3>
-                                    <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-brand-gold/50' : 'bg-gradient-to-r from-emerald-500/50 to-teal-500/50'}`}></div>
+                                    <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-gradient-to-r from-brand-gold to-transparent' : 'bg-gradient-to-r from-emerald-500 to-transparent'}`}></div>
                                 </div>
                                 <div className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold text-black dark:text-white text-center border border-slate-200 dark:border-slate-700">
                                     {t('stochasticPolicy')}
@@ -5467,7 +5467,7 @@
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <h3 className={`text-xs font-bold uppercase tracking-widest ${simulationMode === 'optimize' ? 'text-brand-gold' : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500'}`}>{t('parameters')}</h3>
-                                    <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-brand-gold/50' : 'bg-gradient-to-r from-emerald-500/50 to-teal-500/50'}`}></div>
+                                    <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-gradient-to-r from-brand-gold to-transparent' : 'bg-gradient-to-r from-emerald-500 to-transparent'}`}></div>
                                     {Object.keys(skuParamsMap).length > 0 && (
                                         <span className="text-[8px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded" title="Parameters loaded from template file">
                                             AUTO
@@ -5865,7 +5865,7 @@
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 mb-2">
                                         <h3 className="text-xs font-bold text-brand-gold uppercase tracking-widest">{t('result')}</h3>
-                                        <div className="h-px bg-brand-gold/50 flex-1"></div>
+                                        <div className="h-px bg-gradient-to-r from-brand-gold to-transparent flex-1"></div>
                                     </div>
 
                                     <div className="p-4 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl border border-emerald-300 dark:border-emerald-500/30 shadow-lg shadow-emerald-500/10">
@@ -5936,7 +5936,7 @@
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 mb-2">
                                         <h3 className={`text-xs font-bold uppercase tracking-widest ${simulationMode === 'optimize' ? 'text-brand-gold' : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500'}`}>{t('skuNavigator')}</h3>
-                                        <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-brand-gold/50' : 'bg-gradient-to-r from-emerald-500/50 to-teal-500/50'}`}></div>
+                                        <div className={`h-px flex-1 ${simulationMode === 'optimize' ? 'bg-gradient-to-r from-brand-gold to-transparent' : 'bg-gradient-to-r from-emerald-500 to-transparent'}`}></div>
                                     </div>
                                     <div className="flex items-center gap-2 overflow-hidden">
                                         <button onClick={() => cycleSku(-1)} className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
