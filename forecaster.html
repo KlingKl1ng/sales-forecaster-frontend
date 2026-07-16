@@ -83,35 +83,41 @@
             z-index: 60;
         }
 
+        .fc-kpi-bar {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+            min-width: 0;
+        }
+
         @media (max-width: 639px) {
             .fc-kpi-bar {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr) auto;
-                align-items: stretch;
                 min-height: 3rem;
-            }
-
-            .fc-kpi-spacer {
-                display: none;
             }
         }
 
-        @media (min-width: 640px) {
-            .fc-kpi-bar {
-                display: grid;
-                grid-template-columns: 1fr auto 1fr;
-                align-items: stretch;
-            }
+        .fc-kpi-metrics {
+            flex: 1 1 0%;
+            min-width: 0;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: stretch;
+        }
 
-            .fc-kpi-spacer {
-                display: block;
-            }
+        .fc-kpi-metric {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .fc-kpi-search {
+            flex: 0 0 auto;
         }
 
         .fc-module-header {
-            display: grid;
-            grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+            position: relative;
+            display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 0.5rem;
             padding-left: 0.75rem;
             padding-right: 0.75rem;
@@ -125,18 +131,52 @@
         }
 
         .fc-module-title {
-            min-width: 0;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            max-width: min(70%, 36rem);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            text-align: center;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        html, body {
+            height: 100%;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             overflow: hidden;
             margin: 0;
+        }
+
+        /* Safari: flex item <img> ignores max-width and expands to intrinsic size */
+        .fc-empty-watermark {
+            display: block;
+            width: 320px;
+            max-width: 100%;
+            height: auto;
+            flex: none;
+            opacity: 0.12;
+            filter: grayscale(1);
+            -webkit-filter: grayscale(1);
+        }
+
+        .dark .fc-empty-watermark {
+            opacity: 0.14;
+        }
+
+        @media (min-width: 768px) {
+            .fc-empty-watermark {
+                width: 420px;
+            }
         }
 
         .scroller {
@@ -378,6 +418,7 @@
                     reupload_file: "Re-upload File",
                     edit_mapping: "Edit Mapping",
                     configuration: "Configuration",
+                    action: "Action",
                     val_method: "Validation Method",
                     train_h: "Train Horizon",
                     test_h: "Test Horizon",
@@ -388,7 +429,7 @@
                     processing: "Processing...",
                     export_btn: "Export Report",
                     downloading: "Downloading...",
-                    reset_btn: "Reset Application",
+                    reset_btn: "Reset",
                     interface: "Interface",
                     footer_title: "Operartis Analytics",
                     footer_slogan: "Optimizing Today, Growing Tomorrow"
@@ -424,7 +465,7 @@
                     cloud: "CLOUD"
                 },
                 dashboard: {
-                    batch_overview: "Batch Overview",
+                    batch_overview: "Overview",
                     detailed_view: "Detailed View",
                     total_skus: "Total SKUs",
                     total_skus_short: "SKUs",
@@ -467,9 +508,10 @@
                     reupload_file: "Tải lại tệp",
                     edit_mapping: "Chỉnh sửa dữ liệu",
                     configuration: "Cấu hình",
+                    action: "Hành động",
                     val_method: "Phương pháp kiểm định",
-                    train_h: "Chu kỳ huấn luyện",
-                    test_h: "Chu kỳ thử nghiệm",
+                    train_h: "Chu kỳ H.luyện",
+                    test_h: "Chu kỳ T.nghiệm",
                     fc_h: "Chu kỳ dự báo",
                     total_periods: "Tổng số chu kỳ",
                     horizon_mismatch: "Huấn luyện + Thử nghiệm phải bằng",
@@ -477,7 +519,7 @@
                     processing: "Đang xử lý...",
                     export_btn: "Xuất báo cáo",
                     downloading: "Đang tải xuống...",
-                    reset_btn: "Đặt lại ứng dụng",
+                    reset_btn: "Đặt lại",
                     interface: "Giao diện",
                     footer_title: "Operartis Analytics",
                     footer_slogan: "Optimizing Today, Growing Tomorrow"
@@ -508,7 +550,7 @@
                     confirm: "Xác nhận"
                 },
                 header: {
-                    title: "MACHINE-LEARNING FORECASTER",
+                    title: "DỰ BÁO HỌC MÁY",
                     local: "LOCAL",
                     cloud: "CLOUD"
                 },
@@ -556,17 +598,18 @@
                     reupload_file: "Datei erneut hochladen",
                     edit_mapping: "Zuordnung bearbeiten",
                     configuration: "Konfiguration",
+                    action: "Aktion",
                     val_method: "Validierungsmethode",
-                    train_h: "Trainingshorizont",
-                    test_h: "Testhorizont",
-                    fc_h: "Prognosehorizont",
+                    train_h: "Train-Horizont",
+                    test_h: "Test-Horizont",
+                    fc_h: "Prognose-Horizont",
                     total_periods: "Gesamtzeiträume",
                     horizon_mismatch: "Training + Test muss gleich sein",
                     execute_btn: "Prognose ausführen",
                     processing: "Verarbeitung...",
                     export_btn: "Bericht exportieren",
                     downloading: "Wird heruntergeladen...",
-                    reset_btn: "Anwendung zurücksetzen",
+                    reset_btn: "Zurücksetzen",
                     interface: "Ansicht",
                     footer_title: "Operartis Analytics",
                     footer_slogan: "Optimizing Today, Growing Tomorrow"
@@ -648,19 +691,24 @@
         const MoonIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>;
         const SystemIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>;
         const RefreshIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 21h5v-5" /></svg>;
+        const TrashIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>;
         const SplitIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" /><line x1="4" x2="20" y1="12" y2="12" /></svg>;
         const SingleViewIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" /></svg>;
-        const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>;
+        const DownloadIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>;
         const UploadIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>;
         const CodeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>;
         const CopyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>;
         const LockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
         const SettingsIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>;
+        const ColumnsIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M9 3v18" /><path d="M15 3v18" /></svg>;
         const PaletteIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></svg>;
         const CheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>;
         const ServerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>;
         const ChartLineIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>;
         const LayoutDashboardIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></svg>;
+        const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>;
+        const ListIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>;
+        const EyeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>;
         const SearchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>;
         const ChevronLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>;
         const ChevronRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>;
@@ -701,16 +749,14 @@
             const mobileLabel = shortLabel || label;
             return (
                 <div
-                    className={`flex flex-col justify-center items-center min-w-0 h-full border-r border-white/20 dark:border-white/10 last:border-r-0 ${bgClass} backdrop-blur-md px-1 py-1.5 sm:px-3 md:px-6 sm:min-w-[6.5rem] md:min-w-[140px] sm:snap-start transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
+                    className={`fc-kpi-metric flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 ${bgClass} backdrop-blur-md px-1 py-1.5 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
                     title={label}
                 >
-                    <span className="text-[7px] sm:text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide sm:tracking-wider mb-0.5 text-center leading-[1.1] line-clamp-2 max-sm:max-w-full">
-                        <span className="sm:hidden">{mobileLabel}</span>
-                        <span className="hidden sm:inline whitespace-nowrap">{label}</span>
-                    </span>
-                    <div className="flex items-baseline gap-1 justify-center">
-                        <span className={`text-xs sm:text-base md:text-lg font-bold font-mono leading-none ${colorClass} drop-shadow-sm`}>{value}</span>
-                        {subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500">{subValue}</span>}
+                    <span className="sm:hidden text-[7px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide mb-0.5 text-center leading-[1.1] w-full min-w-0 truncate px-0.5">{mobileLabel}</span>
+                    <span className="hidden sm:block text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wider mb-0.5 text-center leading-[1.1] w-full min-w-0 truncate px-0.5">{label}</span>
+                    <div className="flex items-baseline gap-1 justify-center min-w-0 max-w-full">
+                        <span className={`text-xs sm:text-base md:text-lg font-bold font-mono leading-none truncate ${colorClass} drop-shadow-sm`}>{value}</span>
+                        {subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500 shrink-0">{subValue}</span>}
                     </div>
                 </div>
             );
@@ -788,20 +834,19 @@
             }, [handleSkuSelect, localSku]);
 
             return (
-                <div className="fc-kpi-bar w-full min-h-12 sm:min-h-16 items-stretch">
-                    <div className="fc-kpi-spacer" aria-hidden="true" />
-                    <div className="fc-kpi-metrics grid grid-cols-4 sm:flex sm:items-stretch sm:overflow-visible min-h-12 sm:min-h-16 min-w-0">
+                <div className="fc-kpi-bar min-h-12 sm:min-h-16">
+                    <div className="fc-kpi-metrics min-h-12 sm:min-h-16">
                         <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} />
                         <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
                         <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={fmtNumber(avgMae, 0, 0)} />
                         <MetricTile label={t('dashboard.avg_mse')} shortLabel={t('dashboard.avg_mse_short')} value={fmtNumber(avgMse, 0, 0)} />
                     </div>
 
-                    <div className="fc-kpi-search flex shrink-0 items-center justify-center sm:justify-end border-l border-white/20 dark:border-white/10 px-2 sm:px-4 sm:justify-self-end">
+                    <div className="fc-kpi-search flex items-center justify-center sm:justify-end border-l border-white/20 dark:border-white/10 px-2 sm:px-4">
                         <form
                             onSubmit={onSearchSubmit}
                             onClick={() => inputRef.current?.focus()}
-                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden ${searchActive || localSku ? 'w-[7.5rem] sm:w-48 md:w-64 px-2 sm:px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-9 h-9 sm:w-8 sm:h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden shrink-0 ${searchActive || localSku ? 'w-[7.5rem] sm:w-48 md:w-64 px-2 sm:px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-9 h-9 sm:w-8 sm:h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                         >
                             <SearchIcon className={`shrink-0 transition-colors ${searchActive || localSku ? 'text-brand-gold w-4 h-4' : 'text-slate-500 dark:text-slate-400 w-4 h-4'}`} />
                             <input
@@ -1893,6 +1938,7 @@
                 setSkuCol(""); setStartCol(""); setEndCol("");
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
                 setTotalTimeSeries(0); setAvailableCols([]);
+                setActiveTab("overview");
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
 
@@ -1919,6 +1965,7 @@
             };
 
             const skuData = getCurrentSkuData();
+            const interfaceReady = !!(batchResults && batchResults.length > 0);
 
             // Synchronize Validation Data with Forecast Data Timeline
             const alignedValidationData = useMemo(() => {
@@ -1937,7 +1984,7 @@
             }, [skuData]);
 
             return (
-                <div className="flex h-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
+                <div className="flex h-full min-h-0 bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
                     <MappingModal headers={availableCols} isOpen={isMappingModalOpen} onClose={() => setIsMappingModalOpen(false)} onConfirm={handleMappingConfirm} t={t} />
                     {/* Mobile Sidebar Backdrop */}
                     {isSidebarOpen && (
@@ -1984,9 +2031,28 @@
                                     className="flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold transition-all"
                                     title={t('sidebar.edit_mapping')}
                                 >
-                                    <SettingsIcon width="18" height="18" />
+                                    <ColumnsIcon width="18" height="18" />
                                 </button>
                             )}
+                            <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
+                            <button
+                                type="button"
+                                onClick={() => interfaceReady && setActiveTab('overview')}
+                                disabled={!interfaceReady}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!interfaceReady ? 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'overview' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
+                                title={t('dashboard.batch_overview')}
+                            >
+                                <GridIcon />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => interfaceReady && setActiveTab('details')}
+                                disabled={!interfaceReady}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!interfaceReady ? 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'details' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
+                                title={t('dashboard.detailed_view')}
+                            >
+                                <EyeIcon />
+                            </button>
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
                                 onClick={handleExecute}
@@ -2004,31 +2070,12 @@
                             >
                                 {isExporting ? <div className="animate-spin"><RefreshIcon /></div> : <DownloadIcon />}
                             </button>
-                            {batchResults && (
-                                <>
-                                    <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
-                                    <button
-                                        onClick={() => setActiveTab('overview')}
-                                        className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${activeTab === 'overview' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
-                                        title={t('dashboard.batch_overview')}
-                                    >
-                                        <LayoutDashboardIcon />
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('details')}
-                                        className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${activeTab === 'details' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
-                                        title={t('dashboard.detailed_view')}
-                                    >
-                                        <ChartLineIcon />
-                                    </button>
-                                </>
-                            )}
                             <button
                                 onClick={handleReset}
                                 className="mt-auto flex items-center justify-center h-11 w-11 rounded-xl border border-transparent text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 transition-all"
                                 title={t('sidebar.reset_btn')}
                             >
-                                <RefreshIcon />
+                                <TrashIcon />
                             </button>
                         </div>
                         )}
@@ -2037,8 +2084,8 @@
                         <div className="fc-sidebar-expanded flex-1 overflow-y-auto scroller px-3 pt-3 pb-0 gap-6 min-h-0 flex flex-col">
                             {/* 1. Source Data */}
                             <div>
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                <div className={`relative border border-dashed rounded px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
+                                <div className={`relative border border-dashed rounded-lg px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
                                     <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
                                         {file ? (
                                             <div className="flex flex-col items-center gap-1">
@@ -2047,17 +2094,17 @@
                                                 <div className="flex gap-2 mt-2 justify-center">
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                                                        className="p-1.5 min-w-[28px] min-h-[28px] rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
+                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
                                                         title={t('sidebar.reupload_file')}
                                                     >
                                                         <UploadIcon width="14" height="14" />
                                                     </button>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); setIsMappingModalOpen(true); }}
-                                                        className="p-1.5 min-w-[28px] min-h-[28px] rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
+                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
                                                         title={t('sidebar.edit_mapping')}
                                                     >
-                                                        <SettingsIcon width="14" height="14" />
+                                                        <ColumnsIcon width="14" height="14" />
                                                     </button>
                                                 </div>
                                             </div>
@@ -2071,42 +2118,73 @@
                                 </div>
                             </div>
 
-                            {/* 2. Configuration */}
+                            {/* 2. Interface — always visible, above Configuration */}
                             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-                                    <div>
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.val_method')}</label>
-                                        <select value={validationMethod} onChange={(e) => setValidationMethod(e.target.value)} className="w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors"><option value="simple">Simple Split (Fast)</option><option value="walk_forward">Walk-Forward (Adaptive)</option><option value="rolling_window">Rolling Window (Adaptive)</option></select>
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.interface')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
+                                <div className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                                    <button
+                                        type="button"
+                                        onClick={() => interfaceReady && setActiveTab('overview')}
+                                        disabled={!interfaceReady}
+                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border border-transparent ${!interfaceReady ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'overview' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`}
+                                    >
+                                        <GridIcon />
+                                        {t('dashboard.batch_overview')}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => interfaceReady && setActiveTab('details')}
+                                        disabled={!interfaceReady}
+                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border border-transparent ${!interfaceReady ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'details' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`}
+                                    >
+                                        <EyeIcon />
+                                        {t('dashboard.detailed_view')}
+                                    </button>
+                                </div>
+                            </div>
 
+                            {/* 3. Configuration */}
+                            <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
+                                <form className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800" onSubmit={(e) => e.preventDefault()}>
+                                    <div>
+                                        <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.val_method')}</label>
+                                        <select
+                                            value={validationMethod}
+                                            onChange={(e) => setValidationMethod(e.target.value)}
+                                            className="w-full text-xxs p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors"
+                                        >
+                                            <option value="simple">Simple Split (Fast)</option>
+                                            <option value="walk_forward">Walk-Forward (Adaptive)</option>
+                                            <option value="rolling_window">Rolling Window (Adaptive)</option>
+                                        </select>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <div className="flex-1">
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.train_h')}</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="min-w-0 flex flex-col">
+                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end" title={t('sidebar.train_h')}>{t('sidebar.train_h')}</label>
                                             <input
                                                 type="number"
                                                 value={trainHorizon}
                                                 onChange={(e) => setTrainHorizon(e.target.value)}
                                                 onBlur={() => setTrainHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
-                                                className={`w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
+                                                className={`w-full text-xxs p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
-                                        <div className="flex-1">
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.test_h')}</label>
+                                        <div className="min-w-0 flex flex-col">
+                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase h-4 flex items-end" title={t('sidebar.test_h')}>{t('sidebar.test_h')}</label>
                                             <input
                                                 type="number"
                                                 value={testHorizon}
                                                 onChange={(e) => {
                                                     const newTest = parseInt(e.target.value) || 0;
                                                     setTestHorizon(e.target.value);
-                                                    // Auto-update train horizon when test changes
                                                     if (totalTimeSeries > 0 && newTest > 0 && newTest < totalTimeSeries) {
                                                         setTrainHorizon((totalTimeSeries - newTest).toString());
                                                     }
                                                 }}
                                                 onBlur={() => setTestHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
                                                 min="1"
-                                                className={`w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
+                                                className={`w-full text-xxs p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                     </div>
@@ -2118,59 +2196,49 @@
                                             }
                                         </div>
                                     )}
-                                    <div>
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('sidebar.fc_h')}</label>
+                                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                                        <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.fc_h')}</label>
                                         <input
                                             type="number"
                                             value={forecastSteps}
                                             onChange={(e) => setForecastSteps(e.target.value)}
                                             onBlur={() => setForecastSteps(prev => Math.max(1, parseInt(prev) || 1).toString())}
                                             min="1"
-                                            className="w-full h-8 text-xxs border rounded px-2 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
+                                            className="w-full text-xxs p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
-                                    <button type="button" onClick={handleExecute} disabled={!file || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}>
-                                        {isPolling ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
-                                        {isPolling ? t('sidebar.processing') : t('sidebar.execute_btn')}
-                                    </button>
-                                    <button type="button" onClick={handleExport} disabled={!file || !batchResults || isExporting || isPolling} className={`w-full py-2.5 rounded text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || !batchResults || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}>
-                                        {isExporting ? <div className="animate-spin"><RefreshIcon /></div> : <DownloadIcon />}
-                                        {isExporting ? t('sidebar.downloading') : t('sidebar.export_btn')}
-                                    </button>
-
-                                    {/* Removed Reset Button from here */}
                                 </form>
                             </div>
 
-                            {/* 3. Interface */}
-                            {batchResults && (
-                                <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                    <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.interface')}<span className="h-px flex-1 bg-brand-gold"></span></h3>
-                                    <div className="flex flex-col gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setActiveTab('overview')}
-                                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${activeTab === 'overview' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent'}`}
-                                        >
-                                            <LayoutDashboardIcon className="w-3.5 h-3.5 shrink-0" />
-                                            {t('dashboard.batch_overview')}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setActiveTab('details')}
-                                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${activeTab === 'details' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent'}`}
-                                        >
-                                            <ChartLineIcon className="w-3.5 h-3.5 shrink-0" />
-                                            {t('dashboard.detailed_view')}
-                                        </button>
-                                    </div>
+                            {/* 4. Action */}
+                            <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.action')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
+                                <div className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                                    <button
+                                        type="button"
+                                        onClick={handleExecute}
+                                        disabled={!file || isPolling}
+                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
+                                    >
+                                        {isPolling ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
+                                        {isPolling ? t('sidebar.processing') : t('sidebar.execute_btn')}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleExport}
+                                        disabled={!file || !batchResults || isExporting || isPolling}
+                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || !batchResults || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600 hover:scale-[1.02] shadow-emerald-500/20 hover:shadow-emerald-500/40'}`}
+                                    >
+                                        {isExporting ? <div className="animate-spin"><RefreshIcon /></div> : <DownloadIcon width="16" height="16" />}
+                                        {isExporting ? t('sidebar.downloading') : t('sidebar.export_btn')}
+                                    </button>
                                 </div>
-                            )}
+                            </div>
 
                             {/* Reset Button Area - Inside Body, Pushed to Bottom */}
                             <div className="px-3 pb-1 pt-4 !mt-auto">
                                 <div className="pt-4">
-                                    <button type="button" onClick={handleReset} className="w-full py-2 text-xxs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded transition-colors uppercase tracking-wide flex items-center justify-center gap-2 transition-all"><RefreshIcon /> {t('sidebar.reset_btn')}</button>
+                                    <button type="button" onClick={handleReset} className="w-full py-2 text-xxs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded-xl transition-colors uppercase tracking-wide flex items-center justify-center gap-2 transition-all"><TrashIcon width="16" height="16" /> {t('sidebar.reset_btn')}</button>
                                 </div>
                             </div>
                         </div>
@@ -2189,15 +2257,15 @@
                     </div>
 
                     {/* MAIN CONTENT */}
-                    < div className="flex flex-col flex-grow min-w-0 transition-all relative" >
+                    <div className="flex flex-col flex-grow min-w-0 min-h-0 transition-all relative">
                         {/* Combined Header & Metrics Bar */}
-                        < div className={`flex flex-col sticky top-0 z-30 ${isFullScreen ? 'hidden' : ''}`}>
+                        <div className={`flex flex-col sticky top-0 z-30 shrink-0 ${isFullScreen ? 'hidden' : ''}`}>
                             <header className="fc-module-header h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-b border-white/20 dark:border-white/10 shrink-0 shadow-sm">
-                                <div className="flex items-center justify-start">
+                                <div className="flex items-center justify-start min-h-[2.5rem]">
                                     <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden text-slate-500"><MenuIcon /></button>
                                 </div>
-                                <div className="fc-module-title text-center text-[11px] sm:text-sm md:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest">{t('header.title')}</div>
-                                <div className="flex items-center justify-end gap-4 shrink-0">
+                                <div className="fc-module-title text-[11px] sm:text-sm md:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-dark uppercase tracking-widest">{t('header.title')}</div>
+                                <div className="flex items-center justify-end gap-4 shrink-0 relative z-10">
                                     <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
                                         {environmentBadge && (
                                             <div className={`hidden lg:flex items-center gap-1 px-1.5 py-0.5 rounded border bg-transparent text-[10px] font-bold uppercase tracking-wide ${environmentBadge.className}`} title={environmentBadge.title} aria-label={environmentBadge.title}><span className="w-3 h-3 flex shrink-0 [&_svg]:w-full [&_svg]:h-full"><ServerIcon /></span><span>{environmentBadge.label}</span></div>
@@ -2207,23 +2275,30 @@
                                 </div>
                             </header>
 
-                            {/* KPI BAR */}
-                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden sm:overflow-x-auto relative">
+                            {/* KPI BAR — only after a run finishes with results */}
+                            {interfaceReady && (
+                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden relative">
                                 <KPICards results={batchResults} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
                             </div>
-                        </div >
+                            )}
+                        </div>
 
-                        <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full h-full overflow-hidden mobile-landscape-main ${isFullScreen ? 'hidden' : 'flex'}`}>
+                        <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full min-h-0 overflow-hidden mobile-landscape-main ${isFullScreen ? 'hidden' : 'flex'}`}>
 
                             {/* CONTENT AREA */}
-                            <div className="flex-1 p-2 md:p-4 relative overflow-y-auto scroller md:min-h-0 mobile-landscape-content">
+                            <div className="flex-1 min-h-0 p-2 md:p-4 relative overflow-y-auto scroller mobile-landscape-content">
                                 {!batchResults && (
                                     isPolling ? (
                                         <ForecastingLoader t={t} validationMethod={validationMethod} testHorizon={testHorizon} />
                                     ) : (
-                                        <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600">
-                                            <div className="w-16 h-16 border-2 border-dashed rounded flex items-center justify-center mb-2"><LayoutDashboardIcon /></div>
-                                            <span className="text-xs font-bold uppercase tracking-widest">{t('dashboard.no_results')}</span>
+                                        <div className="h-full min-h-0 min-w-0 flex flex-col items-center justify-center pointer-events-none select-none" aria-hidden="true">
+                                            <img
+                                                src="./fulllogo_transparent_nobuffer.png"
+                                                alt=""
+                                                width="420"
+                                                height="117"
+                                                className="fc-empty-watermark object-contain"
+                                            />
                                         </div>
                                     )
                                 )}
@@ -2265,13 +2340,13 @@
                                 )}
                             </div>
                         </main>
-                    </div >
+                    </div>
 
                     {/* FULL SCREEN */}
 
 
-                    < SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} t={t} />
-                </div >
+                    <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} t={t} />
+                </div>
             );
         };
         ReactDOM.render(<App />, document.getElementById('root'));
