@@ -1028,12 +1028,19 @@
             );
         });
 
-        const KPICards = memo(({ results, currentSku, handleSkuSelect, cycleSku, t }) => {
+        const KPICards = memo(({ results, skuCount = 0, searchQuery, onSearchQueryChange, t }) => {
             const hasData = results && results.length > 0;
 
             // Memoize expensive calculations
             const { totalSeries, avgMse, avgMae, totalForecastVolume } = useMemo(() => {
-                if (!hasData) return { totalSeries: '-', avgMse: '-', avgMae: '-', totalForecastVolume: '-' };
+                if (!hasData) {
+                    return {
+                        totalSeries: skuCount > 0 ? skuCount : '-',
+                        avgMse: '-',
+                        avgMae: '-',
+                        totalForecastVolume: '-',
+                    };
+                }
 
                 const total = results.length;
                 const mseSum = results.reduce((sum, r) => sum + (r.mse_validation || 0), 0);
@@ -1044,24 +1051,21 @@
                 }, 0);
 
                 return {
-                    totalSeries: total,
+                    totalSeries: skuCount > 0 ? skuCount : total,
                     avgMse: mseSum / total,
                     avgMae: maeSum / total,
                     totalForecastVolume: fcVolume
                 };
-            }, [results, hasData]);
+            }, [results, hasData, skuCount]);
 
-            // SKU Navigator State
-            const [localSku, setLocalSku] = useState("");
             const [searchActive, setSearchActive] = useState(false);
             const inputRef = React.useRef(null);
 
             const onSearchSubmit = useCallback((e) => {
                 e.preventDefault();
-                handleSkuSelect(localSku);
-                setLocalSku("");
+                onSearchQueryChange(searchQuery);
                 inputRef.current?.blur();
-            }, [handleSkuSelect, localSku]);
+            }, [onSearchQueryChange, searchQuery]);
 
             return (
                 <div className="fc-kpi-bar min-h-12 sm:min-h-16">
@@ -1076,15 +1080,18 @@
                         <form
                             onSubmit={onSearchSubmit}
                             onClick={() => inputRef.current?.focus()}
-                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden shrink-0 ${searchActive || localSku ? 'w-[7.5rem] sm:w-48 md:w-64 px-2 sm:px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-9 h-9 sm:w-8 sm:h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                            className={`flex items-center rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden shrink-0 ${searchActive || searchQuery ? 'w-[7.5rem] sm:w-48 md:w-64 px-2 sm:px-3 py-1.5 bg-white dark:bg-slate-900 border-brand-gold shadow-sm' : 'w-9 h-9 sm:w-8 sm:h-8 justify-center bg-slate-100 dark:bg-slate-800 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                         >
-                            <SearchIcon className={`shrink-0 transition-colors ${searchActive || localSku ? 'text-brand-gold w-4 h-4' : 'text-slate-500 dark:text-slate-400 w-4 h-4'}`} />
+                            <SearchIcon className={`shrink-0 transition-colors ${searchActive || searchQuery ? 'text-brand-gold w-4 h-4' : 'text-slate-500 dark:text-slate-400 w-4 h-4'}`} />
                             <input
                                 ref={inputRef}
-                                className={`bg-transparent border-none outline-none font-sans font-medium text-xs text-slate-700 dark:text-white placeholder-slate-400 transition-all duration-300 ${searchActive || localSku ? 'w-full ml-2 opacity-100' : 'w-0 opacity-0'}`}
-                                value={localSku}
-                                onChange={(e) => setLocalSku(e.target.value)}
-                                onFocus={() => setSearchActive(true)}
+                                className={`bg-transparent border-none outline-none font-sans font-medium text-xs text-slate-700 dark:text-white placeholder-slate-400 transition-all duration-300 ${searchActive || searchQuery ? 'w-full ml-2 opacity-100' : 'w-0 opacity-0'}`}
+                                value={searchQuery}
+                                onChange={(e) => onSearchQueryChange(e.target.value)}
+                                onFocus={() => {
+                                    setSearchActive(true);
+                                    onSearchQueryChange(searchQuery);
+                                }}
                                 onBlur={() => setSearchActive(false)}
                                 placeholder={t('dashboard.search_placeholder')}
                             />
@@ -1158,13 +1165,76 @@
             const selectedSet = useMemo(() => new Set(selectedSkus), [selectedSkus]);
             const allSelected = results.length > 0 && selectedSkus.length === results.length;
             const someSelected = selectedSkus.length > 0 && !allSelected;
+            const [sortKey, setSortKey] = useState('sku');
+            const [sortDir, setSortDir] = useState('asc');
 
             useEffect(() => {
                 if (selectAllDesktopRef.current) selectAllDesktopRef.current.indeterminate = someSelected;
                 if (selectAllMobileRef.current) selectAllMobileRef.current.indeterminate = someSelected;
             }, [someSelected]);
 
-            const mobileCards = useMemo(() => results.map((r, i) => {
+            const handleSort = useCallback((key) => {
+                setSortKey((prev) => {
+                    if (prev === key) {
+                        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                        return prev;
+                    }
+                    setSortDir('asc');
+                    return key;
+                });
+            }, []);
+
+            const sortedResults = useMemo(() => {
+                const statusRank = { success: 2, running: 1, not_run: 0 };
+                const dir = sortDir === 'asc' ? 1 : -1;
+                const toNum = (v) => (v == null || v === '' || Number.isNaN(Number(v)) ? null : Number(v));
+                const toStr = (v) => String(v == null ? '' : v).toLowerCase();
+
+                return [...results].sort((a, b) => {
+                    let cmp = 0;
+                    if (sortKey === 'sku') {
+                        cmp = toStr(a.sku).localeCompare(toStr(b.sku), undefined, { numeric: true, sensitivity: 'base' });
+                    } else if (sortKey === 'status') {
+                        cmp = (statusRank[a.status] ?? -1) - (statusRank[b.status] ?? -1);
+                    } else if (sortKey === 'model') {
+                        cmp = toStr(a.best_ts_model || '').localeCompare(toStr(b.best_ts_model || ''), undefined, { sensitivity: 'base' });
+                    } else if (sortKey === 'mae' || sortKey === 'mse') {
+                        const field = sortKey === 'mae' ? 'mae_validation' : 'mse_validation';
+                        const av = toNum(a[field]);
+                        const bv = toNum(b[field]);
+                        if (av == null && bv == null) cmp = 0;
+                        else if (av == null) cmp = 1;
+                        else if (bv == null) cmp = -1;
+                        else cmp = av - bv;
+                    }
+                    if (cmp === 0) {
+                        cmp = toStr(a.sku).localeCompare(toStr(b.sku), undefined, { numeric: true, sensitivity: 'base' });
+                    }
+                    return cmp * dir;
+                });
+            }, [results, sortKey, sortDir]);
+
+            const SortHeader = ({ columnKey, label, align = 'left' }) => {
+                const active = sortKey === columnKey;
+                const alignClass = align === 'right' ? 'justify-end text-right' : align === 'center' ? 'justify-center text-center' : 'justify-start text-left';
+                return (
+                    <th className={`p-3 font-bold text-slate-500 dark:text-slate-400 uppercase ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : ''}`}>
+                        <button
+                            type="button"
+                            onClick={() => handleSort(columnKey)}
+                            className={`inline-flex items-center gap-1 w-full ${alignClass} hover:text-slate-700 dark:hover:text-slate-200 transition-colors ${active ? 'text-brand-gold dark:text-brand-gold' : ''}`}
+                            aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                        >
+                            <span>{label}</span>
+                            <span className={`text-[9px] leading-none ${active ? 'opacity-100' : 'opacity-35'}`} aria-hidden="true">
+                                {active ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+                            </span>
+                        </button>
+                    </th>
+                );
+            };
+
+            const mobileCards = useMemo(() => sortedResults.map((r, i) => {
                 const isReady = r.status === 'success';
                 const isChecked = selectedSet.has(r.sku);
                 return (
@@ -1215,9 +1285,9 @@
                         </button>
                     </div>
                 );
-            }), [results, onSelectSku, onToggleSku, selectedSet, t]);
+            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
 
-            const tableRows = useMemo(() => results.map((r, i) => {
+            const tableRows = useMemo(() => sortedResults.map((r, i) => {
                 const isReady = r.status === 'success';
                 const isChecked = selectedSet.has(r.sku);
                 return (
@@ -1251,22 +1321,42 @@
                         <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
                     </tr>
                 );
-            }), [results, onSelectSku, onToggleSku, selectedSet, t]);
+            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
 
             return (
                 <div className="w-full h-full overflow-auto max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm">
                     <div className="md:hidden flex flex-col gap-2.5 p-2 pb-4">
-                        <label className="inline-flex items-center gap-2 px-1 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                            <input
-                                type="checkbox"
-                                className="fc-row-check"
-                                checked={allSelected}
-                                ref={selectAllMobileRef}
-                                onChange={onToggleSelectAll}
-                                aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
-                            />
-                            {t('dashboard.table_select')}
-                        </label>
+                        <div className="flex items-center justify-between gap-2 px-3">
+                            <label className="inline-flex items-center gap-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                <input
+                                    type="checkbox"
+                                    className="fc-row-check"
+                                    checked={allSelected}
+                                    ref={selectAllMobileRef}
+                                    onChange={onToggleSelectAll}
+                                    aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
+                                />
+                                {t('dashboard.table_select')}
+                            </label>
+                            <div className="flex items-center gap-1 overflow-x-auto">
+                                {[
+                                    { key: 'sku', label: t('dashboard.table_sku') },
+                                    { key: 'status', label: t('dashboard.table_status') },
+                                    { key: 'model', label: t('dashboard.table_best_model') },
+                                    { key: 'mae', label: t('dashboard.table_mae') },
+                                    { key: 'mse', label: t('dashboard.table_mse') },
+                                ].map((opt) => (
+                                    <button
+                                        key={opt.key}
+                                        type="button"
+                                        onClick={() => handleSort(opt.key)}
+                                        className={`shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border transition-colors ${sortKey === opt.key ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400'}`}
+                                    >
+                                        {opt.label}{sortKey === opt.key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                         {mobileCards}
                     </div>
                     <table className="hidden md:table w-full text-left text-xs">
@@ -1283,11 +1373,11 @@
                                         aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
                                     />
                                 </th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_sku')}</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_status')}</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-center">{t('dashboard.table_best_model')}</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-right">{t('dashboard.table_mae')}</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-right">{t('dashboard.table_mse')}</th>
+                                <SortHeader columnKey="sku" label={t('dashboard.table_sku')} />
+                                <SortHeader columnKey="status" label={t('dashboard.table_status')} />
+                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" />
+                                <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" />
+                                <SortHeader columnKey="mse" label={t('dashboard.table_mse')} align="right" />
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1564,7 +1654,7 @@
                         </div>
                     </div>
                     <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart data={visibleData} syncId={syncId} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
+                        <ComposedChart data={visibleData} syncId={syncId} margin={{ top: 8, right: 24, left: 8, bottom: 20 }}>
                             <defs>
                                 <linearGradient id="gd_bt_actual_train" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#64748b" stopOpacity={0.3} />
@@ -1584,8 +1674,8 @@
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#334155" : "#e2e8f0"} />
-                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} dy={10} minTickGap={30} />
-                            <YAxis axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} />
+                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={10} minTickGap={36} interval="preserveStartEnd" padding={{ left: 8, right: 8 }} />
+                            <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
                             <Tooltip contentStyle={{ backgroundColor: isDark ? "#0f172a" : "#fff", borderColor: isDark ? "#334155" : "#e2e8f0", fontSize: '12px', color: isDark ? '#fff' : '#000' }} />
                             <Legend verticalAlign="top" height={36} wrapperStyle={{ color: isDark ? '#cbd5e1' : '#64748b' }} />
                             <Area type="monotone" dataKey="actual_train" name={t('charts.act_train')} stroke="#64748b" fill="url(#gd_bt_actual_train)" strokeWidth={2} isAnimationActive={false} />
@@ -1641,7 +1731,7 @@
                     </div>
 
                     <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart data={visibleData} syncId={syncId} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
+                        <ComposedChart data={visibleData} syncId={syncId} margin={{ top: 8, right: 24, left: 8, bottom: 20 }}>
                             <defs>
                                 <linearGradient id="gd_fc_history" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#64748b" stopOpacity={0.3} />
@@ -1657,8 +1747,8 @@
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#334155" : "#e2e8f0"} />
-                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} dy={10} minTickGap={30} />
-                            <YAxis axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} />
+                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={10} minTickGap={36} interval="preserveStartEnd" padding={{ left: 8, right: 8 }} />
+                            <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
                             <Tooltip contentStyle={{ backgroundColor: isDark ? "#0f172a" : "#fff", borderColor: isDark ? "#334155" : "#e2e8f0", fontSize: '12px', color: isDark ? '#fff' : '#000' }} />
                             <Legend verticalAlign="top" height={36} wrapperStyle={{ color: isDark ? '#cbd5e1' : '#64748b' }} />
                             <Area type="monotone" dataKey="actual_history" name={t('charts.history')} stroke="#64748b" fill="url(#gd_fc_history)" strokeWidth={2} isAnimationActive={false} />
@@ -1986,6 +2076,7 @@
             const [isFullScreen, setIsFullScreen] = useState(false);
             const [isSplitView, setIsSplitView] = useState(true); // For All-In-One
             const [activeTab, setActiveTab] = useState("overview"); // overview | sku id
+            const [overviewSearchQuery, setOverviewSearchQuery] = useState("");
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [isMappingModalOpen, setIsMappingModalOpen] = useState(false);
             const [theme, setTheme] = useOperartisTheme();
@@ -2229,8 +2320,9 @@
                 }
                 setMappedSkus(skus);
                 setItemTabs([]);
-                setSelectedSkus([]);
+                setSelectedSkus(skus);
                 setRunningSkus([]);
+                setOverviewSearchQuery("");
                 setActiveTab("overview");
                 setCurrentSku(null);
                 setBatchResults(null);
@@ -2385,6 +2477,7 @@
                 setSelectedSkus([]);
                 setRunningSkus([]);
                 setCurrentSku(null);
+                setOverviewSearchQuery("");
                 setActiveTab("overview");
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
@@ -2479,6 +2572,17 @@
                     };
                 });
             }, [mappedSkus, batchResults, runningSkus]);
+
+            const handleOverviewSearchChange = useCallback((value) => {
+                setOverviewSearchQuery(value);
+                setActiveTab("overview");
+            }, []);
+
+            const filteredOverviewRows = useMemo(() => {
+                const q = overviewSearchQuery.trim().toLowerCase();
+                if (!q) return overviewRows;
+                return overviewRows.filter((r) => String(r.sku).toLowerCase().includes(q));
+            }, [overviewRows, overviewSearchQuery]);
 
             // Synchronize Validation Data with Forecast Data Timeline
             const alignedValidationData = useMemo(() => {
@@ -2755,10 +2859,10 @@
                                 </div>
                             </header>
 
-                            {/* KPI BAR — only after a run finishes with results */}
-                            {interfaceReady && (
+                            {/* KPI BAR — with Overview tab after mapping confirm */}
+                            {mappingReady && (
                             <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden relative">
-                                <KPICards results={batchResults} currentSku={currentSku} handleSkuSelect={handleSkuSelect} cycleSku={cycleSku} t={t} />
+                                <KPICards results={batchResults} skuCount={mappedSkus.length} searchQuery={overviewSearchQuery} onSearchQueryChange={handleOverviewSearchChange} t={t} />
                             </div>
                             )}
                         </div>
@@ -2766,7 +2870,7 @@
                         <main className={`flex-grow flex flex-col bg-slate-50 dark:bg-slate-950 relative w-full min-h-0 overflow-hidden mobile-landscape-main ${isFullScreen ? 'hidden' : 'flex'}`}>
 
                             {/* CONTENT AREA */}
-                            <div className="flex-1 min-h-0 p-2 md:p-4 relative overflow-y-auto scroller mobile-landscape-content">
+                            <div className="flex-1 min-h-0 p-2 md:px-4 md:pb-4 md:pt-2.5 relative overflow-y-auto scroller mobile-landscape-content">
                                 {!mappingReady && (
                                     isPolling ? (
                                         <ForecastingLoader t={t} validationMethod={validationMethod} testHorizon={testHorizon} />
@@ -2785,7 +2889,7 @@
 
                                 {mappingReady && (
                                     <div className="h-full min-h-0 flex flex-col gap-2.5">
-                                        <div className="shrink-0 min-w-0 w-full">
+                                        <div className="shrink-0 min-w-0 w-full mt-2 md:mt-0">
                                             <ResultsTabBar
                                                 activeTab={activeTab}
                                                 itemTabs={itemTabs}
@@ -2801,7 +2905,7 @@
                                         <div className="flex-1 min-h-0">
                                             {activeTab === 'overview' && (
                                                 <BatchOverview
-                                                    results={overviewRows}
+                                                    results={filteredOverviewRows}
                                                     onSelectSku={handleSkuSelect}
                                                     selectedSkus={selectedSkus}
                                                     onToggleSku={handleToggleSkuSelection}
@@ -2810,10 +2914,10 @@
                                                 />
                                             )}
                                             {isDetailTab && skuData && (
-                                                <div className="h-full w-full overflow-auto max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm pt-5 px-2 pb-2 sm:pt-6 lg:p-4 lg:pt-6 mobile-compact-p relative flex flex-col min-h-0" key={layoutKey}>
+                                                <div className="h-full w-full overflow-hidden max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm pt-4 px-3 pb-3 sm:pt-5 lg:p-4 lg:pt-5 mobile-compact-p relative flex flex-col min-h-0" key={layoutKey}>
                                                     <div className="flex flex-col h-full gap-2 mobile-landscape-chart-row mobile-compact-gap min-h-0">
                                                         {/* Dedicated toolbar — keeps SKU + metrics off the chart legend */}
-                                                        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-w-0 px-0.5 mt-2 sm:mt-3 lg:mt-1">
+                                                        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-w-0 px-0.5">
                                                             <div className="flex items-center gap-0.5 lg:gap-1 min-w-0 max-w-full sm:max-w-[55%] bg-slate-100/80 dark:bg-white/5 pl-0.5 pr-1.5 py-0.5 lg:pl-1 lg:pr-3 lg:py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-sm">
                                                                 <button type="button" onClick={() => cycleSku(-1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Previous SKU"><ChevronLeftIcon /></button>
                                                                 <span className="min-w-0 truncate text-xs lg:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight mx-0.5 lg:mx-1" title={skuData.sku}>{skuData.sku}</span>
