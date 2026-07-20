@@ -460,109 +460,86 @@
             backdrop-filter: blur(4px);
         }
 
-        /* Results Tab Bar — Liquid Glass
-           Nested corners stay concentric: outer = tab radius + padding */
+        /* Results Tab Bar — matches sidebar Interface / Action panels */
         .fc-results-tabs {
-            --fc-tab-radius: 0.75rem;
-            --fc-tab-pad: 0.25rem;
             display: flex;
             align-items: center;
-            height: 2.5rem;
-            padding: var(--fc-tab-pad);
             gap: 0.25rem;
-            flex-shrink: 0;
-            width: max-content;
+            flex: 1 1 auto;
+            min-width: 0;
             max-width: 100%;
             overflow-x: auto;
-            border-radius: calc(var(--fc-tab-radius) + var(--fc-tab-pad));
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            position: relative;
+            overflow-y: hidden;
+            padding: 0.25rem;
+            border-radius: 0.625rem;
+            border: 1px solid rgb(241, 245, 249);
+            background: rgb(248, 250, 252);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .fc-results-tabs::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
         }
 
         .dark .fc-results-tabs {
-            border-color: rgba(255, 255, 255, 0.1);
-            background-image: linear-gradient(to bottom right, rgba(30, 41, 59, 0.3), rgba(15, 23, 42, 0.1));
+            border-color: rgb(30, 41, 59);
+            background: rgba(30, 41, 59, 0.5);
         }
 
         .fc-results-tab {
-            position: relative;
-            z-index: 1;
             display: inline-flex;
             align-items: center;
-            gap: 0.375rem;
-            height: 2rem;
-            padding: 0 0.875rem;
-            border: none;
-            border-radius: var(--fc-tab-radius);
+            justify-content: center;
+            gap: 6px;
+            min-height: 30px;
+            padding: 0 0.625rem;
+            border: 1px solid transparent;
+            border-radius: 8px;
             background: transparent;
-            color: rgb(100, 116, 139);
-            font-size: 0.6875rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: none;
             white-space: nowrap;
             cursor: pointer;
-            transition: color 0.2s ease;
+            flex: 0 0 auto;
+            transition: background .18s ease, border-color .18s ease, color .18s ease;
         }
 
         .dark .fc-results-tab {
-            color: rgb(148, 163, 184);
+            color: #94a3b8;
         }
 
         .fc-results-tab:hover {
-            color: rgb(180, 83, 9);
+            background: rgba(148, 163, 184, .08);
+            color: #334155;
         }
 
         .dark .fc-results-tab:hover {
-            color: rgb(251, 191, 36);
+            color: #cbd5e1;
         }
 
         .fc-results-tab.is-active {
-            color: rgb(180, 83, 9);
+            border-color: rgba(245, 158, 11, .35);
+            background: linear-gradient(90deg, rgba(245, 158, 11, .14), rgba(245, 158, 11, .06));
+            color: #0f172a;
         }
 
         .dark .fc-results-tab.is-active {
-            color: rgb(251, 191, 36);
-        }
-
-        .fc-results-tab-indicator {
-            position: absolute;
-            top: 0;
-            left: 0;
-            box-sizing: border-box;
-            border-radius: var(--fc-tab-radius);
-            border: 1px solid rgba(245, 158, 11, 0.22);
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(180, 83, 9, 0.06));
-            box-shadow:
-                0 2px 8px rgba(245, 158, 11, 0.28),
-                0 1px 3px rgba(15, 23, 42, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            pointer-events: none;
-            z-index: 0;
-            transition:
-                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                height 0.38s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .dark .fc-results-tab-indicator {
-            border-color: rgba(245, 158, 11, 0.28);
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(15, 23, 42, 0.35));
+            color: #f8fafc;
         }
 
         .fc-results-tab-close {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 1rem;
-            height: 1rem;
-            border-radius: 9999px;
+            width: 0.875rem;
+            height: 0.875rem;
+            border-radius: 4px;
             color: inherit;
             opacity: 0.55;
             transition: opacity 0.15s ease, background-color 0.15s ease;
@@ -718,7 +695,9 @@
                     unselect_all: "Unselect all",
                     table_success: "SUCCESS",
                     table_not_run: "Not Run",
+                    table_running: "Running",
                     select_required: "Please select at least one ID",
+                    select_already_run: "Selected items have already been run. Please select items that are still Not Run.",
                     select_required_ok: "OK",
                     view_details: "View Details",
                     best_model: "Best Model",
@@ -814,7 +793,9 @@
                     unselect_all: "Bỏ chọn tất cả",
                     table_success: "THÀNH CÔNG",
                     table_not_run: "Chưa chạy",
+                    table_running: "Đang chạy",
                     select_required: "Please select at least one ID",
+                    select_already_run: "Các mục đã chọn đã chạy xong. Vui lòng chọn các mục còn trạng thái Chưa chạy.",
                     select_required_ok: "OK",
                     view_details: "Xem chi tiết",
                     best_model: "Mô hình tốt nhất",
@@ -910,7 +891,9 @@
                     unselect_all: "Auswahl aufheben",
                     table_success: "ERFOLG",
                     table_not_run: "Nicht ausgeführt",
+                    table_running: "Läuft",
                     select_required: "Please select at least one ID",
+                    select_already_run: "Ausgewählte Positionen wurden bereits ausgeführt. Bitte wählen Sie Positionen mit Status Nicht ausgeführt.",
                     select_required_ok: "OK",
                     view_details: "Details ansehen",
                     best_model: "Bestes Modell",
@@ -1117,50 +1100,19 @@
             if (status === 'success') {
                 return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_success')}</span>;
             }
+            if (status === 'running') {
+                return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_running')}</span>;
+            }
             return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_not_run')}</span>;
         };
 
         const ResultsTabBar = memo(({ activeTab, itemTabs, onSelectOverview, onSelectItem, onCloseItem, t }) => {
-            const trackRef = useRef(null);
-            const tabRefs = useRef({});
-            const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0 });
-
-            const syncIndicator = useCallback(() => {
-                const track = trackRef.current;
-                const activeEl = tabRefs.current[activeTab];
-                if (!track || !activeEl) return;
-                const trackRect = track.getBoundingClientRect();
-                const tabRect = activeEl.getBoundingClientRect();
-                setIndicator({
-                    left: tabRect.left - trackRect.left,
-                    top: tabRect.top - trackRect.top,
-                    width: tabRect.width,
-                    height: tabRect.height,
-                });
-            }, [activeTab]);
-
-            useEffect(() => {
-                syncIndicator();
-                window.addEventListener('resize', syncIndicator);
-                return () => window.removeEventListener('resize', syncIndicator);
-            }, [syncIndicator, itemTabs]);
-
             return (
-                <div className="fc-results-tabs scroller" ref={trackRef} role="tablist" aria-label={t('dashboard.batch_overview')}>
-                    <div
-                        className="fc-results-tab-indicator"
-                        aria-hidden="true"
-                        style={{
-                            transform: `translate3d(${indicator.left}px, ${indicator.top}px, 0)`,
-                            width: indicator.width,
-                            height: indicator.height,
-                        }}
-                    />
+                <div className="fc-results-tabs" role="tablist" aria-label={t('dashboard.batch_overview')}>
                     <button
                         type="button"
                         role="tab"
                         aria-selected={activeTab === 'overview'}
-                        ref={(el) => { tabRefs.current.overview = el; }}
                         onClick={onSelectOverview}
                         className={`fc-results-tab ${activeTab === 'overview' ? 'is-active' : ''}`}
                     >
@@ -1172,12 +1124,11 @@
                             type="button"
                             role="tab"
                             aria-selected={activeTab === sku}
-                            ref={(el) => { tabRefs.current[sku] = el; }}
                             onClick={() => onSelectItem(sku)}
                             className={`fc-results-tab ${activeTab === sku ? 'is-active' : ''}`}
                             title={sku}
                         >
-                            <span className="max-w-[9rem] truncate normal-case tracking-normal font-mono">{sku}</span>
+                            <span className="max-w-[9rem] truncate font-mono text-[12px]">{sku}</span>
                             <span
                                 role="button"
                                 tabIndex={0}
@@ -1263,6 +1214,8 @@
                             </div>
                             {isReady ? (
                                 <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold">{t('dashboard.view_details')}<span aria-hidden="true">→</span></span>
+                            ) : r.status === 'running' ? (
+                                <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-300">{t('dashboard.table_running')}</span>
                             ) : (
                                 <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-400">{t('dashboard.table_not_run')}</span>
                             )}
@@ -2018,7 +1971,8 @@
             const [mappedSkus, setMappedSkus] = useState([]);
             const [itemTabs, setItemTabs] = useState([]);
             const [selectedSkus, setSelectedSkus] = useState([]);
-            const [selectRequiredOpen, setSelectRequiredOpen] = useState(false);
+            const [runningSkus, setRunningSkus] = useState([]);
+            const [alertMessage, setAlertMessage] = useState(null);
             const [skuCol, setSkuCol] = useState("");
             const [startCol, setStartCol] = useState("");
             const [endCol, setEndCol] = useState("");
@@ -2172,6 +2126,7 @@
                             setJobStatus(data.status);
                             if (data.status === 'completed') {
                                 setIsPolling(false);
+                                setRunningSkus([]);
                                 const incoming = data.result?.results || [];
                                 setBatchResults((prev) => {
                                     const map = new Map((prev || []).map((r) => [String(r.sku), r]));
@@ -2184,6 +2139,7 @@
                                 }
                             } else if (data.status === 'failed') {
                                 setIsPolling(false);
+                                setRunningSkus([]);
                                 setError("Job Failed: " + data.error);
                             }
                         } catch (e) { console.error(e); }
@@ -2210,6 +2166,7 @@
                 setMappedSkus([]);
                 setItemTabs([]);
                 setSelectedSkus([]);
+                setRunningSkus([]);
                 setBatchResults(null);
                 setSkuCol("");
                 setStartCol("");
@@ -2294,6 +2251,7 @@
                 setMappedSkus(skus);
                 setItemTabs([]);
                 setSelectedSkus([]);
+                setRunningSkus([]);
                 setActiveTab("overview");
                 setCurrentSku(null);
                 setBatchResults(null);
@@ -2314,16 +2272,26 @@
                 if (!file || !skuCol || !startCol || !endCol) { setError("Please select file and map columns."); return; }
                 if (skuColIdx < 0 || startColIdx < 0 || endColIdx < 0) { setError("Invalid column mapping. Please re-map columns."); return; }
                 if (!selectedSkus.length) {
-                    setSelectRequiredOpen(true);
+                    setAlertMessage(t('dashboard.select_required'));
                     return;
                 }
+
+                // Never re-run SKUs that already have results — only Not Run items
+                const completedSkus = new Set((batchResults || []).map((r) => String(r.sku)));
+                const skusToRun = selectedSkus.filter((sku) => !completedSkus.has(String(sku)));
+                if (!skusToRun.length) {
+                    setAlertMessage(t('dashboard.select_already_run'));
+                    return;
+                }
+
                 setError(null);
                 setItemTabs([]);
                 setJobStatus("queued");
                 setActiveTab("overview");
+                setRunningSkus(skusToRun);
 
                 // Use stored indices directly
-                console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus });
+                console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus, skusToRun });
 
                 const fd = new FormData();
                 fd.append('file', file);
@@ -2336,7 +2304,7 @@
                 fd.append('train_horizon', parseInt(trainHorizon) || 24);
                 fd.append('test_horizon', parseInt(testHorizon) || 6);
                 fd.append('forecast_steps', parseInt(forecastSteps) || 6);
-                fd.append('selected_skus', JSON.stringify(selectedSkus));
+                fd.append('selected_skus', JSON.stringify(skusToRun));
 
                 try {
                     const res = await fetch(`${BASE_URL}/batch_init`, { method: 'POST', body: fd });
@@ -2346,12 +2314,16 @@
                             const errBody = await res.json();
                             message = errBody.detail || errBody.message || message;
                         } catch (_) {}
+                        setRunningSkus([]);
                         throw new Error(typeof message === 'string' ? message : "Failed to start job");
                     }
                     const data = await res.json();
                     setJobId(data.job_id);
                     setIsPolling(true);
-                } catch (e) { setError(e.message); }
+                } catch (e) {
+                    setRunningSkus([]);
+                    setError(e.message);
+                }
             };
 
             const handleExport = async () => {
@@ -2432,6 +2404,7 @@
                 setTotalTimeSeries(0); setAvailableCols([]);
                 setSheetRows([]); setMappedSkus([]); setItemTabs([]);
                 setSelectedSkus([]);
+                setRunningSkus([]);
                 setCurrentSku(null);
                 setActiveTab("overview");
                 if (fileInputRef.current) fileInputRef.current.value = "";
@@ -2500,12 +2473,22 @@
             const overviewRows = useMemo(() => {
                 if (!mappedSkus.length) return [];
                 const resultMap = new Map((batchResults || []).map((r) => [String(r.sku), r]));
+                const runningSet = new Set(runningSkus.map(String));
                 return mappedSkus.map((sku) => {
                     const result = resultMap.get(sku);
                     if (result) {
                         return {
                             ...result,
                             status: 'success',
+                        };
+                    }
+                    if (runningSet.has(String(sku))) {
+                        return {
+                            sku,
+                            status: 'running',
+                            best_ts_model: null,
+                            mae_validation: null,
+                            mse_validation: null,
                         };
                     }
                     return {
@@ -2516,7 +2499,7 @@
                         mse_validation: null,
                     };
                 });
-            }, [mappedSkus, batchResults]);
+            }, [mappedSkus, batchResults, runningSkus]);
 
             // Synchronize Validation Data with Forecast Data Timeline
             const alignedValidationData = useMemo(() => {
@@ -2538,10 +2521,10 @@
                 <div className="flex h-full min-h-0 bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
                     <MappingModal headers={availableCols} isOpen={isMappingModalOpen} onClose={() => setIsMappingModalOpen(false)} onConfirm={handleMappingConfirm} t={t} />
                     <AlertModal
-                        isOpen={selectRequiredOpen}
-                        message={t('dashboard.select_required')}
+                        isOpen={!!alertMessage}
+                        message={alertMessage || ''}
                         confirmLabel={t('dashboard.select_required_ok')}
-                        onClose={() => setSelectRequiredOpen(false)}
+                        onClose={() => setAlertMessage(null)}
                     />
                     {/* Mobile Sidebar Backdrop */}
                     {isSidebarOpen && (
@@ -2867,17 +2850,19 @@
 
                                 {mappingReady && (
                                     <div className="h-full min-h-0 flex flex-col gap-2.5">
-                                        <ResultsTabBar
-                                            activeTab={activeTab}
-                                            itemTabs={itemTabs}
-                                            onSelectOverview={() => setActiveTab('overview')}
-                                            onSelectItem={(sku) => {
-                                                setCurrentSku(sku);
-                                                setActiveTab(sku);
-                                            }}
-                                            onCloseItem={handleCloseItemTab}
-                                            t={t}
-                                        />
+                                        <div className="shrink-0 min-w-0 w-full">
+                                            <ResultsTabBar
+                                                activeTab={activeTab}
+                                                itemTabs={itemTabs}
+                                                onSelectOverview={() => setActiveTab('overview')}
+                                                onSelectItem={(sku) => {
+                                                    setCurrentSku(sku);
+                                                    setActiveTab(sku);
+                                                }}
+                                                onCloseItem={handleCloseItemTab}
+                                                t={t}
+                                            />
+                                        </div>
                                         <div className="flex-1 min-h-0">
                                             {activeTab === 'overview' && (
                                                 <BatchOverview
@@ -2890,33 +2875,31 @@
                                                 />
                                             )}
                                             {isDetailTab && skuData && (
-                                                <div className="h-full flex flex-col gap-4 pt-1 sm:pt-2 mobile-compact-gap" key={layoutKey}>
-                                                    <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm pt-5 px-2 pb-2 sm:pt-6 lg:p-4 lg:pt-6 mobile-compact-p relative flex flex-col min-h-0">
-                                                        <div className="flex flex-col h-full gap-2 mobile-landscape-chart-row mobile-compact-gap min-h-0">
-                                                            {/* Dedicated toolbar — keeps SKU + metrics off the chart legend */}
-                                                            <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-w-0 px-0.5 mt-2 sm:mt-3 lg:mt-1">
-                                                                <div className="flex items-center gap-0.5 lg:gap-1 min-w-0 max-w-full sm:max-w-[55%] bg-slate-100/80 dark:bg-white/5 pl-0.5 pr-1.5 py-0.5 lg:pl-1 lg:pr-3 lg:py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-sm">
-                                                                    <button type="button" onClick={() => cycleSku(-1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Previous SKU"><ChevronLeftIcon /></button>
-                                                                    <span className="min-w-0 truncate text-xs lg:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight mx-0.5 lg:mx-1" title={skuData.sku}>{skuData.sku}</span>
-                                                                    <button type="button" onClick={() => cycleSku(1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Next SKU"><ChevronRightIcon /></button>
+                                                <div className="h-full w-full overflow-auto max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm pt-5 px-2 pb-2 sm:pt-6 lg:p-4 lg:pt-6 mobile-compact-p relative flex flex-col min-h-0" key={layoutKey}>
+                                                    <div className="flex flex-col h-full gap-2 mobile-landscape-chart-row mobile-compact-gap min-h-0">
+                                                        {/* Dedicated toolbar — keeps SKU + metrics off the chart legend */}
+                                                        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-w-0 px-0.5 mt-2 sm:mt-3 lg:mt-1">
+                                                            <div className="flex items-center gap-0.5 lg:gap-1 min-w-0 max-w-full sm:max-w-[55%] bg-slate-100/80 dark:bg-white/5 pl-0.5 pr-1.5 py-0.5 lg:pl-1 lg:pr-3 lg:py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-sm">
+                                                                <button type="button" onClick={() => cycleSku(-1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Previous SKU"><ChevronLeftIcon /></button>
+                                                                <span className="min-w-0 truncate text-xs lg:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight mx-0.5 lg:mx-1" title={skuData.sku}>{skuData.sku}</span>
+                                                                <button type="button" onClick={() => cycleSku(1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Next SKU"><ChevronRightIcon /></button>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 lg:gap-4 shrink-0 bg-slate-100/80 dark:bg-white/5 px-2 py-1 lg:px-3 lg:py-1.5 rounded-lg lg:rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
+                                                                <div className="flex flex-col items-end">
+                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
+                                                                    <span className="text-[10px] lg:text-xs font-bold text-brand-gold">{skuData.best_ts_model.toUpperCase()}</span>
                                                                 </div>
-                                                                <div className="flex items-center gap-2 lg:gap-4 shrink-0 bg-slate-100/80 dark:bg-white/5 px-2 py-1 lg:px-3 lg:py-1.5 rounded-lg lg:rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
-                                                                    <div className="flex flex-col items-end">
-                                                                        <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
-                                                                        <span className="text-[10px] lg:text-xs font-bold text-brand-gold">{skuData.best_ts_model.toUpperCase()}</span>
-                                                                    </div>
-                                                                    <div className="flex flex-col items-end">
-                                                                        <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
-                                                                        <span className="text-[10px] lg:text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
-                                                                    </div>
+                                                                <div className="flex flex-col items-end">
+                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
+                                                                    <span className="text-[10px] lg:text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
                                                                 </div>
                                                             </div>
-                                                            <div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative mobile-landscape-chart-sep min-h-0">
-                                                                <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
-                                                            </div>
-                                                            <div className="flex-1 relative min-h-0">
-                                                                <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
-                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative mobile-landscape-chart-sep min-h-0">
+                                                            <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
+                                                        </div>
+                                                        <div className="flex-1 relative min-h-0">
+                                                            <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
                                                         </div>
                                                     </div>
                                                 </div>
