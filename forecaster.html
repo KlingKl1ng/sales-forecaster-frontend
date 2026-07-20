@@ -716,13 +716,15 @@
                     validation_simple: "Simple Split",
                     validation_walk_forward: "Walk-Forward",
                     validation_rolling_window: "Rolling Window",
+                    sort_btn: "Sorting",
+                    sort_title: "Sort by",
                     select_required: "Please select at least one ID",
                     select_already_run: "Some selected items have already been processed. Would you like to re-process these items?",
                     select_already_run_cancel: "Cancel",
                     select_already_run_confirm: "Confirm",
                     select_required_ok: "OK",
                     view_details: "View Details",
-                    best_model: "Best Model",
+                    best_model: "Model",
                     val_mse: "Val. MSE"
                 },
                 charts: {
@@ -821,13 +823,15 @@
                     validation_simple: "Simple Split",
                     validation_walk_forward: "Walk-Forward",
                     validation_rolling_window: "Rolling Window",
+                    sort_btn: "Sắp xếp",
+                    sort_title: "Sắp xếp theo",
                     select_required: "Vui lòng chọn ít nhất một ID",
                     select_already_run: "Trong các mục đã chọn có mục đã được xử lý. Bạn có muốn chạy lại các mục này không?",
                     select_already_run_cancel: "Hủy",
                     select_already_run_confirm: "Xác nhận",
                     select_required_ok: "OK",
                     view_details: "Xem chi tiết",
-                    best_model: "Mô hình tốt nhất",
+                    best_model: "Mô hình",
                     val_mse: "MSE (Val)"
                 },
                 charts: {
@@ -926,13 +930,15 @@
                     validation_simple: "Einfacher Split",
                     validation_walk_forward: "Walk-Forward",
                     validation_rolling_window: "Rolling Window",
+                    sort_btn: "Sortieren",
+                    sort_title: "Sortieren nach",
                     select_required: "Please select at least one ID",
                     select_already_run: "Unter den ausgewählten Positionen sind bereits verarbeitete enthalten. Möchten Sie diese Positionen erneut ausführen?",
                     select_already_run_cancel: "Abbrechen",
                     select_already_run_confirm: "Bestätigen",
                     select_required_ok: "OK",
                     view_details: "Details ansehen",
-                    best_model: "Bestes Modell",
+                    best_model: "Modell",
                     val_mse: "Val. MSE"
                 },
                 charts: {
@@ -1140,7 +1146,7 @@
 
 
         const StatusBadge = ({ status, t }) => {
-            const base = "inline-flex items-center justify-center gap-1 min-w-[7.75rem] px-2 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap";
+            const base = "inline-flex items-center justify-center gap-1 min-w-[6.75rem] px-2 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap";
             if (status === 'success') {
                 return (
                     <span className={`${base} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300`}>
@@ -1182,6 +1188,29 @@
         const ResultsTabBar = memo(({ activeTab, itemTabs, onSelectOverview, onSelectItem, onCloseItem, onReorderItems, t }) => {
             const [dragSku, setDragSku] = useState(null);
             const [overSku, setOverSku] = useState(null);
+            const tabsRef = useRef(null);
+            const tabBtnRefs = useRef({});
+
+            const scrollTabIntoView = useCallback((tabKey) => {
+                const container = tabsRef.current;
+                const el = tabBtnRefs.current[tabKey];
+                if (!container || !el) return;
+                // Scroll only the tab bar — avoid nudging the page with scrollIntoView.
+                requestAnimationFrame(() => {
+                    const cRect = container.getBoundingClientRect();
+                    const eRect = el.getBoundingClientRect();
+                    const pad = 8;
+                    if (eRect.left < cRect.left + pad) {
+                        container.scrollLeft -= (cRect.left + pad) - eRect.left;
+                    } else if (eRect.right > cRect.right - pad) {
+                        container.scrollLeft += eRect.right - (cRect.right - pad);
+                    }
+                });
+            }, []);
+
+            useEffect(() => {
+                scrollTabIntoView(activeTab);
+            }, [activeTab, itemTabs, scrollTabIntoView]);
 
             const handleDragStart = (e, sku) => {
                 setDragSku(sku);
@@ -1217,12 +1246,16 @@
             };
 
             return (
-                <div className="fc-results-tabs" role="tablist" aria-label={t('dashboard.batch_overview')}>
+                <div ref={tabsRef} className="fc-results-tabs" role="tablist" aria-label={t('dashboard.batch_overview')}>
                     <button
                         type="button"
                         role="tab"
+                        ref={(node) => { tabBtnRefs.current.overview = node; }}
                         aria-selected={activeTab === 'overview'}
-                        onClick={onSelectOverview}
+                        onClick={() => {
+                            onSelectOverview();
+                            scrollTabIntoView('overview');
+                        }}
                         className={`fc-results-tab ${activeTab === 'overview' ? 'is-active' : ''}`}
                     >
                         {t('dashboard.batch_overview')}
@@ -1232,9 +1265,13 @@
                             key={sku}
                             type="button"
                             role="tab"
+                            ref={(node) => { tabBtnRefs.current[sku] = node; }}
                             draggable
                             aria-selected={activeTab === sku}
-                            onClick={() => onSelectItem(sku)}
+                            onClick={() => {
+                                onSelectItem(sku);
+                                scrollTabIntoView(sku);
+                            }}
                             onDragStart={(e) => handleDragStart(e, sku)}
                             onDragOver={(e) => handleDragOver(e, sku)}
                             onDragLeave={(e) => handleDragLeave(e, sku)}
@@ -1277,6 +1314,21 @@
             const someSelected = selectedSkus.length > 0 && !allSelected;
             const [sortKey, setSortKey] = useState('sku');
             const [sortDir, setSortDir] = useState('asc');
+            const [sortMenuOpen, setSortMenuOpen] = useState(false);
+
+            const sortOptions = useMemo(() => ([
+                { key: 'sku', label: t('dashboard.table_sku') },
+                { key: 'status', label: t('dashboard.table_status') },
+                { key: 'validation', label: t('dashboard.table_validation') },
+                { key: 'model', label: t('dashboard.table_best_model') },
+                { key: 'mae', label: t('dashboard.table_mae') },
+                { key: 'mse', label: t('dashboard.table_mse') },
+            ]), [t]);
+
+            const activeSortLabel = useMemo(() => {
+                const match = sortOptions.find((opt) => opt.key === sortKey);
+                return match ? match.label : t('dashboard.table_sku');
+            }, [sortOptions, sortKey, t]);
 
             useEffect(() => {
                 if (selectAllDesktopRef.current) selectAllDesktopRef.current.indeterminate = someSelected;
@@ -1293,6 +1345,11 @@
                     return key;
                 });
             }, []);
+
+            const handleSortPick = useCallback((key) => {
+                handleSort(key);
+                setSortMenuOpen(false);
+            }, [handleSort]);
 
             const sortedResults = useMemo(() => {
                 const statusRank = { success: 3, running: 2, not_run: 1, failed: 0 };
@@ -1437,22 +1494,27 @@
                                 aria-label={`${t('dashboard.table_select')} ${r.sku}`}
                             />
                         </td>
-                        <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
-                        <td className="p-3 w-[10.5rem] text-center"><StatusBadge status={r.status} t={t} /></td>
-                        <td className="p-3 w-36 text-center text-slate-600 dark:text-slate-300">
+                        <td className="p-2 lg:p-3 overflow-hidden">
+                            <span className="block truncate font-mono font-bold text-slate-700 dark:text-slate-100" title={r.sku}>{r.sku}</span>
+                        </td>
+                        <td className="p-2 lg:p-3 w-[8.75rem] text-center overflow-hidden"><StatusBadge status={r.status} t={t} /></td>
+                        <td className="p-2 lg:p-3 w-28 lg:w-32 text-center text-slate-600 dark:text-slate-300 overflow-hidden">
                             <span className="block truncate" title={validationLabel}>{validationLabel}</span>
                         </td>
-                        <td className="p-3 w-36 text-slate-600 dark:text-slate-300 uppercase text-center">{r.best_ts_model || '-'}</td>
-                        <td className="p-3 w-28 text-right font-mono dark:text-slate-300">{formatMetric(r.mae_validation)}</td>
-                        <td className="p-3 w-28 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
+                        <td className="p-2 lg:p-3 w-24 lg:w-28 text-slate-600 dark:text-slate-300 uppercase text-center overflow-hidden">
+                            <span className="block truncate">{r.best_ts_model || '-'}</span>
+                        </td>
+                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(r.mae_validation)}</td>
+                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(r.mse_validation)}</td>
                     </tr>
                 );
             }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
 
             return (
-                <div className="w-full h-full overflow-auto max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm">
-                    <div className="md:hidden flex flex-col gap-2.5 p-2 pb-4">
-                        <div className="flex items-center justify-between gap-2 px-3">
+                <div className="w-full h-full overflow-auto max-lg:bg-transparent lg:border lg:border-slate-200 lg:dark:border-slate-800 lg:rounded-lg lg:bg-white lg:dark:bg-slate-900 lg:shadow-sm">
+                    {/* Card/single-column view through tablet widths (incl. iPad portrait). */}
+                    <div className="lg:hidden flex flex-col gap-2.5 p-2 pb-4">
+                        <div className="flex items-center justify-between gap-2 px-0">
                             <label className="inline-flex items-center gap-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                                 <input
                                     type="checkbox"
@@ -1464,32 +1526,76 @@
                                 />
                                 {t('dashboard.table_select')}
                             </label>
-                            <div className="flex items-center gap-1 overflow-x-auto max-w-[70%]">
-                                {[
-                                    { key: 'sku', label: t('dashboard.table_sku') },
-                                    { key: 'status', label: t('dashboard.table_status') },
-                                    { key: 'validation', label: t('dashboard.table_validation') },
-                                    { key: 'model', label: t('dashboard.table_best_model') },
-                                    { key: 'mae', label: t('dashboard.table_mae') },
-                                    { key: 'mse', label: t('dashboard.table_mse') },
-                                ].map((opt) => (
-                                    <button
-                                        key={opt.key}
-                                        type="button"
-                                        onClick={() => handleSort(opt.key)}
-                                        className={`shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border transition-colors ${sortKey === opt.key ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400'}`}
-                                    >
-                                        {opt.label}{sortKey === opt.key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
-                                    </button>
-                                ))}
+                            <div className="inline-flex items-center shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+                                <button
+                                    type="button"
+                                    onClick={() => setSortMenuOpen(true)}
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-gold transition-colors"
+                                    aria-haspopup="dialog"
+                                    aria-expanded={sortMenuOpen}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m3 16 4 4 4-4" /><path d="M7 20V4" /><path d="m21 8-4-4-4 4" /><path d="M17 4v16" /></svg>
+                                    <span>{t('dashboard.sort_btn')}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                                    className="inline-flex items-center gap-0.5 px-2 py-1 border-l border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wide text-brand-gold hover:bg-brand-gold/10 transition-colors"
+                                    title={`${activeSortLabel} ${sortDir === 'asc' ? '▲' : '▼'}`}
+                                    aria-label={`Toggle ${activeSortLabel} sort direction`}
+                                >
+                                    <span>{activeSortLabel}</span>
+                                    <span aria-hidden="true">{sortDir === 'asc' ? '▲' : '▼'}</span>
+                                </button>
                             </div>
                         </div>
+                        {sortMenuOpen && (
+                            <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-4">
+                                <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm modal-backdrop" onClick={() => setSortMenuOpen(false)}></div>
+                                <div
+                                    role="dialog"
+                                    aria-modal="true"
+                                    aria-label={t('dashboard.sort_title')}
+                                    className="relative z-10 w-full max-w-sm bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 animate-slide-up overflow-hidden"
+                                >
+                                    <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                                        <h3 className="text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">{t('dashboard.sort_title')}</h3>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSortMenuOpen(false)}
+                                            className="p-1 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                            aria-label="Close"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                                        </button>
+                                    </div>
+                                    <div className="p-2 max-h-[60vh] overflow-y-auto">
+                                        {sortOptions.map((opt) => {
+                                            const active = sortKey === opt.key;
+                                            return (
+                                                <button
+                                                    key={opt.key}
+                                                    type="button"
+                                                    onClick={() => handleSortPick(opt.key)}
+                                                    className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-left text-xs font-bold uppercase tracking-wide transition-colors ${active ? 'bg-brand-gold/10 text-brand-gold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80'}`}
+                                                >
+                                                    <span>{opt.label}</span>
+                                                    <span className={`text-[10px] ${active ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true">
+                                                        {sortDir === 'asc' ? '▲' : '▼'}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {mobileCards}
                     </div>
-                    <table className="hidden md:table table-fixed w-full text-left text-xs">
+                    <table className="hidden lg:table table-fixed w-full text-left text-xs">
                         <thead className="bg-slate-50 dark:bg-slate-950 sticky top-0 z-10">
                             <tr>
-                                <th className="p-3 w-12 text-center font-bold text-slate-500 dark:text-slate-400 uppercase border-l-[3px] border-transparent">
+                                <th className="p-2 lg:p-3 w-12 text-center font-bold text-slate-500 dark:text-slate-400 uppercase border-l-[3px] border-transparent">
                                     <input
                                         type="checkbox"
                                         className="fc-row-check"
@@ -1501,11 +1607,11 @@
                                     />
                                 </th>
                                 <SortHeader columnKey="sku" label={t('dashboard.table_sku')} thClassName="w-auto" />
-                                <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[10.5rem]" />
-                                <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-36" />
-                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-36" />
-                                <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" thClassName="w-28" />
-                                <SortHeader columnKey="mse" label={t('dashboard.table_mse')} align="right" thClassName="w-28" />
+                                <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[8.75rem]" />
+                                <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-28 lg:w-32" />
+                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-24 lg:w-28" />
+                                <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" thClassName="w-20 lg:w-24" />
+                                <SortHeader columnKey="mse" label={t('dashboard.table_mse')} align="right" thClassName="w-20 lg:w-24" />
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -3159,11 +3265,20 @@
                                                                 <button type="button" onClick={() => cycleSku(1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Next SKU"><ChevronRightIcon /></button>
                                                             </div>
                                                             <div className="flex items-center gap-2 lg:gap-4 shrink-0 bg-slate-100/80 dark:bg-white/5 px-2 py-1 lg:px-3 lg:py-1.5 rounded-lg lg:rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
-                                                                <div className="flex flex-col items-end">
+                                                                <div className="flex flex-col items-center text-center max-w-[7.5rem] lg:max-w-none">
+                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.table_validation')}</span>
+                                                                    <span
+                                                                        className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300 truncate max-w-full"
+                                                                        title={formatValidationMethod(skuData.validation_method || skuValidationMethods[String(skuData.sku)], t)}
+                                                                    >
+                                                                        {formatValidationMethod(skuData.validation_method || skuValidationMethods[String(skuData.sku)], t)}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
                                                                     <span className="text-[10px] lg:text-xs font-bold text-brand-gold">{skuData.best_ts_model.toUpperCase()}</span>
                                                                 </div>
-                                                                <div className="flex flex-col items-end">
+                                                                <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
                                                                     <span className="text-[10px] lg:text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
                                                                 </div>
