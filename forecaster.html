@@ -2185,7 +2185,7 @@
                 return fallback || key;
             };
 
-            // --- POLLING ---
+            // --- POLLING (merge partial results as each SKU completes) ---
             useEffect(() => {
                 let interval;
                 if (isPolling && jobId) {
@@ -2194,26 +2194,29 @@
                             const res = await fetch(`${BASE_URL}/batch_status/${jobId}`);
                             const data = await res.json();
                             setJobStatus(data.status);
-                            if (data.status === 'completed') {
-                                setIsPolling(false);
-                                setRunningSkus([]);
-                                const incoming = data.result?.results || [];
+
+                            const incoming = data.result?.results || [];
+                            if (incoming.length > 0) {
                                 setBatchResults((prev) => {
                                     const map = new Map((prev || []).map((r) => [String(r.sku), r]));
                                     for (const r of incoming) map.set(String(r.sku), r);
                                     return Array.from(map.values());
                                 });
+                                const done = new Set(incoming.map((r) => String(r.sku)));
+                                setRunningSkus((prev) => prev.filter((sku) => !done.has(String(sku))));
+                            }
+
+                            if (data.status === 'completed') {
+                                setIsPolling(false);
+                                setRunningSkus([]);
                                 window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-completed');
-                                if (incoming.length > 0) {
-                                    setCurrentSku(incoming[0].sku);
-                                }
                             } else if (data.status === 'failed') {
                                 setIsPolling(false);
                                 setRunningSkus([]);
                                 setError("Job Failed: " + data.error);
                             }
                         } catch (e) { console.error(e); }
-                    }, 2000);
+                    }, 1000);
                 }
                 return () => clearInterval(interval);
             }, [isPolling, jobId, BASE_URL]);
@@ -2356,7 +2359,6 @@
                 }
 
                 setError(null);
-                setItemTabs([]);
                 setJobStatus("queued");
                 setActiveTab("overview");
                 setRunningSkus(skusToRun);
@@ -2511,15 +2513,17 @@
             };
 
             const cycleSku = (dir) => {
-                if (!batchResults || !currentSku) return;
-                const idx = batchResults.findIndex(r => r.sku === currentSku);
+                if (!itemTabs.length) return;
+                const current = activeTab !== 'overview' ? activeTab : currentSku;
+                if (!current) return;
+                const idx = itemTabs.indexOf(current);
                 if (idx === -1) return;
+                if (itemTabs.length === 1) return;
                 let newIdx = idx + dir;
-                if (newIdx < 0) newIdx = batchResults.length - 1;
-                if (newIdx >= batchResults.length) newIdx = 0;
-                const nextSku = batchResults[newIdx].sku;
+                if (newIdx < 0) newIdx = itemTabs.length - 1;
+                if (newIdx >= itemTabs.length) newIdx = 0;
+                const nextSku = itemTabs[newIdx];
                 setCurrentSku(nextSku);
-                setItemTabs((prev) => (prev.includes(nextSku) ? prev : [...prev, nextSku]));
                 setActiveTab(nextSku);
             };
 
