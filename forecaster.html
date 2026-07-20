@@ -491,6 +491,53 @@
             box-shadow: none;
         }
 
+        /*
+         * Overview card/table switch — plain CSS media queries.
+         * Safari often fails to flip Tailwind `hidden` ↔ `lg:table` / `lg:hidden`,
+         * which shows both layouts and collapses table-fixed columns.
+         */
+        .fc-overview-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+            padding: 0.5rem 0.5rem 1rem;
+        }
+
+        .fc-overview-table {
+            display: none;
+            width: 100%;
+            table-layout: fixed;
+            text-align: left;
+            font-size: 0.75rem;
+        }
+
+        .fc-overview-shell {
+            background: transparent;
+        }
+
+        @media (min-width: 1024px) {
+            .fc-overview-cards {
+                display: none !important;
+            }
+
+            .fc-overview-table {
+                display: table !important;
+            }
+
+            .fc-overview-shell {
+                border: 1px solid rgb(226, 232, 240);
+                border-radius: 0.5rem;
+                background: rgb(255, 255, 255);
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+            }
+
+            .dark .fc-overview-shell {
+                border-color: rgb(30, 41, 59);
+                background: rgb(15, 23, 42);
+                box-shadow: none;
+            }
+        }
+
         .fc-results-tab {
             display: inline-flex;
             align-items: center;
@@ -1387,15 +1434,15 @@
                 const active = sortKey === columnKey;
                 const alignClass = align === 'right' ? 'justify-end text-right' : align === 'center' ? 'justify-center text-center' : 'justify-start text-left';
                 return (
-                    <th className={`p-3 font-bold text-slate-500 dark:text-slate-400 uppercase ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : ''} ${thClassName}`}>
+                    <th className={`p-2 lg:p-3 font-bold text-slate-500 dark:text-slate-400 uppercase ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : ''} ${thClassName}`}>
                         <button
                             type="button"
                             onClick={() => handleSort(columnKey)}
-                            className={`inline-flex items-center gap-1 w-full ${alignClass} hover:text-slate-700 dark:hover:text-slate-200 transition-colors ${active ? 'text-brand-gold dark:text-brand-gold' : ''}`}
+                            className={`inline-flex items-center gap-1 max-w-full ${alignClass} hover:text-slate-700 dark:hover:text-slate-200 transition-colors ${active ? 'text-brand-gold dark:text-brand-gold' : ''}`}
                             aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                         >
-                            <span>{label}</span>
-                            <span className={`text-[9px] leading-none ${active ? 'opacity-100' : 'opacity-35'}`} aria-hidden="true">
+                            <span className="truncate">{label}</span>
+                            <span className={`shrink-0 text-[9px] leading-none ${active ? 'opacity-100' : 'opacity-35'}`} aria-hidden="true">
                                 {active ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
                             </span>
                         </button>
@@ -1511,9 +1558,9 @@
             }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
 
             return (
-                <div className="w-full h-full overflow-auto max-lg:bg-transparent lg:border lg:border-slate-200 lg:dark:border-slate-800 lg:rounded-lg lg:bg-white lg:dark:bg-slate-900 lg:shadow-sm">
+                <div className="fc-overview-shell w-full h-full overflow-auto">
                     {/* Card/single-column view through tablet widths (incl. iPad portrait). */}
-                    <div className="lg:hidden flex flex-col gap-2.5 p-2 pb-4">
+                    <div className="fc-overview-cards">
                         <div className="flex items-center justify-between gap-2 px-0">
                             <label className="inline-flex items-center gap-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                                 <input
@@ -1592,7 +1639,7 @@
                         )}
                         {mobileCards}
                     </div>
-                    <table className="hidden lg:table table-fixed w-full text-left text-xs">
+                    <table className="fc-overview-table">
                         <thead className="bg-slate-50 dark:bg-slate-950 sticky top-0 z-10">
                             <tr>
                                 <th className="p-2 lg:p-3 w-12 text-center font-bold text-slate-500 dark:text-slate-400 uppercase border-l-[3px] border-transparent">
@@ -1606,7 +1653,7 @@
                                         aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
                                     />
                                 </th>
-                                <SortHeader columnKey="sku" label={t('dashboard.table_sku')} thClassName="w-auto" />
+                                <SortHeader columnKey="sku" label={t('dashboard.table_sku')} thClassName="w-[28%]" />
                                 <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[8.75rem]" />
                                 <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-28 lg:w-32" />
                                 <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-24 lg:w-28" />
