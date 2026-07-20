@@ -2174,6 +2174,8 @@
             const [jobStatus, setJobStatus] = useState(null);
             const [error, setError] = useState(null);
             const [isExporting, setIsExporting] = useState(false);
+            // Invalidates in-flight polls when a newer run starts (avoids toggling isPolling off).
+            const runGenerationRef = useRef(0);
 
             // UI State
             const [currentSku, setCurrentSku] = useState(null);
@@ -2299,11 +2301,12 @@
                 let interval;
                 if (isPolling && jobId) {
                     const polledJobId = jobId;
+                    const generation = runGenerationRef.current;
                     const pollOnce = async () => {
                         try {
                             const res = await fetch(`${BASE_URL}/batch_status/${polledJobId}`);
                             const data = await res.json();
-                            if (cancelled) return;
+                            if (cancelled || generation !== runGenerationRef.current) return;
 
                             setJobStatus(data.status);
 
@@ -2318,17 +2321,24 @@
                                 setRunningSkus((prev) => prev.filter((sku) => !done.has(String(sku))));
                             }
 
-                            if (data.status === 'completed') {
+                            const totalCount = data.total_count != null ? Number(data.total_count) : 0;
+                            const completedCount = data.completed_count != null
+                                ? Number(data.completed_count)
+                                : incoming.length;
+                            const allSkusFinished = totalCount > 0 && completedCount >= totalCount;
+                            const jobFinished = data.status === 'completed' || data.status === 'failed' || allSkusFinished;
+
+                            if (jobFinished) {
                                 setIsPolling(false);
                                 setRunningSkus([]);
-                                window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-completed');
-                            } else if (data.status === 'failed') {
-                                setIsPolling(false);
-                                setRunningSkus([]);
-                                setError("Job Failed: " + data.error);
+                                if (data.status === 'failed') {
+                                    setError("Job Failed: " + data.error);
+                                } else {
+                                    window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-completed');
+                                }
                             }
                         } catch (e) {
-                            if (!cancelled) console.error(e);
+                            if (!cancelled && generation === runGenerationRef.current) console.error(e);
                         }
                     };
                     pollOnce();
@@ -2465,9 +2475,12 @@
                 if (!skusToRun.length) return;
 
                 const rerunSet = new Set(skusToRun.map(String));
+                // Bump generation so any in-flight poll from a prior job is ignored.
+                const generation = ++runGenerationRef.current;
 
-                // Stop any in-flight poll from a previous job so stale results cannot reappear.
-                setIsPolling(false);
+                // Show Processing on the Run button immediately; clear jobId so we do not
+                // keep polling the previous job while /batch_init is in flight.
+                setIsPolling(true);
                 setJobId(null);
 
                 // Drop previous metrics/charts for SKUs being re-run so only the newest run is shown.
@@ -2501,19 +2514,23 @@
 
                 try {
                     const res = await fetch(`${BASE_URL}/batch_init`, { method: 'POST', body: fd });
+                    if (generation !== runGenerationRef.current) return;
                     if (!res.ok) {
                         let message = "Failed to start job";
                         try {
                             const errBody = await res.json();
                             message = errBody.detail || errBody.message || message;
                         } catch (_) {}
+                        setIsPolling(false);
                         setRunningSkus([]);
                         throw new Error(typeof message === 'string' ? message : "Failed to start job");
                     }
                     const data = await res.json();
+                    if (generation !== runGenerationRef.current) return;
                     setJobId(data.job_id);
-                    setIsPolling(true);
                 } catch (e) {
+                    if (generation !== runGenerationRef.current) return;
+                    setIsPolling(false);
                     setRunningSkus([]);
                     setError(e.message);
                 }
@@ -2693,6 +2710,8 @@
             const interfaceReady = !!(batchResults && batchResults.length > 0);
             const mappingReady = mappedSkus.length > 0;
             const isDetailTab = activeTab !== 'overview' && !!skuData;
+            // Keep Run button in sync with Overview row status (not only the poll flag).
+            const isRunning = isPolling || runningSkus.length > 0;
 
             const openDetailedView = () => {
                 if (!interfaceReady || !batchResults?.length) return;
@@ -2828,16 +2847,16 @@
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
                                 onClick={handleExecute}
-                                disabled={!file || isPolling}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${!file || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
-                                title={isPolling ? t('sidebar.processing') : t('sidebar.execute_btn')}
+                                disabled={!file || isRunning}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${!file || isRunning ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
+                                title={isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
                             >
-                                {isPolling ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
+                                {isRunning ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
                             </button>
                             <button
                                 onClick={handleExport}
-                                disabled={!file || !batchResults || isExporting || isPolling}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${!file || !batchResults || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
+                                disabled={!file || !batchResults || isExporting || isRunning}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${!file || !batchResults || isExporting || isRunning ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
                                 title={isExporting ? t('sidebar.downloading') : t('sidebar.export_btn')}
                             >
                                 {isExporting ? <div className="animate-spin"><RefreshIcon /></div> : <DownloadIcon />}
@@ -2969,17 +2988,17 @@
                                     <button
                                         type="button"
                                         onClick={handleExecute}
-                                        disabled={!file || isPolling}
-                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
+                                        disabled={!file || isRunning}
+                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || isRunning ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
                                     >
-                                        {isPolling ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
-                                        {isPolling ? t('sidebar.processing') : t('sidebar.execute_btn')}
+                                        {isRunning ? <div className="animate-spin"><RefreshIcon /></div> : <PlayIcon />}
+                                        {isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={handleExport}
-                                        disabled={!file || !batchResults || isExporting || isPolling}
-                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || !batchResults || isExporting || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600 hover:scale-[1.02] shadow-emerald-500/20 hover:shadow-emerald-500/40'}`}
+                                        disabled={!file || !batchResults || isExporting || isRunning}
+                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${!file || !batchResults || isExporting || isRunning ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600 hover:scale-[1.02] shadow-emerald-500/20 hover:shadow-emerald-500/40'}`}
                                     >
                                         {isExporting ? <div className="animate-spin"><RefreshIcon /></div> : <DownloadIcon width="16" height="16" />}
                                         {isExporting ? t('sidebar.downloading') : t('sidebar.export_btn')}
