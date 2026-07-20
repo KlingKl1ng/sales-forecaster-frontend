@@ -1217,7 +1217,20 @@
             const tableRows = useMemo(() => results.map((r, i) => {
                 const isReady = r.status === 'success';
                 return (
-                    <tr key={r.sku || i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <tr
+                        key={r.sku || i}
+                        role={isReady ? 'button' : undefined}
+                        tabIndex={isReady ? 0 : undefined}
+                        onClick={() => isReady && onSelectSku(r.sku)}
+                        onKeyDown={(e) => {
+                            if (!isReady) return;
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                onSelectSku(r.sku);
+                            }
+                        }}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isReady ? 'cursor-pointer' : ''}`}
+                    >
                         <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
                         <td className="p-3"><StatusBadge status={r.status} t={t} /></td>
                         <td className="p-3 text-slate-600 dark:text-slate-300 uppercase">{r.best_ts_model || '-'}</td>
@@ -1225,7 +1238,13 @@
                         <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
                         <td className="p-3 text-center">
                             {isReady ? (
-                                <button type="button" onClick={() => onSelectSku(r.sku)} className="text-brand-gold hover:underline font-bold">{t('dashboard.view_details')}</button>
+                                <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); onSelectSku(r.sku); }}
+                                    className="text-brand-gold hover:underline font-bold"
+                                >
+                                    {t('dashboard.view_details')}
+                                </button>
                             ) : (
                                 <span className="text-slate-400 font-bold">—</span>
                             )}
