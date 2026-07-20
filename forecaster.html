@@ -2295,12 +2295,16 @@
 
             // --- POLLING (merge partial results as each SKU completes) ---
             useEffect(() => {
+                let cancelled = false;
                 let interval;
                 if (isPolling && jobId) {
-                    interval = setInterval(async () => {
+                    const polledJobId = jobId;
+                    const pollOnce = async () => {
                         try {
-                            const res = await fetch(`${BASE_URL}/batch_status/${jobId}`);
+                            const res = await fetch(`${BASE_URL}/batch_status/${polledJobId}`);
                             const data = await res.json();
+                            if (cancelled) return;
+
                             setJobStatus(data.status);
 
                             const incoming = data.result?.results || [];
@@ -2323,10 +2327,17 @@
                                 setRunningSkus([]);
                                 setError("Job Failed: " + data.error);
                             }
-                        } catch (e) { console.error(e); }
-                    }, 1000);
+                        } catch (e) {
+                            if (!cancelled) console.error(e);
+                        }
+                    };
+                    pollOnce();
+                    interval = setInterval(pollOnce, 1000);
                 }
-                return () => clearInterval(interval);
+                return () => {
+                    cancelled = true;
+                    clearInterval(interval);
+                };
             }, [isPolling, jobId, BASE_URL]);
 
             // --- HANDLERS ---
@@ -2454,14 +2465,23 @@
                 if (!skusToRun.length) return;
 
                 const rerunSet = new Set(skusToRun.map(String));
+
+                // Stop any in-flight poll from a previous job so stale results cannot reappear.
+                setIsPolling(false);
+                setJobId(null);
+
+                // Drop previous metrics/charts for SKUs being re-run so only the newest run is shown.
                 setBatchResults((prev) => {
-                    if (!prev?.length) return prev;
-                    return prev.filter((r) => !rerunSet.has(String(r.sku)));
+                    if (!prev?.length) return null;
+                    const next = prev.filter((r) => !rerunSet.has(String(r.sku)));
+                    return next.length ? next : null;
                 });
+                setItemTabs((prev) => prev.filter((sku) => !rerunSet.has(String(sku))));
+                setCurrentSku((prev) => (prev && rerunSet.has(String(prev)) ? null : prev));
+                setActiveTab("overview");
 
                 setError(null);
                 setJobStatus("queued");
-                setActiveTab("overview");
                 setRunningSkus(skusToRun);
 
                 console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus, skusToRun });
@@ -2687,12 +2707,7 @@
                 const runningSet = new Set(runningSkus.map(String));
                 return mappedSkus.map((sku) => {
                     const result = resultMap.get(sku);
-                    if (result) {
-                        return {
-                            ...result,
-                            status: 'success',
-                        };
-                    }
+                    // While a SKU is re-running, never show stale metrics from a previous run.
                     if (runningSet.has(String(sku))) {
                         return {
                             sku,
@@ -2700,6 +2715,12 @@
                             best_ts_model: null,
                             mae_validation: null,
                             mse_validation: null,
+                        };
+                    }
+                    if (result) {
+                        return {
+                            ...result,
+                            status: 'success',
                         };
                     }
                     return {
