@@ -794,7 +794,7 @@
                     table_success: "THÀNH CÔNG",
                     table_not_run: "Chưa chạy",
                     table_running: "Đang chạy",
-                    select_required: "Please select at least one ID",
+                    select_required: "Vui lòng chọn ít nhất một ID",
                     select_already_run: "Các mục đã chọn đã chạy xong. Vui lòng chọn các mục còn trạng thái Chưa chạy.",
                     select_required_ok: "OK",
                     view_details: "Xem chi tiết",
@@ -1098,12 +1098,12 @@
 
         const StatusBadge = ({ status, t }) => {
             if (status === 'success') {
-                return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_success')}</span>;
+                return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold uppercase whitespace-nowrap">{t('dashboard.table_success')}</span>;
             }
             if (status === 'running') {
-                return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_running')}</span>;
+                return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 text-[10px] font-bold uppercase whitespace-nowrap">{t('dashboard.table_running')}</span>;
             }
-            return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_not_run')}</span>;
+            return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] font-bold uppercase whitespace-nowrap">{t('dashboard.table_not_run')}</span>;
         };
 
         const ResultsTabBar = memo(({ activeTab, itemTabs, onSelectOverview, onSelectItem, onCloseItem, t }) => {
@@ -1202,7 +1202,7 @@
                                 <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
                                 <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300">{r.best_ts_model || '-'}</p>
                             </div>
-                            <div className="grid grid-cols-2 gap-2 mb-3">
+                            <div className="grid grid-cols-2 gap-2">
                                 <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
                                     <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
                                     <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mae_validation)}</span>
@@ -1212,13 +1212,6 @@
                                     <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mse_validation)}</span>
                                 </div>
                             </div>
-                            {isReady ? (
-                                <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold">{t('dashboard.view_details')}<span aria-hidden="true">→</span></span>
-                            ) : r.status === 'running' ? (
-                                <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-300">{t('dashboard.table_running')}</span>
-                            ) : (
-                                <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-400">{t('dashboard.table_not_run')}</span>
-                            )}
                         </button>
                     </div>
                 );
@@ -1253,22 +1246,9 @@
                         </td>
                         <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
                         <td className="p-3"><StatusBadge status={r.status} t={t} /></td>
-                        <td className="p-3 text-slate-600 dark:text-slate-300 uppercase">{r.best_ts_model || '-'}</td>
+                        <td className="p-3 text-slate-600 dark:text-slate-300 uppercase text-center">{r.best_ts_model || '-'}</td>
                         <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mae_validation)}</td>
                         <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
-                        <td className="p-3 text-center">
-                            {isReady ? (
-                                <button
-                                    type="button"
-                                    onClick={(e) => { e.stopPropagation(); onSelectSku(r.sku); }}
-                                    className="text-brand-gold hover:underline font-bold"
-                                >
-                                    {t('dashboard.view_details')}
-                                </button>
-                            ) : (
-                                <span className="text-slate-400 font-bold">—</span>
-                            )}
-                        </td>
                     </tr>
                 );
             }), [results, onSelectSku, onToggleSku, selectedSet, t]);
@@ -1305,10 +1285,9 @@
                                 </th>
                                 <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_sku')}</th>
                                 <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_status')}</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_best_model')}</th>
+                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-center">{t('dashboard.table_best_model')}</th>
                                 <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-right">{t('dashboard.table_mae')}</th>
                                 <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-right">{t('dashboard.table_mse')}</th>
-                                <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase text-center">{t('dashboard.table_action')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -2576,25 +2555,6 @@
                             )}
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
-                                type="button"
-                                onClick={() => mappingReady && setActiveTab('overview')}
-                                disabled={!mappingReady}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!mappingReady ? 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'overview' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
-                                title={t('dashboard.batch_overview')}
-                            >
-                                <GridIcon />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={openDetailedView}
-                                disabled={!interfaceReady}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!interfaceReady ? 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : isDetailTab ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
-                                title={t('dashboard.detailed_view')}
-                            >
-                                <EyeIcon />
-                            </button>
-                            <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
-                            <button
                                 onClick={handleExecute}
                                 disabled={!file || isPolling}
                                 className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${!file || isPolling ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
@@ -2658,32 +2618,7 @@
                                 </div>
                             </div>
 
-                            {/* 2. Interface — always visible, above Configuration */}
-                            <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                                <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.interface')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
-                                <div className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
-                                    <button
-                                        type="button"
-                                        onClick={() => mappingReady && setActiveTab('overview')}
-                                        disabled={!mappingReady}
-                                        className={`fc-iface-btn ${!mappingReady ? 'is-disabled' : activeTab === 'overview' ? 'active' : ''}`}
-                                    >
-                                        <span className="fc-iface-btn-ico" aria-hidden="true"><GridIcon /></span>
-                                        <span>{t('dashboard.batch_overview')}</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={openDetailedView}
-                                        disabled={!interfaceReady}
-                                        className={`fc-iface-btn ${!interfaceReady ? 'is-disabled' : isDetailTab ? 'active' : ''}`}
-                                    >
-                                        <span className="fc-iface-btn-ico" aria-hidden="true"><EyeIcon /></span>
-                                        <span>{t('dashboard.detailed_view')}</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* 3. Configuration */}
+                            {/* 2. Configuration */}
                             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
                                 <form className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800" onSubmit={(e) => e.preventDefault()}>
