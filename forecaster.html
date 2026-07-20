@@ -472,8 +472,9 @@
             overflow-y: hidden;
             padding: 0.25rem;
             border-radius: 0.625rem;
-            border: 1px solid rgb(241, 245, 249);
-            background: rgb(248, 250, 252);
+            border: 1px solid rgb(203, 213, 225);
+            background: rgb(255, 255, 255);
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -485,8 +486,9 @@
         }
 
         .dark .fc-results-tabs {
-            border-color: rgb(30, 41, 59);
-            background: rgba(30, 41, 59, 0.5);
+            border-color: rgb(51, 65, 85);
+            background: rgba(30, 41, 59, 0.55);
+            box-shadow: none;
         }
 
         .fc-results-tab {
@@ -531,6 +533,19 @@
 
         .dark .fc-results-tab.is-active {
             color: #f8fafc;
+        }
+
+        .fc-results-tab.is-draggable {
+            cursor: grab;
+        }
+
+        .fc-results-tab.is-dragging {
+            opacity: 0.45;
+        }
+
+        .fc-results-tab.is-drop-target {
+            border-color: rgba(245, 158, 11, .45);
+            background: rgba(245, 158, 11, .08);
         }
 
         .fc-results-tab-close {
@@ -694,10 +709,13 @@
                     select_all: "Select all",
                     unselect_all: "Unselect all",
                     table_success: "SUCCESS",
-                    table_not_run: "Not Run",
-                    table_running: "Running",
+                    table_not_run: "Not Process",
+                    table_running: "Processing",
+                    table_failed: "Failed",
                     select_required: "Please select at least one ID",
-                    select_already_run: "Selected items have already been run. Please select items that are still Not Run.",
+                    select_already_run: "Some selected items have already been processed. Would you like to re-process these items?",
+                    select_already_run_cancel: "Cancel",
+                    select_already_run_confirm: "Confirm",
                     select_required_ok: "OK",
                     view_details: "View Details",
                     best_model: "Best Model",
@@ -792,10 +810,13 @@
                     select_all: "Chọn tất cả",
                     unselect_all: "Bỏ chọn tất cả",
                     table_success: "THÀNH CÔNG",
-                    table_not_run: "Chưa chạy",
-                    table_running: "Đang chạy",
+                    table_not_run: "Chưa xử lý",
+                    table_running: "Đang xử lý",
+                    table_failed: "Thất bại",
                     select_required: "Vui lòng chọn ít nhất một ID",
-                    select_already_run: "Các mục đã chọn đã chạy xong. Vui lòng chọn các mục còn trạng thái Chưa chạy.",
+                    select_already_run: "Trong các mục đã chọn có mục đã được xử lý. Bạn có muốn chạy lại các mục này không?",
+                    select_already_run_cancel: "Hủy",
+                    select_already_run_confirm: "Xác nhận",
                     select_required_ok: "OK",
                     view_details: "Xem chi tiết",
                     best_model: "Mô hình tốt nhất",
@@ -890,10 +911,13 @@
                     select_all: "Alle auswählen",
                     unselect_all: "Auswahl aufheben",
                     table_success: "ERFOLG",
-                    table_not_run: "Nicht ausgeführt",
-                    table_running: "Läuft",
+                    table_not_run: "Nicht verarbeitet",
+                    table_running: "Verarbeitung",
+                    table_failed: "Fehlgeschlagen",
                     select_required: "Please select at least one ID",
-                    select_already_run: "Ausgewählte Positionen wurden bereits ausgeführt. Bitte wählen Sie Positionen mit Status Nicht ausgeführt.",
+                    select_already_run: "Unter den ausgewählten Positionen sind bereits verarbeitete enthalten. Möchten Sie diese Positionen erneut ausführen?",
+                    select_already_run_cancel: "Abbrechen",
+                    select_already_run_confirm: "Bestätigen",
                     select_required_ok: "OK",
                     view_details: "Details ansehen",
                     best_model: "Bestes Modell",
@@ -1104,16 +1128,75 @@
 
 
         const StatusBadge = ({ status, t }) => {
+            const base = "inline-flex items-center justify-center gap-1 min-w-[7.75rem] px-2 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap";
             if (status === 'success') {
-                return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold uppercase whitespace-nowrap">{t('dashboard.table_success')}</span>;
+                return (
+                    <span className={`${base} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+                        {t('dashboard.table_success')}
+                    </span>
+                );
+            }
+            if (status === 'failed') {
+                return (
+                    <span className={`${base} bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                        {t('dashboard.table_failed')}
+                    </span>
+                );
             }
             if (status === 'running') {
-                return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 text-[10px] font-bold uppercase whitespace-nowrap">{t('dashboard.table_running')}</span>;
+                return (
+                    <span className={`${base} bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-spin" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                        {t('dashboard.table_running')}
+                    </span>
+                );
             }
-            return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] font-bold uppercase whitespace-nowrap">{t('dashboard.table_not_run')}</span>;
+            return (
+                <span className={`${base} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}>
+                    {t('dashboard.table_not_run')}
+                </span>
+            );
         };
 
-        const ResultsTabBar = memo(({ activeTab, itemTabs, onSelectOverview, onSelectItem, onCloseItem, t }) => {
+        const ResultsTabBar = memo(({ activeTab, itemTabs, onSelectOverview, onSelectItem, onCloseItem, onReorderItems, t }) => {
+            const [dragSku, setDragSku] = useState(null);
+            const [overSku, setOverSku] = useState(null);
+
+            const handleDragStart = (e, sku) => {
+                setDragSku(sku);
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', sku);
+            };
+
+            const handleDragOver = (e, sku) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (sku !== overSku) setOverSku(sku);
+            };
+
+            const handleDragLeave = (e, sku) => {
+                if (!e.currentTarget.contains(e.relatedTarget)) {
+                    setOverSku((prev) => (prev === sku ? null : prev));
+                }
+            };
+
+            const handleDrop = (e, targetSku) => {
+                e.preventDefault();
+                const source = dragSku || e.dataTransfer.getData('text/plain');
+                if (source && targetSku && source !== targetSku) {
+                    onReorderItems?.(source, targetSku);
+                }
+                setDragSku(null);
+                setOverSku(null);
+            };
+
+            const handleDragEnd = () => {
+                setDragSku(null);
+                setOverSku(null);
+            };
+
             return (
                 <div className="fc-results-tabs" role="tablist" aria-label={t('dashboard.batch_overview')}>
                     <button
@@ -1130,18 +1213,26 @@
                             key={sku}
                             type="button"
                             role="tab"
+                            draggable
                             aria-selected={activeTab === sku}
                             onClick={() => onSelectItem(sku)}
-                            className={`fc-results-tab ${activeTab === sku ? 'is-active' : ''}`}
+                            onDragStart={(e) => handleDragStart(e, sku)}
+                            onDragOver={(e) => handleDragOver(e, sku)}
+                            onDragLeave={(e) => handleDragLeave(e, sku)}
+                            onDrop={(e) => handleDrop(e, sku)}
+                            onDragEnd={handleDragEnd}
+                            className={`fc-results-tab is-draggable ${activeTab === sku ? 'is-active' : ''} ${dragSku === sku ? 'is-dragging' : ''} ${overSku === sku && dragSku !== sku ? 'is-drop-target' : ''}`}
                             title={sku}
                         >
                             <span className="max-w-[9rem] truncate font-mono text-[12px]">{sku}</span>
                             <span
                                 role="button"
                                 tabIndex={0}
+                                draggable={false}
                                 className="fc-results-tab-close"
                                 aria-label={`Close ${sku}`}
                                 onClick={(e) => { e.stopPropagation(); onCloseItem(sku); }}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {
                                         e.preventDefault();
@@ -1185,7 +1276,7 @@
             }, []);
 
             const sortedResults = useMemo(() => {
-                const statusRank = { success: 2, running: 1, not_run: 0 };
+                const statusRank = { success: 3, running: 2, not_run: 1, failed: 0 };
                 const dir = sortDir === 'asc' ? 1 : -1;
                 const toNum = (v) => (v == null || v === '' || Number.isNaN(Number(v)) ? null : Number(v));
                 const toStr = (v) => String(v == null ? '' : v).toLowerCase();
@@ -1214,11 +1305,11 @@
                 });
             }, [results, sortKey, sortDir]);
 
-            const SortHeader = ({ columnKey, label, align = 'left' }) => {
+            const SortHeader = ({ columnKey, label, align = 'left', thClassName = '' }) => {
                 const active = sortKey === columnKey;
                 const alignClass = align === 'right' ? 'justify-end text-right' : align === 'center' ? 'justify-center text-center' : 'justify-start text-left';
                 return (
-                    <th className={`p-3 font-bold text-slate-500 dark:text-slate-400 uppercase ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : ''}`}>
+                    <th className={`p-3 font-bold text-slate-500 dark:text-slate-400 uppercase ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : ''} ${thClassName}`}>
                         <button
                             type="button"
                             onClick={() => handleSort(columnKey)}
@@ -1303,9 +1394,12 @@
                                 onSelectSku(r.sku);
                             }
                         }}
-                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isReady ? 'cursor-pointer' : ''} ${isChecked ? 'bg-brand-gold/5 dark:bg-brand-gold/10' : ''}`}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isReady ? 'cursor-pointer' : ''} ${isChecked ? 'bg-slate-100 dark:bg-slate-800/60' : ''}`}
                     >
-                        <td className="p-3 w-12 text-center" onClick={(e) => e.stopPropagation()}>
+                        <td
+                            className={`p-3 w-12 text-center border-l-[3px] ${isChecked ? 'border-brand-gold' : 'border-transparent'}`}
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <input
                                 type="checkbox"
                                 className="fc-row-check"
@@ -1315,10 +1409,10 @@
                             />
                         </td>
                         <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
-                        <td className="p-3"><StatusBadge status={r.status} t={t} /></td>
-                        <td className="p-3 text-slate-600 dark:text-slate-300 uppercase text-center">{r.best_ts_model || '-'}</td>
-                        <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mae_validation)}</td>
-                        <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
+                        <td className="p-3 w-[10.5rem] text-center"><StatusBadge status={r.status} t={t} /></td>
+                        <td className="p-3 w-40 text-slate-600 dark:text-slate-300 uppercase text-center">{r.best_ts_model || '-'}</td>
+                        <td className="p-3 w-28 text-right font-mono dark:text-slate-300">{formatMetric(r.mae_validation)}</td>
+                        <td className="p-3 w-28 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
                     </tr>
                 );
             }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
@@ -1359,10 +1453,10 @@
                         </div>
                         {mobileCards}
                     </div>
-                    <table className="hidden md:table w-full text-left text-xs">
+                    <table className="hidden md:table table-fixed w-full text-left text-xs">
                         <thead className="bg-slate-50 dark:bg-slate-950 sticky top-0 z-10">
                             <tr>
-                                <th className="p-3 w-12 text-center font-bold text-slate-500 dark:text-slate-400 uppercase">
+                                <th className="p-3 w-12 text-center font-bold text-slate-500 dark:text-slate-400 uppercase border-l-[3px] border-transparent">
                                     <input
                                         type="checkbox"
                                         className="fc-row-check"
@@ -1373,11 +1467,11 @@
                                         aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
                                     />
                                 </th>
-                                <SortHeader columnKey="sku" label={t('dashboard.table_sku')} />
-                                <SortHeader columnKey="status" label={t('dashboard.table_status')} />
-                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" />
-                                <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" />
-                                <SortHeader columnKey="mse" label={t('dashboard.table_mse')} align="right" />
+                                <SortHeader columnKey="sku" label={t('dashboard.table_sku')} thClassName="w-auto" />
+                                <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[10.5rem]" />
+                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-40" />
+                                <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" thClassName="w-28" />
+                                <SortHeader columnKey="mse" label={t('dashboard.table_mse')} align="right" thClassName="w-28" />
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1760,8 +1854,12 @@
             );
         };
 
-        const AlertModal = ({ isOpen, message, confirmLabel, onClose }) => {
+        const AlertModal = ({ isOpen, message, confirmLabel, cancelLabel, onConfirm, onClose }) => {
             if (!isOpen) return null;
+            const handleConfirm = () => {
+                if (onConfirm) onConfirm();
+                else onClose();
+            };
             return (
                 <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm modal-backdrop transition-opacity" onClick={onClose}></div>
@@ -1769,11 +1867,20 @@
                         <div className="p-5">
                             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 text-center leading-relaxed">{message}</p>
                         </div>
-                        <div className="px-5 pb-5 flex justify-center">
+                        <div className={`px-5 pb-5 flex ${cancelLabel ? 'justify-center gap-2' : 'justify-center'}`}>
+                            {cancelLabel && (
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="min-w-[7.5rem] px-5 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors uppercase tracking-wide"
+                                >
+                                    {cancelLabel}
+                                </button>
+                            )}
                             <button
                                 type="button"
-                                onClick={onClose}
-                                className="px-5 py-2 bg-brand-gold text-white text-xs font-bold rounded-lg hover:bg-brand-dark transition-colors uppercase tracking-wide"
+                                onClick={handleConfirm}
+                                className="min-w-[7.5rem] px-5 py-2 bg-brand-gold text-white text-xs font-bold rounded-lg hover:bg-brand-dark transition-colors uppercase tracking-wide"
                             >
                                 {confirmLabel}
                             </button>
@@ -2042,6 +2149,7 @@
             const [selectedSkus, setSelectedSkus] = useState([]);
             const [runningSkus, setRunningSkus] = useState([]);
             const [alertMessage, setAlertMessage] = useState(null);
+            const [rerunConfirmOpen, setRerunConfirmOpen] = useState(false);
             const [skuCol, setSkuCol] = useState("");
             const [startCol, setStartCol] = useState("");
             const [endCol, setEndCol] = useState("");
@@ -2342,28 +2450,20 @@
                 setForecastSteps(initialTest.toString());
             };
 
-            const handleExecute = async () => {
-                if (!file || !skuCol || !startCol || !endCol) { setError("Please select file and map columns."); return; }
-                if (skuColIdx < 0 || startColIdx < 0 || endColIdx < 0) { setError("Invalid column mapping. Please re-map columns."); return; }
-                if (!selectedSkus.length) {
-                    setAlertMessage(t('dashboard.select_required'));
-                    return;
-                }
+            const startBatchForSkus = async (skusToRun) => {
+                if (!skusToRun.length) return;
 
-                // Never re-run SKUs that already have results — only Not Run items
-                const completedSkus = new Set((batchResults || []).map((r) => String(r.sku)));
-                const skusToRun = selectedSkus.filter((sku) => !completedSkus.has(String(sku)));
-                if (!skusToRun.length) {
-                    setAlertMessage(t('dashboard.select_already_run'));
-                    return;
-                }
+                const rerunSet = new Set(skusToRun.map(String));
+                setBatchResults((prev) => {
+                    if (!prev?.length) return prev;
+                    return prev.filter((r) => !rerunSet.has(String(r.sku)));
+                });
 
                 setError(null);
                 setJobStatus("queued");
                 setActiveTab("overview");
                 setRunningSkus(skusToRun);
 
-                // Use stored indices directly
                 console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus, skusToRun });
 
                 const fd = new FormData();
@@ -2397,6 +2497,29 @@
                     setRunningSkus([]);
                     setError(e.message);
                 }
+            };
+
+            const handleExecute = async () => {
+                if (!file || !skuCol || !startCol || !endCol) { setError("Please select file and map columns."); return; }
+                if (skuColIdx < 0 || startColIdx < 0 || endColIdx < 0) { setError("Invalid column mapping. Please re-map columns."); return; }
+                if (!selectedSkus.length) {
+                    setAlertMessage(t('dashboard.select_required'));
+                    return;
+                }
+
+                const completedSkus = new Set((batchResults || []).map((r) => String(r.sku)));
+                const hasAlreadyProcessed = selectedSkus.some((sku) => completedSkus.has(String(sku)));
+                if (hasAlreadyProcessed) {
+                    setRerunConfirmOpen(true);
+                    return;
+                }
+
+                await startBatchForSkus(selectedSkus);
+            };
+
+            const handleConfirmRerun = async () => {
+                setRerunConfirmOpen(false);
+                await startBatchForSkus(selectedSkus);
             };
 
             const handleExport = async () => {
@@ -2512,6 +2635,18 @@
                 }
             };
 
+            const handleReorderItemTabs = useCallback((fromSku, toSku) => {
+                setItemTabs((prev) => {
+                    const from = prev.indexOf(fromSku);
+                    const to = prev.indexOf(toSku);
+                    if (from < 0 || to < 0 || from === to) return prev;
+                    const next = [...prev];
+                    const [moved] = next.splice(from, 1);
+                    next.splice(to, 0, moved);
+                    return next;
+                });
+            }, []);
+
             const cycleSku = (dir) => {
                 if (!itemTabs.length) return;
                 const current = activeTab !== 'overview' ? activeTab : currentSku;
@@ -2612,6 +2747,14 @@
                         message={alertMessage || ''}
                         confirmLabel={t('dashboard.select_required_ok')}
                         onClose={() => setAlertMessage(null)}
+                    />
+                    <AlertModal
+                        isOpen={rerunConfirmOpen}
+                        message={t('dashboard.select_already_run')}
+                        cancelLabel={t('dashboard.select_already_run_cancel')}
+                        confirmLabel={t('dashboard.select_already_run_confirm')}
+                        onClose={() => setRerunConfirmOpen(false)}
+                        onConfirm={handleConfirmRerun}
                     />
                     {/* Mobile Sidebar Backdrop */}
                     {isSidebarOpen && (
@@ -2903,6 +3046,7 @@
                                                     setActiveTab(sku);
                                                 }}
                                                 onCloseItem={handleCloseItemTab}
+                                                onReorderItems={handleReorderItemTabs}
                                                 t={t}
                                             />
                                         </div>
