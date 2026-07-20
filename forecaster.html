@@ -460,18 +460,21 @@
             backdrop-filter: blur(4px);
         }
 
-        /* Results Tab Bar — Liquid Glass */
+        /* Results Tab Bar — Liquid Glass
+           Nested corners stay concentric: outer = tab radius + padding */
         .fc-results-tabs {
+            --fc-tab-radius: 0.75rem;
+            --fc-tab-pad: 0.25rem;
             display: flex;
             align-items: center;
             height: 2.5rem;
-            padding: 0.25rem;
+            padding: var(--fc-tab-pad);
             gap: 0.25rem;
             flex-shrink: 0;
             width: max-content;
             max-width: 100%;
             overflow-x: auto;
-            border-radius: 9999px;
+            border-radius: calc(var(--fc-tab-radius) + var(--fc-tab-pad));
             border: 1px solid rgba(255, 255, 255, 0.4);
             background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
@@ -494,7 +497,7 @@
             height: 2rem;
             padding: 0 0.875rem;
             border: none;
-            border-radius: 0.75rem;
+            border-radius: var(--fc-tab-radius);
             background: transparent;
             color: rgb(100, 116, 139);
             font-size: 0.6875rem;
@@ -531,7 +534,7 @@
             top: 0;
             left: 0;
             box-sizing: border-box;
-            border-radius: 0.75rem;
+            border-radius: var(--fc-tab-radius);
             border: 1px solid rgba(245, 158, 11, 0.22);
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(180, 83, 9, 0.06));
             box-shadow:
@@ -568,6 +571,14 @@
         .fc-results-tab-close:hover {
             opacity: 1;
             background-color: rgba(148, 163, 184, 0.25);
+        }
+
+        .fc-row-check {
+            width: 0.875rem;
+            height: 0.875rem;
+            accent-color: #d97706;
+            cursor: pointer;
+            flex-shrink: 0;
         }
     </style>
 
@@ -702,8 +713,13 @@
                     table_mae: "MAE (Val)",
                     table_mse: "MSE (Val)",
                     table_action: "Action",
+                    table_select: "Select",
+                    select_all: "Select all",
+                    unselect_all: "Unselect all",
                     table_success: "SUCCESS",
                     table_not_run: "Not Run",
+                    select_required: "Please select at least one ID",
+                    select_required_ok: "OK",
                     view_details: "View Details",
                     best_model: "Best Model",
                     val_mse: "Val. MSE"
@@ -793,8 +809,13 @@
                     table_mae: "MAE (Val)",
                     table_mse: "MSE (Val)",
                     table_action: "Hành động",
+                    table_select: "Chọn",
+                    select_all: "Chọn tất cả",
+                    unselect_all: "Bỏ chọn tất cả",
                     table_success: "THÀNH CÔNG",
                     table_not_run: "Chưa chạy",
+                    select_required: "Please select at least one ID",
+                    select_required_ok: "OK",
                     view_details: "Xem chi tiết",
                     best_model: "Mô hình tốt nhất",
                     val_mse: "MSE (Val)"
@@ -884,8 +905,13 @@
                     table_mae: "MAE (Val)",
                     table_mse: "MSE (Val)",
                     table_action: "Aktion",
+                    table_select: "Auswählen",
+                    select_all: "Alle auswählen",
+                    unselect_all: "Auswahl aufheben",
                     table_success: "ERFOLG",
                     table_not_run: "Nicht ausgeführt",
+                    select_required: "Please select at least one ID",
+                    select_required_ok: "OK",
                     view_details: "Details ansehen",
                     best_model: "Bestes Modell",
                     val_mse: "Val. MSE"
@@ -1174,48 +1200,80 @@
             );
         });
 
-        const BatchOverview = memo(({ results, onSelectSku, t }) => {
+        const BatchOverview = memo(({ results, onSelectSku, selectedSkus, onToggleSku, onToggleSelectAll, t }) => {
             const formatMetric = (value) => (value == null || value === '' ? '-' : Number(value).toLocaleString());
+            const selectAllDesktopRef = useRef(null);
+            const selectAllMobileRef = useRef(null);
+            const selectedSet = useMemo(() => new Set(selectedSkus), [selectedSkus]);
+            const allSelected = results.length > 0 && selectedSkus.length === results.length;
+            const someSelected = selectedSkus.length > 0 && !allSelected;
+
+            useEffect(() => {
+                if (selectAllDesktopRef.current) selectAllDesktopRef.current.indeterminate = someSelected;
+                if (selectAllMobileRef.current) selectAllMobileRef.current.indeterminate = someSelected;
+            }, [someSelected]);
 
             const mobileCards = useMemo(() => results.map((r, i) => {
                 const isReady = r.status === 'success';
+                const isChecked = selectedSet.has(r.sku);
                 return (
-                    <button
+                    <div
                         key={r.sku || i}
-                        type="button"
-                        onClick={() => isReady && onSelectSku(r.sku)}
-                        disabled={!isReady}
-                        className={`w-full text-left rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-3 shadow-sm transition-transform ${isReady ? 'active:scale-[0.99]' : 'cursor-default opacity-95'}`}
+                        className={`w-full text-left rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-3 shadow-sm transition-transform ${isReady ? 'active:scale-[0.99]' : 'opacity-95'}`}
                     >
                         <div className="flex items-start justify-between gap-2 mb-2">
-                            <span className="font-mono font-bold text-sm text-slate-800 dark:text-slate-100 break-all leading-tight">{r.sku}</span>
+                            <label className="inline-flex items-start gap-2 min-w-0" onClick={(e) => e.stopPropagation()}>
+                                <input
+                                    type="checkbox"
+                                    className="fc-row-check mt-0.5"
+                                    checked={isChecked}
+                                    onChange={() => onToggleSku(r.sku)}
+                                    aria-label={`${t('dashboard.table_select')} ${r.sku}`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => isReady && onSelectSku(r.sku)}
+                                    disabled={!isReady}
+                                    className={`font-mono font-bold text-sm text-left break-all leading-tight ${isReady ? 'text-slate-800 dark:text-slate-100' : 'text-slate-800 dark:text-slate-100 cursor-default'}`}
+                                >
+                                    {r.sku}
+                                </button>
+                            </label>
                             <StatusBadge status={r.status} t={t} />
                         </div>
-                        <div className="mb-3">
-                            <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
-                            <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300">{r.best_ts_model || '-'}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mb-3">
-                            <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                                <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
-                                <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mae_validation)}</span>
+                        <button
+                            type="button"
+                            onClick={() => isReady && onSelectSku(r.sku)}
+                            disabled={!isReady}
+                            className={`w-full text-left ${isReady ? '' : 'cursor-default'}`}
+                        >
+                            <div className="mb-3">
+                                <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
+                                <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300">{r.best_ts_model || '-'}</p>
                             </div>
-                            <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                                <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mse')}</span>
-                                <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mse_validation)}</span>
+                            <div className="grid grid-cols-2 gap-2 mb-3">
+                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
+                                    <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mae_validation)}</span>
+                                </div>
+                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mse')}</span>
+                                    <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mse_validation)}</span>
+                                </div>
                             </div>
-                        </div>
-                        {isReady ? (
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold">{t('dashboard.view_details')}<span aria-hidden="true">→</span></span>
-                        ) : (
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-400">{t('dashboard.table_not_run')}</span>
-                        )}
-                    </button>
+                            {isReady ? (
+                                <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold">{t('dashboard.view_details')}<span aria-hidden="true">→</span></span>
+                            ) : (
+                                <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-400">{t('dashboard.table_not_run')}</span>
+                            )}
+                        </button>
+                    </div>
                 );
-            }), [results, onSelectSku, t]);
+            }), [results, onSelectSku, onToggleSku, selectedSet, t]);
 
             const tableRows = useMemo(() => results.map((r, i) => {
                 const isReady = r.status === 'success';
+                const isChecked = selectedSet.has(r.sku);
                 return (
                     <tr
                         key={r.sku || i}
@@ -1229,8 +1287,17 @@
                                 onSelectSku(r.sku);
                             }
                         }}
-                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isReady ? 'cursor-pointer' : ''}`}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isReady ? 'cursor-pointer' : ''} ${isChecked ? 'bg-brand-gold/5 dark:bg-brand-gold/10' : ''}`}
                     >
+                        <td className="p-3 w-12 text-center" onClick={(e) => e.stopPropagation()}>
+                            <input
+                                type="checkbox"
+                                className="fc-row-check"
+                                checked={isChecked}
+                                onChange={() => onToggleSku(r.sku)}
+                                aria-label={`${t('dashboard.table_select')} ${r.sku}`}
+                            />
+                        </td>
                         <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
                         <td className="p-3"><StatusBadge status={r.status} t={t} /></td>
                         <td className="p-3 text-slate-600 dark:text-slate-300 uppercase">{r.best_ts_model || '-'}</td>
@@ -1251,16 +1318,38 @@
                         </td>
                     </tr>
                 );
-            }), [results, onSelectSku, t]);
+            }), [results, onSelectSku, onToggleSku, selectedSet, t]);
 
             return (
                 <div className="w-full h-full overflow-auto max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm">
                     <div className="md:hidden flex flex-col gap-2.5 p-2 pb-4">
+                        <label className="inline-flex items-center gap-2 px-1 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                            <input
+                                type="checkbox"
+                                className="fc-row-check"
+                                checked={allSelected}
+                                ref={selectAllMobileRef}
+                                onChange={onToggleSelectAll}
+                                aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
+                            />
+                            {t('dashboard.table_select')}
+                        </label>
                         {mobileCards}
                     </div>
                     <table className="hidden md:table w-full text-left text-xs">
                         <thead className="bg-slate-50 dark:bg-slate-950 sticky top-0 z-10">
                             <tr>
+                                <th className="p-3 w-12 text-center font-bold text-slate-500 dark:text-slate-400 uppercase">
+                                    <input
+                                        type="checkbox"
+                                        className="fc-row-check"
+                                        checked={allSelected}
+                                        ref={selectAllDesktopRef}
+                                        onChange={onToggleSelectAll}
+                                        title={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
+                                        aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
+                                    />
+                                </th>
                                 <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_sku')}</th>
                                 <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_status')}</th>
                                 <th className="p-3 font-bold text-slate-500 dark:text-slate-400 uppercase">{t('dashboard.table_best_model')}</th>
@@ -1649,6 +1738,29 @@
             );
         };
 
+        const AlertModal = ({ isOpen, message, confirmLabel, onClose }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm modal-backdrop transition-opacity" onClick={onClose}></div>
+                    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-xl shadow-2xl w-full max-w-sm border border-white/20 dark:border-white/10 relative animate-slide-up z-10 ring-1 ring-black/5 dark:ring-white/5">
+                        <div className="p-5">
+                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 text-center leading-relaxed">{message}</p>
+                        </div>
+                        <div className="px-5 pb-5 flex justify-center">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="px-5 py-2 bg-brand-gold text-white text-xs font-bold rounded-lg hover:bg-brand-dark transition-colors uppercase tracking-wide"
+                            >
+                                {confirmLabel}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const MappingModal = ({ headers, isOpen, onClose, onConfirm, t }) => {
             const [sku, setSku] = useState('');
             const [startCol, setStartCol] = useState('');
@@ -1905,6 +2017,8 @@
             const [sheetRows, setSheetRows] = useState([]);
             const [mappedSkus, setMappedSkus] = useState([]);
             const [itemTabs, setItemTabs] = useState([]);
+            const [selectedSkus, setSelectedSkus] = useState([]);
+            const [selectRequiredOpen, setSelectRequiredOpen] = useState(false);
             const [skuCol, setSkuCol] = useState("");
             const [startCol, setStartCol] = useState("");
             const [endCol, setEndCol] = useState("");
@@ -2058,10 +2172,15 @@
                             setJobStatus(data.status);
                             if (data.status === 'completed') {
                                 setIsPolling(false);
-                                setBatchResults(data.result.results);
+                                const incoming = data.result?.results || [];
+                                setBatchResults((prev) => {
+                                    const map = new Map((prev || []).map((r) => [String(r.sku), r]));
+                                    for (const r of incoming) map.set(String(r.sku), r);
+                                    return Array.from(map.values());
+                                });
                                 window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-completed');
-                                if (data.result.results.length > 0) {
-                                    setCurrentSku(data.result.results[0].sku);
+                                if (incoming.length > 0) {
+                                    setCurrentSku(incoming[0].sku);
                                 }
                             } else if (data.status === 'failed') {
                                 setIsPolling(false);
@@ -2090,6 +2209,7 @@
                 setSheetRows([]);
                 setMappedSkus([]);
                 setItemTabs([]);
+                setSelectedSkus([]);
                 setBatchResults(null);
                 setSkuCol("");
                 setStartCol("");
@@ -2173,6 +2293,7 @@
                 }
                 setMappedSkus(skus);
                 setItemTabs([]);
+                setSelectedSkus([]);
                 setActiveTab("overview");
                 setCurrentSku(null);
                 setBatchResults(null);
@@ -2192,14 +2313,17 @@
             const handleExecute = async () => {
                 if (!file || !skuCol || !startCol || !endCol) { setError("Please select file and map columns."); return; }
                 if (skuColIdx < 0 || startColIdx < 0 || endColIdx < 0) { setError("Invalid column mapping. Please re-map columns."); return; }
+                if (!selectedSkus.length) {
+                    setSelectRequiredOpen(true);
+                    return;
+                }
                 setError(null);
-                setBatchResults(null);
                 setItemTabs([]);
                 setJobStatus("queued");
                 setActiveTab("overview");
 
                 // Use stored indices directly
-                console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx });
+                console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus });
 
                 const fd = new FormData();
                 fd.append('file', file);
@@ -2212,10 +2336,18 @@
                 fd.append('train_horizon', parseInt(trainHorizon) || 24);
                 fd.append('test_horizon', parseInt(testHorizon) || 6);
                 fd.append('forecast_steps', parseInt(forecastSteps) || 6);
+                fd.append('selected_skus', JSON.stringify(selectedSkus));
 
                 try {
                     const res = await fetch(`${BASE_URL}/batch_init`, { method: 'POST', body: fd });
-                    if (!res.ok) throw new Error("Failed to start job");
+                    if (!res.ok) {
+                        let message = "Failed to start job";
+                        try {
+                            const errBody = await res.json();
+                            message = errBody.detail || errBody.message || message;
+                        } catch (_) {}
+                        throw new Error(typeof message === 'string' ? message : "Failed to start job");
+                    }
                     const data = await res.json();
                     setJobId(data.job_id);
                     setIsPolling(true);
@@ -2299,6 +2431,7 @@
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
                 setTotalTimeSeries(0); setAvailableCols([]);
                 setSheetRows([]); setMappedSkus([]); setItemTabs([]);
+                setSelectedSkus([]);
                 setCurrentSku(null);
                 setActiveTab("overview");
                 if (fileInputRef.current) fileInputRef.current.value = "";
@@ -2311,6 +2444,18 @@
                     setActiveTab(sku);
                 }
             };
+
+            const handleToggleSkuSelection = useCallback((sku) => {
+                setSelectedSkus((prev) => (
+                    prev.includes(sku) ? prev.filter((s) => s !== sku) : [...prev, sku]
+                ));
+            }, []);
+
+            const handleToggleSelectAll = useCallback(() => {
+                setSelectedSkus((prev) => (
+                    mappedSkus.length > 0 && prev.length === mappedSkus.length ? [] : [...mappedSkus]
+                ));
+            }, [mappedSkus]);
 
             const handleCloseItemTab = (sku) => {
                 setItemTabs((prev) => prev.filter((s) => s !== sku));
@@ -2392,6 +2537,12 @@
             return (
                 <div className="flex h-full min-h-0 bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
                     <MappingModal headers={availableCols} isOpen={isMappingModalOpen} onClose={() => setIsMappingModalOpen(false)} onConfirm={handleMappingConfirm} t={t} />
+                    <AlertModal
+                        isOpen={selectRequiredOpen}
+                        message={t('dashboard.select_required')}
+                        confirmLabel={t('dashboard.select_required_ok')}
+                        onClose={() => setSelectRequiredOpen(false)}
+                    />
                     {/* Mobile Sidebar Backdrop */}
                     {isSidebarOpen && (
                         <div
@@ -2729,7 +2880,14 @@
                                         />
                                         <div className="flex-1 min-h-0">
                                             {activeTab === 'overview' && (
-                                                <BatchOverview results={overviewRows} onSelectSku={handleSkuSelect} t={t} />
+                                                <BatchOverview
+                                                    results={overviewRows}
+                                                    onSelectSku={handleSkuSelect}
+                                                    selectedSkus={selectedSkus}
+                                                    onToggleSku={handleToggleSkuSelection}
+                                                    onToggleSelectAll={handleToggleSelectAll}
+                                                    t={t}
+                                                />
                                             )}
                                             {isDetailTab && skuData && (
                                                 <div className="h-full flex flex-col gap-4 pt-1 sm:pt-2 mobile-compact-gap" key={layoutKey}>
