@@ -459,6 +459,116 @@
         .modal-backdrop {
             backdrop-filter: blur(4px);
         }
+
+        /* Results Tab Bar — Liquid Glass */
+        .fc-results-tabs {
+            display: flex;
+            align-items: center;
+            height: 2.5rem;
+            padding: 0.25rem;
+            gap: 0.25rem;
+            flex-shrink: 0;
+            width: max-content;
+            max-width: 100%;
+            overflow-x: auto;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: relative;
+        }
+
+        .dark .fc-results-tabs {
+            border-color: rgba(255, 255, 255, 0.1);
+            background-image: linear-gradient(to bottom right, rgba(30, 41, 59, 0.3), rgba(15, 23, 42, 0.1));
+        }
+
+        .fc-results-tab {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            height: 2rem;
+            padding: 0 0.875rem;
+            border: none;
+            border-radius: 0.75rem;
+            background: transparent;
+            color: rgb(100, 116, 139);
+            font-size: 0.6875rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .dark .fc-results-tab {
+            color: rgb(148, 163, 184);
+        }
+
+        .fc-results-tab:hover {
+            color: rgb(180, 83, 9);
+        }
+
+        .dark .fc-results-tab:hover {
+            color: rgb(251, 191, 36);
+        }
+
+        .fc-results-tab.is-active {
+            color: rgb(180, 83, 9);
+        }
+
+        .dark .fc-results-tab.is-active {
+            color: rgb(251, 191, 36);
+        }
+
+        .fc-results-tab-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(180, 83, 9, 0.06));
+            box-shadow:
+                0 2px 8px rgba(245, 158, 11, 0.28),
+                0 1px 3px rgba(15, 23, 42, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            pointer-events: none;
+            z-index: 0;
+            transition:
+                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dark .fc-results-tab-indicator {
+            border-color: rgba(245, 158, 11, 0.28);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(15, 23, 42, 0.35));
+        }
+
+        .fc-results-tab-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            color: inherit;
+            opacity: 0.55;
+            transition: opacity 0.15s ease, background-color 0.15s ease;
+        }
+
+        .fc-results-tab-close:hover {
+            opacity: 1;
+            background-color: rgba(148, 163, 184, 0.25);
+        }
     </style>
 
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
@@ -593,6 +703,7 @@
                     table_mse: "MSE (Val)",
                     table_action: "Action",
                     table_success: "SUCCESS",
+                    table_not_run: "Not Run",
                     view_details: "View Details",
                     best_model: "Best Model",
                     val_mse: "Val. MSE"
@@ -683,6 +794,7 @@
                     table_mse: "MSE (Val)",
                     table_action: "Hành động",
                     table_success: "THÀNH CÔNG",
+                    table_not_run: "Chưa chạy",
                     view_details: "Xem chi tiết",
                     best_model: "Mô hình tốt nhất",
                     val_mse: "MSE (Val)"
@@ -773,6 +885,7 @@
                     table_mse: "MSE (Val)",
                     table_action: "Aktion",
                     table_success: "ERFOLG",
+                    table_not_run: "Nicht ausgeführt",
                     view_details: "Details ansehen",
                     best_model: "Bestes Modell",
                     val_mse: "Val. MSE"
@@ -974,48 +1087,152 @@
 
 
 
+        const StatusBadge = ({ status, t }) => {
+            if (status === 'success') {
+                return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_success')}</span>;
+            }
+            return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_not_run')}</span>;
+        };
+
+        const ResultsTabBar = memo(({ activeTab, itemTabs, onSelectOverview, onSelectItem, onCloseItem, t }) => {
+            const trackRef = useRef(null);
+            const tabRefs = useRef({});
+            const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0 });
+
+            const syncIndicator = useCallback(() => {
+                const track = trackRef.current;
+                const activeEl = tabRefs.current[activeTab];
+                if (!track || !activeEl) return;
+                const trackRect = track.getBoundingClientRect();
+                const tabRect = activeEl.getBoundingClientRect();
+                setIndicator({
+                    left: tabRect.left - trackRect.left,
+                    top: tabRect.top - trackRect.top,
+                    width: tabRect.width,
+                    height: tabRect.height,
+                });
+            }, [activeTab]);
+
+            useEffect(() => {
+                syncIndicator();
+                window.addEventListener('resize', syncIndicator);
+                return () => window.removeEventListener('resize', syncIndicator);
+            }, [syncIndicator, itemTabs]);
+
+            return (
+                <div className="fc-results-tabs scroller" ref={trackRef} role="tablist" aria-label={t('dashboard.batch_overview')}>
+                    <div
+                        className="fc-results-tab-indicator"
+                        aria-hidden="true"
+                        style={{
+                            transform: `translate3d(${indicator.left}px, ${indicator.top}px, 0)`,
+                            width: indicator.width,
+                            height: indicator.height,
+                        }}
+                    />
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activeTab === 'overview'}
+                        ref={(el) => { tabRefs.current.overview = el; }}
+                        onClick={onSelectOverview}
+                        className={`fc-results-tab ${activeTab === 'overview' ? 'is-active' : ''}`}
+                    >
+                        {t('dashboard.batch_overview')}
+                    </button>
+                    {itemTabs.map((sku) => (
+                        <button
+                            key={sku}
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTab === sku}
+                            ref={(el) => { tabRefs.current[sku] = el; }}
+                            onClick={() => onSelectItem(sku)}
+                            className={`fc-results-tab ${activeTab === sku ? 'is-active' : ''}`}
+                            title={sku}
+                        >
+                            <span className="max-w-[9rem] truncate normal-case tracking-normal font-mono">{sku}</span>
+                            <span
+                                role="button"
+                                tabIndex={0}
+                                className="fc-results-tab-close"
+                                aria-label={`Close ${sku}`}
+                                onClick={(e) => { e.stopPropagation(); onCloseItem(sku); }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        onCloseItem(sku);
+                                    }
+                                }}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                            </span>
+                        </button>
+                    ))}
+                </div>
+            );
+        });
+
         const BatchOverview = memo(({ results, onSelectSku, t }) => {
-            const formatMetric = (value) => (value == null ? '-' : Number(value).toLocaleString());
+            const formatMetric = (value) => (value == null || value === '' ? '-' : Number(value).toLocaleString());
 
-            const mobileCards = useMemo(() => results.map((r, i) => (
-                <button
-                    key={r.sku || i}
-                    type="button"
-                    onClick={() => onSelectSku(r.sku)}
-                    className="w-full text-left rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-3 shadow-sm active:scale-[0.99] transition-transform"
-                >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="font-mono font-bold text-sm text-slate-800 dark:text-slate-100 break-all leading-tight">{r.sku}</span>
-                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold whitespace-nowrap">{t('dashboard.table_success')}</span>
-                    </div>
-                    <div className="mb-3">
-                        <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
-                        <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300">{r.best_ts_model || '-'}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                        <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                            <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
-                            <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mae_validation)}</span>
+            const mobileCards = useMemo(() => results.map((r, i) => {
+                const isReady = r.status === 'success';
+                return (
+                    <button
+                        key={r.sku || i}
+                        type="button"
+                        onClick={() => isReady && onSelectSku(r.sku)}
+                        disabled={!isReady}
+                        className={`w-full text-left rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-3 shadow-sm transition-transform ${isReady ? 'active:scale-[0.99]' : 'cursor-default opacity-95'}`}
+                    >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                            <span className="font-mono font-bold text-sm text-slate-800 dark:text-slate-100 break-all leading-tight">{r.sku}</span>
+                            <StatusBadge status={r.status} t={t} />
                         </div>
-                        <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                            <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mse')}</span>
-                            <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mse_validation)}</span>
+                        <div className="mb-3">
+                            <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
+                            <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300">{r.best_ts_model || '-'}</p>
                         </div>
-                    </div>
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold">{t('dashboard.view_details')}<span aria-hidden="true">→</span></span>
-                </button>
-            )), [results, onSelectSku, t]);
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                            <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
+                                <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mae_validation)}</span>
+                            </div>
+                            <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mse')}</span>
+                                <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mse_validation)}</span>
+                            </div>
+                        </div>
+                        {isReady ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold">{t('dashboard.view_details')}<span aria-hidden="true">→</span></span>
+                        ) : (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-400">{t('dashboard.table_not_run')}</span>
+                        )}
+                    </button>
+                );
+            }), [results, onSelectSku, t]);
 
-            const tableRows = useMemo(() => results.map((r, i) => (
-                <tr key={r.sku || i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
-                    <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold">{t('dashboard.table_success')}</span></td>
-                    <td className="p-3 text-slate-600 dark:text-slate-300 uppercase">{r.best_ts_model}</td>
-                    <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mae_validation)}</td>
-                    <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
-                    <td className="p-3 text-center"><button type="button" onClick={() => onSelectSku(r.sku)} className="text-brand-gold hover:underline font-bold">{t('dashboard.view_details')}</button></td>
-                </tr>
-            )), [results, onSelectSku, t]);
+            const tableRows = useMemo(() => results.map((r, i) => {
+                const isReady = r.status === 'success';
+                return (
+                    <tr key={r.sku || i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
+                        <td className="p-3"><StatusBadge status={r.status} t={t} /></td>
+                        <td className="p-3 text-slate-600 dark:text-slate-300 uppercase">{r.best_ts_model || '-'}</td>
+                        <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mae_validation)}</td>
+                        <td className="p-3 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
+                        <td className="p-3 text-center">
+                            {isReady ? (
+                                <button type="button" onClick={() => onSelectSku(r.sku)} className="text-brand-gold hover:underline font-bold">{t('dashboard.view_details')}</button>
+                            ) : (
+                                <span className="text-slate-400 font-bold">—</span>
+                            )}
+                        </td>
+                    </tr>
+                );
+            }), [results, onSelectSku, t]);
 
             return (
                 <div className="w-full h-full overflow-auto max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm">
@@ -1666,6 +1883,9 @@
         const App = () => {
             const [file, setFile] = useState(null);
             const [availableCols, setAvailableCols] = useState([]);
+            const [sheetRows, setSheetRows] = useState([]);
+            const [mappedSkus, setMappedSkus] = useState([]);
+            const [itemTabs, setItemTabs] = useState([]);
             const [skuCol, setSkuCol] = useState("");
             const [startCol, setStartCol] = useState("");
             const [endCol, setEndCol] = useState("");
@@ -1699,7 +1919,7 @@
             const showExpandedSidebarContent = !isLargeScreen || !isSidebarCollapsed;
             const [isFullScreen, setIsFullScreen] = useState(false);
             const [isSplitView, setIsSplitView] = useState(true); // For All-In-One
-            const [activeTab, setActiveTab] = useState("overview"); // overview, details
+            const [activeTab, setActiveTab] = useState("overview"); // overview | sku id
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [isMappingModalOpen, setIsMappingModalOpen] = useState(false);
             const [theme, setTheme] = useOperartisTheme();
@@ -1848,19 +2068,28 @@
                 setFile(f);
                 setError(null);
                 setAvailableCols([]);
+                setSheetRows([]);
+                setMappedSkus([]);
+                setItemTabs([]);
+                setBatchResults(null);
                 setSkuCol("");
                 setStartCol("");
                 setEndCol("");
+                setSkuColIdx(-1);
+                setStartColIdx(-1);
+                setEndColIdx(-1);
+                setActiveTab("overview");
                 const reader = new FileReader();
                 reader.onload = (evt) => {
                     try {
                         const wb = XLSX.read(evt.target.result, { type: 'binary', cellDates: true });
                         window.OperartisSecurity.validateWorkbook(wb);
                         const ws = wb.Sheets[wb.SheetNames[0]];
-                        const rawHeaders = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false })[0];
+                        const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
+                        const rawHeaders = rawRows[0] || [];
 
                         // Convert headers - handle Date objects and other types
-                        const headers = rawHeaders.map(h => {
+                        const normalizeCell = (h) => {
                             if (h instanceof Date) {
                                 // Format Date as YYYY-MM-DD
                                 return h.toISOString().split('T')[0];
@@ -1876,10 +2105,12 @@
                                 return String(h);
                             }
                             return String(h);
-                        });
+                        };
+                        const headers = rawHeaders.map(normalizeCell);
 
                         if (headers && headers.length > 0) {
                             setAvailableCols(headers);
+                            setSheetRows(rawRows.slice(1));
                             setIsMappingModalOpen(true);
                         } else {
                             setError("No headers found in file.");
@@ -1909,6 +2140,24 @@
 
                 console.log('Mapping confirmed - Indices:', { skuIdx, startIdx, endIdx });
 
+                // Build Main Table SKU list from mapped data (pre-forecast)
+                const seen = new Set();
+                const skus = [];
+                if (skuIdx >= 0) {
+                    for (const row of sheetRows) {
+                        if (!row || row[skuIdx] == null || row[skuIdx] === '') continue;
+                        const value = String(row[skuIdx]).trim();
+                        if (!value || seen.has(value)) continue;
+                        seen.add(value);
+                        skus.push(value);
+                    }
+                }
+                setMappedSkus(skus);
+                setItemTabs([]);
+                setActiveTab("overview");
+                setCurrentSku(null);
+                setBatchResults(null);
+
                 // Calculate total time series from column range
                 const total = endIdx - startIdx + 1;
                 setTotalTimeSeries(total);
@@ -1926,6 +2175,7 @@
                 if (skuColIdx < 0 || startColIdx < 0 || endColIdx < 0) { setError("Invalid column mapping. Please re-map columns."); return; }
                 setError(null);
                 setBatchResults(null);
+                setItemTabs([]);
                 setJobStatus("queued");
                 setActiveTab("overview");
 
@@ -2029,6 +2279,8 @@
                 setSkuCol(""); setStartCol(""); setEndCol("");
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
                 setTotalTimeSeries(0); setAvailableCols([]);
+                setSheetRows([]); setMappedSkus([]); setItemTabs([]);
+                setCurrentSku(null);
                 setActiveTab("overview");
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
@@ -2036,7 +2288,16 @@
             const handleSkuSelect = (sku) => {
                 if (batchResults && batchResults.find(r => r.sku === sku)) {
                     setCurrentSku(sku);
-                    setActiveTab("details");
+                    setItemTabs((prev) => (prev.includes(sku) ? prev : [...prev, sku]));
+                    setActiveTab(sku);
+                }
+            };
+
+            const handleCloseItemTab = (sku) => {
+                setItemTabs((prev) => prev.filter((s) => s !== sku));
+                if (activeTab === sku) {
+                    setActiveTab("overview");
+                    setCurrentSku(null);
                 }
             };
 
@@ -2047,16 +2308,51 @@
                 let newIdx = idx + dir;
                 if (newIdx < 0) newIdx = batchResults.length - 1;
                 if (newIdx >= batchResults.length) newIdx = 0;
-                setCurrentSku(batchResults[newIdx].sku);
+                const nextSku = batchResults[newIdx].sku;
+                setCurrentSku(nextSku);
+                setItemTabs((prev) => (prev.includes(nextSku) ? prev : [...prev, nextSku]));
+                setActiveTab(nextSku);
             };
 
             const getCurrentSkuData = () => {
-                if (!batchResults || !currentSku) return null;
-                return batchResults.find(r => r.sku === currentSku);
+                if (!batchResults) return null;
+                const targetSku = activeTab !== 'overview' ? activeTab : currentSku;
+                if (!targetSku) return null;
+                return batchResults.find(r => r.sku === targetSku);
             };
 
             const skuData = getCurrentSkuData();
             const interfaceReady = !!(batchResults && batchResults.length > 0);
+            const mappingReady = mappedSkus.length > 0;
+            const isDetailTab = activeTab !== 'overview' && !!skuData;
+
+            const openDetailedView = () => {
+                if (!interfaceReady || !batchResults?.length) return;
+                const target = (currentSku && batchResults.find(r => r.sku === currentSku)?.sku)
+                    || batchResults[0].sku;
+                handleSkuSelect(target);
+            };
+
+            const overviewRows = useMemo(() => {
+                if (!mappedSkus.length) return [];
+                const resultMap = new Map((batchResults || []).map((r) => [String(r.sku), r]));
+                return mappedSkus.map((sku) => {
+                    const result = resultMap.get(sku);
+                    if (result) {
+                        return {
+                            ...result,
+                            status: 'success',
+                        };
+                    }
+                    return {
+                        sku,
+                        status: 'not_run',
+                        best_ts_model: null,
+                        mae_validation: null,
+                        mse_validation: null,
+                    };
+                });
+            }, [mappedSkus, batchResults]);
 
             // Synchronize Validation Data with Forecast Data Timeline
             const alignedValidationData = useMemo(() => {
@@ -2128,18 +2424,18 @@
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
                                 type="button"
-                                onClick={() => interfaceReady && setActiveTab('overview')}
-                                disabled={!interfaceReady}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!interfaceReady ? 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'overview' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
+                                onClick={() => mappingReady && setActiveTab('overview')}
+                                disabled={!mappingReady}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!mappingReady ? 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'overview' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
                                 title={t('dashboard.batch_overview')}
                             >
                                 <GridIcon />
                             </button>
                             <button
                                 type="button"
-                                onClick={() => interfaceReady && setActiveTab('details')}
+                                onClick={openDetailedView}
                                 disabled={!interfaceReady}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!interfaceReady ? 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : activeTab === 'details' ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${!interfaceReady ? 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : isDetailTab ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
                                 title={t('dashboard.detailed_view')}
                             >
                                 <EyeIcon />
@@ -2215,18 +2511,18 @@
                                 <div className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
                                     <button
                                         type="button"
-                                        onClick={() => interfaceReady && setActiveTab('overview')}
-                                        disabled={!interfaceReady}
-                                        className={`fc-iface-btn ${!interfaceReady ? 'is-disabled' : activeTab === 'overview' ? 'active' : ''}`}
+                                        onClick={() => mappingReady && setActiveTab('overview')}
+                                        disabled={!mappingReady}
+                                        className={`fc-iface-btn ${!mappingReady ? 'is-disabled' : activeTab === 'overview' ? 'active' : ''}`}
                                     >
                                         <span className="fc-iface-btn-ico" aria-hidden="true"><GridIcon /></span>
                                         <span>{t('dashboard.batch_overview')}</span>
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => interfaceReady && setActiveTab('details')}
+                                        onClick={openDetailedView}
                                         disabled={!interfaceReady}
-                                        className={`fc-iface-btn ${!interfaceReady ? 'is-disabled' : activeTab === 'details' ? 'active' : ''}`}
+                                        className={`fc-iface-btn ${!interfaceReady ? 'is-disabled' : isDetailTab ? 'active' : ''}`}
                                     >
                                         <span className="fc-iface-btn-ico" aria-hidden="true"><EyeIcon /></span>
                                         <span>{t('dashboard.detailed_view')}</span>
@@ -2383,7 +2679,7 @@
 
                             {/* CONTENT AREA */}
                             <div className="flex-1 min-h-0 p-2 md:p-4 relative overflow-y-auto scroller mobile-landscape-content">
-                                {!batchResults && (
+                                {!mappingReady && (
                                     isPolling ? (
                                         <ForecastingLoader t={t} validationMethod={validationMethod} testHorizon={testHorizon} />
                                     ) : (
@@ -2399,40 +2695,57 @@
                                     )
                                 )}
 
-                                {batchResults && activeTab === 'overview' && <BatchOverview results={batchResults} onSelectSku={handleSkuSelect} t={t} />}
-
-                                {batchResults && activeTab === 'details' && skuData && (
-                                    <div className="h-full flex flex-col gap-4 pt-2 sm:pt-3 mobile-compact-gap" key={layoutKey}>
-                                        <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm pt-5 px-2 pb-2 sm:pt-6 lg:p-4 lg:pt-6 mobile-compact-p relative flex flex-col min-h-0">
-                                            <div className="flex flex-col h-full gap-2 mobile-landscape-chart-row mobile-compact-gap min-h-0">
-                                                {/* Dedicated toolbar — keeps SKU + metrics off the chart legend */}
-                                                <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-w-0 px-0.5 mt-2 sm:mt-3 lg:mt-1">
-                                                    <div className="flex items-center gap-0.5 lg:gap-1 min-w-0 max-w-full sm:max-w-[55%] bg-slate-100/80 dark:bg-white/5 pl-0.5 pr-1.5 py-0.5 lg:pl-1 lg:pr-3 lg:py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-sm">
-                                                        <button type="button" onClick={() => cycleSku(-1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Previous SKU"><ChevronLeftIcon /></button>
-                                                        <span className="min-w-0 truncate text-xs lg:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight mx-0.5 lg:mx-1" title={skuData.sku}>{skuData.sku}</span>
-                                                        <button type="button" onClick={() => cycleSku(1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Next SKU"><ChevronRightIcon /></button>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 lg:gap-4 shrink-0 bg-slate-100/80 dark:bg-white/5 px-2 py-1 lg:px-3 lg:py-1.5 rounded-lg lg:rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
-                                                        <div className="flex flex-col items-end">
-                                                            <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
-                                                            <span className="text-[10px] lg:text-xs font-bold text-brand-gold">{skuData.best_ts_model.toUpperCase()}</span>
+                                {mappingReady && (
+                                    <div className="h-full min-h-0 flex flex-col gap-2.5">
+                                        <ResultsTabBar
+                                            activeTab={activeTab}
+                                            itemTabs={itemTabs}
+                                            onSelectOverview={() => setActiveTab('overview')}
+                                            onSelectItem={(sku) => {
+                                                setCurrentSku(sku);
+                                                setActiveTab(sku);
+                                            }}
+                                            onCloseItem={handleCloseItemTab}
+                                            t={t}
+                                        />
+                                        <div className="flex-1 min-h-0">
+                                            {activeTab === 'overview' && (
+                                                <BatchOverview results={overviewRows} onSelectSku={handleSkuSelect} t={t} />
+                                            )}
+                                            {isDetailTab && skuData && (
+                                                <div className="h-full flex flex-col gap-4 pt-1 sm:pt-2 mobile-compact-gap" key={layoutKey}>
+                                                    <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm pt-5 px-2 pb-2 sm:pt-6 lg:p-4 lg:pt-6 mobile-compact-p relative flex flex-col min-h-0">
+                                                        <div className="flex flex-col h-full gap-2 mobile-landscape-chart-row mobile-compact-gap min-h-0">
+                                                            {/* Dedicated toolbar — keeps SKU + metrics off the chart legend */}
+                                                            <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-w-0 px-0.5 mt-2 sm:mt-3 lg:mt-1">
+                                                                <div className="flex items-center gap-0.5 lg:gap-1 min-w-0 max-w-full sm:max-w-[55%] bg-slate-100/80 dark:bg-white/5 pl-0.5 pr-1.5 py-0.5 lg:pl-1 lg:pr-3 lg:py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-sm">
+                                                                    <button type="button" onClick={() => cycleSku(-1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Previous SKU"><ChevronLeftIcon /></button>
+                                                                    <span className="min-w-0 truncate text-xs lg:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight mx-0.5 lg:mx-1" title={skuData.sku}>{skuData.sku}</span>
+                                                                    <button type="button" onClick={() => cycleSku(1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Next SKU"><ChevronRightIcon /></button>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 lg:gap-4 shrink-0 bg-slate-100/80 dark:bg-white/5 px-2 py-1 lg:px-3 lg:py-1.5 rounded-lg lg:rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
+                                                                    <div className="flex flex-col items-end">
+                                                                        <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
+                                                                        <span className="text-[10px] lg:text-xs font-bold text-brand-gold">{skuData.best_ts_model.toUpperCase()}</span>
+                                                                    </div>
+                                                                    <div className="flex flex-col items-end">
+                                                                        <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
+                                                                        <span className="text-[10px] lg:text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative mobile-landscape-chart-sep min-h-0">
+                                                                <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
+                                                            </div>
+                                                            <div className="flex-1 relative min-h-0">
+                                                                <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
+                                                            </div>
                                                         </div>
-                                                        <div className="flex flex-col items-end">
-                                                            <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
-                                                            <span className="text-[10px] lg:text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
-                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative mobile-landscape-chart-sep min-h-0">
-                                                    <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
-                                                </div>
-                                                <div className="flex-1 relative min-h-0">
-                                                    <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
-                                                </div>
-                                            </div>
+                                            )}
                                         </div>
                                     </div>
-
                                 )}
                             </div>
                         </main>
