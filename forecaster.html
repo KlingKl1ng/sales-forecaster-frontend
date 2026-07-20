@@ -701,6 +701,7 @@
                     running_algo: "Running Analytics Algorithms",
                     table_sku: "SKU",
                     table_status: "Status",
+                    table_validation: "Validation",
                     table_best_model: "Best Model",
                     table_mae: "MAE (Val)",
                     table_mse: "MSE (Val)",
@@ -712,6 +713,9 @@
                     table_not_run: "Not Process",
                     table_running: "Processing",
                     table_failed: "Failed",
+                    validation_simple: "Simple Split",
+                    validation_walk_forward: "Walk-Forward",
+                    validation_rolling_window: "Rolling Window",
                     select_required: "Please select at least one ID",
                     select_already_run: "Some selected items have already been processed. Would you like to re-process these items?",
                     select_already_run_cancel: "Cancel",
@@ -802,6 +806,7 @@
                     running_algo: "Đang chạy thuật toán phân tích",
                     table_sku: "Mã hàng (SKU)",
                     table_status: "Trạng thái",
+                    table_validation: "Kiểm định",
                     table_best_model: "Mô hình tốt nhất",
                     table_mae: "MAE (Val)",
                     table_mse: "MSE (Val)",
@@ -813,6 +818,9 @@
                     table_not_run: "Chưa xử lý",
                     table_running: "Đang xử lý",
                     table_failed: "Thất bại",
+                    validation_simple: "Simple Split",
+                    validation_walk_forward: "Walk-Forward",
+                    validation_rolling_window: "Rolling Window",
                     select_required: "Vui lòng chọn ít nhất một ID",
                     select_already_run: "Trong các mục đã chọn có mục đã được xử lý. Bạn có muốn chạy lại các mục này không?",
                     select_already_run_cancel: "Hủy",
@@ -903,6 +911,7 @@
                     running_algo: "Analytik-Algorithmen laufen",
                     table_sku: "SKU",
                     table_status: "Status",
+                    table_validation: "Validierung",
                     table_best_model: "Bestes Modell",
                     table_mae: "MAE (Val)",
                     table_mse: "MSE (Val)",
@@ -914,6 +923,9 @@
                     table_not_run: "Nicht verarbeitet",
                     table_running: "Verarbeitung",
                     table_failed: "Fehlgeschlagen",
+                    validation_simple: "Einfacher Split",
+                    validation_walk_forward: "Walk-Forward",
+                    validation_rolling_window: "Rolling Window",
                     select_required: "Please select at least one ID",
                     select_already_run: "Unter den ausgewählten Positionen sind bereits verarbeitete enthalten. Möchten Sie diese Positionen erneut ausführen?",
                     select_already_run_cancel: "Abbrechen",
@@ -1160,6 +1172,13 @@
             );
         };
 
+        const formatValidationMethod = (method, t) => {
+            if (!method) return '-';
+            const key = `dashboard.validation_${method}`;
+            const label = t(key);
+            return label === key ? String(method) : label;
+        };
+
         const ResultsTabBar = memo(({ activeTab, itemTabs, onSelectOverview, onSelectItem, onCloseItem, onReorderItems, t }) => {
             const [dragSku, setDragSku] = useState(null);
             const [overSku, setOverSku] = useState(null);
@@ -1287,6 +1306,8 @@
                         cmp = toStr(a.sku).localeCompare(toStr(b.sku), undefined, { numeric: true, sensitivity: 'base' });
                     } else if (sortKey === 'status') {
                         cmp = (statusRank[a.status] ?? -1) - (statusRank[b.status] ?? -1);
+                    } else if (sortKey === 'validation') {
+                        cmp = toStr(a.validation_method || '').localeCompare(toStr(b.validation_method || ''), undefined, { sensitivity: 'base' });
                     } else if (sortKey === 'model') {
                         cmp = toStr(a.best_ts_model || '').localeCompare(toStr(b.best_ts_model || ''), undefined, { sensitivity: 'base' });
                     } else if (sortKey === 'mae' || sortKey === 'mse') {
@@ -1328,6 +1349,7 @@
             const mobileCards = useMemo(() => sortedResults.map((r, i) => {
                 const isReady = r.status === 'success';
                 const isChecked = selectedSet.has(r.sku);
+                const validationLabel = formatValidationMethod(r.validation_method, t);
                 return (
                     <div
                         key={r.sku || i}
@@ -1359,9 +1381,15 @@
                             disabled={!isReady}
                             className={`w-full text-left ${isReady ? '' : 'cursor-default'}`}
                         >
-                            <div className="mb-3">
-                                <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
-                                <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300">{r.best_ts_model || '-'}</p>
+                            <div className="grid grid-cols-2 gap-2 mb-3">
+                                <div className="min-w-0">
+                                    <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_validation')}</span>
+                                    <p className="mt-0.5 text-xs font-semibold text-slate-600 dark:text-slate-300 truncate" title={validationLabel}>{validationLabel}</p>
+                                </div>
+                                <div className="min-w-0">
+                                    <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
+                                    <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate">{r.best_ts_model || '-'}</p>
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
@@ -1381,6 +1409,7 @@
             const tableRows = useMemo(() => sortedResults.map((r, i) => {
                 const isReady = r.status === 'success';
                 const isChecked = selectedSet.has(r.sku);
+                const validationLabel = formatValidationMethod(r.validation_method, t);
                 return (
                     <tr
                         key={r.sku || i}
@@ -1410,7 +1439,10 @@
                         </td>
                         <td className="p-3 font-mono font-bold text-slate-700 dark:text-slate-100">{r.sku}</td>
                         <td className="p-3 w-[10.5rem] text-center"><StatusBadge status={r.status} t={t} /></td>
-                        <td className="p-3 w-40 text-slate-600 dark:text-slate-300 uppercase text-center">{r.best_ts_model || '-'}</td>
+                        <td className="p-3 w-36 text-center text-slate-600 dark:text-slate-300">
+                            <span className="block truncate" title={validationLabel}>{validationLabel}</span>
+                        </td>
+                        <td className="p-3 w-36 text-slate-600 dark:text-slate-300 uppercase text-center">{r.best_ts_model || '-'}</td>
                         <td className="p-3 w-28 text-right font-mono dark:text-slate-300">{formatMetric(r.mae_validation)}</td>
                         <td className="p-3 w-28 text-right font-mono dark:text-slate-300">{formatMetric(r.mse_validation)}</td>
                     </tr>
@@ -1432,10 +1464,11 @@
                                 />
                                 {t('dashboard.table_select')}
                             </label>
-                            <div className="flex items-center gap-1 overflow-x-auto">
+                            <div className="flex items-center gap-1 overflow-x-auto max-w-[70%]">
                                 {[
                                     { key: 'sku', label: t('dashboard.table_sku') },
                                     { key: 'status', label: t('dashboard.table_status') },
+                                    { key: 'validation', label: t('dashboard.table_validation') },
                                     { key: 'model', label: t('dashboard.table_best_model') },
                                     { key: 'mae', label: t('dashboard.table_mae') },
                                     { key: 'mse', label: t('dashboard.table_mse') },
@@ -1469,7 +1502,8 @@
                                 </th>
                                 <SortHeader columnKey="sku" label={t('dashboard.table_sku')} thClassName="w-auto" />
                                 <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[10.5rem]" />
-                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-40" />
+                                <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-36" />
+                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-36" />
                                 <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" thClassName="w-28" />
                                 <SortHeader columnKey="mse" label={t('dashboard.table_mse')} align="right" thClassName="w-28" />
                             </tr>
@@ -2148,6 +2182,7 @@
             const [itemTabs, setItemTabs] = useState([]);
             const [selectedSkus, setSelectedSkus] = useState([]);
             const [runningSkus, setRunningSkus] = useState([]);
+            const [skuValidationMethods, setSkuValidationMethods] = useState({});
             const [alertMessage, setAlertMessage] = useState(null);
             const [rerunConfirmOpen, setRerunConfirmOpen] = useState(false);
             const [skuCol, setSkuCol] = useState("");
@@ -2369,6 +2404,7 @@
                 setItemTabs([]);
                 setSelectedSkus([]);
                 setRunningSkus([]);
+                setSkuValidationMethods({});
                 setBatchResults(null);
                 setSkuCol("");
                 setStartCol("");
@@ -2454,6 +2490,7 @@
                 setItemTabs([]);
                 setSelectedSkus(skus);
                 setRunningSkus([]);
+                setSkuValidationMethods({});
                 setOverviewSearchQuery("");
                 setActiveTab("overview");
                 setCurrentSku(null);
@@ -2496,6 +2533,11 @@
                 setError(null);
                 setJobStatus("queued");
                 setRunningSkus(skusToRun);
+                setSkuValidationMethods((prev) => {
+                    const next = { ...prev };
+                    for (const sku of skusToRun) next[String(sku)] = validationMethod;
+                    return next;
+                });
 
                 console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus, skusToRun });
 
@@ -2641,6 +2683,7 @@
                 setCurrentSku(null);
                 setOverviewSearchQuery("");
                 setActiveTab("overview");
+                setSkuValidationMethods({});
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
 
@@ -2726,11 +2769,13 @@
                 const runningSet = new Set(runningSkus.map(String));
                 return mappedSkus.map((sku) => {
                     const result = resultMap.get(sku);
+                    const trackedMethod = skuValidationMethods[String(sku)] || null;
                     // While a SKU is re-running, never show stale metrics from a previous run.
                     if (runningSet.has(String(sku))) {
                         return {
                             sku,
                             status: 'running',
+                            validation_method: trackedMethod,
                             best_ts_model: null,
                             mae_validation: null,
                             mse_validation: null,
@@ -2740,17 +2785,19 @@
                         return {
                             ...result,
                             status: 'success',
+                            validation_method: result.validation_method || trackedMethod,
                         };
                     }
                     return {
                         sku,
                         status: 'not_run',
+                        validation_method: null,
                         best_ts_model: null,
                         mae_validation: null,
                         mse_validation: null,
                     };
                 });
-            }, [mappedSkus, batchResults, runningSkus]);
+            }, [mappedSkus, batchResults, runningSkus, skuValidationMethods]);
 
             const handleOverviewSearchChange = useCallback((value) => {
                 setOverviewSearchQuery(value);
