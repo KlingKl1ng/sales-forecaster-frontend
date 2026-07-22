@@ -1932,6 +1932,7 @@
         .status-stat {
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: space-between;
             gap: 10px;
             min-height: 92px;
@@ -1939,12 +1940,20 @@
             border: 1px solid var(--line);
             border-radius: var(--radius);
             background: var(--surface-inset);
+            text-align: center;
+        }
+        .status-stat .badge {
+            justify-content: center;
+            align-self: stretch;
+            width: 100%;
+            box-sizing: border-box;
         }
         .status-stat-count {
             font-size: clamp(24px, 6vw, 30px);
             font-weight: 800;
             line-height: 1;
             letter-spacing: -.02em;
+            text-align: center;
         }
         .reports-table-wrap table {
             min-width: 640px;
