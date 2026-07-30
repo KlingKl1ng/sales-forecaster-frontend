@@ -1157,6 +1157,52 @@
         .proof-build-layer.is-active .proof-formula-line:nth-child(3) { transition-delay: 0.18s; }
         .proof-build-layer.is-active .proof-formula-line:nth-child(4) { transition-delay: 0.24s; }
         .proof-build-layer.is-active .proof-formula-line:nth-child(5) { transition-delay: 0.3s; }
+        .proof-build-layer.is-active .proof-formula-line:nth-child(6) { transition-delay: 0.36s; }
+        .proof-build-layer.is-active .proof-formula-line:nth-child(7) { transition-delay: 0.42s; }
+
+        .proof-formula-sub,
+        .proof-formula-sup {
+            font-size: 0.78em;
+            font-weight: inherit;
+            line-height: 0;
+            letter-spacing: 0.01em;
+        }
+
+        .proof-formula-sub {
+            vertical-align: sub;
+        }
+
+        .proof-formula-sup {
+            vertical-align: super;
+        }
+
+        .proof-formula-sum {
+            font-size: 1.15em;
+            line-height: 1;
+            margin-right: 0.05em;
+        }
+
+        .proof-formula-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 9.5rem;
+            column-gap: 1rem;
+            align-items: baseline;
+            width: 100%;
+        }
+
+        .proof-formula-rhs {
+            white-space: nowrap;
+            text-align: left;
+            justify-self: stretch;
+            color: inherit;
+            opacity: 0.92;
+        }
+
+        @media (min-width: 768px) {
+            .proof-formula-row {
+                grid-template-columns: minmax(0, 1fr) 10.5rem;
+            }
+        }
 
         .proof-vrp-open-edge {
             stroke-dasharray: 3.5 3.5;
@@ -2945,13 +2991,14 @@
                             problem_desc: "A fleet of identical vehicles starts from one depot, must visit every customer exactly once, and return. Demand cannot exceed vehicle capacity. The objective is to minimize total travel cost.",
                             formula_title: "Illustrative formulation",
                             lines: [
-                                "min   Σₖ∈K Σᵢ,ⱼ∈V  cᵢⱼ xᵢⱼᵏ",
-                                "s.t.  Σₖ∈K Σᵢ∈V  xᵢⱼᵏ = 1          ∀ j ∈ C",
-                                "      Σⱼ∈C  x₀ⱼᵏ = Σᵢ∈C  xᵢ₀ᵏ = 1   ∀ k ∈ K",
-                                "      Σⱼ∈C  dⱼ yⱼᵏ ≤ Q               ∀ k ∈ K",
-                                "      xᵢⱼᵏ ∈ {0,1},   |K| = 3, |C| = 10"
+                                { lhs: "min   Σ_{k ∈ K} Σ_{i,j ∈ V}  c_{ij} x_{ij}^{k}" },
+                                { lhs: "s.t.  Σ_{k ∈ K} Σ_{i ∈ V}  x_{ij}^{k} = 1", rhs: "∀ j ∈ C" },
+                                { lhs: "      Σ_{j ∈ C} x_{0j}^{k} = Σ_{i ∈ C} x_{i0}^{k} = 1", rhs: "∀ k ∈ K" },
+                                { lhs: "      Σ_{j ∈ C} d_{j} y_{j}^{k} ≤ Q", rhs: "∀ k ∈ K" },
+                                { lhs: "      x_{ij}^{k} ∈ {0,1}", rhs: "∀ i,j ∈ V, k ∈ K" },
+                                { lhs: "      y_{j}^{k} ∈ {0,1}", rhs: "∀ j ∈ C, k ∈ K" },
+                                { lhs: "      |K| = 3,   |C| = 10" }
                             ],
-                            graph_note: "Open instance · grey edges = feasible arcs · no route assigned",
                             depot_label: "Depot",
                             vehicles_label: "3 vehicles",
                             customers_label: "10 customers"
@@ -3288,13 +3335,14 @@
                             problem_desc: "Một đội xe đồng nhất xuất phát từ một depot, phải ghé thăm mỗi khách hàng đúng một lần rồi quay về. Nhu cầu không vượt quá tải trọng xe. Mục tiêu là cực tiểu hoá tổng chi phí di chuyển.",
                             formula_title: "Công thức minh hoạ",
                             lines: [
-                                "min   Σₖ∈K Σᵢ,ⱼ∈V  cᵢⱼ xᵢⱼᵏ",
-                                "s.t.  Σₖ∈K Σᵢ∈V  xᵢⱼᵏ = 1          ∀ j ∈ C",
-                                "      Σⱼ∈C  x₀ⱼᵏ = Σᵢ∈C  xᵢ₀ᵏ = 1   ∀ k ∈ K",
-                                "      Σⱼ∈C  dⱼ yⱼᵏ ≤ Q               ∀ k ∈ K",
-                                "      xᵢⱼᵏ ∈ {0,1},   |K| = 3, |C| = 10"
+                                { lhs: "min   Σ_{k ∈ K} Σ_{i,j ∈ V}  c_{ij} x_{ij}^{k}" },
+                                { lhs: "s.t.  Σ_{k ∈ K} Σ_{i ∈ V}  x_{ij}^{k} = 1", rhs: "∀ j ∈ C" },
+                                { lhs: "      Σ_{j ∈ C} x_{0j}^{k} = Σ_{i ∈ C} x_{i0}^{k} = 1", rhs: "∀ k ∈ K" },
+                                { lhs: "      Σ_{j ∈ C} d_{j} y_{j}^{k} ≤ Q", rhs: "∀ k ∈ K" },
+                                { lhs: "      x_{ij}^{k} ∈ {0,1}", rhs: "∀ i,j ∈ V, k ∈ K" },
+                                { lhs: "      y_{j}^{k} ∈ {0,1}", rhs: "∀ j ∈ C, k ∈ K" },
+                                { lhs: "      |K| = 3,   |C| = 10" }
                             ],
-                            graph_note: "Thể hiện mở · cạnh xám = cung khả thi · chưa gán tuyến",
                             depot_label: "Depot",
                             vehicles_label: "3 xe",
                             customers_label: "10 khách hàng"
@@ -3631,13 +3679,14 @@
                             problem_desc: "Eine Flotte identischer Fahrzeuge startet von einem Depot, besucht jeden Kunden genau einmal und kehrt zurück. Die Nachfrage darf die Fahrzeugkapazität nicht überschreiten. Ziel: Gesamtreisekosten minimieren.",
                             formula_title: "Illustrative Formulierung",
                             lines: [
-                                "min   Σₖ∈K Σᵢ,ⱼ∈V  cᵢⱼ xᵢⱼᵏ",
-                                "s.t.  Σₖ∈K Σᵢ∈V  xᵢⱼᵏ = 1          ∀ j ∈ C",
-                                "      Σⱼ∈C  x₀ⱼᵏ = Σᵢ∈C  xᵢ₀ᵏ = 1   ∀ k ∈ K",
-                                "      Σⱼ∈C  dⱼ yⱼᵏ ≤ Q               ∀ k ∈ K",
-                                "      xᵢⱼᵏ ∈ {0,1},   |K| = 3, |C| = 10"
+                                { lhs: "min   Σ_{k ∈ K} Σ_{i,j ∈ V}  c_{ij} x_{ij}^{k}" },
+                                { lhs: "s.t.  Σ_{k ∈ K} Σ_{i ∈ V}  x_{ij}^{k} = 1", rhs: "∀ j ∈ C" },
+                                { lhs: "      Σ_{j ∈ C} x_{0j}^{k} = Σ_{i ∈ C} x_{i0}^{k} = 1", rhs: "∀ k ∈ K" },
+                                { lhs: "      Σ_{j ∈ C} d_{j} y_{j}^{k} ≤ Q", rhs: "∀ k ∈ K" },
+                                { lhs: "      x_{ij}^{k} ∈ {0,1}", rhs: "∀ i,j ∈ V, k ∈ K" },
+                                { lhs: "      y_{j}^{k} ∈ {0,1}", rhs: "∀ j ∈ C, k ∈ K" },
+                                { lhs: "      |K| = 3,   |C| = 10" }
                             ],
-                            graph_note: "Offene Instanz · graue Kanten = zulässige Bögen · keine Tour zugewiesen",
                             depot_label: "Depot",
                             vehicles_label: "3 Fahrzeuge",
                             customers_label: "10 Kunden"
@@ -5332,6 +5381,37 @@
             </div>
         );
 
+        // Render proof formulas: Σ_{k ∈ K}, x_{ij}^{k} → proper sub/sup (readable ∈)
+        const renderProofFormula = (line) => {
+            const tokens = String(line || '').split(/(\_\{[^}]+\}|\^\{[^}]+\})/g).filter(Boolean);
+            return tokens.map((tok, i) => {
+                if (tok.startsWith('_{') && tok.endsWith('}')) {
+                    return <sub key={i} className="proof-formula-sub">{tok.slice(2, -1)}</sub>;
+                }
+                if (tok.startsWith('^{') && tok.endsWith('}')) {
+                    return <sup key={i} className="proof-formula-sup">{tok.slice(2, -1)}</sup>;
+                }
+                const withSum = tok.split(/(Σ)/g).filter(Boolean);
+                return withSum.map((part, j) => (
+                    part === 'Σ'
+                        ? <span key={`${i}-${j}`} className="proof-formula-sum">Σ</span>
+                        : <span key={`${i}-${j}`}>{part}</span>
+                ));
+            });
+        };
+
+        const plainProofFormula = (line) => String(line || '')
+            .replace(/\_\{([^}]+)\}/g, '_$1')
+            .replace(/\^\{([^}]+)\}/g, '^$1');
+
+        const normalizeProofFormulaLine = (line) => {
+            if (line && typeof line === 'object') return line;
+            const text = String(line || '');
+            const match = text.match(/^(.*?)(?:\s{2,}|[ \t]+)(∀\s.+)$/);
+            if (match) return { lhs: match[1].trimEnd(), rhs: match[2].trim() };
+            return { lhs: text };
+        };
+
         // Illustrative VRP instance for proof-build Formulate stage (open graph, no solution)
         const PROOF_VRP_INSTANCE = (() => {
             const depot = { x: 150, y: 118 };
@@ -5478,53 +5558,65 @@
                                     })}
                                 </div>
 
-                                <div className="proof-build-panel rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/50 dark:bg-slate-950/35 px-4 py-4 md:px-5 md:py-5">
+                                <div className="proof-build-panel rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/50 dark:bg-slate-950/35 px-5 py-5 md:px-7 md:py-7">
                                     {/* Formulate */}
                                     <div className={`proof-build-layer ${stageIdx === 0 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 0}>
-                                        <div className="grid lg:grid-cols-12 gap-5 lg:gap-6 items-stretch w-full">
-                                            <div className="lg:col-span-6 flex flex-col gap-3 min-w-0">
+                                        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-stretch w-full min-h-[22rem] md:min-h-[26rem]">
+                                            <div className="lg:col-span-6 flex flex-col gap-4 md:gap-5 min-w-0">
                                                 <div>
-                                                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-1.5">
+                                                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-2">
                                                         {formulateStage.problem_title}
                                                     </h3>
-                                                    <p className="text-xs md:text-[13px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                    <p className="text-sm md:text-[15px] text-slate-600 dark:text-slate-400 leading-relaxed">
                                                         {formulateStage.problem_desc}
                                                     </p>
                                                 </div>
-                                                <div className="rounded-lg border border-slate-200/70 dark:border-white/10 bg-slate-950/[0.03] dark:bg-slate-950/40 px-3 py-2.5 md:px-3.5 md:py-3">
-                                                    <div className="text-[9px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-2">
+                                                <div className="flex-1 rounded-xl border border-slate-200/70 dark:border-white/10 bg-slate-950/[0.03] dark:bg-slate-950/40 px-4 py-3.5 md:px-5 md:py-4">
+                                                    <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-2.5">
                                                         {formulateStage.formula_title}
                                                     </div>
-                                                    <div className="font-mono text-[10px] sm:text-[11px] leading-relaxed text-slate-700 dark:text-slate-200 space-y-1 overflow-x-auto">
-                                                        {(formulateStage.lines || []).map((line, i) => (
-                                                            <div
-                                                                key={line}
-                                                                className={`proof-formula-line whitespace-pre ${i === 0 ? 'text-brand-gold font-semibold' : ''}`}
-                                                            >
-                                                                {line}
-                                                            </div>
-                                                        ))}
+                                                    <div className="font-mono text-xs sm:text-sm md:text-[15px] leading-relaxed md:leading-8 text-slate-700 dark:text-slate-200 space-y-2 overflow-x-auto">
+                                                        {(formulateStage.lines || []).map((line, i) => {
+                                                            const row = normalizeProofFormulaLine(line);
+                                                            return (
+                                                                <div
+                                                                    key={`${row.lhs}-${row.rhs || i}`}
+                                                                    className={`proof-formula-line proof-formula-row ${i === 0 ? 'text-brand-gold font-semibold' : ''}`}
+                                                                >
+                                                                    <div className="whitespace-pre min-w-0 overflow-x-auto">
+                                                                        {renderProofFormula(row.lhs)}
+                                                                    </div>
+                                                                    {row.rhs ? (
+                                                                        <div className="proof-formula-rhs whitespace-pre">
+                                                                            {renderProofFormula(row.rhs)}
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="proof-formula-rhs" aria-hidden="true" />
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div className="lg:col-span-6 min-w-0 flex flex-col">
-                                                <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                                                <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
                                                         {formulateStage.depot_label}
                                                     </span>
-                                                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-brand-gold/25 bg-brand-gold/8 text-brand-gold">
+                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-brand-gold/25 bg-brand-gold/8 text-brand-gold">
                                                         {formulateStage.vehicles_label}
                                                     </span>
-                                                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
                                                         {formulateStage.customers_label}
                                                     </span>
                                                 </div>
-                                                <div className="flex-1 rounded-lg border border-slate-200/70 dark:border-white/10 bg-white/60 dark:bg-slate-950/40 px-2 py-2">
+                                                <div className="flex-1 flex items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/60 dark:bg-slate-950/40 px-3 py-3 md:px-4 md:py-4 min-h-[18rem] md:min-h-[22rem]">
                                                     <svg
                                                         key={stageIdx === 0 ? 'vrp-open' : 'vrp-open-idle'}
                                                         viewBox={`0 0 ${vb.w} ${vb.h}`}
-                                                        className="w-full h-auto max-h-[14rem]"
+                                                        className="w-full h-full max-h-[22rem] md:max-h-[24rem]"
                                                         aria-hidden="true"
                                                     >
                                                         {edges.map(([a, b], i) => (
@@ -5594,9 +5686,6 @@
                                                         </g>
                                                     </svg>
                                                 </div>
-                                                <p className="mt-2 text-[10px] font-mono text-slate-400 dark:text-slate-500 leading-snug">
-                                                    {formulateStage.graph_note}
-                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -5604,7 +5693,10 @@
                                     {/* Pack */}
                                     <div className={`proof-build-layer ${stageIdx === 1 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 1}>
                                         <div className="proof-pack-ghost font-mono text-[10px] text-slate-400 dark:text-slate-500 leading-snug whitespace-pre">
-                                            {(formulateStage.lines || []).slice(0, 2).join('\n')}
+                                            {(formulateStage.lines || []).slice(0, 2).map((line) => {
+                                                const row = normalizeProofFormulaLine(line);
+                                                return plainProofFormula(row.rhs ? `${row.lhs}  ${row.rhs}` : row.lhs);
+                                            }).join('\n')}
                                         </div>
                                         <div className="proof-pack-chip inline-flex items-center gap-3 rounded-xl border border-brand-gold/30 bg-brand-gold/8 px-4 py-3 max-w-full">
                                             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-gold/15 text-brand-gold">
