@@ -354,6 +354,8 @@
             width: auto;
             height: 2.5rem;
             gap: 0.25rem;
+            padding-left: 0.35rem;
+            padding-right: 0.35rem;
         }
 
         .header-nav-glass-slab {
@@ -367,21 +369,24 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            height: 1.5625rem;
+            height: 1.75rem;
+            min-height: 1.75rem;
             padding: 0 0.75rem;
             line-height: 1;
             box-sizing: border-box;
             text-align: center;
+            border-radius: 9999px;
         }
 
         .header-nav-glass-slab .header-nav-tab-label {
             display: block;
             line-height: 1;
-            transform: translateY(1.5px);
+            transform: none;
         }
 
         .header-nav-tabs-track {
             position: relative;
+            align-items: center;
         }
 
         .header-nav-glass-indicator {
@@ -389,7 +394,7 @@
             top: 0;
             left: 0;
             box-sizing: border-box;
-            border-radius: 0.75rem;
+            border-radius: 9999px;
             border: 1px solid rgba(245, 158, 11, 0.22);
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(180, 83, 9, 0.06));
             box-shadow:
@@ -529,7 +534,7 @@
             align-items: center;
             justify-content: center;
             padding: 0.375rem 0.75rem;
-            border-radius: 0.75rem;
+            border-radius: 9999px;
             border: 1px solid transparent;
             font-size: 0.625rem;
             font-weight: 700;
@@ -597,6 +602,9 @@
         .header-nav-aps-wrap {
             position: relative;
             flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            height: 1.75rem;
         }
 
         .header-nav-aps-menu {
@@ -1081,6 +1089,205 @@
             .hero-aps-pipeline-step-active,
             .hero-console-cursor {
                 animation: none;
+            }
+        }
+
+        /* Proof foundation — model → module → solve stage */
+        .proof-build-stage-btn {
+            transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .proof-build-stage-btn.is-active {
+            color: #d97706;
+            border-color: rgba(245, 158, 11, 0.35);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(180, 83, 9, 0.04));
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.12);
+        }
+
+        .dark .proof-build-stage-btn.is-active {
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.4);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(15, 23, 42, 0.35));
+        }
+
+        .proof-build-panel {
+            display: grid;
+            overflow: hidden;
+        }
+
+        .proof-build-layer {
+            grid-area: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            pointer-events: none;
+            transition:
+                opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.45s;
+        }
+
+        .proof-build-layer.is-active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+        .proof-formula-line {
+            opacity: 0.28;
+            transform: translateX(-4px);
+            transition:
+                opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.35s ease;
+        }
+
+        .proof-build-layer.is-active .proof-formula-line {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .proof-build-layer.is-active .proof-formula-line:nth-child(1) { transition-delay: 0.05s; }
+        .proof-build-layer.is-active .proof-formula-line:nth-child(2) { transition-delay: 0.12s; }
+        .proof-build-layer.is-active .proof-formula-line:nth-child(3) { transition-delay: 0.18s; }
+        .proof-build-layer.is-active .proof-formula-line:nth-child(4) { transition-delay: 0.24s; }
+        .proof-build-layer.is-active .proof-formula-line:nth-child(5) { transition-delay: 0.3s; }
+
+        .proof-vrp-open-edge {
+            stroke-dasharray: 3.5 3.5;
+            opacity: 0.55;
+        }
+
+        .proof-build-layer.is-active .proof-vrp-open-edge {
+            animation: proof-open-edge-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes proof-open-edge-in {
+            from { opacity: 0; }
+            to { opacity: 0.55; }
+        }
+
+        .proof-vrp-depot-vehicle {
+            opacity: 0.9;
+        }
+
+        .proof-pack-chip {
+            transform: scale(0.92);
+            opacity: 0.55;
+            transition:
+                transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.45s ease,
+                box-shadow 0.45s ease;
+        }
+
+        .proof-build-layer.is-active .proof-pack-chip {
+            transform: scale(1);
+            opacity: 1;
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.14);
+        }
+
+        .proof-pack-ghost {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.35s ease, max-height 0.45s ease, margin 0.35s ease;
+        }
+
+        .proof-build-layer.is-active .proof-pack-ghost {
+            opacity: 0.35;
+            max-height: 3.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .proof-vrp-route {
+            stroke-dasharray: 6 5;
+            stroke-dashoffset: 48;
+            opacity: 0.35;
+            transition: opacity 0.35s ease;
+        }
+
+        .proof-build-layer.is-active .proof-vrp-route {
+            opacity: 1;
+            animation: proof-vrp-draw 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+                sc-flow-dash 1.1s linear 1.6s infinite;
+        }
+
+        @keyframes proof-vrp-draw {
+            from { stroke-dashoffset: 120; opacity: 0.2; }
+            to { stroke-dashoffset: 0; opacity: 1; }
+        }
+
+        .proof-vrp-node {
+            transform-box: fill-box;
+            transform-origin: center;
+            opacity: 0.45;
+            transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .proof-build-layer.is-active .proof-vrp-node {
+            opacity: 1;
+            animation: proof-vrp-node-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .proof-build-layer.is-active .proof-vrp-node:nth-child(2) { animation-delay: 0.05s; }
+        .proof-build-layer.is-active .proof-vrp-node:nth-child(3) { animation-delay: 0.12s; }
+        .proof-build-layer.is-active .proof-vrp-node:nth-child(4) { animation-delay: 0.18s; }
+        .proof-build-layer.is-active .proof-vrp-node:nth-child(5) { animation-delay: 0.24s; }
+        .proof-build-layer.is-active .proof-vrp-node:nth-child(6) { animation-delay: 0.3s; }
+        .proof-build-layer.is-active .proof-vrp-node:nth-child(7) { animation-delay: 0.36s; }
+
+        @keyframes proof-vrp-node-in {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .proof-solve-badge {
+            opacity: 0;
+            transform: translateY(6px);
+            transition:
+                opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.55s,
+                transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.55s;
+        }
+
+        .proof-build-layer.is-active .proof-solve-badge {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .proof-build-layer,
+            .proof-formula-line,
+            .proof-pack-chip,
+            .proof-pack-ghost,
+            .proof-solve-badge,
+            .proof-vrp-node {
+                transition: none !important;
+                animation: none !important;
+            }
+
+            .proof-build-layer.is-active .proof-vrp-route {
+                animation: none;
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+
+            .proof-build-layer.is-active .proof-vrp-open-edge {
+                animation: none;
+                opacity: 0.55;
+            }
+
+            .proof-build-layer {
+                transform: none;
+            }
+
+            .proof-build-layer.is-active {
+                opacity: 1;
+                visibility: visible;
             }
         }
 
@@ -2720,6 +2927,49 @@
                     cta_why: "Why Operartis",
                     metrics_eyebrow: "Built for measurable impact",
                     metrics_title: "One platform. Every planning horizon.",
+                    proof_eyebrow: "Mathematical foundation",
+                    proof_title: "Optimization with proof — not promises.",
+                    proof_body: "Operartis is an optimization system built from data-driven mathematical models. It helps managers make better decisions. The results are (sub)optimal solutions under given constraints that can be proven.",
+                    proof_pillars: [
+                        { label: "Models from data", text: "Recommendations rest on quantitative models grounded in operational data — not intuition alone." },
+                        { label: "Decision support", text: "Built to help managers act under real constraints: capacity, cost, service, and time." },
+                        { label: "Provable optima", text: "No claims without proof. No marketing theatre. No exaggeration — only solutions that stand on mathematics." }
+                    ],
+                    proof_build_eyebrow: "From model to module",
+                    proof_build_stages: [
+                        {
+                            id: "formulate",
+                            label: "Formulate",
+                            caption: "Start from a standard VRP instance — then write the decision as mathematics.",
+                            problem_title: "Standard Vehicle Routing Problem",
+                            problem_desc: "A fleet of identical vehicles starts from one depot, must visit every customer exactly once, and return. Demand cannot exceed vehicle capacity. The objective is to minimize total travel cost.",
+                            formula_title: "Illustrative formulation",
+                            lines: [
+                                "min   Σₖ∈K Σᵢ,ⱼ∈V  cᵢⱼ xᵢⱼᵏ",
+                                "s.t.  Σₖ∈K Σᵢ∈V  xᵢⱼᵏ = 1          ∀ j ∈ C",
+                                "      Σⱼ∈C  x₀ⱼᵏ = Σᵢ∈C  xᵢ₀ᵏ = 1   ∀ k ∈ K",
+                                "      Σⱼ∈C  dⱼ yⱼᵏ ≤ Q               ∀ k ∈ K",
+                                "      xᵢⱼᵏ ∈ {0,1},   |K| = 3, |C| = 10"
+                            ],
+                            graph_note: "Open instance · grey edges = feasible arcs · no route assigned",
+                            depot_label: "Depot",
+                            vehicles_label: "3 vehicles",
+                            customers_label: "10 customers"
+                        },
+                        {
+                            id: "pack",
+                            label: "Pack",
+                            caption: "Compress the formulation into a compact, reusable optimization module.",
+                            module: "Vehicle Routing Problem",
+                            module_tag: "APS module"
+                        },
+                        {
+                            id: "solve",
+                            label: "Solve",
+                            caption: "Run the module on operational data — return a (sub)optimal, proven plan.",
+                            proof: "feasible · (sub)optimal under constraints · proven"
+                        }
+                    ],
                     stat_live: "Live Modules",
                     stat_horizons: "Planning Horizons",
                     stat_blocks: "Module Blocks",
@@ -3020,6 +3270,49 @@
                     cta_why: "Vì Sao Chọn Operartis",
                     metrics_eyebrow: "Được xây dựng để đo lường tác động",
                     metrics_title: "Một nền tảng. Mọi khung hoạch định.",
+                    proof_eyebrow: "Nền tảng toán học",
+                    proof_title: "Tối ưu có chứng minh — không phải lời hứa.",
+                    proof_body: "Operartis là hệ thống tối ưu hoá xây dựng từ các mô hình toán học dựa trên dữ liệu. Hệ thống hỗ trợ nhà quản lý ra quyết định tốt hơn. Kết quả là các lời giải (cận) tối ưu dưới các ràng buộc cho trước có thể chứng minh được.",
+                    proof_pillars: [
+                        { label: "Mô hình từ dữ liệu", text: "Mọi đề xuất dựa trên mô hình định lượng gắn với dữ liệu vận hành — không chỉ dựa vào trực giác." },
+                        { label: "Hỗ trợ quyết định", text: "Được thiết kế để giúp nhà quản lý hành động dưới ràng buộc thực tế: năng lực, chi phí, dịch vụ và thời gian." },
+                        { label: "Tối ưu có chứng minh", text: "Không khẳng định thiếu chứng minh. Không marketing thổi phồng. Không phóng đại — chỉ những lời giải đứng vững trên toán học." }
+                    ],
+                    proof_build_eyebrow: "Từ mô hình đến mô-đun",
+                    proof_build_stages: [
+                        {
+                            id: "formulate",
+                            label: "Diễn đạt",
+                            caption: "Bắt đầu từ một bài VRP chuẩn — rồi viết quyết định bằng toán học.",
+                            problem_title: "Bài toán định tuyến xe (VRP) chuẩn",
+                            problem_desc: "Một đội xe đồng nhất xuất phát từ một depot, phải ghé thăm mỗi khách hàng đúng một lần rồi quay về. Nhu cầu không vượt quá tải trọng xe. Mục tiêu là cực tiểu hoá tổng chi phí di chuyển.",
+                            formula_title: "Công thức minh hoạ",
+                            lines: [
+                                "min   Σₖ∈K Σᵢ,ⱼ∈V  cᵢⱼ xᵢⱼᵏ",
+                                "s.t.  Σₖ∈K Σᵢ∈V  xᵢⱼᵏ = 1          ∀ j ∈ C",
+                                "      Σⱼ∈C  x₀ⱼᵏ = Σᵢ∈C  xᵢ₀ᵏ = 1   ∀ k ∈ K",
+                                "      Σⱼ∈C  dⱼ yⱼᵏ ≤ Q               ∀ k ∈ K",
+                                "      xᵢⱼᵏ ∈ {0,1},   |K| = 3, |C| = 10"
+                            ],
+                            graph_note: "Thể hiện mở · cạnh xám = cung khả thi · chưa gán tuyến",
+                            depot_label: "Depot",
+                            vehicles_label: "3 xe",
+                            customers_label: "10 khách hàng"
+                        },
+                        {
+                            id: "pack",
+                            label: "Đóng gói",
+                            caption: "Nén công thức thành một mô-đun tối ưu hoá gọn, tái sử dụng được.",
+                            module: "Bài toán định tuyến xe (VRP)",
+                            module_tag: "Mô-đun APS"
+                        },
+                        {
+                            id: "solve",
+                            label: "Giải",
+                            caption: "Chạy mô-đun trên dữ liệu vận hành — trả về kế hoạch (cận) tối ưu có chứng minh.",
+                            proof: "khả thi · (cận) tối ưu dưới ràng buộc · có chứng minh"
+                        }
+                    ],
                     stat_live: "Mô-đun Hoạt Động",
                     stat_horizons: "Khung Hoạch Định",
                     stat_blocks: "Khối Chức Năng",
@@ -3320,6 +3613,49 @@
                     cta_why: "Warum Operartis",
                     metrics_eyebrow: "Für messbare Wirkung entwickelt",
                     metrics_title: "Eine Plattform. Jeder Planungshorizont.",
+                    proof_eyebrow: "Mathematische Grundlage",
+                    proof_title: "Optimierung mit Beweis — keine Versprechen.",
+                    proof_body: "Operartis ist ein Optimierungssystem aus datengestützten mathematischen Modellen. Es unterstützt Führungskräfte bei besseren Entscheidungen. Die Ergebnisse sind (sub)optimale Lösungen unter gegebenen Restriktionen, die beweisbar sind.",
+                    proof_pillars: [
+                        { label: "Modelle aus Daten", text: "Empfehlungen beruhen auf quantitativen Modellen aus Betriebsdaten — nicht allein auf Intuition." },
+                        { label: "Entscheidungsunterstützung", text: "Gebaut, damit Manager unter realen Restriktionen handeln: Kapazität, Kosten, Service und Zeit." },
+                        { label: "Beweisbare Optima", text: "Keine Behauptungen ohne Beweis. Kein Marketingtheater. Keine Übertreibung — nur Lösungen auf mathematischem Fundament." }
+                    ],
+                    proof_build_eyebrow: "Vom Modell zum Modul",
+                    proof_build_stages: [
+                        {
+                            id: "formulate",
+                            label: "Formulieren",
+                            caption: "Mit einer Standard-VRP-Instanz starten — dann die Entscheidung mathematisch schreiben.",
+                            problem_title: "Standard Vehicle Routing Problem",
+                            problem_desc: "Eine Flotte identischer Fahrzeuge startet von einem Depot, besucht jeden Kunden genau einmal und kehrt zurück. Die Nachfrage darf die Fahrzeugkapazität nicht überschreiten. Ziel: Gesamtreisekosten minimieren.",
+                            formula_title: "Illustrative Formulierung",
+                            lines: [
+                                "min   Σₖ∈K Σᵢ,ⱼ∈V  cᵢⱼ xᵢⱼᵏ",
+                                "s.t.  Σₖ∈K Σᵢ∈V  xᵢⱼᵏ = 1          ∀ j ∈ C",
+                                "      Σⱼ∈C  x₀ⱼᵏ = Σᵢ∈C  xᵢ₀ᵏ = 1   ∀ k ∈ K",
+                                "      Σⱼ∈C  dⱼ yⱼᵏ ≤ Q               ∀ k ∈ K",
+                                "      xᵢⱼᵏ ∈ {0,1},   |K| = 3, |C| = 10"
+                            ],
+                            graph_note: "Offene Instanz · graue Kanten = zulässige Bögen · keine Tour zugewiesen",
+                            depot_label: "Depot",
+                            vehicles_label: "3 Fahrzeuge",
+                            customers_label: "10 Kunden"
+                        },
+                        {
+                            id: "pack",
+                            label: "Packen",
+                            caption: "Die Formulierung in ein kompaktes, wiederverwendbares Optimierungsmodul verdichten.",
+                            module: "Vehicle Routing Problem",
+                            module_tag: "APS-Modul"
+                        },
+                        {
+                            id: "solve",
+                            label: "Lösen",
+                            caption: "Das Modul auf Betriebsdaten anwenden — einen (sub)optimalen, beweisbaren Plan liefern.",
+                            proof: "zulässig · (sub)optimal unter Restriktionen · bewiesen"
+                        }
+                    ],
                     stat_live: "Aktive Module",
                     stat_horizons: "Planungshorizonte",
                     stat_blocks: "Funktionsblöcke",
@@ -4671,7 +5007,7 @@
         const LandingCanvasBackground = ({ theme }) => {
             const canvasRef = useRef(null);
             const frameRef = useRef(null);
-            const stateRef = useRef({ nodes: [], w: 0, h: 0 });
+            const stateRef = useRef({ nodes: [], w: 0, h: 0, linkDist: 130 });
 
             const isDark = useMemo(() => (
                 theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -4683,9 +5019,23 @@
 
                 const ctx = canvas.getContext('2d');
                 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                const NODE_COUNT = 42;
-                const LINK_DIST = 130;
                 const GRID_STEP = 48;
+
+                // Mobile stays as-is; laptop/desktop add moderate density only.
+                const getNetworkParams = (w, h) => {
+                    if (w < 768) {
+                        return { nodeCount: 42, linkDist: 130 };
+                    }
+                    if (w < 1024) {
+                        return { nodeCount: 48, linkDist: 140 };
+                    }
+                    // Lighter desktop density — enough network feel without clutter.
+                    const area = w * h;
+                    const nodeCount = Math.max(52, Math.min(72, Math.round(area / 32000)));
+                    const spacing = Math.sqrt(area / nodeCount);
+                    const linkDist = Math.max(145, Math.min(190, Math.round(spacing * 1.35)));
+                    return { nodeCount, linkDist };
+                };
 
                 const palette = () => (isDark ? {
                     grid: 'rgba(148, 163, 184, 0.07)',
@@ -4699,32 +5049,49 @@
                     vignette: 'rgba(248, 250, 252, 0.65)',
                 });
 
-                const seedNodes = (w, h) => Array.from({ length: NODE_COUNT }, () => ({
-                    x: Math.random() * w,
-                    y: Math.random() * h,
-                    vx: (Math.random() - 0.5) * 0.12,
-                    vy: (Math.random() - 0.5) * 0.12,
-                    r: 1 + Math.random() * 1.4,
-                }));
+                const seedNodes = (w, h, count) => Array.from({ length: count }, (_, i) => {
+                    // Occasional larger hubs — sparse, for a light supply-chain cue.
+                    const isHub = i % 16 === 0;
+                    return {
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        vx: (Math.random() - 0.5) * (isHub ? 0.07 : 0.12),
+                        vy: (Math.random() - 0.5) * (isHub ? 0.07 : 0.12),
+                        r: isHub ? 1.8 + Math.random() * 0.8 : 1 + Math.random() * 1.4,
+                        hub: isHub,
+                    };
+                });
 
                 const resize = () => {
                     const dpr = Math.min(window.devicePixelRatio || 1, 2);
                     const w = window.innerWidth;
                     const h = window.innerHeight;
+                    const { nodeCount, linkDist } = getNetworkParams(w, h);
                     canvas.width = Math.floor(w * dpr);
                     canvas.height = Math.floor(h * dpr);
                     canvas.style.width = `${w}px`;
                     canvas.style.height = `${h}px`;
                     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-                    if (!stateRef.current.nodes.length) {
-                        stateRef.current.nodes = seedNodes(w, h);
+
+                    const prev = stateRef.current;
+                    const sizeChanged = Math.abs(prev.w - w) > 64 || Math.abs(prev.h - h) > 64;
+                    const countChanged = prev.nodes.length !== nodeCount;
+                    if (!prev.nodes.length || sizeChanged || countChanged) {
+                        stateRef.current.nodes = seedNodes(w, h, nodeCount);
+                    } else {
+                        // Keep nodes on-screen after minor resizes
+                        for (const node of prev.nodes) {
+                            node.x = Math.max(0, Math.min(w, node.x));
+                            node.y = Math.max(0, Math.min(h, node.y));
+                        }
                     }
                     stateRef.current.w = w;
                     stateRef.current.h = h;
+                    stateRef.current.linkDist = linkDist;
                 };
 
                 const draw = () => {
-                    const { w, h, nodes } = stateRef.current;
+                    const { w, h, nodes, linkDist } = stateRef.current;
                     if (!w || !h) return;
 
                     const colors = palette();
@@ -4765,14 +5132,18 @@
 
                     ctx.lineCap = 'butt';
                     ctx.lineJoin = 'miter';
+                    const maxLink = linkDist || 130;
+                    // Soft hub reach — avoid dense mesh on large screens.
+                    const hubBonus = w >= 1024 ? maxLink * 0.12 : 0;
                     for (let i = 0; i < nodes.length; i++) {
                         for (let j = i + 1; j < nodes.length; j++) {
                             const dx = nodes[i].x - nodes[j].x;
                             const dy = nodes[i].y - nodes[j].y;
                             const dist = Math.hypot(dx, dy);
-                            if (dist < LINK_DIST) {
-                                const fade = 1 - dist / LINK_DIST;
-                                ctx.globalAlpha = 0.35 + fade * (isDark ? 0.55 : 0.45);
+                            const reach = maxLink + ((nodes[i].hub || nodes[j].hub) ? hubBonus : 0);
+                            if (dist < reach) {
+                                const fade = 1 - dist / reach;
+                                ctx.globalAlpha = 0.18 + fade * (isDark ? 0.38 : 0.32);
                                 ctx.strokeStyle = colors.line;
                                 ctx.lineWidth = 1;
                                 ctx.beginPath();
@@ -4960,6 +5331,350 @@
                 </div>
             </div>
         );
+
+        // Illustrative VRP instance for proof-build Formulate stage (open graph, no solution)
+        const PROOF_VRP_INSTANCE = (() => {
+            const depot = { x: 150, y: 118 };
+            const customers = Array.from({ length: 10 }, (_, i) => {
+                const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
+                return {
+                    id: i + 1,
+                    x: depot.x + Math.cos(a) * 92,
+                    y: depot.y + Math.sin(a) * 78,
+                };
+            });
+            const edges = [];
+            for (let i = 0; i < customers.length; i++) {
+                edges.push([i, (i + 1) % customers.length]);
+                edges.push([i, (i + 2) % customers.length]);
+            }
+            return { depot, customers, edges, vb: { w: 300, h: 236 } };
+        })();
+
+        // Proof foundation — manifesto + model→module→solve visual (Plan B)
+        const ProofFoundationSection = ({ content }) => {
+            const ui = content.ui;
+            const pillars = ui.proof_pillars || [];
+            const stages = ui.proof_build_stages || [];
+            const sectionRef = useRef(null);
+            const [inView, setInView] = useState(false);
+            const [stageIdx, setStageIdx] = useState(0);
+            const [autoPlay, setAutoPlay] = useState(true);
+
+            useEffect(() => {
+                const el = sectionRef.current;
+                if (!el) return undefined;
+                const observer = new IntersectionObserver(([entry]) => {
+                    setInView(entry.isIntersecting);
+                }, { threshold: 0.25 });
+                observer.observe(el);
+                return () => observer.disconnect();
+            }, []);
+
+            useEffect(() => {
+                if (!stages.length || !inView || !autoPlay) return undefined;
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (prefersReducedMotion) {
+                    setStageIdx(stages.length - 1);
+                    return undefined;
+                }
+                const timer = setInterval(() => {
+                    setStageIdx(prev => (prev + 1) % stages.length);
+                }, 4200);
+                return () => clearInterval(timer);
+            }, [stages.length, inView, autoPlay]);
+
+            const activeStage = stages[stageIdx] || null;
+            const formulateStage = stages[0] || {};
+            const packStage = stages[1] || {};
+            const solveStage = stages[2] || {};
+            const { depot, customers, edges, vb } = PROOF_VRP_INSTANCE;
+
+            const selectStage = (idx) => {
+                setStageIdx(idx);
+                setAutoPlay(false);
+            };
+
+            return (
+                <section
+                    ref={sectionRef}
+                    className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm"
+                    aria-label={ui.proof_title}
+                >
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl" aria-hidden="true">
+                        <div className="absolute -top-10 left-1/4 w-72 h-36 bg-brand-gold/6 rounded-full blur-3xl" />
+                        <div className="absolute -bottom-12 right-1/4 w-56 h-28 bg-amber-500/4 rounded-full blur-3xl" />
+                    </div>
+
+                    <div className="relative w-full px-5 sm:px-6 md:px-8 py-6 md:py-8">
+                        <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+                            <div className="lg:col-span-5">
+                                <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{ui.proof_eyebrow}</p>
+                                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug mb-4">
+                                    {ui.proof_title}
+                                </h2>
+                                <p className="text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    {ui.proof_body}
+                                </p>
+                            </div>
+
+                            <div className="lg:col-span-7 flex flex-col gap-3">
+                                {pillars.map((pillar, i) => (
+                                    <div
+                                        key={pillar.label}
+                                        className="flex gap-3 sm:gap-4 rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/45 dark:bg-slate-950/30 px-4 py-3.5 md:px-5 md:py-4"
+                                    >
+                                        <span className="shrink-0 font-mono text-[10px] font-bold tabular-nums text-brand-gold/90 pt-0.5">
+                                            {String(i + 1).padStart(2, '0')}
+                                        </span>
+                                        <div className="min-w-0">
+                                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-1">
+                                                {pillar.label}
+                                            </h3>
+                                            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                {pillar.text}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {stages.length > 0 && (
+                            <div className="mt-8 md:mt-10 pt-6 md:pt-8 border-t border-slate-200/70 dark:border-white/10">
+                                <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+                                    <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold">
+                                        {ui.proof_build_eyebrow}
+                                    </p>
+                                    {activeStage && (
+                                        <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl text-right">
+                                            {activeStage.caption}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-2 mb-4" role="tablist" aria-label={ui.proof_build_eyebrow}>
+                                    {stages.map((stage, i) => {
+                                        const isActive = i === stageIdx;
+                                        return (
+                                            <button
+                                                key={stage.id}
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={isActive}
+                                                onClick={() => selectStage(i)}
+                                                className={`proof-build-stage-btn rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/35 dark:bg-slate-950/20 px-2.5 sm:px-3 py-2.5 text-left ${isActive ? 'is-active' : 'text-slate-500 dark:text-slate-400 hover:border-brand-gold/25 hover:text-brand-gold'}`}
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <span className="font-mono text-[10px] font-bold tabular-nums opacity-80">
+                                                        {String(i + 1).padStart(2, '0')}
+                                                    </span>
+                                                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">
+                                                        {stage.label}
+                                                    </span>
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="proof-build-panel rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/50 dark:bg-slate-950/35 px-4 py-4 md:px-5 md:py-5">
+                                    {/* Formulate */}
+                                    <div className={`proof-build-layer ${stageIdx === 0 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 0}>
+                                        <div className="grid lg:grid-cols-12 gap-5 lg:gap-6 items-stretch w-full">
+                                            <div className="lg:col-span-6 flex flex-col gap-3 min-w-0">
+                                                <div>
+                                                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-1.5">
+                                                        {formulateStage.problem_title}
+                                                    </h3>
+                                                    <p className="text-xs md:text-[13px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                        {formulateStage.problem_desc}
+                                                    </p>
+                                                </div>
+                                                <div className="rounded-lg border border-slate-200/70 dark:border-white/10 bg-slate-950/[0.03] dark:bg-slate-950/40 px-3 py-2.5 md:px-3.5 md:py-3">
+                                                    <div className="text-[9px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-2">
+                                                        {formulateStage.formula_title}
+                                                    </div>
+                                                    <div className="font-mono text-[10px] sm:text-[11px] leading-relaxed text-slate-700 dark:text-slate-200 space-y-1 overflow-x-auto">
+                                                        {(formulateStage.lines || []).map((line, i) => (
+                                                            <div
+                                                                key={line}
+                                                                className={`proof-formula-line whitespace-pre ${i === 0 ? 'text-brand-gold font-semibold' : ''}`}
+                                                            >
+                                                                {line}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="lg:col-span-6 min-w-0 flex flex-col">
+                                                <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                                                        {formulateStage.depot_label}
+                                                    </span>
+                                                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-brand-gold/25 bg-brand-gold/8 text-brand-gold">
+                                                        {formulateStage.vehicles_label}
+                                                    </span>
+                                                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                                                        {formulateStage.customers_label}
+                                                    </span>
+                                                </div>
+                                                <div className="flex-1 rounded-lg border border-slate-200/70 dark:border-white/10 bg-white/60 dark:bg-slate-950/40 px-2 py-2">
+                                                    <svg
+                                                        key={stageIdx === 0 ? 'vrp-open' : 'vrp-open-idle'}
+                                                        viewBox={`0 0 ${vb.w} ${vb.h}`}
+                                                        className="w-full h-auto max-h-[14rem]"
+                                                        aria-hidden="true"
+                                                    >
+                                                        {edges.map(([a, b], i) => (
+                                                            <line
+                                                                key={`e-${i}`}
+                                                                className="proof-vrp-open-edge"
+                                                                x1={customers[a].x}
+                                                                y1={customers[a].y}
+                                                                x2={customers[b].x}
+                                                                y2={customers[b].y}
+                                                                stroke="currentColor"
+                                                                strokeWidth="1"
+                                                                style={{ color: '#94a3b8', animationDelay: `${(i % 8) * 0.04}s` }}
+                                                            />
+                                                        ))}
+                                                        {customers.map((n) => (
+                                                            <line
+                                                                key={`d-${n.id}`}
+                                                                className="proof-vrp-open-edge"
+                                                                x1={depot.x}
+                                                                y1={depot.y}
+                                                                x2={n.x}
+                                                                y2={n.y}
+                                                                stroke="currentColor"
+                                                                strokeWidth="1"
+                                                                style={{ color: '#94a3b8', opacity: 0.4 }}
+                                                            />
+                                                        ))}
+                                                        {customers.map((n) => (
+                                                            <g key={n.id} className="proof-vrp-node">
+                                                                <circle cx={n.x} cy={n.y} r="7" className="fill-white dark:fill-slate-900" stroke="#64748b" strokeWidth="1.5" />
+                                                                <text
+                                                                    x={n.x}
+                                                                    y={n.y + 3.2}
+                                                                    textAnchor="middle"
+                                                                    className="fill-slate-600 dark:fill-slate-300"
+                                                                    style={{ fontSize: '8px', fontFamily: 'ui-monospace, monospace', fontWeight: 700 }}
+                                                                >
+                                                                    {n.id}
+                                                                </text>
+                                                            </g>
+                                                        ))}
+                                                        <g className="proof-vrp-node">
+                                                            <circle cx={depot.x} cy={depot.y} r="22" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" strokeWidth="1.75" />
+                                                            <circle cx={depot.x} cy={depot.y} r="22" fill="none" stroke="#f59e0b" strokeOpacity="0.25" strokeWidth="1" />
+                                                            {[
+                                                                { dx: -8, dy: -1 },
+                                                                { dx: 0, dy: -1 },
+                                                                { dx: 8, dy: -1 },
+                                                            ].map((v, i) => (
+                                                                <g key={i} className="proof-vrp-depot-vehicle" transform={`translate(${depot.x + v.dx}, ${depot.y + v.dy})`}>
+                                                                    <rect x="-4.5" y="-3" width="9" height="5.5" rx="1" fill="#f59e0b" />
+                                                                    <rect x="-2.5" y="-5.5" width="5" height="2.5" rx="0.6" fill="#d97706" />
+                                                                    <circle cx="-2.8" cy="3.2" r="1.1" fill="#334155" />
+                                                                    <circle cx="2.8" cy="3.2" r="1.1" fill="#334155" />
+                                                                </g>
+                                                            ))}
+                                                            <text
+                                                                x={depot.x}
+                                                                y={depot.y + 16}
+                                                                textAnchor="middle"
+                                                                fill="#b45309"
+                                                                style={{ fontSize: '7px', fontFamily: 'ui-monospace, monospace', fontWeight: 700 }}
+                                                            >
+                                                                {formulateStage.depot_label}
+                                                            </text>
+                                                        </g>
+                                                    </svg>
+                                                </div>
+                                                <p className="mt-2 text-[10px] font-mono text-slate-400 dark:text-slate-500 leading-snug">
+                                                    {formulateStage.graph_note}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Pack */}
+                                    <div className={`proof-build-layer ${stageIdx === 1 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 1}>
+                                        <div className="proof-pack-ghost font-mono text-[10px] text-slate-400 dark:text-slate-500 leading-snug whitespace-pre">
+                                            {(formulateStage.lines || []).slice(0, 2).join('\n')}
+                                        </div>
+                                        <div className="proof-pack-chip inline-flex items-center gap-3 rounded-xl border border-brand-gold/30 bg-brand-gold/8 px-4 py-3 max-w-full">
+                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-gold/15 text-brand-gold">
+                                                <VrpIcon />
+                                            </span>
+                                            <div className="min-w-0">
+                                                <div className="text-[9px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-0.5">
+                                                    {packStage.module_tag}
+                                                </div>
+                                                <div className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">
+                                                    {packStage.module}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Solve */}
+                                    <div className={`proof-build-layer ${stageIdx === 2 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 2}>
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                                            <svg key={stageIdx === 2 ? 'vrp-run' : 'vrp-idle'} viewBox="0 0 220 110" className="w-full sm:w-56 h-28 shrink-0" aria-hidden="true">
+                                                <path
+                                                    className="proof-vrp-route"
+                                                    d="M28 78 L58 34 L102 52 L138 22 L176 48 L196 78 Z"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="1.75"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    style={{ color: '#f59e0b' }}
+                                                />
+                                                {[
+                                                    { x: 28, y: 78, depot: true },
+                                                    { x: 58, y: 34 },
+                                                    { x: 102, y: 52 },
+                                                    { x: 138, y: 22 },
+                                                    { x: 176, y: 48 },
+                                                    { x: 196, y: 78 },
+                                                ].map((n, i) => (
+                                                    <g key={i} className="proof-vrp-node">
+                                                        <circle
+                                                            cx={n.x}
+                                                            cy={n.y}
+                                                            r={n.depot ? 6.5 : 4.5}
+                                                            fill={n.depot ? '#f59e0b' : 'currentColor'}
+                                                            className={n.depot ? '' : 'text-slate-500 dark:text-slate-300'}
+                                                        />
+                                                        {n.depot && (
+                                                            <circle cx={n.x} cy={n.y} r="10" fill="none" stroke="#f59e0b" strokeOpacity="0.35" strokeWidth="1" />
+                                                        )}
+                                                    </g>
+                                                ))}
+                                            </svg>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-1.5">
+                                                    {packStage.module}
+                                                </div>
+                                                <div className="proof-solve-badge inline-flex items-center gap-2 rounded-full border border-brand-gold/25 bg-brand-gold/8 px-3 py-1.5 text-[10px] sm:text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-200">
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-brand-gold shrink-0" />
+                                                    {solveStage.proof}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            );
+        };
 
         // Journey strip — connected horizon timeline (INFORM/Zentio process narrative)
         const JourneyStrip = ({ content, horizons, onNav }) => {
@@ -6835,6 +7550,10 @@
 
                             <div className="mt-14 md:mt-20">
                                 <Reveal><MetricsBand content={content} stats={stats} /></Reveal>
+                            </div>
+
+                            <div className="mt-14 md:mt-16">
+                                <Reveal delay={100}><ProofFoundationSection content={content} /></Reveal>
                             </div>
 
                             <div className="mt-16 md:mt-20">
