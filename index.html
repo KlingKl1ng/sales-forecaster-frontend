@@ -1222,50 +1222,569 @@
             opacity: 0.9;
         }
 
-        .proof-pack-chip {
-            transform: scale(0.92);
-            opacity: 0.55;
-            transition:
-                transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.45s ease,
-                box-shadow 0.45s ease;
+        .proof-pack-scene {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.85rem;
+            width: 100%;
+            min-height: 18rem;
+            padding: 0.25rem 0;
         }
 
-        .proof-build-layer.is-active .proof-pack-chip {
-            transform: scale(1);
-            opacity: 1;
-            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.14);
-        }
-
-        .proof-pack-ghost {
-            opacity: 0;
-            max-height: 0;
+        .proof-pack-formula {
+            position: relative;
+            width: 100%;
+            max-width: 28rem;
             overflow: hidden;
-            transition: opacity 0.35s ease, max-height 0.45s ease, margin 0.35s ease;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: rgba(15, 23, 42, 0.03);
+            padding: 0.55rem 0.7rem;
+            transform-origin: 50% 0%;
+            will-change: transform, opacity, filter;
+            box-shadow: 0 0 0 0 transparent;
         }
 
-        .proof-build-layer.is-active .proof-pack-ghost {
-            opacity: 0.35;
-            max-height: 3.5rem;
-            margin-bottom: 0.75rem;
+        @media (min-width: 768px) {
+            .proof-pack-formula {
+                max-width: 30rem;
+                padding: 0.6rem 0.8rem;
+            }
         }
 
-        .proof-vrp-route {
-            stroke-dasharray: 6 5;
-            stroke-dashoffset: 48;
-            opacity: 0.35;
-            transition: opacity 0.35s ease;
+        .dark .proof-pack-formula {
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(2, 6, 23, 0.4);
         }
 
-        .proof-build-layer.is-active .proof-vrp-route {
+        @keyframes proof-pack-formula-glow {
+            0% {
+                border-color: rgba(148, 163, 184, 0.22);
+                box-shadow: 0 0 0 0 transparent;
+            }
+            28%, 72% {
+                border-color: rgba(245, 158, 11, 0.42);
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.1),
+                    0 10px 28px rgba(245, 158, 11, 0.1);
+            }
+            100% {
+                border-color: rgba(245, 158, 11, 0.28);
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.06),
+                    0 6px 18px rgba(245, 158, 11, 0.06);
+            }
+        }
+
+        @keyframes proof-pack-formula-glow-dark {
+            0% {
+                border-color: rgba(255, 255, 255, 0.1);
+                box-shadow: 0 0 0 0 transparent;
+            }
+            28%, 72% {
+                border-color: rgba(245, 158, 11, 0.5);
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.14),
+                    0 12px 32px rgba(245, 158, 11, 0.12);
+            }
+            100% {
+                border-color: rgba(245, 158, 11, 0.32);
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.1),
+                    0 8px 22px rgba(245, 158, 11, 0.08);
+            }
+        }
+
+        .proof-pack-scan {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(
+                105deg,
+                transparent 0%,
+                rgba(245, 158, 11, 0.04) 38%,
+                rgba(245, 158, 11, 0.18) 50%,
+                rgba(245, 158, 11, 0.04) 62%,
+                transparent 100%
+            );
+            transform: translateX(-130%);
+            opacity: 0;
+        }
+
+        .proof-pack-formula.is-running .proof-pack-scan {
+            animation: proof-pack-scan 1.35s cubic-bezier(0.4, 0, 0.2, 1) 0.18s 2 both;
+        }
+
+        @keyframes proof-pack-scan {
+            0% { transform: translateX(-130%); opacity: 0; }
+            18% { opacity: 0.95; }
+            82% { opacity: 0.55; }
+            100% { transform: translateX(130%); opacity: 0; }
+        }
+
+        .proof-pack-formula.is-running.is-merging {
+            animation:
+                proof-pack-formula-glow 2.6s cubic-bezier(0.45, 0.05, 0.25, 1) 0.05s both,
+                proof-pack-merge 1.45s cubic-bezier(0.33, 1, 0.68, 1) 2.2s forwards;
+        }
+
+        .dark .proof-pack-formula.is-running.is-merging {
+            animation:
+                proof-pack-formula-glow-dark 2.6s cubic-bezier(0.45, 0.05, 0.25, 1) 0.05s both,
+                proof-pack-merge 1.45s cubic-bezier(0.33, 1, 0.68, 1) 2.2s forwards;
+        }
+
+        @keyframes proof-pack-merge {
+            0% {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0.72;
+                filter: blur(0.2px);
+                transform: scale(0.84) translateY(0.15rem);
+            }
+        }
+
+        .proof-pack-formula .proof-formula-line {
             opacity: 1;
-            animation: proof-vrp-draw 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-                sc-flow-dash 1.1s linear 1.6s infinite;
+            transform: none;
         }
 
-        @keyframes proof-vrp-draw {
-            from { stroke-dashoffset: 120; opacity: 0.2; }
-            to { stroke-dashoffset: 0; opacity: 1; }
+        .proof-pack-formula.is-running .proof-formula-line {
+            animation: proof-pack-line-pulse 0.85s cubic-bezier(0.45, 0, 0.55, 1) both;
+        }
+
+        .proof-pack-formula.is-running .proof-formula-line:nth-child(1) { animation-delay: 0.06s; }
+        .proof-pack-formula.is-running .proof-formula-line:nth-child(2) { animation-delay: 0.14s; }
+        .proof-pack-formula.is-running .proof-formula-line:nth-child(3) { animation-delay: 0.22s; }
+        .proof-pack-formula.is-running .proof-formula-line:nth-child(4) { animation-delay: 0.3s; }
+        .proof-pack-formula.is-running .proof-formula-line:nth-child(5) { animation-delay: 0.38s; }
+        .proof-pack-formula.is-running .proof-formula-line:nth-child(6) { animation-delay: 0.46s; }
+        .proof-pack-formula.is-running .proof-formula-line:nth-child(7) { animation-delay: 0.54s; }
+
+        @keyframes proof-pack-line-pulse {
+            0% { opacity: 0.45; }
+            40% { opacity: 1; }
+            100% { opacity: 0.88; }
+        }
+
+        .proof-pack-funnel {
+            height: 2.75rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+        }
+
+        .proof-pack-funnel.is-active {
+            animation: proof-pack-funnel-in 0.55s cubic-bezier(0.33, 1, 0.68, 1) 2.05s forwards;
+        }
+
+        .proof-pack-funnel-line {
+            width: 2px;
+            height: 100%;
+            border-radius: 9999px;
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.85) 70%, rgba(245, 158, 11, 0.35));
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+            transform: scaleY(0);
+            transform-origin: top center;
+            will-change: transform;
+        }
+
+        .proof-pack-funnel.is-active .proof-pack-funnel-line {
+            animation: proof-pack-funnel-draw 0.85s cubic-bezier(0.33, 1, 0.68, 1) 2.1s forwards;
+        }
+
+        @keyframes proof-pack-funnel-in {
+            to { opacity: 1; }
+        }
+
+        @keyframes proof-pack-funnel-draw {
+            0% { transform: scaleY(0); opacity: 0.4; }
+            100% { transform: scaleY(1); opacity: 1; }
+        }
+
+        /* Pack module chip: monotone → gold via opacity overlay (smooth, no gradient snap) */
+        .proof-pack-chip {
+            position: relative;
+            isolation: isolate;
+            transform: scale(0.94) translateY(10px);
+            opacity: 0.65;
+            border: 1px solid rgba(148, 163, 184, 0.38);
+            background-image:
+                linear-gradient(145deg, rgba(241, 245, 249, 0.88) 0%, rgba(226, 232, 240, 0.45) 52%, rgba(148, 163, 184, 0.12) 100%);
+            box-shadow:
+                0 4px 14px rgba(15, 23, 42, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.35);
+            filter: grayscale(1);
+            will-change: transform, opacity, filter, border-color, box-shadow;
+        }
+
+        .proof-pack-chip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background-image:
+                linear-gradient(145deg, rgba(255, 251, 235, 0.96) 0%, rgba(254, 243, 199, 0.42) 48%, rgba(245, 158, 11, 0.16) 100%);
+            opacity: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .dark .proof-pack-chip {
+            border-color: rgba(100, 116, 139, 0.45);
+            background-image:
+                linear-gradient(145deg, rgba(51, 65, 85, 0.75) 0%, rgba(30, 41, 59, 0.55) 52%, rgba(71, 85, 105, 0.2) 100%);
+            box-shadow:
+                0 4px 14px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .dark .proof-pack-chip::before {
+            background-image:
+                linear-gradient(145deg, rgba(120, 53, 15, 0.58) 0%, rgba(69, 26, 3, 0.42) 48%, rgba(245, 158, 11, 0.14) 100%);
+        }
+
+        .proof-pack-chip > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .proof-pack-chip-icon {
+            color: #64748b;
+            background: rgba(100, 116, 139, 0.14);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            transition: none;
+        }
+
+        .dark .proof-pack-chip-icon {
+            color: #94a3b8;
+            background: rgba(71, 85, 105, 0.35);
+            border-color: rgba(100, 116, 139, 0.4);
+        }
+
+        .proof-pack-chip-tag {
+            color: #64748b;
+        }
+
+        .dark .proof-pack-chip-tag {
+            color: #94a3b8;
+        }
+
+        .proof-pack-chip-title {
+            color: #475569;
+        }
+
+        .dark .proof-pack-chip-title {
+            color: #cbd5e1;
+        }
+
+        @keyframes proof-pack-chip-in {
+            0% {
+                transform: scale(0.94) translateY(10px);
+                opacity: 0.65;
+                filter: grayscale(1);
+                border-color: rgba(148, 163, 184, 0.38);
+                box-shadow:
+                    0 4px 14px rgba(15, 23, 42, 0.05),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+            }
+            100% {
+                transform: scale(1.05) translateY(0);
+                opacity: 1;
+                filter: grayscale(0);
+                border-color: rgba(245, 158, 11, 0.48);
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.12),
+                    0 8px 22px rgba(245, 158, 11, 0.14),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+                    0 0 0 0 rgba(245, 158, 11, 0.28);
+            }
+        }
+
+        @keyframes proof-pack-chip-in-dark {
+            0% {
+                transform: scale(0.94) translateY(10px);
+                opacity: 0.65;
+                filter: grayscale(1);
+                border-color: rgba(100, 116, 139, 0.45);
+                box-shadow:
+                    0 4px 14px rgba(0, 0, 0, 0.28),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            }
+            100% {
+                transform: scale(1.05) translateY(0);
+                opacity: 1;
+                filter: grayscale(0);
+                border-color: rgba(245, 158, 11, 0.48);
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.18),
+                    0 8px 22px rgba(245, 158, 11, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                    0 0 0 0 rgba(245, 158, 11, 0.28);
+            }
+        }
+
+        @keyframes proof-pack-chip-sheen {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .proof-pack-chip.is-assembling {
+            animation:
+                proof-pack-chip-in 1.35s cubic-bezier(0.33, 1, 0.68, 1) 2.85s forwards,
+                proof-pack-chip-heartbeat 3s cubic-bezier(0.45, 0, 0.55, 1) 4.35s infinite;
+        }
+
+        .dark .proof-pack-chip.is-assembling {
+            animation:
+                proof-pack-chip-in-dark 1.35s cubic-bezier(0.33, 1, 0.68, 1) 2.85s forwards,
+                proof-pack-chip-heartbeat-dark 3s cubic-bezier(0.45, 0, 0.55, 1) 4.35s infinite;
+        }
+
+        .proof-pack-chip.is-assembling::before {
+            animation: proof-pack-chip-sheen 1.35s cubic-bezier(0.33, 1, 0.68, 1) 2.85s forwards;
+        }
+
+        @keyframes proof-pack-chip-heartbeat {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.12),
+                    0 8px 22px rgba(245, 158, 11, 0.14),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+                    0 0 0 0 rgba(245, 158, 11, 0.28);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.16),
+                    0 10px 28px rgba(245, 158, 11, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+                    0 0 0 12px rgba(245, 158, 11, 0);
+            }
+        }
+
+        @keyframes proof-pack-chip-heartbeat-dark {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.18),
+                    0 8px 22px rgba(245, 158, 11, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                    0 0 0 0 rgba(245, 158, 11, 0.28);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.22),
+                    0 10px 28px rgba(245, 158, 11, 0.18),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                    0 0 0 12px rgba(245, 158, 11, 0);
+            }
+        }
+
+        .proof-pack-chip.is-assembling .proof-pack-chip-icon {
+            animation: proof-pack-chip-icon-in 1.2s cubic-bezier(0.33, 1, 0.68, 1) 3.05s forwards;
+        }
+
+        .proof-pack-chip.is-assembling .proof-pack-chip-tag {
+            animation: proof-pack-chip-tag-in 1.15s cubic-bezier(0.33, 1, 0.68, 1) 3.15s forwards;
+        }
+
+        .dark .proof-pack-chip.is-assembling .proof-pack-chip-tag {
+            animation: proof-pack-chip-tag-in-dark 1.15s cubic-bezier(0.33, 1, 0.68, 1) 3.15s forwards;
+        }
+
+        .proof-pack-chip.is-assembling .proof-pack-chip-title {
+            animation: proof-pack-chip-title-in 1.15s cubic-bezier(0.33, 1, 0.68, 1) 3.22s forwards;
+        }
+
+        .dark .proof-pack-chip.is-assembling .proof-pack-chip-title {
+            animation: proof-pack-chip-title-in-dark 1.15s cubic-bezier(0.33, 1, 0.68, 1) 3.22s forwards;
+        }
+
+        @keyframes proof-pack-chip-icon-in {
+            from {
+                color: #64748b;
+                background: rgba(100, 116, 139, 0.14);
+                border-color: rgba(148, 163, 184, 0.28);
+                transform: scale(1);
+            }
+            to {
+                color: #d97706;
+                background: rgba(245, 158, 11, 0.15);
+                border-color: rgba(245, 158, 11, 0.28);
+                transform: scale(1.02);
+            }
+        }
+
+        .dark .proof-pack-chip.is-assembling .proof-pack-chip-icon {
+            animation: proof-pack-chip-icon-in-dark 1.2s cubic-bezier(0.33, 1, 0.68, 1) 3.05s forwards;
+        }
+
+        @keyframes proof-pack-chip-icon-in-dark {
+            from {
+                color: #94a3b8;
+                background: rgba(71, 85, 105, 0.35);
+                border-color: rgba(100, 116, 139, 0.4);
+                transform: scale(1);
+            }
+            to {
+                color: #fbbf24;
+                background: rgba(245, 158, 11, 0.18);
+                border-color: rgba(245, 158, 11, 0.35);
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes proof-pack-chip-tag-in {
+            from { color: #64748b; letter-spacing: 0.06em; }
+            to { color: #d97706; letter-spacing: 0.08em; }
+        }
+
+        @keyframes proof-pack-chip-tag-in-dark {
+            from { color: #94a3b8; letter-spacing: 0.06em; }
+            to { color: #fbbf24; letter-spacing: 0.08em; }
+        }
+
+        @keyframes proof-pack-chip-title-in {
+            from { color: #475569; opacity: 0.85; }
+            to { color: #1e293b; opacity: 1; }
+        }
+
+        @keyframes proof-pack-chip-title-in-dark {
+            from { color: #cbd5e1; opacity: 0.85; }
+            to { color: #f8fafc; opacity: 1; }
+        }
+
+        .proof-pack-chip-pulse {
+            position: absolute;
+            inset: -3px;
+            border-radius: inherit;
+            border: 1px solid transparent;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .proof-pack-chip.is-assembling .proof-pack-chip-pulse {
+            border-color: rgba(245, 158, 11, 0.32);
+            background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.14), transparent 72%);
+            animation:
+                proof-pack-chip-pulse-in 1.15s cubic-bezier(0.33, 1, 0.68, 1) 3.35s 2 forwards,
+                proof-pack-chip-pulse-loop 3s cubic-bezier(0.45, 0, 0.55, 1) 4.35s infinite;
+        }
+
+        @keyframes proof-pack-chip-pulse-in {
+            0% { transform: scale(1); opacity: 0.35; }
+            100% { transform: scale(1.1); opacity: 0; }
+        }
+
+        @keyframes proof-pack-chip-pulse-loop {
+            0%, 100% { transform: scale(1); opacity: 0.28; }
+            50% { transform: scale(1.05); opacity: 0.1; }
+        }
+
+        .proof-pack-desc {
+            opacity: 0;
+            transform: translateY(8px);
+            max-width: 36rem;
+            text-align: center;
+        }
+
+        .proof-pack-desc.is-ready {
+            animation: proof-pack-desc-in 0.75s cubic-bezier(0.33, 1, 0.68, 1) 4s forwards;
+        }
+
+        @keyframes proof-pack-desc-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .proof-pack-formula.is-running,
+            .proof-pack-formula.is-merging,
+            .proof-pack-formula.is-running .proof-pack-scan,
+            .proof-pack-formula.is-running .proof-formula-line,
+            .proof-pack-funnel.is-active,
+            .proof-pack-funnel.is-active .proof-pack-funnel-line,
+            .proof-pack-chip.is-assembling,
+            .proof-pack-chip.is-assembling::before,
+            .proof-pack-chip.is-assembling .proof-pack-chip-pulse,
+            .proof-pack-chip.is-assembling .proof-pack-chip-icon,
+            .proof-pack-chip.is-assembling .proof-pack-chip-tag,
+            .proof-pack-chip.is-assembling .proof-pack-chip-title,
+            .proof-pack-desc.is-ready {
+                animation: none !important;
+            }
+
+            .proof-pack-formula.is-merging {
+                opacity: 0.72;
+                transform: scale(0.84);
+                border-color: rgba(245, 158, 11, 0.28);
+            }
+
+            .proof-pack-chip.is-assembling {
+                opacity: 1;
+                transform: scale(1.05);
+                filter: none;
+                border-color: rgba(245, 158, 11, 0.48);
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.12),
+                    0 8px 22px rgba(245, 158, 11, 0.14),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+            }
+
+            .proof-pack-chip.is-assembling::before {
+                opacity: 1;
+            }
+
+            .dark .proof-pack-chip.is-assembling {
+                box-shadow:
+                    0 0 0 1px rgba(245, 158, 11, 0.18),
+                    0 8px 22px rgba(245, 158, 11, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            .proof-pack-chip.is-assembling .proof-pack-chip-icon {
+                color: #d97706;
+                background: rgba(245, 158, 11, 0.15);
+                border-color: rgba(245, 158, 11, 0.28);
+            }
+
+            .dark .proof-pack-chip.is-assembling .proof-pack-chip-icon {
+                color: #fbbf24;
+            }
+
+            .proof-pack-chip.is-assembling .proof-pack-chip-tag {
+                color: #d97706;
+            }
+
+            .dark .proof-pack-chip.is-assembling .proof-pack-chip-tag {
+                color: #fbbf24;
+            }
+
+            .proof-pack-chip.is-assembling .proof-pack-chip-title {
+                color: #1e293b;
+            }
+
+            .dark .proof-pack-chip.is-assembling .proof-pack-chip-title {
+                color: #f8fafc;
+            }
+
+            .proof-pack-funnel.is-active,
+            .proof-pack-desc.is-ready {
+                opacity: 1;
+                transform: none;
+            }
+
+            .proof-pack-funnel.is-active .proof-pack-funnel-line {
+                transform: scaleY(1);
+            }
         }
 
         .proof-vrp-node {
@@ -1280,24 +1799,71 @@
             animation: proof-vrp-node-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
-        .proof-build-layer.is-active .proof-vrp-node:nth-child(2) { animation-delay: 0.05s; }
-        .proof-build-layer.is-active .proof-vrp-node:nth-child(3) { animation-delay: 0.12s; }
-        .proof-build-layer.is-active .proof-vrp-node:nth-child(4) { animation-delay: 0.18s; }
-        .proof-build-layer.is-active .proof-vrp-node:nth-child(5) { animation-delay: 0.24s; }
-        .proof-build-layer.is-active .proof-vrp-node:nth-child(6) { animation-delay: 0.3s; }
-        .proof-build-layer.is-active .proof-vrp-node:nth-child(7) { animation-delay: 0.36s; }
-
         @keyframes proof-vrp-node-in {
             from { transform: scale(0.7); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
+        }
+
+        .proof-vrp-sol-arc {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 2;
+            opacity: 0;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+        }
+
+        .proof-build-layer.is-active .proof-vrp-sol-arc {
+            animation:
+                proof-vrp-sol-draw 0.55s cubic-bezier(0.33, 1, 0.68, 1) forwards,
+                proof-vrp-sol-flow 1.15s linear infinite;
+        }
+
+        @keyframes proof-vrp-sol-draw {
+            0% {
+                opacity: 0.15;
+                stroke-dasharray: 100;
+                stroke-dashoffset: 100;
+            }
+            78% {
+                opacity: 1;
+                stroke-dasharray: 100;
+                stroke-dashoffset: 0;
+            }
+            100% {
+                opacity: 1;
+                stroke-dasharray: 5.5 4;
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes proof-vrp-sol-flow {
+            to { stroke-dashoffset: -19; }
+        }
+
+        .proof-vrp-sol-legend {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+
+        .proof-build-layer.is-active .proof-vrp-sol-legend {
+            animation: proof-vrp-sol-legend-in 0.55s cubic-bezier(0.33, 1, 0.68, 1) 1.85s forwards;
+        }
+
+        @keyframes proof-vrp-sol-legend-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .proof-solve-badge {
             opacity: 0;
             transform: translateY(6px);
             transition:
-                opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.55s,
-                transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.55s;
+                opacity 0.45s cubic-bezier(0.33, 1, 0.68, 1) 2.05s,
+                transform 0.45s cubic-bezier(0.33, 1, 0.68, 1) 2.05s;
         }
 
         .proof-build-layer.is-active .proof-solve-badge {
@@ -1308,18 +1874,24 @@
         @media (prefers-reduced-motion: reduce) {
             .proof-build-layer,
             .proof-formula-line,
-            .proof-pack-chip,
-            .proof-pack-ghost,
             .proof-solve-badge,
-            .proof-vrp-node {
+            .proof-vrp-node,
+            .proof-vrp-sol-legend {
                 transition: none !important;
                 animation: none !important;
             }
 
-            .proof-build-layer.is-active .proof-vrp-route {
+            .proof-build-layer.is-active .proof-vrp-sol-arc {
                 animation: none;
+                stroke-dasharray: none;
                 stroke-dashoffset: 0;
                 opacity: 1;
+            }
+
+            .proof-build-layer.is-active .proof-vrp-sol-legend,
+            .proof-build-layer.is-active .proof-solve-badge {
+                opacity: 1;
+                transform: none;
             }
 
             .proof-build-layer.is-active .proof-vrp-open-edge {
@@ -3008,7 +3580,8 @@
                             label: "Pack",
                             caption: "Compress the formulation into a compact, reusable optimization module.",
                             module: "Vehicle Routing Problem",
-                            module_tag: "APS module"
+                            module_tag: "APS module",
+                            module_desc: "The mathematical model is packed into an optimization module — ready to use out of the box, or adapted to the customer’s requirements."
                         },
                         {
                             id: "solve",
@@ -3352,7 +3925,8 @@
                             label: "Đóng gói",
                             caption: "Nén công thức thành một mô-đun tối ưu hoá gọn, tái sử dụng được.",
                             module: "Bài toán định tuyến xe (VRP)",
-                            module_tag: "Mô-đun APS"
+                            module_tag: "Mô-đun APS",
+                            module_desc: "Mô hình toán học được đóng gói thành mô-đun tối ưu hoá — sẵn sàng dùng ngay, hoặc điều chỉnh theo yêu cầu của khách hàng."
                         },
                         {
                             id: "solve",
@@ -3696,7 +4270,8 @@
                             label: "Packen",
                             caption: "Die Formulierung in ein kompaktes, wiederverwendbares Optimierungsmodul verdichten.",
                             module: "Vehicle Routing Problem",
-                            module_tag: "APS-Modul"
+                            module_tag: "APS-Modul",
+                            module_desc: "Das mathematische Modell wird in ein Optimierungsmodul gepackt — sofort einsatzbereit oder anpassbar an die Kundenanforderungen."
                         },
                         {
                             id: "solve",
@@ -5400,10 +5975,6 @@
             });
         };
 
-        const plainProofFormula = (line) => String(line || '')
-            .replace(/\_\{([^}]+)\}/g, '_$1')
-            .replace(/\^\{([^}]+)\}/g, '^$1');
-
         const normalizeProofFormulaLine = (line) => {
             if (line && typeof line === 'object') return line;
             const text = String(line || '');
@@ -5428,7 +5999,54 @@
                 edges.push([i, (i + 1) % customers.length]);
                 edges.push([i, (i + 2) % customers.length]);
             }
-            return { depot, customers, edges, vb: { w: 300, h: 236 } };
+            // Solution: 3 vehicles, contiguous clusters around the ring
+            const routes = [
+                { id: 'v1', color: '#f59e0b', label: 'V1', nodes: [1, 2, 3] },
+                { id: 'v2', color: '#38bdf8', label: 'V2', nodes: [4, 5, 6] },
+                { id: 'v3', color: '#c084fc', label: 'V3', nodes: [7, 8, 9, 10] },
+            ];
+            const customerRoute = {};
+            routes.forEach((route) => {
+                route.nodes.forEach((id) => { customerRoute[id] = route; });
+            });
+            const shortenSeg = (x1, y1, x2, y2, padA, padB) => {
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const len = Math.hypot(dx, dy) || 1;
+                const ux = dx / len;
+                const uy = dy / len;
+                return {
+                    x1: x1 + ux * padA,
+                    y1: y1 + uy * padA,
+                    x2: x2 - ux * padB,
+                    y2: y2 - uy * padB,
+                };
+            };
+            const solutionArcs = [];
+            let arcIndex = 0;
+            routes.forEach((route, routeIdx) => {
+                const stops = [depot, ...route.nodes.map((id) => customers[id - 1]), depot];
+                for (let i = 0; i < stops.length - 1; i++) {
+                    const a = stops[i];
+                    const b = stops[i + 1];
+                    const fromDepot = i === 0;
+                    const toDepot = i === stops.length - 2;
+                    const seg = shortenSeg(
+                        a.x, a.y, b.x, b.y,
+                        fromDepot ? 24 : 9,
+                        toDepot ? 24 : 9
+                    );
+                    solutionArcs.push({
+                        ...seg,
+                        route,
+                        routeIdx,
+                        delay: 0.12 + arcIndex * 0.11 + routeIdx * 0.08,
+                        key: `${route.id}-${i}`,
+                    });
+                    arcIndex += 1;
+                }
+            });
+            return { depot, customers, edges, routes, customerRoute, solutionArcs, vb: { w: 300, h: 236 } };
         })();
 
         // Proof foundation — manifesto + model→module→solve visual (Plan B)
@@ -5460,7 +6078,7 @@
                 }
                 const timer = setInterval(() => {
                     setStageIdx(prev => (prev + 1) % stages.length);
-                }, 4200);
+                }, 6800);
                 return () => clearInterval(timer);
             }, [stages.length, inView, autoPlay]);
 
@@ -5468,7 +6086,7 @@
             const formulateStage = stages[0] || {};
             const packStage = stages[1] || {};
             const solveStage = stages[2] || {};
-            const { depot, customers, edges, vb } = PROOF_VRP_INSTANCE;
+            const { depot, customers, edges, routes, customerRoute, solutionArcs, vb } = PROOF_VRP_INSTANCE;
 
             const selectStage = (idx) => {
                 setStageIdx(idx);
@@ -5583,7 +6201,7 @@
                                                                     key={`${row.lhs}-${row.rhs || i}`}
                                                                     className={`proof-formula-line proof-formula-row ${i === 0 ? 'text-brand-gold font-semibold' : ''}`}
                                                                 >
-                                                                    <div className="whitespace-pre min-w-0 overflow-x-auto">
+                                                                    <div className="whitespace-pre min-w-0">
                                                                         {renderProofFormula(row.lhs)}
                                                                     </div>
                                                                     {row.rhs ? (
@@ -5692,68 +6310,188 @@
 
                                     {/* Pack */}
                                     <div className={`proof-build-layer ${stageIdx === 1 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 1}>
-                                        <div className="proof-pack-ghost font-mono text-[10px] text-slate-400 dark:text-slate-500 leading-snug whitespace-pre">
-                                            {(formulateStage.lines || []).slice(0, 2).map((line) => {
-                                                const row = normalizeProofFormulaLine(line);
-                                                return plainProofFormula(row.rhs ? `${row.lhs}  ${row.rhs}` : row.lhs);
-                                            }).join('\n')}
-                                        </div>
-                                        <div className="proof-pack-chip inline-flex items-center gap-3 rounded-xl border border-brand-gold/30 bg-brand-gold/8 px-4 py-3 max-w-full">
-                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-gold/15 text-brand-gold">
-                                                <VrpIcon />
-                                            </span>
-                                            <div className="min-w-0">
-                                                <div className="text-[9px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-0.5">
-                                                    {packStage.module_tag}
-                                                </div>
-                                                <div className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">
-                                                    {packStage.module}
+                                        <div
+                                            key={stageIdx === 1 ? 'pack-anim' : 'pack-idle'}
+                                            className="proof-pack-scene"
+                                        >
+                                            <div className={`proof-pack-formula ${stageIdx === 1 ? 'is-running is-merging' : ''}`}>
+                                                <div className="proof-pack-scan" aria-hidden="true" />
+                                                <div className="relative z-[1] font-mono text-[10px] sm:text-[11px] md:text-xs leading-snug md:leading-relaxed text-slate-600 dark:text-slate-300 space-y-1 overflow-x-auto">
+                                                    {(formulateStage.lines || []).map((line, i) => {
+                                                        const row = normalizeProofFormulaLine(line);
+                                                        return (
+                                                            <div
+                                                                key={`${row.lhs}-${row.rhs || i}`}
+                                                                className={`proof-formula-line proof-formula-row ${i === 0 ? 'text-brand-gold font-semibold' : ''}`}
+                                                            >
+                                                                <div className="whitespace-pre min-w-0">
+                                                                    {renderProofFormula(row.lhs)}
+                                                                </div>
+                                                                {row.rhs ? (
+                                                                    <div className="proof-formula-rhs whitespace-pre">
+                                                                        {renderProofFormula(row.rhs)}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="proof-formula-rhs" aria-hidden="true" />
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
+
+                                            <div className={`proof-pack-funnel ${stageIdx === 1 ? 'is-active' : ''}`} aria-hidden="true">
+                                                <div className="proof-pack-funnel-line" />
+                                            </div>
+
+                                            <div className={`proof-pack-chip inline-flex items-center gap-4 md:gap-5 rounded-2xl px-6 py-4 md:px-8 md:py-5 max-w-full ${stageIdx === 1 ? 'is-assembling' : ''}`}>
+                                                <span className="proof-pack-chip-pulse sc-pulse-ring-gold" aria-hidden="true" />
+                                                <span className="proof-pack-chip-icon flex h-12 w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-xl scale-125">
+                                                    <VrpIcon />
+                                                </span>
+                                                <div className="min-w-0">
+                                                    <div className="proof-pack-chip-tag text-[11px] md:text-xs font-mono font-bold uppercase tracking-wider mb-1">
+                                                        {packStage.module_tag}
+                                                    </div>
+                                                    <div className="proof-pack-chip-title text-lg md:text-xl font-bold truncate">
+                                                        {packStage.module}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {packStage.module_desc && (
+                                                <p className={`proof-pack-desc text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed ${stageIdx === 1 ? 'is-ready' : ''}`}>
+                                                    {packStage.module_desc}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 
                                     {/* Solve */}
                                     <div className={`proof-build-layer ${stageIdx === 2 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 2}>
-                                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                                            <svg key={stageIdx === 2 ? 'vrp-run' : 'vrp-idle'} viewBox="0 0 220 110" className="w-full sm:w-56 h-28 shrink-0" aria-hidden="true">
-                                                <path
-                                                    className="proof-vrp-route"
-                                                    d="M28 78 L58 34 L102 52 L138 22 L176 48 L196 78 Z"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="1.75"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    style={{ color: '#f59e0b' }}
-                                                />
-                                                {[
-                                                    { x: 28, y: 78, depot: true },
-                                                    { x: 58, y: 34 },
-                                                    { x: 102, y: 52 },
-                                                    { x: 138, y: 22 },
-                                                    { x: 176, y: 48 },
-                                                    { x: 196, y: 78 },
-                                                ].map((n, i) => (
-                                                    <g key={i} className="proof-vrp-node">
-                                                        <circle
-                                                            cx={n.x}
-                                                            cy={n.y}
-                                                            r={n.depot ? 6.5 : 4.5}
-                                                            fill={n.depot ? '#f59e0b' : 'currentColor'}
-                                                            className={n.depot ? '' : 'text-slate-500 dark:text-slate-300'}
+                                        <div className="flex flex-col lg:flex-row gap-5 md:gap-6 lg:items-center">
+                                            <div className="flex-1 flex items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/60 dark:bg-slate-950/40 px-3 py-3 md:px-4 md:py-4 min-h-[18rem] md:min-h-[22rem]">
+                                                <svg
+                                                    key={stageIdx === 2 ? 'vrp-solve' : 'vrp-solve-idle'}
+                                                    viewBox={`0 0 ${vb.w} ${vb.h}`}
+                                                    className="w-full h-full max-h-[22rem] md:max-h-[24rem]"
+                                                    aria-hidden="true"
+                                                >
+                                                    <defs>
+                                                        {routes.map((route) => (
+                                                            <marker
+                                                                key={`m-${route.id}`}
+                                                                id={`proof-vrp-arrow-${route.id}`}
+                                                                viewBox="0 0 10 10"
+                                                                refX="9"
+                                                                refY="5"
+                                                                markerWidth="5.5"
+                                                                markerHeight="5.5"
+                                                                orient="auto"
+                                                                markerUnits="strokeWidth"
+                                                            >
+                                                                <path d="M 0 1.2 L 9 5 L 0 8.8 Z" fill={route.color} />
+                                                            </marker>
+                                                        ))}
+                                                    </defs>
+
+                                                    {solutionArcs.map((arc) => (
+                                                        <line
+                                                            key={arc.key}
+                                                            className="proof-vrp-sol-arc"
+                                                            pathLength="100"
+                                                            x1={arc.x1}
+                                                            y1={arc.y1}
+                                                            x2={arc.x2}
+                                                            y2={arc.y2}
+                                                            stroke={arc.route.color}
+                                                            markerEnd={`url(#proof-vrp-arrow-${arc.route.id})`}
+                                                            style={{
+                                                                animationDelay: `${arc.delay}s, ${arc.delay + 0.55}s`,
+                                                            }}
                                                         />
-                                                        {n.depot && (
-                                                            <circle cx={n.x} cy={n.y} r="10" fill="none" stroke="#f59e0b" strokeOpacity="0.35" strokeWidth="1" />
-                                                        )}
+                                                    ))}
+
+                                                    {customers.map((n, i) => {
+                                                        const route = customerRoute[n.id];
+                                                        const color = route ? route.color : '#64748b';
+                                                        return (
+                                                            <g
+                                                                key={n.id}
+                                                                className="proof-vrp-node"
+                                                                style={{ animationDelay: `${0.05 + i * 0.04}s` }}
+                                                            >
+                                                                <circle
+                                                                    cx={n.x}
+                                                                    cy={n.y}
+                                                                    r="7"
+                                                                    className="fill-white dark:fill-slate-900"
+                                                                    stroke={color}
+                                                                    strokeWidth="1.75"
+                                                                />
+                                                                <text
+                                                                    x={n.x}
+                                                                    y={n.y + 3.2}
+                                                                    textAnchor="middle"
+                                                                    fill={color}
+                                                                    style={{ fontSize: '8px', fontFamily: 'ui-monospace, monospace', fontWeight: 700 }}
+                                                                >
+                                                                    {n.id}
+                                                                </text>
+                                                            </g>
+                                                        );
+                                                    })}
+
+                                                    <g className="proof-vrp-node" style={{ animationDelay: '0.02s' }}>
+                                                        <circle cx={depot.x} cy={depot.y} r="22" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" strokeWidth="1.75" />
+                                                        <circle cx={depot.x} cy={depot.y} r="22" fill="none" stroke="#f59e0b" strokeOpacity="0.25" strokeWidth="1" />
+                                                        {routes.map((route, i) => {
+                                                            const dx = (i - 1) * 8;
+                                                            return (
+                                                                <g key={route.id} className="proof-vrp-depot-vehicle" transform={`translate(${depot.x + dx}, ${depot.y - 1})`}>
+                                                                    <rect x="-4.5" y="-3" width="9" height="5.5" rx="1" fill={route.color} />
+                                                                    <rect x="-2.5" y="-5.5" width="5" height="2.5" rx="0.6" fill={route.color} opacity="0.75" />
+                                                                    <circle cx="-2.8" cy="3.2" r="1.1" fill="#334155" />
+                                                                    <circle cx="2.8" cy="3.2" r="1.1" fill="#334155" />
+                                                                </g>
+                                                            );
+                                                        })}
+                                                        <text
+                                                            x={depot.x}
+                                                            y={depot.y + 16}
+                                                            textAnchor="middle"
+                                                            fill="#b45309"
+                                                            style={{ fontSize: '7px', fontFamily: 'ui-monospace, monospace', fontWeight: 700 }}
+                                                        >
+                                                            {formulateStage.depot_label}
+                                                        </text>
                                                     </g>
-                                                ))}
-                                            </svg>
-                                            <div className="min-w-0 flex-1">
-                                                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-1.5">
+                                                </svg>
+                                            </div>
+
+                                            <div className="min-w-0 lg:w-64 xl:w-72 shrink-0 flex flex-col gap-3">
+                                                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-gold">
                                                     {packStage.module}
                                                 </div>
-                                                <div className="proof-solve-badge inline-flex items-center gap-2 rounded-full border border-brand-gold/25 bg-brand-gold/8 px-3 py-1.5 text-[10px] sm:text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-200">
+                                                <div className="proof-vrp-sol-legend flex flex-col gap-2">
+                                                    {routes.map((route) => (
+                                                        <div
+                                                            key={route.id}
+                                                            className="flex items-center gap-2.5 text-[11px] sm:text-xs font-mono text-slate-600 dark:text-slate-300"
+                                                        >
+                                                            <span
+                                                                className="h-2 w-2 rounded-full shrink-0"
+                                                                style={{ background: route.color, boxShadow: `0 0 0 3px ${route.color}22` }}
+                                                            />
+                                                            <span className="font-bold" style={{ color: route.color }}>{route.label}</span>
+                                                            <span className="text-slate-400">·</span>
+                                                            <span>
+                                                                D{route.nodes.map((id) => `→${id}`).join('')}→D
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="proof-solve-badge inline-flex items-center gap-2 rounded-full border border-brand-gold/25 bg-brand-gold/8 px-3 py-1.5 text-[10px] sm:text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-200 w-fit">
                                                     <span className="h-1.5 w-1.5 rounded-full bg-brand-gold shrink-0" />
                                                     {solveStage.proof}
                                                 </div>
