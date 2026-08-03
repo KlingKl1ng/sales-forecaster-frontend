@@ -11,6 +11,7 @@ const cleanRoutes = new Set([
   'abcxyz',
   'accept-invite',
   'admin',
+  'contact',
   'dashboard',
   'forecaster',
   'index',
@@ -96,5 +97,5 @@ const server = createServer((req, res) => {
 
 server.listen(port, host, () => {
   console.log(`Operartis frontend server running at http://${host}:${port}/`);
-  console.log('Clean URLs enabled: /forecaster, /mlforecaster, /inventory, /abcxyz, /dashboard');
+  console.log('Clean URLs enabled: /forecaster, /mlforecaster, /inventory, /abcxyz, /dashboard, /contact');
 });

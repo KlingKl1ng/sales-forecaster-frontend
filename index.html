@@ -2123,8 +2123,6 @@
         }
         .opus-marquee {
             animation: opusMarquee 38s linear infinite;
-            -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-            mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
         }
 
         .opus-marquee-wrap {
@@ -3538,6 +3536,7 @@
                 },
                 ...otherHorizons,
                 { id: 'about', label: ui.nav_about },
+                { id: 'contact', label: ui.nav_contact },
             ];
         };
 
@@ -8226,7 +8225,7 @@
                         <p className="text-slate-800 dark:text-slate-200 font-medium max-w-2xl md:max-w-4xl mx-auto text-base md:text-lg leading-relaxed md:whitespace-nowrap">{content.ui.invite_text}</p>
                         <p className="text-brand-gold font-bold uppercase tracking-widest mt-5 text-xs">Let’s optimize today — so you can grow stronger tomorrow.</p>
                         <a
-                            href="mailto:info@operartis.io"
+                            href="./contact"
                             className="inline-flex items-center justify-center gap-2 mt-6 px-6 py-3 rounded-xl bg-brand-gold text-white text-sm font-bold shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all"
                         >
                             {content.ui.contact_operartis}
@@ -8274,6 +8273,7 @@
             const companyLinks = [
                 { id: 'about', label: ui.nav_about },
                 { id: 'about', label: ui.cta_why },
+                { id: 'contact', label: ui.nav_contact, href: './contact' },
             ];
 
             const legalLinks = [
@@ -8316,13 +8316,17 @@
                                     <ul className="space-y-0.5 pb-3">
                                         {companyLinks.map((link, i) => (
                                             <li key={`${link.label}-${i}`}>
-                                                <button type="button" onClick={() => onNav(link.id)} className={footerMobileLinkClass}>
-                                                    {link.label}
-                                                </button>
+                                                {link.href ? (
+                                                    <a href={link.href} className={footerMobileLinkClass}>{link.label}</a>
+                                                ) : (
+                                                    <button type="button" onClick={() => onNav(link.id)} className={footerMobileLinkClass}>
+                                                        {link.label}
+                                                    </button>
+                                                )}
                                             </li>
                                         ))}
                                         <li className="opus-site-footer-divider pt-2 mt-1 border-t">
-                                            <a href="mailto:info@operartis.io" className={footerMobileLinkClass}>
+                                            <a href="./contact" className={footerMobileLinkClass}>
                                                 {ui.footer_partner}
                                             </a>
                                         </li>
@@ -8341,7 +8345,7 @@
                             </div>
 
                             <a
-                                href="mailto:info@operartis.io"
+                                href="./contact"
                                 className="mt-6 flex h-11 w-full items-center justify-center rounded-xl bg-gradient-to-tr from-brand-gold to-brand-dark text-sm font-bold text-white shadow-lg shadow-brand-gold/20 hover:scale-[1.01] active:scale-[0.98] transition-transform"
                             >
                                 {ui.nav_contact}
@@ -8391,13 +8395,17 @@
                                 <ul className="space-y-2.5">
                                     {companyLinks.map((link, i) => (
                                         <li key={`${link.label}-${i}`}>
-                                            <button type="button" onClick={() => onNav(link.id)} className={footerLinkClass}>
-                                                {link.label}
-                                            </button>
+                                            {link.href ? (
+                                                <a href={link.href} className={footerLinkClass}>{link.label}</a>
+                                            ) : (
+                                                <button type="button" onClick={() => onNav(link.id)} className={footerLinkClass}>
+                                                    {link.label}
+                                                </button>
+                                            )}
                                         </li>
                                     ))}
                                     <li className="opus-site-footer-divider pt-3 mt-1 border-t">
-                                        <a href="mailto:info@operartis.io" className={footerLinkClass}>
+                                        <a href="./contact" className={footerLinkClass}>
                                             {ui.footer_partner}
                                         </a>
                                     </li>
@@ -8510,6 +8518,11 @@
             }, [getSectionList, getAnchorOffset]);
 
             const scrollToNavItem = useCallback((id) => {
+                if (id === 'contact') {
+                    window.location.href = './contact';
+                    return;
+                }
+
                 const scrollRoot = getMainScrollRoot();
                 const el = document.getElementById(getNavTargetId(id));
                 if (!scrollRoot || !el) return;
@@ -8545,6 +8558,10 @@
             }, [getAnchorOffset, updateActiveFromScroll]);
 
             const scrollToId = useCallback((id) => {
+                if (id === 'contact') {
+                    window.location.href = './contact';
+                    return;
+                }
                 if (['supply-chain', 'industry-40', 'analytics', 'about', 'platform'].includes(id)) {
                     scrollToNavItem(id === 'platform' ? 'strategic' : id);
                     return;
