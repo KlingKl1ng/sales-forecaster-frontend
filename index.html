@@ -593,10 +593,20 @@
 
         .header-nav-child {
             width: 100%;
+            justify-content: flex-start;
             text-align: left;
             font-size: 0.625rem;
             padding: 0.45rem 0.65rem;
             border-radius: 0.5rem;
+        }
+
+        .header-nav-aps-menu .header-nav-child {
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .header-nav-aps-menu .header-nav-child.header-nav-aps-nested-trigger {
+            justify-content: space-between;
         }
 
         .header-nav-aps-wrap {
@@ -659,11 +669,134 @@
             margin-bottom: 0.15rem;
         }
 
+        .header-nav-aps-menu-subhead {
+            border-bottom: none;
+            margin-bottom: 0;
+            margin-top: 0.15rem;
+            color: #92400e;
+            opacity: 0.9;
+        }
+
+        button.header-nav-aps-menu-head {
+            width: 100%;
+            display: block;
+            text-align: left;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        button.header-nav-aps-nested-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        button.header-nav-aps-menu-subhead:hover {
+            opacity: 1;
+        }
+
+        button.header-nav-aps-menu-subhead:focus-visible {
+            outline: 2px solid rgba(245, 158, 11, 0.45);
+            outline-offset: 1px;
+        }
+
+        .header-nav-aps-menu-divider {
+            height: 1px;
+            margin: 0.35rem 0.35rem 0.25rem;
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .header-nav-aps-nested-wrap {
+            position: relative;
+        }
+
+        .header-nav-aps-nested-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            text-align: left;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 0.5rem;
+            transition: background-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .header-nav-aps-nested-trigger:hover,
+        .header-nav-aps-nested-trigger[aria-expanded="true"] {
+            opacity: 1;
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .header-nav-aps-nested-trigger:focus-visible {
+            outline: 2px solid rgba(245, 158, 11, 0.45);
+            outline-offset: 1px;
+        }
+
+        .header-nav-aps-nested-menu {
+            position: absolute;
+            top: 0;
+            left: calc(100% + 0.35rem);
+            z-index: 2;
+            min-width: 11.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            padding: 0.35rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            box-shadow:
+                0 12px 32px rgba(15, 23, 42, 0.14),
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            animation: header-nav-nested-in 0.16s ease-out;
+        }
+
+        .header-nav-aps-nested-menu-left {
+            left: auto;
+            right: calc(100% + 0.35rem);
+        }
+
         .dark .header-nav-aps-menu-head {
             color: #fbbf24;
         }
 
+        .dark .header-nav-aps-menu-subhead {
+            color: #fcd34d;
+        }
+
+        .dark .header-nav-aps-menu-divider {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
         .dark .header-nav-aps-menu {
+            background: rgba(15, 23, 42, 0.96);
+            border-color: rgba(245, 158, 11, 0.2);
+            box-shadow:
+                0 12px 32px rgba(0, 0, 0, 0.45),
+                0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+        }
+
+        .dark .header-nav-aps-nested-trigger:hover,
+        .dark .header-nav-aps-nested-trigger[aria-expanded="true"] {
+            background: rgba(245, 158, 11, 0.12);
+        }
+
+        .dark .header-nav-aps-nested-menu {
             background: rgba(15, 23, 42, 0.96);
             border-color: rgba(245, 158, 11, 0.2);
             box-shadow:
@@ -683,8 +816,21 @@
             }
         }
 
+        @keyframes header-nav-nested-in {
+            from {
+                opacity: 0;
+                transform: translateX(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         @media (prefers-reduced-motion: reduce) {
-            .header-nav-aps-menu {
+            .header-nav-aps-menu,
+            .header-nav-aps-nested-menu {
                 animation: none;
             }
         }
@@ -694,10 +840,65 @@
             margin-left: 0.2rem;
             opacity: 0.65;
             transition: transform 0.2s ease;
+            flex-shrink: 0;
         }
 
         .header-nav-chevron-open {
             transform: rotate(180deg);
+        }
+
+        .header-nav-chevron-nested {
+            margin-left: 0;
+            transform: rotate(-90deg);
+        }
+
+        .header-nav-chevron-nested-open {
+            transform: rotate(90deg);
+        }
+
+        .mobile-nav-nested-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            min-height: 2.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0.625rem 0.75rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: rgb(71 85 105);
+            transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .dark .mobile-nav-nested-trigger {
+            border-color: rgb(30 41 59);
+            background: rgba(15, 23, 42, 0.7);
+            color: rgb(203 213 225);
+        }
+
+        .mobile-nav-nested-trigger[aria-expanded="true"],
+        .mobile-nav-nested-trigger.is-active {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .dark .mobile-nav-nested-trigger[aria-expanded="true"],
+        .dark .mobile-nav-nested-trigger.is-active {
+            color: #fbbf24;
+        }
+
+        .mobile-nav-nested-children {
+            display: grid;
+            gap: 0.5rem;
+            padding-left: 0.5rem;
+            margin-top: 0.5rem;
         }
 
         .mobile-nav-panel {
@@ -3318,14 +3519,32 @@
                 .map(h => ({ id: h.id, label: h.title }));
 
             return [
-                { id: 'supply-chain', label: ui.nav_supply_chain },
-                { id: 'industry-40', label: ui.nav_industry_40 },
-                { id: 'aps-group', label: ui.nav_aps, children: apsChildren },
+                {
+                    id: 'platform-group',
+                    label: ui.nav_platform,
+                    children: [
+                        { id: 'supply-chain', label: ui.nav_supply_chain },
+                        { id: 'industry-40', label: ui.nav_industry_40 },
+                        { id: 'analytics', label: ui.nav_analytics },
+                    ],
+                },
+                {
+                    id: 'solutions-group',
+                    label: ui.nav_solutions,
+                    children: [
+                        { id: 'aps-group', label: ui.nav_aps_system, children: apsChildren },
+                        { id: 'or-process', label: ui.nav_implementation_process },
+                    ],
+                },
                 ...otherHorizons,
-                { id: 'analytics', label: ui.nav_analytics },
-                { id: 'or-process', label: ui.nav_or_process },
                 { id: 'about', label: ui.nav_about },
             ];
+        };
+
+        const navItemContainsId = (item, targetId) => {
+            if (!item || !targetId) return false;
+            if (item.id === targetId) return true;
+            return (item.children || []).some(child => navItemContainsId(child, targetId));
         };
 
         const getNavTargetId = (navId) => {
@@ -3488,7 +3707,7 @@
                         { title: "Commitment to Results", text: "Our mission is not just to deliver a system, but to help you achieve real improvements in efficiency, cost savings, and operational resilience." },
                         { title: "Privacy Policy", text: "Your operational data stays protected. Operartis applies strict confidentiality, least-privilege access, and transparent handling — so responsible privacy becomes a trust advantage in every partnership." }
                     ],
-                    invite_text: "We invite businesses that are serious about transforming their operations, optimizing their supply chain, and building a competitive edge to partner with Operartis.",
+                    invite_text: "Ready to build competitive advantages with an innovative optimization system?",
                     contact_operartis: "Contact Operartis",
                     nav_contact: "Contact",
                     nav_login: "Login",
@@ -3539,7 +3758,7 @@
                     analytics_operartis_title: "Where Operartis Creates Value",
                     analytics_operartis_desc: "Operartis bridges diagnostic visibility with predictive and prescriptive APS — turning ERP and MES data into optimized plans, simulations and decision support.",
                     analytics_tap_hint: "Select a level to explore",
-                    or_process_eyebrow: "Implementation Process for an APS System",
+                    or_process_eyebrow: "Deployment Process for an APS System",
                     or_process_title: "Build Your Own APS — Together With Operartis",
                     or_process_subtitle: "Want to build your own APS system or optimized scenario-based solution with Operartis? Here is how we work together to reach your purpose.",
                     or_process_model_world: "Operartis",
@@ -3634,9 +3853,13 @@
                     platform_title: "Functional module block",
                     nav_supply_chain: "Supply Chain",
                     nav_industry_40: "Industry 4.0",
+                    nav_platform: "Plattform",
                     nav_aps: "APS",
+                    nav_solutions: "Solutions",
+                    nav_aps_system: "APS-System",
                     nav_analytics: "Analytics",
                     nav_or_process: "Process",
+                    nav_implementation_process: "Custom Deployment",
                     nav_about: "About Us",
                     capabilities_label: "Optimization coverage",
                     i4l_eyebrow: "Industry 4.0",
@@ -3842,7 +4065,7 @@
                         { title: "Cam Kết Kết Quả", text: "Sứ mệnh của chúng tôi không chỉ là bàn giao hệ thống, mà là giúp bạn đạt được cải thiện thực sự về hiệu quả, tiết kiệm chi phí và sự bền bỉ trong vận hành." },
                         { title: "Chính sách Bảo mật", text: "Dữ liệu vận hành của bạn được bảo vệ nghiêm ngặt. Operartis áp dụng bảo mật thông tin, quyền truy cập tối thiểu và xử lý minh bạch — biến quyền riêng tư thành lợi thế tin cậy trong mọi quan hệ đối tác." }
                     ],
-                    invite_text: "Chúng tôi mời gọi các doanh nghiệp nghiêm túc về việc chuyển đổi vận hành, tối ưu hóa chuỗi cung ứng và xây dựng lợi thế cạnh tranh hãy hợp tác cùng Operartis.",
+                    invite_text: "Sẵn sàng xây dựng lợi thế cạnh tranh với một hệ thống tối ưu hóa sáng tạo?",
                     contact_operartis: "Liên hệ Operartis",
                     nav_contact: "Liên hệ",
                     nav_login: "Đăng nhập",
@@ -3988,9 +4211,13 @@
                     platform_title: "Khối chức năng",
                     nav_supply_chain: "Chuỗi cung ứng",
                     nav_industry_40: "Công nghiệp 4.0",
+                    nav_platform: "Nền tảng",
                     nav_aps: "APS",
+                    nav_solutions: "Giải pháp",
+                    nav_aps_system: "APS-System",
                     nav_analytics: "Phân tích",
                     nav_or_process: "Quy trình",
+                    nav_implementation_process: "Triển khai tùy chỉnh",
                     nav_about: "Về chúng tôi",
                     capabilities_label: "Phạm vi tối ưu hóa",
                     i4l_eyebrow: "Công nghiệp 4.0",
@@ -4196,7 +4423,7 @@
                         { title: "Ergebnisorientierung", text: "Unsere Mission ist nicht nur die Lieferung eines Systems, sondern echte Verbesserungen in Effizienz, Kosteneinsparung und operativer Resilienz." },
                         { title: "Datenschutz", text: "Ihre Betriebsdaten bleiben geschützt. Operartis setzt auf strikte Vertraulichkeit, minimalen Zugriff und transparente Handhabung — verantwortungsvoller Datenschutz als Vertrauensvorteil in jeder Partnerschaft." }
                     ],
-                    invite_text: "Wir laden Unternehmen ein, die ihre Abläufe transformieren, ihre Supply Chain optimieren und einen Wettbewerbsvorteil aufbauen wollen, mit Operartis zusammenzuarbeiten.",
+                    invite_text: "Bereit, Wettbewerbsvorteile mit einem innovativen Optimierungssystem aufzubauen?",
                     contact_operartis: "Operartis kontaktieren",
                     nav_contact: "Kontakt",
                     nav_login: "Anmelden",
@@ -4247,7 +4474,7 @@
                     analytics_operartis_title: "Wo Operartis Mehrwert schafft",
                     analytics_operartis_desc: "Operartis verbindet diagnostische Transparenz mit prädiktiver und präskriptiver APS — und verwandelt ERP- und Shopfloor-Daten in optimierte Pläne, Simulationen und Entscheidungsunterstützung.",
                     analytics_tap_hint: "Stufe auswählen",
-                    or_process_eyebrow: "OR-Analytics-Prozess",
+                    or_process_eyebrow: "Deployment-Prozess für ein APS-System",
                     or_process_title: "Ihr eigenes APS — gemeinsam mit Operartis",
                     or_process_subtitle: "Sie möchten Ihr eigenes APS-System oder eine optimierte szenariobasierte Lösung mit Operartis entwickeln? So arbeiten wir zusammen, um Ihr Ziel zu erreichen.",
                     or_process_model_world: "Operartis",
@@ -4342,9 +4569,13 @@
                     platform_title: "Funktionsmodul auswählen",
                     nav_supply_chain: "Lieferkette",
                     nav_industry_40: "Industry 4.0",
+                    nav_platform: "Plattform",
                     nav_aps: "APS",
+                    nav_solutions: "Lösungen",
+                    nav_aps_system: "APS-System",
                     nav_analytics: "Analytics-Stufen",
                     nav_or_process: "OR-Prozess",
+                    nav_implementation_process: "Individuelles Deployment",
                     nav_about: "Über uns",
                     capabilities_label: "Optimierungsabdeckung",
                     i4l_eyebrow: "Industry-4.0-Integration",
@@ -6669,29 +6900,33 @@
             const scrollRef = useRef(null);
             const trackRef = useRef(null);
             const tabRefs = useRef({});
-            const apsTriggerRef = useRef(null);
+            const triggerRefs = useRef({});
             const [navFits, setNavFits] = useState(true);
             const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
             const [indicatorAnimated, setIndicatorAnimated] = useState(false);
-            const apsChildIds = useMemo(() => {
-                const aps = items.find(i => i.id === 'aps-group');
-                return (aps?.children || []).map(c => c.id);
-            }, [items]);
-            const apsItem = useMemo(() => items.find(i => i.id === 'aps-group'), [items]);
-            const isApsChildActive = apsChildIds.includes(activeId);
-            const [apsOpen, setApsOpen] = useState(false);
+            const [openMenuId, setOpenMenuId] = useState(null);
+            const [openNestedId, setOpenNestedId] = useState(null);
+            const [nestedPlacement, setNestedPlacement] = useState('right');
             const [menuRect, setMenuRect] = useState(null);
+            const nestedTriggerRefs = useRef({});
+
+            const openMenuItem = useMemo(
+                () => items.find(item => item.id === openMenuId) || null,
+                [items, openMenuId]
+            );
 
             const indicatorTargetId = useMemo(() => {
-                if (isApsChildActive || apsOpen) return 'aps-group';
-                const match = items.find(item => item.id === activeId);
+                if (openMenuId) return openMenuId;
+                const match = items.find(item => navItemContainsId(item, activeId));
                 return match ? match.id : items[0]?.id;
-            }, [activeId, apsOpen, isApsChildActive, items]);
+            }, [activeId, items, openMenuId]);
 
             const isTabActive = useCallback((item) => {
-                if (item.id === 'aps-group') return isApsChildActive || apsOpen;
+                if (item.children?.length) {
+                    return openMenuId === item.id || navItemContainsId(item, activeId);
+                }
                 return activeId === item.id;
-            }, [activeId, apsOpen, isApsChildActive]);
+            }, [activeId, openMenuId]);
 
             const updateIndicator = useCallback(() => {
                 const track = trackRef.current;
@@ -6762,11 +6997,12 @@
             }, [items, onCollapseChange]);
 
             useEffect(() => {
-                if (!navFits) setApsOpen(false);
+                if (!navFits) setOpenMenuId(null);
             }, [navFits]);
 
             const updateMenuRect = useCallback(() => {
-                const el = apsTriggerRef.current;
+                if (!openMenuId) return;
+                const el = triggerRefs.current[openMenuId];
                 if (!el) return;
                 const r = el.getBoundingClientRect();
                 setMenuRect({
@@ -6774,10 +7010,10 @@
                     left: r.left,
                     minWidth: Math.max(r.width, 192),
                 });
-            }, []);
+            }, [openMenuId]);
 
             useEffect(() => {
-                if (!apsOpen) {
+                if (!openMenuId) {
                     setMenuRect(null);
                     return undefined;
                 }
@@ -6789,16 +7025,41 @@
                     window.removeEventListener('resize', onLayout);
                     window.removeEventListener('scroll', onLayout, true);
                 };
-            }, [apsOpen, updateMenuRect]);
+            }, [openMenuId, updateMenuRect]);
 
             useEffect(() => {
-                if (!apsOpen) return undefined;
+                if (!openMenuId) {
+                    setOpenNestedId(null);
+                    return undefined;
+                }
                 const onKeyDown = (e) => {
-                    if (e.key === 'Escape') setApsOpen(false);
+                    if (e.key !== 'Escape') return;
+                    if (openNestedId) {
+                        setOpenNestedId(null);
+                        return;
+                    }
+                    setOpenMenuId(null);
                 };
                 window.addEventListener('keydown', onKeyDown);
                 return () => window.removeEventListener('keydown', onKeyDown);
-            }, [apsOpen]);
+            }, [openMenuId, openNestedId]);
+
+            useLayoutEffect(() => {
+                if (!openNestedId) {
+                    setNestedPlacement('right');
+                    return undefined;
+                }
+                const el = nestedTriggerRefs.current[openNestedId];
+                if (!el) return undefined;
+                const updatePlacement = () => {
+                    const r = el.getBoundingClientRect();
+                    const spaceRight = window.innerWidth - r.right;
+                    setNestedPlacement(spaceRight < 200 ? 'left' : 'right');
+                };
+                updatePlacement();
+                window.addEventListener('resize', updatePlacement);
+                return () => window.removeEventListener('resize', updatePlacement);
+            }, [openNestedId, menuRect]);
 
             useEffect(() => {
                 if (!navFits) return undefined;
@@ -6817,8 +7078,84 @@
 
             const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active' : ''}`;
 
+            const toggleMenu = useCallback((id) => {
+                setOpenNestedId(null);
+                setOpenMenuId(prev => (prev === id ? null : id));
+            }, []);
+
+            const closeMenuAndNav = useCallback((id) => {
+                onNav(id);
+                setOpenNestedId(null);
+                setOpenMenuId(null);
+            }, [onNav]);
+
+            const toggleNestedMenu = useCallback((id) => {
+                setOpenNestedId(prev => (prev === id ? null : id));
+            }, []);
+
+            const renderMenuEntries = (entries) => {
+                const nodes = [];
+                entries.forEach((entry) => {
+                    if (entry.children?.length) {
+                        const isNestedOpen = openNestedId === entry.id;
+                        const nestedActive = navItemContainsId(entry, activeId);
+                        nodes.push(
+                            <div key={entry.id} className="header-nav-aps-nested-wrap">
+                                <button
+                                    ref={(el) => {
+                                        if (el) nestedTriggerRefs.current[entry.id] = el;
+                                        else delete nestedTriggerRefs.current[entry.id];
+                                    }}
+                                    type="button"
+                                    role="menuitem"
+                                    aria-expanded={isNestedOpen}
+                                    aria-haspopup="menu"
+                                    onClick={() => toggleNestedMenu(entry.id)}
+                                    className={`${tabClass(nestedActive || isNestedOpen)} header-nav-child header-nav-aps-nested-trigger`}
+                                >
+                                    <span>{entry.label}</span>
+                                    <ChevronDownIcon className={`header-nav-chevron header-nav-chevron-nested${isNestedOpen ? ' header-nav-chevron-nested-open' : ''}`} />
+                                </button>
+                                {isNestedOpen && (
+                                    <div
+                                        className={`header-nav-aps-nested-menu${nestedPlacement === 'left' ? ' header-nav-aps-nested-menu-left' : ''}`}
+                                        role="menu"
+                                        aria-label={entry.label}
+                                    >
+                                        {entry.children.map(child => (
+                                            <button
+                                                key={child.id}
+                                                type="button"
+                                                role="menuitem"
+                                                onClick={() => closeMenuAndNav(child.id)}
+                                                className={`${tabClass(activeId === child.id)} header-nav-child`}
+                                            >
+                                                {child.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                        return;
+                    }
+                    nodes.push(
+                        <button
+                            key={entry.id}
+                            type="button"
+                            role="menuitem"
+                            onClick={() => closeMenuAndNav(entry.id)}
+                            className={`${tabClass(activeId === entry.id)} header-nav-child`}
+                        >
+                            {entry.label}
+                        </button>
+                    );
+                });
+                return nodes;
+            };
+
             const renderRulerTabs = () => items.map(item => {
-                if (item.id === 'aps-group') {
+                if (item.children?.length) {
                     return (
                         <span key={item.id} className={`${tabClass(false)} inline-flex items-center`} aria-hidden="true">
                             <span className="header-nav-tab-label">{item.label}</span>
@@ -6833,34 +7170,24 @@
                 );
             });
 
-            const apsMenu = apsOpen && menuRect && apsItem ? ReactDOM.createPortal(
+            const dropdownMenu = openMenuId && menuRect && openMenuItem ? ReactDOM.createPortal(
                 <>
                     <button
                         type="button"
                         className="header-nav-aps-backdrop"
-                        aria-label="Close APS menu"
-                        onClick={() => setApsOpen(false)}
+                        aria-label={`Close ${openMenuItem.label} menu`}
+                        onClick={() => {
+                            setOpenNestedId(null);
+                            setOpenMenuId(null);
+                        }}
                     />
                     <div
                         className="header-nav-aps-menu header-nav-aps-menu-floating"
                         role="menu"
                         style={{ top: `${menuRect.top}px`, left: `${menuRect.left}px`, minWidth: `${menuRect.minWidth}px` }}
                     >
-                        <div className="header-nav-aps-menu-head">{apsItem.label}</div>
-                        {apsItem.children.map(child => (
-                            <button
-                                key={child.id}
-                                type="button"
-                                role="menuitem"
-                                onClick={() => {
-                                    onNav(child.id);
-                                    setApsOpen(false);
-                                }}
-                                className={`${tabClass(activeId === child.id)} header-nav-child`}
-                            >
-                                {child.label}
-                            </button>
-                        ))}
+                        <div className="header-nav-aps-menu-head">{openMenuItem.label}</div>
+                        {renderMenuEntries(openMenuItem.children || [])}
                     </div>
                 </>,
                 document.body
@@ -6894,23 +7221,24 @@
                                     }}
                                 />
                                 {items.map(item => {
-                                    if (item.id === 'aps-group') {
-                                        const apsHighlighted = isTabActive(item);
+                                    if (item.children?.length) {
+                                        const highlighted = isTabActive(item);
+                                        const isOpen = openMenuId === item.id;
                                         return (
                                             <div key={item.id} className="header-nav-aps-wrap">
                                                 <button
                                                     ref={(el) => {
-                                                        apsTriggerRef.current = el;
+                                                        triggerRefs.current[item.id] = el;
                                                         setTabRef(item.id, el);
                                                     }}
                                                     type="button"
-                                                    aria-expanded={apsOpen}
+                                                    aria-expanded={isOpen}
                                                     aria-haspopup="menu"
-                                                    onClick={() => setApsOpen(open => !open)}
-                                                    className={`${tabClass(apsHighlighted)} flex items-center`}
+                                                    onClick={() => toggleMenu(item.id)}
+                                                    className={`${tabClass(highlighted)} flex items-center`}
                                                 >
                                                     <span className="header-nav-tab-label">{item.label}</span>
-                                                    <ChevronDownIcon className={`header-nav-chevron ${apsOpen ? 'header-nav-chevron-open' : ''}`} />
+                                                    <ChevronDownIcon className={`header-nav-chevron ${isOpen ? 'header-nav-chevron-open' : ''}`} />
                                                 </button>
                                             </div>
                                         );
@@ -6932,14 +7260,19 @@
                             </div>
                         </div>
                     )}
-                    {apsMenu}
+                    {dropdownMenu}
                 </div>
             );
         };
 
         const MobileNavDrawer = ({ items, activeId, onNav, open, onClose, content }) => {
+            const [expandedIds, setExpandedIds] = useState(() => new Set());
+
             useEffect(() => {
-                if (!open) return undefined;
+                if (!open) {
+                    setExpandedIds(new Set());
+                    return undefined;
+                }
                 const previousOverflow = document.body.style.overflow;
                 document.body.style.overflow = 'hidden';
                 const onKeyDown = (e) => {
@@ -6959,6 +7292,15 @@
                 onClose();
             };
 
+            const toggleExpanded = (id) => {
+                setExpandedIds(prev => {
+                    const next = new Set(prev);
+                    if (next.has(id)) next.delete(id);
+                    else next.add(id);
+                    return next;
+                });
+            };
+
             const buttonClass = (isActive, nested = false) => `
                 w-full min-h-11 rounded-xl border px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wide
                 transition-colors flex items-center gap-3
@@ -6967,6 +7309,79 @@
                     ? 'border-brand-gold/40 bg-brand-gold/10 text-brand-gold'
                     : 'border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-slate-600 dark:text-slate-300'}
             `;
+
+            const renderNavTree = (navItems, depth = 0) => navItems.map(item => {
+                if (item.children?.length) {
+                    const activeGroup = navItemContainsId(item, activeId);
+                    const nestedModules = item.children.some(child => child.children?.length);
+                    return (
+                        <div
+                            key={item.id}
+                            className={`rounded-2xl border p-2 ${activeGroup ? 'border-brand-gold/35 bg-brand-gold/5' : 'border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/20'}`}
+                        >
+                            <div className={`px-2 pb-2 text-[10px] font-black uppercase tracking-widest ${activeGroup ? 'text-brand-gold' : 'text-slate-500 dark:text-slate-400'}`}>
+                                {item.label}
+                            </div>
+                            <div className="grid gap-2">
+                                {item.children.map(child => {
+                                    if (child.children?.length) {
+                                        const isExpanded = expandedIds.has(child.id);
+                                        const childActive = navItemContainsId(child, activeId);
+                                        return (
+                                            <div key={child.id} className="grid gap-0">
+                                                <button
+                                                    type="button"
+                                                    aria-expanded={isExpanded}
+                                                    onClick={() => toggleExpanded(child.id)}
+                                                    className={`mobile-nav-nested-trigger${childActive || isExpanded ? ' is-active' : ''}`}
+                                                >
+                                                    <span>{child.label}</span>
+                                                    <ChevronDownIcon className={`header-nav-chevron ${isExpanded ? 'header-nav-chevron-open' : ''}`} />
+                                                </button>
+                                                {isExpanded && (
+                                                    <div className="mobile-nav-nested-children">
+                                                        {child.children.map(leaf => (
+                                                            <button
+                                                                key={leaf.id}
+                                                                type="button"
+                                                                onClick={() => activate(leaf.id)}
+                                                                className={buttonClass(activeId === leaf.id, true)}
+                                                            >
+                                                                <span>{leaf.label}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    }
+                                    return (
+                                        <button
+                                            key={child.id}
+                                            type="button"
+                                            onClick={() => activate(child.id)}
+                                            className={buttonClass(activeId === child.id, nestedModules || depth > 0)}
+                                        >
+                                            <span>{child.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => activate(item.id)}
+                        className={buttonClass(activeId === item.id)}
+                    >
+                        <span>{item.label}</span>
+                    </button>
+                );
+            });
 
             return ReactDOM.createPortal(
                 <div className="fixed inset-0 z-50">
@@ -6992,42 +7407,7 @@
                         </div>
                         <div className="max-h-[min(34rem,calc(100dvh-7rem))] overflow-y-auto custom-scrollbar px-3 py-3">
                             <div className="grid gap-2">
-                                {items.map(item => {
-                                    if (item.id === 'aps-group') {
-                                        const activeGroup = (item.children || []).some(child => child.id === activeId);
-                                        return (
-                                            <div key={item.id} className={`rounded-2xl border p-2 ${activeGroup ? 'border-brand-gold/35 bg-brand-gold/5' : 'border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/20'}`}>
-                                                <div className={`px-2 pb-2 text-[10px] font-black uppercase tracking-widest ${activeGroup ? 'text-brand-gold' : 'text-slate-500 dark:text-slate-400'}`}>
-                                                    {item.label}
-                                                </div>
-                                                <div className="grid gap-2">
-                                                    {(item.children || []).map(child => (
-                                                        <button
-                                                            key={child.id}
-                                                            type="button"
-                                                            onClick={() => activate(child.id)}
-                                                            className={buttonClass(activeId === child.id, true)}
-                                                        >
-                                                            <span>{child.label}</span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-
-                                    const isActive = activeId === item.id;
-                                    return (
-                                        <button
-                                            key={item.id}
-                                            type="button"
-                                            onClick={() => activate(item.id)}
-                                            className={buttonClass(isActive)}
-                                        >
-                                            <span>{item.label}</span>
-                                        </button>
-                                    );
-                                })}
+                                {renderNavTree(items)}
                             </div>
                         </div>
                     </div>
@@ -7887,8 +8267,8 @@
                 { id: 'supply-chain', label: ui.nav_supply_chain },
                 { id: 'industry-40', label: ui.nav_industry_40 },
                 { id: 'analytics', label: ui.nav_analytics },
-                { id: 'or-process', label: ui.nav_or_process },
-                { id: 'platform', label: ui.footer_modules },
+                { id: 'platform', label: ui.nav_aps_system },
+                { id: 'or-process', label: ui.nav_implementation_process },
             ];
 
             const companyLinks = [
@@ -8085,9 +8465,7 @@
             );
 
             const sessionProgress = useMemo(() => {
-                const idx = pageNavItems.findIndex(item => (
-                    item.id === activeNavId || (item.children && item.children.some(c => c.id === activeNavId))
-                ));
+                const idx = pageNavItems.findIndex(item => navItemContainsId(item, activeNavId));
                 return pageNavItems.length > 0 ? ((Math.max(0, idx) + 1) / pageNavItems.length) * 100 : 0;
             }, [pageNavItems, activeNavId]);
 
@@ -8113,8 +8491,8 @@
                 const sections = [
                     { id: 'supply-chain', el: document.getElementById('supply-chain') },
                     { id: 'industry-40', el: document.getElementById('industry-40') },
-                    ...content.matrix.map(h => ({ id: h.id, el: document.getElementById(`horizon-${h.id}`) })),
                     { id: 'analytics', el: document.getElementById('analytics') },
+                    ...content.matrix.map(h => ({ id: h.id, el: document.getElementById(`horizon-${h.id}`) })),
                     { id: 'or-process', el: document.getElementById('or-process') },
                     { id: 'about', el: document.getElementById('about') },
                 ].filter(s => s.el);
@@ -8503,6 +8881,12 @@
                                 <Reveal delay={150}><SystemIntegrationLoop content={content} /></Reveal>
                             </div>
 
+                            <Reveal delay={200}>
+                                <div className="opus-scroll-target pt-12 md:pt-16 mt-4 md:mt-8 border-t border-slate-200/70 dark:border-white/5">
+                                    <AnalyticsMaturitySection content={content} />
+                                </div>
+                            </Reveal>
+
                             <div id="matrix-fit" className="opus-scroll-target mt-16 md:mt-24">
                                 <Reveal><JourneyStrip content={content} horizons={content.matrix} onNav={scrollToHorizon} /></Reveal>
                             </div>
@@ -8531,12 +8915,6 @@
                             </div>
 
                             <Reveal delay={175}>
-                                <div className="opus-scroll-target pt-12 md:pt-16 mt-4 md:mt-8 border-t border-slate-200/70 dark:border-white/5">
-                                    <AnalyticsMaturitySection content={content} />
-                                </div>
-                            </Reveal>
-
-                            <Reveal delay={200}>
                                 <div className="pt-12 md:pt-16 mt-4 md:mt-8 border-t border-slate-200/70 dark:border-white/5">
                                     <OrProcessSection content={content} />
                                 </div>
