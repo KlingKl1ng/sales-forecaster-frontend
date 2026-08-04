@@ -338,9 +338,13 @@
             padding: 0.25rem;
             flex-shrink: 0;
             border-radius: 9999px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            /* Visible slate edge in light mode — white border disappears on Safari/light */
+            border: 1px solid rgba(100, 116, 139, 0.32);
+            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.2));
+            box-shadow:
+                0 4px 16px rgba(15, 23, 42, 0.08),
+                0 0 0 1px rgba(148, 163, 184, 0.18),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
@@ -348,6 +352,18 @@
         .dark .header-glass-pill {
             border-color: rgba(255, 255, 255, 0.1);
             background-image: linear-gradient(to bottom right, rgba(30, 41, 59, 0.3), rgba(15, 23, 42, 0.1));
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* Safari light: strengthen continuous pill outline (partial top/bottom edges otherwise) */
+        @supports (-webkit-touch-callout: none) {
+            html:not(.dark) .header-glass-pill {
+                border-color: rgba(100, 116, 139, 0.42);
+                box-shadow:
+                    0 4px 16px rgba(15, 23, 42, 0.08),
+                    inset 0 0 0 1px rgba(100, 116, 139, 0.28),
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+            }
         }
 
         .header-glass-pill--wide {
@@ -4287,11 +4303,11 @@
                     about_who_text: [
                         "Operartis là đơn vị tư vấn và công nghệ, hỗ trợ doanh nghiệp xây dựng một hệ thống vận hành trơn tru và tối ưu hóa quy trình.",
                         "Chúng tôi kết hợp chuyên môn về chuỗi cung ứng, từ logistics, sản xuất đến kho bãi với các phương pháp định lượng và mô phỏng tiên tiến để mang lại cải tiến rõ rệt, có thể đo lường.",
-                        "Tại Operartis, chúng tôi hiểu rằng dữ liệu trong hệ thống ERP chỉ là bước đầu. Sự tối ưu trong vận hành đòi hỏi phải biến dữ liệu đó thành thông tin chi tiết cho dự báo, hoạch định ngắn trung và ngắn hạn, tới lập kế hoạch dài hạn. Đó là lý do chúng tôi tập trung phát triển Hệ thống Hoạch định và Lập kế hoạch Nâng cao (APS) riêng biệt — giúp khách hàng tận dụng dữ liệu không chỉ để lưu trữ mà còn tạo lợi thế cạnh tranh thông qua việc tối ưu hoá hệ thống vận hành."
+                        "Tại Operartis, chúng tôi hiểu rằng dữ liệu trong hệ thống ERP chỉ là bước đầu. Sự tối ưu trong vận hành đòi hỏi phải biến dữ liệu đó thành thông tin chi tiết cho dự báo, hoạch định ngắn trung và ngắn hạn, tới lập kế hoạch dài hạn. Đó là lý do chúng tôi tập trung phát triển Hệ thống Lập kế hoạch và Tối ưu hoá vận hành (APS) riêng biệt — giúp khách hàng tận dụng dữ liệu không chỉ để lưu trữ mà còn tạo lợi thế cạnh tranh nhờ vào quy trình vận hành được tối ưu."
                     ],
                     about_what_text: [
                         "Chúng tôi tư vấn doanh nghiệp phân tích kỹ lưỡng quy trình vận hành toàn chuỗi cung ứng từ kho bãi, logistics và sản xuất, tới dự báo và tồn kho — nhận diện các điểm nghẽn, kém hiệu quả và cơ hội tối ưu hóa.",
-                        "Chúng tôi thiết kế và triển khai hệ thống APS có sẵn hoặc tuỳ chỉnh có thể tích hợp với hệ thống ERP và MES hiện có của doanh nghiệp, cho phép lập kế hoạch nâng cao, mô phỏng, dự báo nhu cầu, hoạch định năng lực và lịch trình sản xuất, tối ưu hoá quản lý tồn kho, và vận tải.",
+                        "Chúng tôi thiết kế và triển khai hệ thống APS được đóng gói sẵn hoặc tuỳ chỉnh theo yêu cầu có thể tích hợp với hệ thống ERP và MES hiện có của doanh nghiệp, cho phép lập kế hoạch chuyên sâu, mô phỏng, dự báo nhu cầu, hoạch định năng lực và lịch trình sản xuất, tối ưu hoá quản lý tồn kho, và vận tải.",
                         "Chúng tôi đồng hành cùng khách hàng qua mọi giai đoạn: từ đánh giá ban đầu, tư vấn, thiết kế hệ thống, đến triển khai, đào tạo nhân sự và cải tiến liên tục — đảm bảo giá trị bền vững.",
                         "Cách tiếp cận dựa trên định lượng của chúng tôi giúp khách hàng ra quyết định dựa trên dữ liệu và chứng minh, không phải cảm tính, giúp cắt giảm lãng phí, rút ngắn thời gian vận hành, và nâng cao hiệu quả tổng thể."
                     ],
