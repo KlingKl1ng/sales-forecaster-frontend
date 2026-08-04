@@ -1444,7 +1444,7 @@
                 overflow: visible;
                 width: 100%;
                 max-width: 100%;
-                align-items: stretch;
+                align-items: center;
             }
 
             .proof-pack-formula {
@@ -1458,7 +1458,7 @@
                 padding-right: 0.85rem;
                 padding-top: 0.75rem;
                 padding-bottom: 0.75rem;
-                width: 100%;
+                width: auto;
                 max-width: 100%;
                 box-sizing: border-box;
                 transform: scale(1) translateY(8px);
@@ -6835,12 +6835,12 @@
                                                 <div className="proof-pack-funnel-line" />
                                             </div>
 
-                                            <div className={`proof-pack-chip inline-flex items-center gap-3 sm:gap-4 md:gap-5 rounded-2xl px-4 py-3.5 sm:px-6 sm:py-4 md:px-8 md:py-5 w-full max-w-full min-w-0 ${packPlaying ? 'is-assembling' : ''}`}>
+                                            <div className={`proof-pack-chip inline-flex items-center gap-3 sm:gap-4 md:gap-5 rounded-2xl px-4 py-3.5 sm:px-6 sm:py-4 md:px-8 md:py-5 max-w-full min-w-0 ${packPlaying ? 'is-assembling' : ''}`}>
                                                 <span className="proof-pack-chip-pulse sc-pulse-ring-gold" aria-hidden="true" />
-                                                <span className="proof-pack-chip-icon flex h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-xl scale-100 sm:scale-125">
+                                                <span className="proof-pack-chip-icon flex h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-xl scale-110 sm:scale-125">
                                                     <VrpIcon />
                                                 </span>
-                                                <div className="min-w-0 flex-1">
+                                                <div className="min-w-0">
                                                     <div className="proof-pack-chip-tag text-[10px] sm:text-[11px] md:text-xs font-mono font-bold uppercase tracking-wider mb-1">
                                                         {packStage.module_tag}
                                                     </div>
@@ -6851,7 +6851,7 @@
                                             </div>
 
                                             {packStage.module_desc && (
-                                                <p className={`proof-pack-desc text-[13px] sm:text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed w-full ${packPlaying ? 'is-ready' : ''}`}>
+                                                <p className={`proof-pack-desc text-[13px] sm:text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed px-1 ${packPlaying ? 'is-ready' : ''}`}>
                                                     {packStage.module_desc}
                                                 </p>
                                             )}
