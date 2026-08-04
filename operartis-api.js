@@ -130,6 +130,7 @@
         var path = pathOf(input);
         return path === '/auth/login' ||
             path === '/auth/invites/accept' ||
+            path === '/contact' ||
             path.indexOf('/auth/password/reset') === 0;
     }
 
@@ -297,6 +298,15 @@
         window.dispatchEvent(new CustomEvent('operartis:logged-out'));
     }
 
+    async function submitContact(payload) {
+        var response = await apiFetch('/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload || {})
+        });
+        return parseJsonResponse(response);
+    }
+
     window.OperartisApi = {
         apiFetch: apiFetch,
         broadcastDashboardDataChanged: broadcastDashboardDataChanged,
@@ -308,6 +318,7 @@
         requestPasswordReset: requestPasswordReset,
         validatePasswordReset: validatePasswordReset,
         confirmPasswordReset: confirmPasswordReset,
-        logout: logout
+        logout: logout,
+        submitContact: submitContact
     };
 })();
