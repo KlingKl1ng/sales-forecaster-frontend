@@ -2982,9 +2982,9 @@
         .aa-bar-flat-0,
         .aa-flow-accent-0,
         .aa-chevron-active-0 {
-            --aa-accent-bg: #fde68a;
-            --aa-accent-border: #fcd34d;
-            --aa-accent-fg: #92400e;
+            --aa-accent-bg: #fbbf24;
+            --aa-accent-border: #f59e0b;
+            --aa-accent-fg: #78350f;
         }
 
         .dark .aa-bar-flat-0,
@@ -2998,9 +2998,9 @@
         .aa-bar-flat-1,
         .aa-flow-accent-1,
         .aa-chevron-active-1 {
-            --aa-accent-bg: #fcd34d;
-            --aa-accent-border: #fbbf24;
-            --aa-accent-fg: #92400e;
+            --aa-accent-bg: #f59e0b;
+            --aa-accent-border: #d97706;
+            --aa-accent-fg: #78350f;
         }
 
         .dark .aa-bar-flat-1,
@@ -3022,9 +3022,9 @@
         .aa-bar-flat-2,
         .aa-flow-accent-2,
         .aa-chevron-active-2 {
-            --aa-accent-bg: #fbbf24;
-            --aa-accent-border: #f59e0b;
-            --aa-accent-fg: #78350f;
+            --aa-accent-bg: #ea580c;
+            --aa-accent-border: #c2410c;
+            --aa-accent-fg: #fff7ed;
         }
 
         .dark .aa-bar-flat-2,
@@ -3038,9 +3038,9 @@
         .aa-bar-flat-3,
         .aa-flow-accent-3,
         .aa-chevron-active-3 {
-            --aa-accent-bg: #f59e0b;
-            --aa-accent-border: #d97706;
-            --aa-accent-fg: #fffbeb;
+            --aa-accent-bg: #c2410c;
+            --aa-accent-border: #9a3412;
+            --aa-accent-fg: #fff7ed;
         }
 
         .dark .aa-bar-flat-3,
@@ -3105,8 +3105,8 @@
         }
 
         .aa-chevron-seg-inactive {
-            background-color: #e7e5e4;
-            color: #57534e;
+            background-color: #d6d3d1;
+            color: #44403c;
         }
 
         .dark .aa-chevron-seg-inactive {
@@ -3131,11 +3131,11 @@
 
         .aa-level-title-0 { color: #b45309; }
         .dark .aa-level-title-0 { color: #fcd34d; }
-        .aa-level-title-1 { color: #d97706; }
+        .aa-level-title-1 { color: #c2410c; }
         .dark .aa-level-title-1 { color: #fbbf24; }
-        .aa-level-title-2 { color: #f59e0b; }
+        .aa-level-title-2 { color: #9a3412; }
         .dark .aa-level-title-2 { color: #fbbf24; }
-        .aa-level-title-3 { color: #d97706; }
+        .aa-level-title-3 { color: #7c2d12; }
         .dark .aa-level-title-3 { color: #facc15; }
 
         .aa-human-bar {
@@ -3148,6 +3148,14 @@
 
         .dark .aa-human-bar-fill {
             background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-human-bar-fill {
+            background: var(--aa-accent-bg);
+        }
+
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-human-label {
+            color: var(--aa-accent-bg);
         }
 
         .aa-flow-stage {
@@ -3242,28 +3250,53 @@
             color: var(--aa-accent-fg);
         }
 
-        .dark .aa-flow-accent-3 .aa-flow-stage:not(.aa-flow-stage--muted) {
-            border-color: rgba(234, 179, 8, 0.45);
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage--muted .aa-flow-stage-index {
+            border-color: rgba(148, 163, 184, 0.45);
+            background-color: rgba(148, 163, 184, 0.28);
+            color: rgb(100 116 139);
         }
 
-        .dark .aa-flow-accent-3 .aa-flow-stage:not(.aa-flow-stage--muted)::before {
-            background: linear-gradient(180deg, rgba(234, 179, 8, 0.9), rgba(234, 179, 8, 0.22));
+        .dark .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage--muted .aa-flow-stage-index {
+            border-color: rgba(100, 116, 139, 0.55);
+            background-color: rgba(51, 65, 85, 0.85);
+            color: rgb(148 163 184);
         }
 
-        .dark .aa-flow-accent-3 .aa-flow-stage-active {
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(234, 179, 8, 0.22);
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage:not(.aa-flow-stage--muted) {
+            border-color: color-mix(in srgb, var(--aa-accent-bg) 70%, transparent);
         }
 
-        .dark .aa-flow-accent-3 .aa-human-bar-fill {
-            background: linear-gradient(90deg, #facc15, #eab308);
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage:not(.aa-flow-stage--muted)::before {
+            background: linear-gradient(
+                180deg,
+                color-mix(in srgb, var(--aa-accent-bg) 90%, transparent),
+                color-mix(in srgb, var(--aa-accent-bg) 22%, transparent)
+            );
         }
 
-        .dark .aa-flow-accent-3 .aa-prescriptive-toggle {
-            border-color: rgba(234, 179, 8, 0.35);
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-stage-active {
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05), 0 0 0 1px color-mix(in srgb, var(--aa-accent-bg) 22%, transparent);
         }
 
-        .dark .aa-flow-accent-3 .aa-flow-connector::after {
-            background: linear-gradient(90deg, rgba(234, 179, 8, 0.55), rgba(148, 163, 184, 0.35));
+        .aa-flow-accent-3 .aa-prescriptive-toggle {
+            border-color: color-mix(in srgb, var(--aa-accent-bg) 35%, transparent);
+        }
+
+        .aa-flow-accent-3 .aa-prescriptive-toggle-button.is-active {
+            background-color: var(--aa-accent-bg);
+            color: var(--aa-accent-fg);
+        }
+
+        .aa-flow-accent-3 .aa-prescriptive-toggle-button:not(.is-active):hover {
+            color: var(--aa-accent-bg);
+        }
+
+        .aa-flow-stage-grid[class*='aa-flow-accent-'] .aa-flow-connector::after {
+            background: linear-gradient(
+                90deg,
+                color-mix(in srgb, var(--aa-accent-bg) 55%, transparent),
+                rgba(148, 163, 184, 0.35)
+            );
         }
 
         .aa-flow-stage-body {
@@ -3332,6 +3365,25 @@
             align-items: stretch;
         }
 
+        @media (max-width: 1023px) {
+            .aa-flow-stage {
+                /* Match tallest level (Đề xuất with Support/Auto toggle) on mobile too */
+                min-height: 8.75rem;
+            }
+
+            .aa-flow-stage-head {
+                min-height: 2.75rem;
+            }
+
+            .aa-flow-stage-body {
+                min-height: 4.25rem;
+            }
+
+            .aa-flow-stage-results {
+                min-height: 8.75rem;
+            }
+        }
+
         @media (min-width: 390px) and (max-width: 1023px) {
             .aa-flow-stage-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3361,7 +3413,8 @@
                 display: grid;
                 grid-template-rows: 3.35rem minmax(0, 1fr);
                 row-gap: 0.75rem;
-                min-height: 8.5rem;
+                /* Match tallest level (Đề xuất with Support/Auto toggle) so cards don’t resize when switching tabs */
+                min-height: 9.5rem;
             }
 
             .aa-flow-stage-head {
@@ -3375,6 +3428,7 @@
 
             .aa-flow-stage-body {
                 flex: 1 1 auto;
+                min-height: 4.85rem;
             }
 
             .aa-flow-stage-bar-labels {
@@ -8152,9 +8206,7 @@
             const humanW = isAutoMode ? ANALYTICS_HUMAN_W_AUTO : ANALYTICS_HUMAN_W[activeIdx];
             const modelW = 100 - humanW;
             const levelTitleClass = ANALYTICS_LEVEL_META[activeIdx].titleClass;
-            const flowCardAccent = isPrescriptive
-                ? 'border-amber-300/55 dark:border-yellow-500/45 bg-white/55 dark:bg-slate-800/50'
-                : 'border-amber-300/55 dark:border-amber-800/55 bg-white/55 dark:bg-slate-800/50';
+            const flowCardAccent = 'border bg-white/55 dark:bg-slate-800/50';
             const decisionTypeDetail = isAutoMode
                 ? (ui.analytics_prescriptive_auto_short || ui.analytics_prescriptive_auto)
                 : ((ui.analytics_decision_types || [])[activeIdx] || activeLevel.focus);
@@ -8375,20 +8427,20 @@
                                                             <div className="aa-human-meter-model" />
                                                         </div>
                                                         <div className="aa-flow-stage-bar-labels mt-2 grid grid-cols-2 gap-2 overflow-hidden">
-                                                            <span className={`text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 ${isPrescriptive ? 'dark:text-yellow-400' : 'dark:text-amber-400'}`}>{ui.analytics_human_input_short || ui.analytics_human_input} {humanW}%</span>
+                                                            <span className="aa-human-label text-[9px] font-semibold uppercase tracking-wide leading-tight">{ui.analytics_human_input_short || ui.analytics_human_input} {humanW}%</span>
                                                             <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-slate-500 dark:text-slate-400 text-right">{ui.analytics_model_driven_short || ui.analytics_model_driven} {modelW}%</span>
                                                         </div>
                                                     </div>
                                                 ) : stage.key === 'analytics' && isPrescriptive ? (
                                                     <>
                                                         <p className="aa-flow-stage-detail text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">{stage.detail}</p>
-                                                        <div className="aa-prescriptive-toggle mt-2 rounded-md border border-brand-gold/25 dark:border-yellow-500/35 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
+                                                        <div className="aa-prescriptive-toggle mt-2 rounded-md border p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setPrescriptiveMode('support')}
                                                                 aria-label={ui.analytics_prescriptive_support}
                                                                 title={ui.analytics_prescriptive_support}
-                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'support' ? 'bg-brand-gold text-white dark:bg-yellow-500 dark:text-stone-900' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold dark:hover:text-yellow-400'}`}
+                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'support' ? 'is-active' : 'text-slate-600 dark:text-slate-300'}`}
                                                             >
                                                                 {ui.analytics_prescriptive_support_short || ui.analytics_prescriptive_support}
                                                             </button>
@@ -8397,7 +8449,7 @@
                                                                 onClick={() => setPrescriptiveMode('auto')}
                                                                 aria-label={ui.analytics_prescriptive_auto}
                                                                 title={ui.analytics_prescriptive_auto}
-                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'auto' ? 'bg-brand-gold text-white dark:bg-yellow-500 dark:text-stone-900' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold dark:hover:text-yellow-400'}`}
+                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'auto' ? 'is-active' : 'text-slate-600 dark:text-slate-300'}`}
                                                             >
                                                                 {ui.analytics_prescriptive_auto_short || ui.analytics_prescriptive_auto}
                                                             </button>
