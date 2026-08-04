@@ -497,30 +497,6 @@
             background: rgba(100, 116, 139, 0.75);
         }
 
-        .horizon-nav-session-track {
-            position: relative;
-            width: 100%;
-            height: 3px;
-            border-radius: 0;
-            background: rgba(148, 163, 184, 0.2);
-            overflow: hidden;
-        }
-
-        .dark .horizon-nav-session-track {
-            background: rgba(51, 65, 85, 0.55);
-        }
-
-        .horizon-nav-session-fill {
-            height: 100%;
-            border-radius: 0;
-            background: linear-gradient(90deg, rgba(100, 116, 139, 0.85) 0%, rgba(245, 158, 11, 0.95) 100%);
-            transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .dark .horizon-nav-session-fill {
-            background: linear-gradient(90deg, rgba(100, 116, 139, 0.9) 0%, rgba(251, 191, 36, 0.95) 100%);
-        }
-
         .horizon-nav-scroll {
             overflow-x: auto;
             overflow-y: visible;
@@ -1410,6 +1386,48 @@
             opacity: 0.92;
         }
 
+        @media (max-width: 639px) {
+            /* Keep ∀ quantifiers on the same line as the constraint (wrap only if needed) */
+            .proof-formula-row {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: baseline;
+                column-gap: 0.65rem;
+                row-gap: 0.15rem;
+            }
+
+            .proof-formula-rhs {
+                white-space: nowrap;
+                padding-left: 0;
+                font-size: 0.92em;
+                opacity: 0.88;
+            }
+
+            .proof-build-stage-btn {
+                min-height: 2.75rem;
+                padding-left: 0.45rem;
+                padding-right: 0.45rem;
+            }
+
+            .proof-build-stage-btn .proof-stage-label {
+                white-space: normal;
+                line-height: 1.2;
+                letter-spacing: 0.04em;
+            }
+
+            .proof-pack-scene {
+                gap: 0.65rem;
+                min-height: 0;
+            }
+
+            .proof-pack-chip {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                padding-top: 0.85rem;
+                padding-bottom: 0.85rem;
+            }
+        }
+
         @media (min-width: 768px) {
             .proof-formula-row {
                 grid-template-columns: minmax(0, 1fr) 10.5rem;
@@ -1623,6 +1641,37 @@
                 opacity: 0.72;
                 filter: blur(0.2px);
                 transform: scale(0.84) translateY(0.15rem);
+            }
+        }
+
+        /* Mobile: formula is already near full panel width — scale(1.14) overflows the outer block */
+        @media (max-width: 639px) {
+            .proof-pack-scene {
+                overflow: hidden;
+            }
+
+            .proof-pack-formula {
+                max-width: 100%;
+            }
+
+            .proof-pack-formula.is-running.is-merging {
+                transform: scale(1) translateY(0);
+                animation:
+                    proof-pack-formula-glow 3.65s cubic-bezier(0.45, 0.05, 0.25, 1) 0.05s both,
+                    proof-pack-merge-mobile 1.45s cubic-bezier(0.33, 1, 0.68, 1) 2.2s forwards;
+            }
+        }
+
+        @keyframes proof-pack-merge-mobile {
+            0% {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0.72;
+                filter: blur(0.2px);
+                transform: scale(0.88) translateY(0.15rem);
             }
         }
 
@@ -2214,11 +2263,12 @@
             position: relative;
             overflow: hidden;
             background: rgba(255, 255, 255, 0.28);
-            border-color: rgba(148, 163, 184, 0.24);
+            /* Real border — Safari light drops masked ::after rings when border is transparent */
+            border: 1px solid rgba(100, 116, 139, 0.38);
             backdrop-filter: blur(18px) saturate(1.06);
             -webkit-backdrop-filter: blur(18px) saturate(1.06);
             box-shadow:
-                0 0 0 1px rgba(255, 255, 255, 0.28),
+                0 0 0 1px rgba(148, 163, 184, 0.22),
                 0 14px 34px rgba(15, 23, 42, 0.04),
                 inset 0 1px 0 rgba(255, 255, 255, 0.36),
                 inset 0 -1px 0 rgba(255, 255, 255, 0.07);
@@ -2247,8 +2297,31 @@
                 linear-gradient(#000 0 0) content-box,
                 linear-gradient(#000 0 0);
             -webkit-mask-composite: xor;
+            mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
             mask-composite: exclude;
             pointer-events: none;
+        }
+
+        /* Safari: mask-composite exclude is unreliable in light mode */
+        @supports (-webkit-touch-callout: none) {
+            html:not(.dark) .opus-metrics-glass {
+                border-color: rgba(100, 116, 139, 0.45);
+                box-shadow:
+                    0 0 0 1px rgba(148, 163, 184, 0.3),
+                    0 14px 34px rgba(15, 23, 42, 0.04),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+                    inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+            }
+
+            html:not(.dark) .opus-metrics-glass::after {
+                padding: 0;
+                background: transparent;
+                -webkit-mask: none;
+                mask: none;
+                box-shadow: inset 0 0 0 1px rgba(100, 116, 139, 0.4);
+            }
         }
 
         .dark .opus-metrics-glass {
@@ -4159,12 +4232,12 @@
                     metrics_eyebrow: "Được xây dựng để đo lường tác động",
                     metrics_title: "Một nền tảng. Mọi khung hoạch định.",
                     proof_eyebrow: "Nền tảng toán học",
-                    proof_title: "Tối ưu có chứng minh.",
-                    proof_body: "Operartis là hệ thống tối ưu hoá xây dựng từ các mô hình toán học dựa trên dữ liệu. Hệ thống hỗ trợ nhà quản lý ra quyết định tốt hơn. Kết quả là các lời giải (cận) tối ưu dưới các ràng buộc cho trước có thể chứng minh được.",
+                    proof_title: "Tối ưu hoá có thể chứng minh",
+                    proof_body: "Operartis là hệ thống tối ưu hoá xây dựng từ các mô hình toán học dựa trên dữ liệu. Hệ thống hỗ trợ nhà quản lý ra quyết định tốt hơn. Kết quả là các lời giải (cận) tối ưu dưới các điều kiện ràng buộc cho trước có thể chứng minh được.",
                     proof_pillars: [
                         { label: "Mô hình từ dữ liệu", text: "Mọi đề xuất dựa trên mô hình định lượng gắn với dữ liệu vận hành — không chỉ dựa vào trực giác." },
-                        { label: "Hỗ trợ quyết định", text: "Được thiết kế để giúp nhà quản lý hành động dưới ràng buộc thực tế: năng lực, chi phí, dịch vụ và thời gian." },
-                        { label: "Tối ưu có chứng minh", text: "Không khẳng định thiếu chứng minh. Không marketing thổi phồng. Không phóng đại — chỉ những lời giải đứng vững trên toán học." }
+                        { label: "Hỗ trợ quyết định", text: "Được thiết kế để giúp nhà quản lý ra quyết định hành động tối ưu nhất có thể dưới các điều kiện ràng buộc thực tế: nguồn lực, chi phí, dịch vụ và thời gian." },
+                        { label: "Tối ưu có chứng minh", text: "Không khẳng định thiếu chứng minh. Không marketing thổi phồng. Không phóng đại — chỉ những giải pháp dựa trên sự logic chặt chẽ và toán học." }
                     ],
                     proof_build_eyebrow: "Từ mô hình đến mô-đun",
                     proof_build_stages: [
@@ -4173,7 +4246,7 @@
                             label: "Diễn đạt",
                             caption: "Bắt đầu từ một bài VRP chuẩn — rồi viết quyết định bằng toán học.",
                             problem_title: "Bài toán định tuyến xe (VRP) chuẩn",
-                            problem_desc: "Một đội xe đồng nhất xuất phát từ một depot, phải ghé thăm mỗi khách hàng đúng một lần rồi quay về. Nhu cầu không vượt quá tải trọng xe. Mục tiêu là cực tiểu hoá tổng chi phí di chuyển.",
+                            problem_desc: "Một đội xe đồng nhất xuất phát từ một depot, phải ghé giao/nhận mỗi khách hàng đúng một lần rồi quay về. Hàng giao/nhận không được vượt quá tải trọng xe. Mục tiêu là tối thiểu hoá tổng chi phí di chuyển.",
                             formula_title: "Công thức minh hoạ",
                             lines: [
                                 { lhs: "min   Σ_{k ∈ K} Σ_{i,j ∈ V}  c_{ij} x_{ij}^{k}" },
@@ -4201,9 +4274,9 @@
                             label: "Giải",
                             caption: "Chạy mô-đun trên dữ liệu vận hành — trả về kế hoạch (cận) tối ưu có chứng minh.",
                             proof: "khả thi · (cận) tối ưu dưới ràng buộc · có chứng minh",
-                            solution_eyebrow: "Nghiệm tối ưu",
+                            solution_eyebrow: "Đáp Án Tối Ưu",
                             solution_lead: "Không thể cải thiện thêm dưới các ràng buộc đã cho.",
-                            solution_body: "Trong bài toán VRP này, mọi khách hàng được phục vụ đúng một lần, tải trọng xe được tôn trọng, và tổng chi phí di chuyển được tối thiểu hoá. Không có tập lộ trình khả thi nào tốt hơn về chi phí.",
+                            solution_body: "Trong vấn đề định tuyến này, mọi khách hàng được phục vụ đúng một lần, tải trọng xe phải được đảm bảo, và tổng chi phí di chuyển được tối thiểu hoá. Không có tập lộ trình khả thi nào tốt hơn về chi phí.",
                             solution_points: [
                                 "Phục vụ đủ 10 khách hàng",
                                 "Tổng chi phí di chuyển nhỏ nhất",
@@ -6238,7 +6311,7 @@
 
         // Metrics band — Zentio "measurable impact" strip
         const MetricsBand = ({ content, stats }) => (
-            <div className="opus-metrics-glass rounded-3xl border border-transparent dark:border-white/[0.06] ring-0 dark:ring-1 dark:ring-white/[0.04] p-8 md:p-10">
+            <div className="opus-metrics-glass rounded-3xl border border-slate-400/40 dark:border-white/[0.06] ring-0 dark:ring-1 dark:ring-white/[0.04] p-8 md:p-10">
                 <div className="relative z-[1] text-center max-w-2xl mx-auto mb-8">
                     <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{content.ui.metrics_eyebrow}</p>
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{content.ui.metrics_title}</h2>
@@ -6302,7 +6375,7 @@
             const routes = [
                 { id: 'v1', color: '#fbbf24', label: 'V1', nodes: [1, 2, 3] },
                 { id: 'v2', color: '#f97316', label: 'V2', nodes: [4, 5, 6] },
-                { id: 'v3', color: '#b45309', label: 'V3', nodes: [7, 8, 9, 10] },
+                { id: 'v3', color: '#c2410c', label: 'V3', nodes: [7, 8, 9, 10] },
             ];
             const customerRoute = {};
             routes.forEach((route) => {
@@ -6439,32 +6512,32 @@
                         <div className="absolute -bottom-12 right-1/4 w-56 h-28 bg-amber-500/4 rounded-full blur-3xl" />
                     </div>
 
-                    <div className="relative w-full px-5 sm:px-6 md:px-8 py-6 md:py-8">
-                        <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+                    <div className="relative w-full px-3.5 sm:px-5 md:px-8 py-5 sm:py-6 md:py-8">
+                        <div className="grid lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-10 items-start">
                             <div className="lg:col-span-5">
                                 <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold mb-2">{ui.proof_eyebrow}</p>
-                                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug mb-4">
+                                <h2 className="text-[1.35rem] sm:text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug mb-3 sm:mb-4">
                                     {ui.proof_title}
                                 </h2>
-                                <p className="text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                <p className="text-[13px] sm:text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
                                     {ui.proof_body}
                                 </p>
                             </div>
 
-                            <div className="lg:col-span-7 flex flex-col gap-3">
+                            <div className="lg:col-span-7 flex flex-col gap-2.5 sm:gap-3">
                                 {pillars.map((pillar, i) => (
                                     <div
                                         key={pillar.label}
-                                        className="flex gap-3 sm:gap-4 rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/45 dark:bg-slate-950/30 px-4 py-3.5 md:px-5 md:py-4"
+                                        className="flex gap-3 rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/45 dark:bg-slate-950/30 px-3.5 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4"
                                     >
                                         <span className="shrink-0 font-mono text-[10px] font-bold tabular-nums text-brand-gold/90 pt-0.5">
                                             {String(i + 1).padStart(2, '0')}
                                         </span>
                                         <div className="min-w-0">
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-1">
+                                            <h3 className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-1">
                                                 {pillar.label}
                                             </h3>
-                                            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                            <p className="text-[12px] sm:text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                                                 {pillar.text}
                                             </p>
                                         </div>
@@ -6474,19 +6547,19 @@
                         </div>
 
                         {stages.length > 0 && (
-                            <div className="mt-8 md:mt-10 pt-6 md:pt-8 border-t border-slate-200/70 dark:border-white/10">
-                                <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+                            <div className="mt-6 sm:mt-8 md:mt-10 pt-5 sm:pt-6 md:pt-8 border-t border-slate-200/70 dark:border-white/10">
+                                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-3 mb-3 sm:mb-4">
                                     <p className="text-[10px] font-bold uppercase opus-eyebrow text-brand-gold">
                                         {ui.proof_build_eyebrow}
                                     </p>
                                     {activeStage && (
-                                        <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl text-right">
+                                        <p className="text-[12px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl sm:text-right">
                                             {activeStage.caption}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-2 mb-4" role="tablist" aria-label={ui.proof_build_eyebrow}>
+                                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3 sm:mb-4" role="tablist" aria-label={ui.proof_build_eyebrow}>
                                     {stages.map((stage, i) => {
                                         const isActive = i === stageIdx;
                                         return (
@@ -6496,13 +6569,13 @@
                                                 role="tab"
                                                 aria-selected={isActive}
                                                 onClick={() => selectStage(i)}
-                                                className={`proof-build-stage-btn rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/35 dark:bg-slate-950/20 px-2.5 sm:px-3 py-2.5 text-left ${isActive ? 'is-active' : 'text-slate-500 dark:text-slate-400 hover:border-brand-gold/25 hover:text-brand-gold'}`}
+                                                className={`proof-build-stage-btn rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/35 dark:bg-slate-950/20 px-2 sm:px-3 py-2 sm:py-2.5 text-left ${isActive ? 'is-active' : 'text-slate-500 dark:text-slate-400 hover:border-brand-gold/25 hover:text-brand-gold'}`}
                                             >
-                                                <span className="flex items-center gap-2">
+                                                <span className="flex flex-col sm:flex-row items-start sm:items-center gap-0.5 sm:gap-2 min-w-0">
                                                     <span className="font-mono text-[10px] font-bold tabular-nums opacity-80">
                                                         {String(i + 1).padStart(2, '0')}
                                                     </span>
-                                                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">
+                                                    <span className="proof-stage-label text-[10px] sm:text-xs font-bold uppercase tracking-wider max-w-full">
                                                         {stage.label}
                                                     </span>
                                                 </span>
@@ -6513,25 +6586,25 @@
 
                                 <div
                                     ref={panelRef}
-                                    className={`proof-build-panel rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/50 dark:bg-slate-950/35 px-5 py-5 md:px-7 md:py-7${hasEntered ? ' proof-anim-play' : ''}`}
+                                    className={`proof-build-panel rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/50 dark:bg-slate-950/35 px-3.5 py-4 sm:px-5 sm:py-5 md:px-7 md:py-7${hasEntered ? ' proof-anim-play' : ''}`}
                                 >
                                     {/* Formulate */}
                                     <div className={`proof-build-layer ${stageIdx === 0 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 0}>
-                                        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-stretch w-full min-h-[22rem] md:min-h-[26rem]">
-                                            <div className="lg:col-span-6 flex flex-col gap-4 md:gap-5 min-w-0">
+                                        <div className="grid lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-stretch w-full min-h-0 md:min-h-[22rem] lg:min-h-[26rem]">
+                                            <div className="lg:col-span-6 flex flex-col gap-3 sm:gap-4 md:gap-5 min-w-0">
                                                 <div>
-                                                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-2">
+                                                    <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-1.5 sm:mb-2">
                                                         {formulateStage.problem_title}
                                                     </h3>
-                                                    <p className="text-sm md:text-[15px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                    <p className="text-[13px] sm:text-sm md:text-[15px] text-slate-600 dark:text-slate-400 leading-relaxed">
                                                         {formulateStage.problem_desc}
                                                     </p>
                                                 </div>
-                                                <div className="flex-1 rounded-xl border border-slate-200/70 dark:border-white/10 bg-slate-950/[0.03] dark:bg-slate-950/40 px-4 py-3.5 md:px-5 md:py-4">
-                                                    <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-2.5">
+                                                <div className="flex-1 rounded-xl border border-slate-200/70 dark:border-white/10 bg-slate-950/[0.03] dark:bg-slate-950/40 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4 min-w-0">
+                                                    <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-2 sm:mb-2.5">
                                                         {formulateStage.formula_title}
                                                     </div>
-                                                    <div className="font-mono text-xs sm:text-sm md:text-[15px] leading-relaxed md:leading-8 text-slate-700 dark:text-slate-200 space-y-2 overflow-x-auto">
+                                                    <div className="font-mono text-[11px] sm:text-xs md:text-[15px] leading-relaxed md:leading-8 text-slate-700 dark:text-slate-200 space-y-1.5 sm:space-y-2 overflow-x-auto -mx-0.5 px-0.5">
                                                         {(formulateStage.lines || []).map((line, i) => {
                                                             const row = normalizeProofFormulaLine(line);
                                                             return (
@@ -6557,22 +6630,22 @@
                                             </div>
 
                                             <div className="lg:col-span-6 min-w-0 flex flex-col">
-                                                <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-2.5">
+                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
                                                         1 {formulateStage.depot_label}
                                                     </span>
-                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
                                                         {formulateStage.vehicles_label}
                                                     </span>
-                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-slate-200/70 dark:border-slate-700 text-slate-500 dark:text-slate-400">
                                                         {formulateStage.customers_label}
                                                     </span>
                                                 </div>
-                                                <div className="flex-1 flex items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/60 dark:bg-slate-950/40 px-1.5 py-1.5 md:px-2 md:py-2 min-h-[18rem] md:min-h-[22rem]">
+                                                <div className="flex-1 flex items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 bg-white/60 dark:bg-slate-950/40 px-1 py-1 sm:px-1.5 sm:py-1.5 md:px-2 md:py-2 min-h-[14rem] sm:min-h-[18rem] md:min-h-[22rem]">
                                                     <svg
                                                         key={formulatePlaying ? `vrp-open-${playGen}` : 'vrp-open-idle'}
                                                         viewBox={`0 0 ${vb.w} ${vb.h}`}
-                                                        className="w-full h-full max-h-[18rem] md:max-h-[22rem]"
+                                                        className="w-full h-full max-h-[14rem] sm:max-h-[18rem] md:max-h-[22rem]"
                                                         aria-hidden="true"
                                                     >
                                                         {edges.map(([a, b], i) => (
@@ -6619,9 +6692,9 @@
                                                             <circle cx={depot.x} cy={depot.y} r={depot.r} fill="rgba(245,158,11,0.12)" stroke="#f59e0b" strokeWidth="1.75" />
                                                             <circle cx={depot.x} cy={depot.y} r={depot.r} fill="none" stroke="#f59e0b" strokeOpacity="0.25" strokeWidth="1" />
                                                             {[
-                                                                { dx: -11.5, color: '#fbbf24' },
+                                                                { dx: -11.5, color: '#c2410c' },
                                                                 { dx: 0, color: '#f97316' },
-                                                                { dx: 11.5, color: '#b45309' },
+                                                                { dx: 11.5, color: '#fbbf24' },
                                                             ].map((v, i) => (
                                                                 <ProofDepotTruck
                                                                     key={i}
@@ -6655,7 +6728,7 @@
                                         >
                                             <div className={`proof-pack-formula ${packPlaying ? 'is-running is-merging' : ''}`}>
                                                 <div className="proof-pack-scan" aria-hidden="true" />
-                                                <div className="relative z-[1] font-mono text-[10px] sm:text-[11px] md:text-xs leading-snug md:leading-relaxed text-slate-600 dark:text-slate-300 space-y-1 overflow-x-auto">
+                                                <div className="relative z-[1] font-mono text-[10px] sm:text-[11px] md:text-xs leading-snug md:leading-relaxed text-slate-600 dark:text-slate-300 space-y-1 overflow-x-auto -mx-0.5 px-0.5">
                                                     {(formulateStage.lines || []).map((line, i) => {
                                                         const row = normalizeProofFormulaLine(line);
                                                         return (
@@ -6683,23 +6756,23 @@
                                                 <div className="proof-pack-funnel-line" />
                                             </div>
 
-                                            <div className={`proof-pack-chip inline-flex items-center gap-4 md:gap-5 rounded-2xl px-6 py-4 md:px-8 md:py-5 max-w-full ${packPlaying ? 'is-assembling' : ''}`}>
+                                            <div className={`proof-pack-chip inline-flex items-center gap-3 sm:gap-4 md:gap-5 rounded-2xl px-4 py-3.5 sm:px-6 sm:py-4 md:px-8 md:py-5 max-w-full ${packPlaying ? 'is-assembling' : ''}`}>
                                                 <span className="proof-pack-chip-pulse sc-pulse-ring-gold" aria-hidden="true" />
-                                                <span className="proof-pack-chip-icon flex h-12 w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-xl scale-125">
+                                                <span className="proof-pack-chip-icon flex h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-xl scale-110 sm:scale-125">
                                                     <VrpIcon />
                                                 </span>
                                                 <div className="min-w-0">
-                                                    <div className="proof-pack-chip-tag text-[11px] md:text-xs font-mono font-bold uppercase tracking-wider mb-1">
+                                                    <div className="proof-pack-chip-tag text-[10px] sm:text-[11px] md:text-xs font-mono font-bold uppercase tracking-wider mb-1">
                                                         {packStage.module_tag}
                                                     </div>
-                                                    <div className="proof-pack-chip-title text-lg md:text-xl font-bold truncate">
+                                                    <div className="proof-pack-chip-title text-base sm:text-lg md:text-xl font-bold truncate">
                                                         {packStage.module}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {packStage.module_desc && (
-                                                <p className={`proof-pack-desc text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed ${packPlaying ? 'is-ready' : ''}`}>
+                                                <p className={`proof-pack-desc text-[13px] sm:text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed px-1 ${packPlaying ? 'is-ready' : ''}`}>
                                                     {packStage.module_desc}
                                                 </p>
                                             )}
@@ -6708,12 +6781,12 @@
 
                                     {/* Solve */}
                                     <div className={`proof-build-layer ${stageIdx === 2 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 2}>
-                                        <div className="flex flex-col lg:flex-row gap-5 md:gap-6 lg:items-center">
-                                            <div className="proof-vrp-earth-frame flex-1 flex items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 px-1.5 py-1.5 md:px-2 md:py-2 min-h-[18rem] md:min-h-[22rem]">
+                                        <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6 lg:items-center">
+                                            <div className="proof-vrp-earth-frame flex-1 flex items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 px-1 py-1 sm:px-1.5 sm:py-1.5 md:px-2 md:py-2 min-h-[14rem] sm:min-h-[18rem] md:min-h-[22rem]">
                                                 <svg
                                                     key={solvePlaying ? `vrp-solve-${playGen}` : 'vrp-solve-idle'}
                                                     viewBox={`0 0 ${vb.w} ${vb.h}`}
-                                                    className="w-full h-full max-h-[18rem] md:max-h-[22rem]"
+                                                    className="w-full h-full max-h-[14rem] sm:max-h-[18rem] md:max-h-[22rem]"
                                                     aria-hidden="true"
                                                 >
                                                     {solutionArcs.map((arc) => (
@@ -6778,15 +6851,18 @@
                                                     <g className="proof-vrp-node" style={{ animationDelay: '0.02s' }}>
                                                         <circle cx={depot.x} cy={depot.y} r={depot.r} fill="rgba(245,158,11,0.12)" stroke="#f59e0b" strokeWidth="1.75" />
                                                         <circle cx={depot.x} cy={depot.y} r={depot.r} fill="none" stroke="#f59e0b" strokeOpacity="0.25" strokeWidth="1" />
-                                                        {routes.map((route, i) => (
+                                                        {routes.map((route) => {
+                                                            const truckDx = { v1: 11.5, v2: 0, v3: -11.5 };
+                                                            return (
                                                             <ProofDepotTruck
                                                                 key={route.id}
                                                                 color={route.color}
-                                                                x={depot.x + (i - 1) * 11.5}
+                                                                x={depot.x + truckDx[route.id]}
                                                                 y={depot.y - 2.5}
                                                                 scale={0.46}
                                                             />
-                                                        ))}
+                                                            );
+                                                        })}
                                                         <text
                                                             x={depot.x}
                                                             y={depot.y + 18}
@@ -8570,13 +8646,6 @@
                 [content]
             );
 
-            const sessionProgress = useMemo(() => {
-                if (!activeNavId) return 0;
-                const idx = pageNavItems.findIndex(item => navItemContainsId(item, activeNavId));
-                if (idx < 0) return 0;
-                return pageNavItems.length > 0 ? ((idx + 1) / pageNavItems.length) * 100 : 0;
-            }, [pageNavItems, activeNavId]);
-
             // Derived stats for hero console + metrics band
             const stats = useMemo(() => {
                 const liveCount = Object.values(MODULE_STATIC_DATA).filter(m => m.status === 'live').length;
@@ -8959,9 +9028,6 @@
                                 )}
                             </div>
                         </div>
-                        </div>
-                        <div className="horizon-nav-session-track shrink-0" aria-hidden="true">
-                            <div className="horizon-nav-session-fill" style={{ width: `${sessionProgress}%` }} />
                         </div>
                     </nav>
 
