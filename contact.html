@@ -1047,6 +1047,7 @@
                 nav_logout: 'Logout',
                 footer_tagline: 'An APS optimization platform that transforms ERP and MES data into actionable plans across the supply chain.',
                 footer_platform: 'Platform',
+                footer_solutions: 'Solutions',
                 footer_legal: 'Legal',
                 footer_company: 'Company',
                 footer_partner: 'Partner with Operartis',
@@ -1098,6 +1099,7 @@
                 nav_logout: 'Đăng xuất',
                 footer_tagline: 'Nền tảng tối ưu APS biến dữ liệu ERP và MES thành kế hoạch khả thi trên toàn chuỗi cung ứng.',
                 footer_platform: 'Nền tảng',
+                footer_solutions: 'Giải pháp',
                 footer_legal: 'Pháp lý',
                 footer_company: 'Công ty',
                 footer_partner: 'Hợp tác với Operartis',
@@ -1149,6 +1151,7 @@
                 nav_logout: 'Abmelden',
                 footer_tagline: 'Eine APS-Optimierungsplattform, die ERP- und MES-Daten in umsetzbare Pläne über die gesamte Lieferkette verwandelt.',
                 footer_platform: 'Plattform',
+                footer_solutions: 'Lösungen',
                 footer_legal: 'Rechtliches',
                 footer_company: 'Unternehmen',
                 footer_partner: 'Partner von Operartis werden',
@@ -1200,8 +1203,8 @@
                 id: 'platform-group',
                 label: ui.nav_platform,
                 children: [
-                    { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                     { id: 'supply-chain', label: ui.nav_supply_chain },
+                    { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                     { id: 'industry-40', label: ui.nav_industry_40 },
                     { id: 'analytics', label: ui.nav_analytics },
                 ],
@@ -2112,11 +2115,14 @@
             const footerMobileLinkClass = `${footerLinkClass} flex min-h-11 w-full items-center`;
 
             const platformLinks = [
-                { href: './#proof-foundation', label: ui.nav_mathematical_foundation },
                 { href: './#supply-chain', label: ui.nav_supply_chain },
+                { href: './#proof-foundation', label: ui.nav_mathematical_foundation },
                 { href: './#industry-40', label: ui.nav_industry_40 },
                 { href: './#analytics', label: ui.nav_analytics },
-                { href: './#platform', label: ui.nav_aps_system },
+            ];
+
+            const solutionsLinks = [
+                { href: './#matrix-fit', label: ui.nav_aps_system },
                 { href: './#or-process', label: ui.nav_implementation_process },
             ];
 
@@ -2160,6 +2166,16 @@
                                     </ul>
                                 </FooterAccordion>
 
+                                <FooterAccordion title={ui.footer_solutions}>
+                                    <ul className="space-y-0.5 pb-3">
+                                        {solutionsLinks.map((link) => (
+                                            <li key={`${link.href}-${link.label}`}>
+                                                <a href={link.href} className={footerMobileLinkClass}>{link.label}</a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </FooterAccordion>
+
                                 <FooterAccordion title={ui.footer_company}>
                                     <ul className="space-y-0.5 pb-3">
                                         {companyLinks.map((link, i) => (
@@ -2192,7 +2208,7 @@
                             </a>
                         </div>
 
-                        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+                        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 lg:gap-10">
                             <div className="md:col-span-2 lg:col-span-1">
                                 <div className="flex items-center gap-3 mb-5">
                                     <img
@@ -2218,10 +2234,10 @@
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_legal}</h3>
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_solutions}</h3>
                                 <ul className="space-y-2.5">
-                                    {legalLinks.map((link) => (
-                                        <li key={link.label}>
+                                    {solutionsLinks.map((link) => (
+                                        <li key={`${link.href}-${link.label}`}>
                                             <a href={link.href} className={footerLinkClass}>{link.label}</a>
                                         </li>
                                     ))}
@@ -2239,6 +2255,17 @@
                                     <li className="opus-site-footer-divider pt-3 mt-1 border-t">
                                         <a href="./contact" className={footerLinkClass}>{ui.footer_partner}</a>
                                     </li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_legal}</h3>
+                                <ul className="space-y-2.5">
+                                    {legalLinks.map((link) => (
+                                        <li key={link.label}>
+                                            <a href={link.href} className={footerLinkClass}>{link.label}</a>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         </div>

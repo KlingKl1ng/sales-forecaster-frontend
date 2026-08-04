@@ -3046,9 +3046,9 @@
         .dark .aa-bar-flat-3,
         .dark .aa-flow-accent-3,
         .dark .aa-chevron-active-3 {
-            --aa-accent-bg: #f59e0b;
-            --aa-accent-border: #fbbf24;
-            --aa-accent-fg: #fffbeb;
+            --aa-accent-bg: #eab308;
+            --aa-accent-border: #facc15;
+            --aa-accent-fg: #1c1917;
         }
 
         .aa-bar-flat-0,
@@ -3136,7 +3136,7 @@
         .aa-level-title-2 { color: #f59e0b; }
         .dark .aa-level-title-2 { color: #fbbf24; }
         .aa-level-title-3 { color: #d97706; }
-        .dark .aa-level-title-3 { color: #f59e0b; }
+        .dark .aa-level-title-3 { color: #facc15; }
 
         .aa-human-bar {
             transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
@@ -3240,6 +3240,30 @@
             border-color: var(--aa-accent-border);
             background-color: var(--aa-accent-bg);
             color: var(--aa-accent-fg);
+        }
+
+        .dark .aa-flow-accent-3 .aa-flow-stage:not(.aa-flow-stage--muted) {
+            border-color: rgba(234, 179, 8, 0.45);
+        }
+
+        .dark .aa-flow-accent-3 .aa-flow-stage:not(.aa-flow-stage--muted)::before {
+            background: linear-gradient(180deg, rgba(234, 179, 8, 0.9), rgba(234, 179, 8, 0.22));
+        }
+
+        .dark .aa-flow-accent-3 .aa-flow-stage-active {
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(234, 179, 8, 0.22);
+        }
+
+        .dark .aa-flow-accent-3 .aa-human-bar-fill {
+            background: linear-gradient(90deg, #facc15, #eab308);
+        }
+
+        .dark .aa-flow-accent-3 .aa-prescriptive-toggle {
+            border-color: rgba(234, 179, 8, 0.35);
+        }
+
+        .dark .aa-flow-accent-3 .aa-flow-connector::after {
+            background: linear-gradient(90deg, rgba(234, 179, 8, 0.55), rgba(148, 163, 184, 0.35));
         }
 
         .aa-flow-stage-body {
@@ -3684,8 +3708,8 @@
                     id: 'platform-group',
                     label: ui.nav_platform,
                     children: [
-                        { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                         { id: 'supply-chain', label: ui.nav_supply_chain },
+                        { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                         { id: 'industry-40', label: ui.nav_industry_40 },
                         { id: 'analytics', label: ui.nav_analytics },
                     ],
@@ -3943,6 +3967,7 @@
                     footer_terms: "Terms of Services",
                     footer_tagline: "An APS optimization platform that transforms ERP and MES data into actionable plans across the supply chain.",
                     footer_platform: "Platform",
+                    footer_solutions: "Solutions",
                     footer_legal: "Legal",
                     footer_company: "Company",
                     footer_modules: "APS Modules",
@@ -4302,6 +4327,7 @@
                     footer_terms: "Điều khoản dịch vụ",
                     footer_tagline: "Nền tảng APS tối ưu hoá dữ liệu ERP và MES thành kế hoạch thực thi chi tiết và cụ thể cho toàn bộ chuỗi cung ứng.",
                     footer_platform: "Nền tảng",
+                    footer_solutions: "Giải pháp",
                     footer_legal: "Pháp lý",
                     footer_company: "Công ty",
                     footer_modules: "Mô-đun APS",
@@ -4344,7 +4370,7 @@
                             id: "pack",
                             label: "Đóng gói",
                             caption: "Nén công thức thành một mô-đun tối ưu hoá gọn, tái sử dụng được.",
-                            module: "Bài toán định tuyến xe (VRP)",
+                            module: "Bài toán định tuyến xe",
                             module_tag: "Mô-đun APS",
                             module_desc: "Mô hình toán học được đóng gói thành mô-đun tối ưu hoá — sẵn sàng dùng ngay, hoặc điều chỉnh theo yêu cầu của khách hàng."
                         },
@@ -4661,6 +4687,7 @@
                     footer_terms: "Nutzungsbedingungen",
                     footer_tagline: "Eine APS-Optimierungsplattform, die ERP- und MES-Daten in umsetzbare Pläne für die Lieferkette verwandelt.",
                     footer_platform: "Plattform",
+                    footer_solutions: "Lösungen",
                     footer_legal: "Rechtliches",
                     footer_company: "Unternehmen",
                     footer_modules: "APS-Module",
@@ -8125,7 +8152,9 @@
             const humanW = isAutoMode ? ANALYTICS_HUMAN_W_AUTO : ANALYTICS_HUMAN_W[activeIdx];
             const modelW = 100 - humanW;
             const levelTitleClass = ANALYTICS_LEVEL_META[activeIdx].titleClass;
-            const flowCardAccent = 'border-amber-300/55 dark:border-amber-800/55 bg-white/55 dark:bg-slate-800/50';
+            const flowCardAccent = isPrescriptive
+                ? 'border-amber-300/55 dark:border-yellow-500/45 bg-white/55 dark:bg-slate-800/50'
+                : 'border-amber-300/55 dark:border-amber-800/55 bg-white/55 dark:bg-slate-800/50';
             const decisionTypeDetail = isAutoMode
                 ? (ui.analytics_prescriptive_auto_short || ui.analytics_prescriptive_auto)
                 : ((ui.analytics_decision_types || [])[activeIdx] || activeLevel.focus);
@@ -8346,20 +8375,20 @@
                                                             <div className="aa-human-meter-model" />
                                                         </div>
                                                         <div className="aa-flow-stage-bar-labels mt-2 grid grid-cols-2 gap-2 overflow-hidden">
-                                                            <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 dark:text-amber-400">{ui.analytics_human_input_short || ui.analytics_human_input} {humanW}%</span>
+                                                            <span className={`text-[9px] font-semibold uppercase tracking-wide leading-tight text-amber-700 ${isPrescriptive ? 'dark:text-yellow-400' : 'dark:text-amber-400'}`}>{ui.analytics_human_input_short || ui.analytics_human_input} {humanW}%</span>
                                                             <span className="text-[9px] font-semibold uppercase tracking-wide leading-tight text-slate-500 dark:text-slate-400 text-right">{ui.analytics_model_driven_short || ui.analytics_model_driven} {modelW}%</span>
                                                         </div>
                                                     </div>
                                                 ) : stage.key === 'analytics' && isPrescriptive ? (
                                                     <>
                                                         <p className="aa-flow-stage-detail text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">{stage.detail}</p>
-                                                        <div className="aa-prescriptive-toggle mt-2 rounded-md border border-brand-gold/25 dark:border-brand-gold/20 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
+                                                        <div className="aa-prescriptive-toggle mt-2 rounded-md border border-brand-gold/25 dark:border-yellow-500/35 p-0.5 bg-white/90 dark:bg-slate-900/90 w-full">
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setPrescriptiveMode('support')}
                                                                 aria-label={ui.analytics_prescriptive_support}
                                                                 title={ui.analytics_prescriptive_support}
-                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'support' ? 'bg-brand-gold text-white' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold'}`}
+                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'support' ? 'bg-brand-gold text-white dark:bg-yellow-500 dark:text-stone-900' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold dark:hover:text-yellow-400'}`}
                                                             >
                                                                 {ui.analytics_prescriptive_support_short || ui.analytics_prescriptive_support}
                                                             </button>
@@ -8368,7 +8397,7 @@
                                                                 onClick={() => setPrescriptiveMode('auto')}
                                                                 aria-label={ui.analytics_prescriptive_auto}
                                                                 title={ui.analytics_prescriptive_auto}
-                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'auto' ? 'bg-brand-gold text-white' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold'}`}
+                                                                className={`aa-prescriptive-toggle-button px-1.5 py-1 rounded text-[8px] font-bold uppercase tracking-wide leading-tight transition-colors ${prescriptiveMode === 'auto' ? 'bg-brand-gold text-white dark:bg-yellow-500 dark:text-stone-900' : 'text-slate-600 dark:text-slate-300 hover:text-brand-gold dark:hover:text-yellow-400'}`}
                                                             >
                                                                 {ui.analytics_prescriptive_auto_short || ui.analytics_prescriptive_auto}
                                                             </button>
@@ -8516,11 +8545,14 @@
             const footerMobileLinkClass = `${footerLinkClass} flex min-h-11 w-full items-center`;
 
             const platformLinks = [
-                { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                 { id: 'supply-chain', label: ui.nav_supply_chain },
+                { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                 { id: 'industry-40', label: ui.nav_industry_40 },
                 { id: 'analytics', label: ui.nav_analytics },
-                { id: 'platform', label: ui.nav_aps_system },
+            ];
+
+            const solutionsLinks = [
+                { id: 'matrix-fit', label: ui.nav_aps_system },
                 { id: 'or-process', label: ui.nav_implementation_process },
             ];
 
@@ -8557,6 +8589,18 @@
                                 <FooterAccordion title={ui.footer_platform} defaultOpen>
                                     <ul className="space-y-0.5 pb-3">
                                         {platformLinks.map((link) => (
+                                            <li key={`${link.id}-${link.label}`}>
+                                                <button type="button" onClick={() => onNav(link.id)} className={footerMobileLinkClass}>
+                                                    {link.label}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </FooterAccordion>
+
+                                <FooterAccordion title={ui.footer_solutions}>
+                                    <ul className="space-y-0.5 pb-3">
+                                        {solutionsLinks.map((link) => (
                                             <li key={`${link.id}-${link.label}`}>
                                                 <button type="button" onClick={() => onNav(link.id)} className={footerMobileLinkClass}>
                                                     {link.label}
@@ -8606,7 +8650,7 @@
                             </a>
                         </div>
 
-                        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+                        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 lg:gap-10">
                             <div className="md:col-span-2 lg:col-span-1">
                                 <div className="flex items-center gap-3 mb-5">
                                     <img
@@ -8634,11 +8678,13 @@
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_legal}</h3>
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_solutions}</h3>
                                 <ul className="space-y-2.5">
-                                    {legalLinks.map((link) => (
-                                        <li key={link.label}>
-                                            <a href={link.href} className={footerLinkClass}>{link.label}</a>
+                                    {solutionsLinks.map((link) => (
+                                        <li key={`${link.id}-${link.label}`}>
+                                            <button type="button" onClick={() => onNav(link.id)} className={footerLinkClass}>
+                                                {link.label}
+                                            </button>
                                         </li>
                                     ))}
                                 </ul>
@@ -8663,6 +8709,17 @@
                                             {ui.footer_partner}
                                         </a>
                                     </li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{ui.footer_legal}</h3>
+                                <ul className="space-y-2.5">
+                                    {legalLinks.map((link) => (
+                                        <li key={link.label}>
+                                            <a href={link.href} className={footerLinkClass}>{link.label}</a>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         </div>
@@ -8746,8 +8803,8 @@
 
             const getSectionList = useCallback(() => {
                 const sections = [
-                    { id: 'proof-foundation', el: document.getElementById('proof-foundation') },
                     { id: 'supply-chain', el: document.getElementById('supply-chain') },
+                    { id: 'proof-foundation', el: document.getElementById('proof-foundation') },
                     { id: 'industry-40', el: document.getElementById('industry-40') },
                     { id: 'analytics', el: document.getElementById('analytics') },
                     ...content.matrix.map(h => ({ id: h.id, el: document.getElementById(`horizon-${h.id}`) })),
@@ -9135,11 +9192,11 @@
                             </div>
 
                             <div className="mt-14 md:mt-16">
-                                <Reveal delay={100}><ProofFoundationSection content={content} /></Reveal>
+                                <Reveal delay={100}><SupplyChainFlow content={content} /></Reveal>
                             </div>
 
                             <div className="mt-16 md:mt-20">
-                                <Reveal delay={125}><SupplyChainFlow content={content} /></Reveal>
+                                <Reveal delay={125}><ProofFoundationSection content={content} /></Reveal>
                             </div>
                             <div className="mt-16 md:mt-20">
                                 <SystemIntegrationLoop content={content} />
