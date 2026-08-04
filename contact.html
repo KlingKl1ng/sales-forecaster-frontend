@@ -442,6 +442,14 @@
             align-items: center;
             height: 1.75rem;
         }
+        .header-nav-aps-wrap::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            height: 12px;
+        }
         .header-nav-aps-menu {
             min-width: 11.5rem;
             display: flex;
@@ -465,7 +473,7 @@
         .header-nav-aps-backdrop {
             position: fixed;
             inset: 0;
-            z-index: 55;
+            z-index: 15;
             background: rgba(2, 6, 23, 0.18);
             backdrop-filter: blur(1px);
             -webkit-backdrop-filter: blur(1px);
@@ -539,10 +547,11 @@
             border-radius: 0.5rem;
             transition: background-color 0.15s ease, opacity 0.15s ease;
         }
-        .header-nav-aps-nested-trigger:hover,
-        .header-nav-aps-nested-trigger[aria-expanded="true"] {
+        .header-nav-aps-nested-trigger:hover:not(.header-nav-tab-active),
+        .header-nav-aps-nested-trigger[aria-expanded="true"]:not(.header-nav-tab-active) {
             opacity: 1;
-            background: rgba(245, 158, 11, 0.08);
+            background: transparent;
+            box-shadow: none;
         }
         .header-nav-aps-nested-trigger:focus-visible {
             outline: 2px solid rgba(245, 158, 11, 0.45);
@@ -582,9 +591,10 @@
                 0 12px 32px rgba(0, 0, 0, 0.45),
                 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
         }
-        .dark .header-nav-aps-nested-trigger:hover,
-        .dark .header-nav-aps-nested-trigger[aria-expanded="true"] {
-            background: rgba(245, 158, 11, 0.12);
+        .dark .header-nav-aps-nested-trigger:hover:not(.header-nav-tab-active),
+        .dark .header-nav-aps-nested-trigger[aria-expanded="true"]:not(.header-nav-tab-active) {
+            background: transparent;
+            box-shadow: none;
         }
         .dark .header-nav-aps-nested-menu {
             background: rgba(15, 23, 42, 0.96);
@@ -942,6 +952,7 @@
                 assurance_3: 'Professional and helpful service',
                 nav_platform: 'Plattform',
                 nav_solutions: 'Solutions',
+                nav_mathematical_foundation: 'Mathematical Foundation',
                 nav_supply_chain: 'Supply Chain',
                 nav_industry_40: 'Industry 4.0',
                 nav_analytics: 'Analytics',
@@ -992,6 +1003,7 @@
                 assurance_3: 'Dịch vụ chuyên nghiệp và tận tâm',
                 nav_platform: 'Nền tảng',
                 nav_solutions: 'Giải pháp',
+                nav_mathematical_foundation: 'Nền tảng toán học',
                 nav_supply_chain: 'Chuỗi cung ứng',
                 nav_industry_40: 'Công nghiệp 4.0',
                 nav_analytics: 'Phân tích',
@@ -1042,6 +1054,7 @@
                 assurance_3: 'Professioneller und hilfreicher Service',
                 nav_platform: 'Plattform',
                 nav_solutions: 'Lösungen',
+                nav_mathematical_foundation: 'Mathematische Grundlage',
                 nav_supply_chain: 'Lieferkette',
                 nav_industry_40: 'Industry 4.0',
                 nav_analytics: 'Analytics-Stufen',
@@ -1065,20 +1078,47 @@
         };
 
         const NAV_HREF = {
+            'proof-foundation': './#proof-foundation',
             'supply-chain': './#supply-chain',
             'industry-40': './#industry-40',
             'analytics': './#analytics',
             'platform': './#platform',
+            'strategic': './#horizon-strategic',
+            'tactical': './#horizon-tactical',
+            'operational': './#horizon-operational',
+            'cross': './#horizon-cross',
             'or-process': './#or-process',
             'about': './#about',
             'contact': './contact',
         };
 
-        const buildPageNavItems = (ui) => ([
+        const APS_HORIZON_NAV = {
+            en: [
+                { id: 'strategic', label: 'Strategic' },
+                { id: 'tactical', label: 'Tactical' },
+                { id: 'operational', label: 'Operational' },
+                { id: 'cross', label: 'Cross-Functional' },
+            ],
+            vi: [
+                { id: 'strategic', label: 'Chiến lược' },
+                { id: 'tactical', label: 'Chiến thuật' },
+                { id: 'operational', label: 'Vận hành' },
+                { id: 'cross', label: 'Đa chức năng' },
+            ],
+            de: [
+                { id: 'strategic', label: 'Strategisch' },
+                { id: 'tactical', label: 'Taktisch' },
+                { id: 'operational', label: 'Operativ' },
+                { id: 'cross', label: 'Funktionsübergreifend' },
+            ],
+        };
+
+        const buildPageNavItems = (ui, lang = 'en') => ([
             {
                 id: 'platform-group',
                 label: ui.nav_platform,
                 children: [
+                    { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                     { id: 'supply-chain', label: ui.nav_supply_chain },
                     { id: 'industry-40', label: ui.nav_industry_40 },
                     { id: 'analytics', label: ui.nav_analytics },
@@ -1088,7 +1128,11 @@
                 id: 'solutions-group',
                 label: ui.nav_solutions,
                 children: [
-                    { id: 'platform', label: ui.nav_aps_system },
+                    {
+                        id: 'aps-group',
+                        label: ui.nav_aps_system,
+                        children: APS_HORIZON_NAV[lang] || APS_HORIZON_NAV.en,
+                    },
                     { id: 'or-process', label: ui.nav_implementation_process },
                 ],
             },
@@ -1347,7 +1391,49 @@
             const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
             const [indicatorAnimated, setIndicatorAnimated] = useState(false);
             const [openMenuId, setOpenMenuId] = useState(null);
+            const [openNestedId, setOpenNestedId] = useState(null);
+            const [nestedPlacement, setNestedPlacement] = useState('right');
             const [menuRect, setMenuRect] = useState(null);
+            const menuCloseTimerRef = useRef(null);
+            const nestedTriggerRefs = useRef({});
+
+            const clearMenuCloseTimer = useCallback(() => {
+                if (menuCloseTimerRef.current) {
+                    clearTimeout(menuCloseTimerRef.current);
+                    menuCloseTimerRef.current = null;
+                }
+            }, []);
+
+            const prefersHoverMenus = useCallback(() => {
+                try {
+                    return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+                } catch (e) {
+                    return true;
+                }
+            }, []);
+
+            const openMenu = useCallback((id) => {
+                clearMenuCloseTimer();
+                setOpenNestedId(null);
+                setOpenMenuId(id);
+            }, [clearMenuCloseTimer]);
+
+            const closeMenu = useCallback(() => {
+                clearMenuCloseTimer();
+                setOpenNestedId(null);
+                setOpenMenuId(null);
+            }, [clearMenuCloseTimer]);
+
+            const scheduleCloseMenu = useCallback(() => {
+                clearMenuCloseTimer();
+                menuCloseTimerRef.current = setTimeout(() => {
+                    menuCloseTimerRef.current = null;
+                    setOpenNestedId(null);
+                    setOpenMenuId(null);
+                }, 160);
+            }, [clearMenuCloseTimer]);
+
+            useEffect(() => () => clearMenuCloseTimer(), [clearMenuCloseTimer]);
 
             const openMenuItem = useMemo(
                 () => items.find(item => item.id === openMenuId) || null,
@@ -1355,17 +1441,16 @@
             );
 
             const indicatorTargetId = useMemo(() => {
-                if (openMenuId) return openMenuId;
                 const match = items.find(item => navItemContainsId(item, activeId));
-                return match ? match.id : items[0]?.id;
-            }, [activeId, items, openMenuId]);
+                return match ? match.id : null;
+            }, [activeId, items]);
 
             const isTabActive = useCallback((item) => {
                 if (item.children?.length) {
-                    return openMenuId === item.id || navItemContainsId(item, activeId);
+                    return navItemContainsId(item, activeId);
                 }
                 return activeId === item.id;
-            }, [activeId, openMenuId]);
+            }, [activeId]);
 
             const updateIndicator = useCallback(() => {
                 const track = trackRef.current;
@@ -1466,13 +1551,38 @@
             }, [openMenuId, updateMenuRect]);
 
             useEffect(() => {
-                if (!openMenuId) return undefined;
+                if (!openMenuId) {
+                    setOpenNestedId(null);
+                    return undefined;
+                }
                 const onKeyDown = (e) => {
-                    if (e.key === 'Escape') setOpenMenuId(null);
+                    if (e.key !== 'Escape') return;
+                    if (openNestedId) {
+                        setOpenNestedId(null);
+                        return;
+                    }
+                    closeMenu();
                 };
                 window.addEventListener('keydown', onKeyDown);
                 return () => window.removeEventListener('keydown', onKeyDown);
-            }, [openMenuId]);
+            }, [openMenuId, openNestedId, closeMenu]);
+
+            useLayoutEffect(() => {
+                if (!openNestedId) {
+                    setNestedPlacement('right');
+                    return undefined;
+                }
+                const el = nestedTriggerRefs.current[openNestedId];
+                if (!el) return undefined;
+                const updatePlacement = () => {
+                    const r = el.getBoundingClientRect();
+                    const spaceRight = window.innerWidth - r.right;
+                    setNestedPlacement(spaceRight < 200 ? 'left' : 'right');
+                };
+                updatePlacement();
+                window.addEventListener('resize', updatePlacement);
+                return () => window.removeEventListener('resize', updatePlacement);
+            }, [openNestedId, menuRect]);
 
             useEffect(() => {
                 if (!navFits) return undefined;
@@ -1492,25 +1602,113 @@
             const tabClass = (isActive) => `header-nav-tab ${isActive ? 'header-nav-tab-active' : ''}`;
 
             const toggleMenu = useCallback((id) => {
+                setOpenNestedId(null);
                 setOpenMenuId(prev => (prev === id ? null : id));
             }, []);
 
             const closeMenuAndNav = useCallback((id) => {
                 onNav(id);
-                setOpenMenuId(null);
-            }, [onNav]);
+                closeMenu();
+            }, [onNav, closeMenu]);
 
-            const renderMenuEntries = (entries) => entries.map((entry) => (
-                <button
-                    key={entry.id}
-                    type="button"
-                    role="menuitem"
-                    onClick={() => closeMenuAndNav(entry.id)}
-                    className={`${tabClass(activeId === entry.id)} header-nav-child`}
-                >
-                    {entry.label}
-                </button>
-            ));
+            const toggleNestedMenu = useCallback((id) => {
+                setOpenNestedId(prev => (prev === id ? null : id));
+            }, []);
+
+            const onDropdownTriggerEnter = useCallback((id) => {
+                if (!prefersHoverMenus()) return;
+                openMenu(id);
+            }, [openMenu, prefersHoverMenus]);
+
+            const onDropdownTriggerLeave = useCallback(() => {
+                if (!prefersHoverMenus()) return;
+                scheduleCloseMenu();
+            }, [prefersHoverMenus, scheduleCloseMenu]);
+
+            const onDropdownMenuEnter = useCallback(() => {
+                if (!prefersHoverMenus()) return;
+                clearMenuCloseTimer();
+            }, [clearMenuCloseTimer, prefersHoverMenus]);
+
+            const onDropdownMenuLeave = useCallback(() => {
+                if (!prefersHoverMenus()) return;
+                scheduleCloseMenu();
+            }, [prefersHoverMenus, scheduleCloseMenu]);
+
+            const onPlainTabEnter = useCallback(() => {
+                if (!prefersHoverMenus()) return;
+                if (openMenuId) scheduleCloseMenu();
+            }, [openMenuId, prefersHoverMenus, scheduleCloseMenu]);
+
+            const renderMenuEntries = (entries) => {
+                const nodes = [];
+                entries.forEach((entry) => {
+                    if (entry.children?.length) {
+                        const isNestedOpen = openNestedId === entry.id;
+                        const nestedActive = navItemContainsId(entry, activeId);
+                        nodes.push(
+                            <div
+                                key={entry.id}
+                                className="header-nav-aps-nested-wrap"
+                                onMouseEnter={() => {
+                                    if (prefersHoverMenus()) setOpenNestedId(entry.id);
+                                }}
+                            >
+                                <button
+                                    ref={(el) => {
+                                        if (el) nestedTriggerRefs.current[entry.id] = el;
+                                        else delete nestedTriggerRefs.current[entry.id];
+                                    }}
+                                    type="button"
+                                    role="menuitem"
+                                    aria-expanded={isNestedOpen}
+                                    aria-haspopup="menu"
+                                    onClick={() => toggleNestedMenu(entry.id)}
+                                    className={`${tabClass(nestedActive)} header-nav-child header-nav-aps-nested-trigger`}
+                                >
+                                    <span>{entry.label}</span>
+                                    <ChevronDownIcon className={`header-nav-chevron header-nav-chevron-nested${isNestedOpen ? ' header-nav-chevron-nested-open' : ''}`} />
+                                </button>
+                                {isNestedOpen && (
+                                    <div
+                                        className={`header-nav-aps-nested-menu${nestedPlacement === 'left' ? ' header-nav-aps-nested-menu-left' : ''}`}
+                                        role="menu"
+                                        aria-label={entry.label}
+                                    >
+                                        {entry.children.map(child => (
+                                            <button
+                                                key={child.id}
+                                                type="button"
+                                                role="menuitem"
+                                                onClick={() => closeMenuAndNav(child.id)}
+                                                className={`${tabClass(activeId === child.id)} header-nav-child`}
+                                            >
+                                                {child.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                        return;
+                    }
+                    nodes.push(
+                        <button
+                            key={entry.id}
+                            type="button"
+                            role="menuitem"
+                            onClick={() => closeMenuAndNav(entry.id)}
+                            onMouseEnter={() => {
+                                if (prefersHoverMenus()) setOpenNestedId(null);
+                            }}
+                            className={`${tabClass(activeId === entry.id)} header-nav-child`}
+                        >
+                            {entry.label}
+                        </button>
+                    );
+                });
+                return nodes;
+            };
 
             const renderRulerTabs = () => items.map(item => {
                 if (item.children?.length) {
@@ -1530,16 +1728,20 @@
 
             const dropdownMenu = openMenuId && menuRect && openMenuItem ? ReactDOM.createPortal(
                 <>
-                    <button
-                        type="button"
-                        className="header-nav-aps-backdrop"
-                        aria-label={`Close ${openMenuItem.label} menu`}
-                        onClick={() => setOpenMenuId(null)}
-                    />
+                    {!prefersHoverMenus() ? (
+                        <button
+                            type="button"
+                            className="header-nav-aps-backdrop"
+                            aria-label={`Close ${openMenuItem.label} menu`}
+                            onClick={closeMenu}
+                        />
+                    ) : null}
                     <div
                         className="header-nav-aps-menu header-nav-aps-menu-floating"
                         role="menu"
                         style={{ top: `${menuRect.top}px`, left: `${menuRect.left}px`, minWidth: `${menuRect.minWidth}px` }}
+                        onMouseEnter={onDropdownMenuEnter}
+                        onMouseLeave={onDropdownMenuLeave}
                     >
                         <div className="header-nav-aps-menu-head">{openMenuItem.label}</div>
                         {renderMenuEntries(openMenuItem.children || [])}
@@ -1580,7 +1782,12 @@
                                         const highlighted = isTabActive(item);
                                         const isOpen = openMenuId === item.id;
                                         return (
-                                            <div key={item.id} className="header-nav-aps-wrap">
+                                            <div
+                                                key={item.id}
+                                                className="header-nav-aps-wrap"
+                                                onMouseEnter={() => onDropdownTriggerEnter(item.id)}
+                                                onMouseLeave={onDropdownTriggerLeave}
+                                            >
                                                 <button
                                                     ref={(el) => {
                                                         triggerRefs.current[item.id] = el;
@@ -1606,6 +1813,7 @@
                                             type="button"
                                             ref={(el) => setTabRef(item.id, el)}
                                             onClick={() => onNav(item.id)}
+                                            onMouseEnter={onPlainTabEnter}
                                             className={tabClass(isActive)}
                                         >
                                             <span className="header-nav-tab-label">{item.label}</span>
@@ -1663,16 +1871,43 @@
                                 {item.label}
                             </div>
                             <div className="grid gap-2">
-                                {item.children.map(child => (
-                                    <button
-                                        key={child.id}
-                                        type="button"
-                                        onClick={() => activate(child.id)}
-                                        className={buttonClass(activeId === child.id, true)}
-                                    >
-                                        <span>{child.label}</span>
-                                    </button>
-                                ))}
+                                {item.children.map(child => {
+                                    if (child.children?.length) {
+                                        const childActive = navItemContainsId(child, activeId);
+                                        return (
+                                            <div
+                                                key={child.id}
+                                                className={`rounded-xl border p-2 ${childActive ? 'border-brand-gold/30 bg-brand-gold/5' : 'border-slate-200/70 dark:border-slate-800/80'}`}
+                                            >
+                                                <div className={`px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wide ${childActive ? 'text-brand-gold' : 'text-slate-500 dark:text-slate-400'}`}>
+                                                    {child.label}
+                                                </div>
+                                                <div className="grid gap-1.5">
+                                                    {child.children.map(grand => (
+                                                        <button
+                                                            key={grand.id}
+                                                            type="button"
+                                                            onClick={() => activate(grand.id)}
+                                                            className={buttonClass(activeId === grand.id, true)}
+                                                        >
+                                                            <span>{grand.label}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return (
+                                        <button
+                                            key={child.id}
+                                            type="button"
+                                            onClick={() => activate(child.id)}
+                                            className={buttonClass(activeId === child.id, true)}
+                                        >
+                                            <span>{child.label}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     );
@@ -1749,6 +1984,7 @@
             const footerMobileLinkClass = `${footerLinkClass} flex min-h-11 w-full items-center`;
 
             const platformLinks = [
+                { href: './#proof-foundation', label: ui.nav_mathematical_foundation },
                 { href: './#supply-chain', label: ui.nav_supply_chain },
                 { href: './#industry-40', label: ui.nav_industry_40 },
                 { href: './#analytics', label: ui.nav_analytics },
@@ -2047,7 +2283,7 @@
             const headerNavRef = useRef(null);
             const accountMenuRef = useRef(null);
             const copy = CONTACT_COPY[lang] || CONTACT_COPY.en;
-            const pageNavItems = useMemo(() => buildPageNavItems(copy), [copy]);
+            const pageNavItems = useMemo(() => buildPageNavItems(copy, lang), [copy, lang]);
             const activeNavId = 'contact';
             const sessionProgress = 100;
 
@@ -2164,7 +2400,7 @@
                 <div className="contact-shell h-full bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
                     <ContactCanvas theme={theme} />
 
-                    <nav className="header-bar relative z-20 shrink-0 overflow-visible border-b border-slate-200/50 dark:border-slate-800/50">
+                    <nav className="header-bar relative z-30 shrink-0 overflow-visible border-b border-slate-200/50 dark:border-slate-800/50">
                         <div className="max-w-7xl mx-auto w-full h-16 px-3 sm:px-6 md:px-10 flex items-center gap-2 md:gap-4 overflow-visible">
                             <div className="flex items-center gap-2 sm:gap-3 shrink-0 p-1.5 pr-3 sm:pr-4 md:pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                                 <a href="./">

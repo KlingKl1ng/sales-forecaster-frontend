@@ -617,6 +617,15 @@
             height: 1.75rem;
         }
 
+        .header-nav-aps-wrap::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            height: 12px;
+        }
+
         .header-nav-aps-menu {
             min-width: 11.5rem;
             display: flex;
@@ -642,7 +651,7 @@
         .header-nav-aps-backdrop {
             position: fixed;
             inset: 0;
-            z-index: 55;
+            z-index: 15;
             background: rgba(2, 6, 23, 0.18);
             backdrop-filter: blur(1px);
             -webkit-backdrop-filter: blur(1px);
@@ -734,10 +743,10 @@
             transition: background-color 0.15s ease, opacity 0.15s ease;
         }
 
-        .header-nav-aps-nested-trigger:hover,
-        .header-nav-aps-nested-trigger[aria-expanded="true"] {
-            opacity: 1;
-            background: rgba(245, 158, 11, 0.08);
+        .header-nav-aps-nested-trigger:hover:not(.header-nav-tab-active),
+        .header-nav-aps-nested-trigger[aria-expanded="true"]:not(.header-nav-tab-active) {
+            background: transparent;
+            box-shadow: none;
         }
 
         .header-nav-aps-nested-trigger:focus-visible {
@@ -791,9 +800,10 @@
                 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
         }
 
-        .dark .header-nav-aps-nested-trigger:hover,
-        .dark .header-nav-aps-nested-trigger[aria-expanded="true"] {
-            background: rgba(245, 158, 11, 0.12);
+        .dark .header-nav-aps-nested-trigger:hover:not(.header-nav-tab-active),
+        .dark .header-nav-aps-nested-trigger[aria-expanded="true"]:not(.header-nav-tab-active) {
+            background: transparent;
+            box-shadow: none;
         }
 
         .dark .header-nav-aps-nested-menu {
@@ -3496,8 +3506,9 @@
         };
 
         const resolveActiveHorizonId = (sections, scrollRoot, anchorOffset) => {
+            if (!sections.length) return null;
             const scrollPos = scrollRoot.scrollTop + anchorOffset;
-            let activeId = sections[0]?.id ?? null;
+            let activeId = null;
             for (const section of sections) {
                 if (scrollPos >= getSectionTopInRoot(section.el, scrollRoot) - 2) {
                     activeId = section.id;
@@ -3521,6 +3532,7 @@
                     id: 'platform-group',
                     label: ui.nav_platform,
                     children: [
+                        { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                         { id: 'supply-chain', label: ui.nav_supply_chain },
                         { id: 'industry-40', label: ui.nav_industry_40 },
                         { id: 'analytics', label: ui.nav_analytics },
@@ -3547,7 +3559,7 @@
         };
 
         const getNavTargetId = (navId) => {
-            if (['supply-chain', 'industry-40', 'analytics', 'or-process', 'about', 'matrix-fit'].includes(navId)) return navId;
+            if (['proof-foundation', 'supply-chain', 'industry-40', 'analytics', 'or-process', 'about', 'matrix-fit'].includes(navId)) return navId;
             return `horizon-${navId}`;
         };
 
@@ -3788,8 +3800,8 @@
                     metrics_eyebrow: "Built for measurable impact",
                     metrics_title: "One platform. Every planning horizon.",
                     proof_eyebrow: "Mathematical foundation",
-                    proof_title: "Optimization with proof — not promises.",
-                    proof_body: "Operartis is an optimization system built from data-driven mathematical models. It helps managers make better decisions. The results are (sub)optimal solutions under given constraints that can be proven.",
+                    proof_title: "Optimization with proof.",
+                    proof_body: "Operartis is an optimization system built from data-driven mathematical models. It helps managers make better decisions. The results are (near)optimal solutions under given constraints that can be proven.",
                     proof_pillars: [
                         { label: "Models from data", text: "Recommendations rest on quantitative models grounded in operational data — not intuition alone." },
                         { label: "Decision support", text: "Built to help managers act under real constraints: capacity, cost, service, and time." },
@@ -3853,6 +3865,7 @@
                     nav_supply_chain: "Supply Chain",
                     nav_industry_40: "Industry 4.0",
                     nav_platform: "Plattform",
+                    nav_mathematical_foundation: "Mathematical Foundation",
                     nav_aps: "APS",
                     nav_solutions: "Solutions",
                     nav_aps_system: "APS-System",
@@ -4146,7 +4159,7 @@
                     metrics_eyebrow: "Được xây dựng để đo lường tác động",
                     metrics_title: "Một nền tảng. Mọi khung hoạch định.",
                     proof_eyebrow: "Nền tảng toán học",
-                    proof_title: "Tối ưu có chứng minh — không phải lời hứa.",
+                    proof_title: "Tối ưu có chứng minh.",
                     proof_body: "Operartis là hệ thống tối ưu hoá xây dựng từ các mô hình toán học dựa trên dữ liệu. Hệ thống hỗ trợ nhà quản lý ra quyết định tốt hơn. Kết quả là các lời giải (cận) tối ưu dưới các ràng buộc cho trước có thể chứng minh được.",
                     proof_pillars: [
                         { label: "Mô hình từ dữ liệu", text: "Mọi đề xuất dựa trên mô hình định lượng gắn với dữ liệu vận hành — không chỉ dựa vào trực giác." },
@@ -4211,6 +4224,7 @@
                     nav_supply_chain: "Chuỗi cung ứng",
                     nav_industry_40: "Công nghiệp 4.0",
                     nav_platform: "Nền tảng",
+                    nav_mathematical_foundation: "Nền tảng toán học",
                     nav_aps: "APS",
                     nav_solutions: "Giải pháp",
                     nav_aps_system: "APS-System",
@@ -4504,8 +4518,8 @@
                     metrics_eyebrow: "Für messbare Wirkung entwickelt",
                     metrics_title: "Eine Plattform. Jeder Planungshorizont.",
                     proof_eyebrow: "Mathematische Grundlage",
-                    proof_title: "Optimierung mit Beweis — keine Versprechen.",
-                    proof_body: "Operartis ist ein Optimierungssystem aus datengestützten mathematischen Modellen. Es unterstützt Führungskräfte bei besseren Entscheidungen. Die Ergebnisse sind (sub)optimale Lösungen unter gegebenen Restriktionen, die beweisbar sind.",
+                    proof_title: "Optimierung mit Beweis.",
+                    proof_body: "Operartis ist ein Optimierungssystem aus datengestützten mathematischen Modellen. Es unterstützt Führungskräfte bei besseren Entscheidungen. Die Ergebnisse sind (nahezu)optimale Lösungen unter gegebenen Restriktionen, die beweisbar sind.",
                     proof_pillars: [
                         { label: "Modelle aus Daten", text: "Empfehlungen beruhen auf quantitativen Modellen aus Betriebsdaten — nicht allein auf Intuition." },
                         { label: "Entscheidungsunterstützung", text: "Gebaut, damit Manager unter realen Restriktionen handeln: Kapazität, Kosten, Service und Zeit." },
@@ -4569,6 +4583,7 @@
                     nav_supply_chain: "Lieferkette",
                     nav_industry_40: "Industry 4.0",
                     nav_platform: "Plattform",
+                    nav_mathematical_foundation: "Mathematische Grundlage",
                     nav_aps: "APS",
                     nav_solutions: "Lösungen",
                     nav_aps_system: "APS-System",
@@ -5692,18 +5707,20 @@
             useEffect(() => {
                 const el = sectionRef.current;
                 if (!el) return undefined;
+                const root = getMainScrollRoot();
                 const observer = new IntersectionObserver(([entry]) => {
-                    if (entry.isIntersecting) {
-                        setStarted(true);
-                        observer.disconnect();
-                    }
-                }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
+                    if (!entry.isIntersecting) return;
+                    setPhase(0);
+                    setStarted(true);
+                    observer.disconnect();
+                }, { root: root || null, threshold: 0.01, rootMargin: '80px 0px' });
                 observer.observe(el);
                 return () => observer.disconnect();
             }, []);
 
             useEffect(() => {
                 if (!started) return undefined;
+                setPhase(0);
                 const timer = setInterval(() => setPhase(p => (p + 1) % 2), 9500);
                 return () => clearInterval(timer);
             }, [started]);
@@ -6413,7 +6430,8 @@
             return (
                 <section
                     ref={sectionRef}
-                    className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm"
+                    id="proof-foundation"
+                    className="opus-scroll-target relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-b from-white/55 via-white/35 to-white/20 dark:from-slate-900/55 dark:via-slate-900/35 dark:to-slate-900/20 backdrop-blur-xl shadow-sm"
                     aria-label={ui.proof_title}
                 >
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl" aria-hidden="true">
@@ -6908,6 +6926,45 @@
             const [nestedPlacement, setNestedPlacement] = useState('right');
             const [menuRect, setMenuRect] = useState(null);
             const nestedTriggerRefs = useRef({});
+            const menuCloseTimerRef = useRef(null);
+
+            const clearMenuCloseTimer = useCallback(() => {
+                if (menuCloseTimerRef.current) {
+                    clearTimeout(menuCloseTimerRef.current);
+                    menuCloseTimerRef.current = null;
+                }
+            }, []);
+
+            const prefersHoverMenus = useCallback(() => {
+                try {
+                    return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+                } catch (e) {
+                    return true;
+                }
+            }, []);
+
+            const openMenu = useCallback((id) => {
+                clearMenuCloseTimer();
+                setOpenNestedId(null);
+                setOpenMenuId(id);
+            }, [clearMenuCloseTimer]);
+
+            const closeMenu = useCallback(() => {
+                clearMenuCloseTimer();
+                setOpenNestedId(null);
+                setOpenMenuId(null);
+            }, [clearMenuCloseTimer]);
+
+            const scheduleCloseMenu = useCallback(() => {
+                clearMenuCloseTimer();
+                menuCloseTimerRef.current = setTimeout(() => {
+                    menuCloseTimerRef.current = null;
+                    setOpenNestedId(null);
+                    setOpenMenuId(null);
+                }, 160);
+            }, [clearMenuCloseTimer]);
+
+            useEffect(() => () => clearMenuCloseTimer(), [clearMenuCloseTimer]);
 
             const openMenuItem = useMemo(
                 () => items.find(item => item.id === openMenuId) || null,
@@ -6915,17 +6972,16 @@
             );
 
             const indicatorTargetId = useMemo(() => {
-                if (openMenuId) return openMenuId;
                 const match = items.find(item => navItemContainsId(item, activeId));
-                return match ? match.id : items[0]?.id;
-            }, [activeId, items, openMenuId]);
+                return match ? match.id : null;
+            }, [activeId, items]);
 
             const isTabActive = useCallback((item) => {
                 if (item.children?.length) {
-                    return openMenuId === item.id || navItemContainsId(item, activeId);
+                    return navItemContainsId(item, activeId);
                 }
                 return activeId === item.id;
-            }, [activeId, openMenuId]);
+            }, [activeId]);
 
             const updateIndicator = useCallback(() => {
                 const track = trackRef.current;
@@ -7084,13 +7140,37 @@
 
             const closeMenuAndNav = useCallback((id) => {
                 onNav(id);
-                setOpenNestedId(null);
-                setOpenMenuId(null);
-            }, [onNav]);
+                closeMenu();
+            }, [onNav, closeMenu]);
 
             const toggleNestedMenu = useCallback((id) => {
                 setOpenNestedId(prev => (prev === id ? null : id));
             }, []);
+
+            const onDropdownTriggerEnter = useCallback((id) => {
+                if (!prefersHoverMenus()) return;
+                openMenu(id);
+            }, [openMenu, prefersHoverMenus]);
+
+            const onDropdownTriggerLeave = useCallback(() => {
+                if (!prefersHoverMenus()) return;
+                scheduleCloseMenu();
+            }, [prefersHoverMenus, scheduleCloseMenu]);
+
+            const onDropdownMenuEnter = useCallback(() => {
+                if (!prefersHoverMenus()) return;
+                clearMenuCloseTimer();
+            }, [clearMenuCloseTimer, prefersHoverMenus]);
+
+            const onDropdownMenuLeave = useCallback(() => {
+                if (!prefersHoverMenus()) return;
+                scheduleCloseMenu();
+            }, [prefersHoverMenus, scheduleCloseMenu]);
+
+            const onPlainTabEnter = useCallback(() => {
+                if (!prefersHoverMenus()) return;
+                if (openMenuId) scheduleCloseMenu();
+            }, [openMenuId, prefersHoverMenus, scheduleCloseMenu]);
 
             const renderMenuEntries = (entries) => {
                 const nodes = [];
@@ -7099,7 +7179,13 @@
                         const isNestedOpen = openNestedId === entry.id;
                         const nestedActive = navItemContainsId(entry, activeId);
                         nodes.push(
-                            <div key={entry.id} className="header-nav-aps-nested-wrap">
+                            <div
+                                key={entry.id}
+                                className="header-nav-aps-nested-wrap"
+                                onMouseEnter={() => {
+                                    if (prefersHoverMenus()) setOpenNestedId(entry.id);
+                                }}
+                            >
                                 <button
                                     ref={(el) => {
                                         if (el) nestedTriggerRefs.current[entry.id] = el;
@@ -7110,7 +7196,7 @@
                                     aria-expanded={isNestedOpen}
                                     aria-haspopup="menu"
                                     onClick={() => toggleNestedMenu(entry.id)}
-                                    className={`${tabClass(nestedActive || isNestedOpen)} header-nav-child header-nav-aps-nested-trigger`}
+                                    className={`${tabClass(nestedActive)} header-nav-child header-nav-aps-nested-trigger`}
                                 >
                                     <span>{entry.label}</span>
                                     <ChevronDownIcon className={`header-nav-chevron header-nav-chevron-nested${isNestedOpen ? ' header-nav-chevron-nested-open' : ''}`} />
@@ -7144,6 +7230,9 @@
                             type="button"
                             role="menuitem"
                             onClick={() => closeMenuAndNav(entry.id)}
+                            onMouseEnter={() => {
+                                if (prefersHoverMenus()) setOpenNestedId(null);
+                            }}
                             className={`${tabClass(activeId === entry.id)} header-nav-child`}
                         >
                             {entry.label}
@@ -7171,19 +7260,20 @@
 
             const dropdownMenu = openMenuId && menuRect && openMenuItem ? ReactDOM.createPortal(
                 <>
-                    <button
-                        type="button"
-                        className="header-nav-aps-backdrop"
-                        aria-label={`Close ${openMenuItem.label} menu`}
-                        onClick={() => {
-                            setOpenNestedId(null);
-                            setOpenMenuId(null);
-                        }}
-                    />
+                    {!prefersHoverMenus() ? (
+                        <button
+                            type="button"
+                            className="header-nav-aps-backdrop"
+                            aria-label={`Close ${openMenuItem.label} menu`}
+                            onClick={closeMenu}
+                        />
+                    ) : null}
                     <div
                         className="header-nav-aps-menu header-nav-aps-menu-floating"
                         role="menu"
                         style={{ top: `${menuRect.top}px`, left: `${menuRect.left}px`, minWidth: `${menuRect.minWidth}px` }}
+                        onMouseEnter={onDropdownMenuEnter}
+                        onMouseLeave={onDropdownMenuLeave}
                     >
                         <div className="header-nav-aps-menu-head">{openMenuItem.label}</div>
                         {renderMenuEntries(openMenuItem.children || [])}
@@ -7224,7 +7314,12 @@
                                         const highlighted = isTabActive(item);
                                         const isOpen = openMenuId === item.id;
                                         return (
-                                            <div key={item.id} className="header-nav-aps-wrap">
+                                            <div
+                                                key={item.id}
+                                                className="header-nav-aps-wrap"
+                                                onMouseEnter={() => onDropdownTriggerEnter(item.id)}
+                                                onMouseLeave={onDropdownTriggerLeave}
+                                            >
                                                 <button
                                                     ref={(el) => {
                                                         triggerRefs.current[item.id] = el;
@@ -7250,6 +7345,7 @@
                                             type="button"
                                             ref={(el) => setTabRef(item.id, el)}
                                             onClick={() => onNav(item.id)}
+                                            onMouseEnter={onPlainTabEnter}
                                             className={tabClass(isActive)}
                                         >
                                             <span className="header-nav-tab-label">{item.label}</span>
@@ -8142,7 +8238,7 @@
         };
 
         // About — INFORM editorial: sticky title rail + flowing narrative, Odoo-style "why" grid
-        const AboutSection = ({ content }) => (
+        const AboutSection = ({ content, onNav }) => (
             <div id="about" className="opus-scroll-target mt-8 pt-16 border-t border-slate-200/70 dark:border-white/5 pb-8">
                 <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
                     {/* Sticky brand rail */}
@@ -8224,12 +8320,13 @@
                     <div className="mt-16 text-center rounded-2xl border border-brand-gold/20 bg-brand-gold/5 p-6 md:p-8">
                         <p className="text-slate-800 dark:text-slate-200 font-medium max-w-2xl md:max-w-4xl mx-auto text-base md:text-lg leading-relaxed md:whitespace-nowrap">{content.ui.invite_text}</p>
                         <p className="text-brand-gold font-bold uppercase tracking-widest mt-5 text-xs">Let’s optimize today — so you can grow stronger tomorrow.</p>
-                        <a
-                            href="./contact"
+                        <button
+                            type="button"
+                            onClick={() => onNav?.('contact')}
                             className="inline-flex items-center justify-center gap-2 mt-6 px-6 py-3 rounded-xl bg-brand-gold text-white text-sm font-bold shadow-lg shadow-brand-gold/20 hover:bg-amber-600 hover:shadow-brand-gold/40 hover:scale-[1.02] active:scale-95 transition-all"
                         >
                             {content.ui.contact_operartis}
-                        </a>
+                        </button>
                     </div>
                 </Reveal>
             </div>
@@ -8263,6 +8360,7 @@
             const footerMobileLinkClass = `${footerLinkClass} flex min-h-11 w-full items-center`;
 
             const platformLinks = [
+                { id: 'proof-foundation', label: ui.nav_mathematical_foundation },
                 { id: 'supply-chain', label: ui.nav_supply_chain },
                 { id: 'industry-40', label: ui.nav_industry_40 },
                 { id: 'analytics', label: ui.nav_analytics },
@@ -8455,7 +8553,7 @@
             const [activeQuickViewBlockId, setActiveQuickViewBlockId] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [navCollapsed, setNavCollapsed] = useState(false);
-            const [activeNavId, setActiveNavId] = useState('supply-chain');
+            const [activeNavId, setActiveNavId] = useState(null);
             const [authUser, setAuthUser] = useState(() => window.OperartisAuth?.getUser?.() || null);
             const [accountMenuOpen, setAccountMenuOpen] = useState(false);
             const headerNavRef = useRef(null);
@@ -8473,8 +8571,10 @@
             );
 
             const sessionProgress = useMemo(() => {
+                if (!activeNavId) return 0;
                 const idx = pageNavItems.findIndex(item => navItemContainsId(item, activeNavId));
-                return pageNavItems.length > 0 ? ((Math.max(0, idx) + 1) / pageNavItems.length) * 100 : 0;
+                if (idx < 0) return 0;
+                return pageNavItems.length > 0 ? ((idx + 1) / pageNavItems.length) * 100 : 0;
             }, [pageNavItems, activeNavId]);
 
             // Derived stats for hero console + metrics band
@@ -8497,6 +8597,7 @@
 
             const getSectionList = useCallback(() => {
                 const sections = [
+                    { id: 'proof-foundation', el: document.getElementById('proof-foundation') },
                     { id: 'supply-chain', el: document.getElementById('supply-chain') },
                     { id: 'industry-40', el: document.getElementById('industry-40') },
                     { id: 'analytics', el: document.getElementById('analytics') },
@@ -8514,7 +8615,7 @@
                 if (!scrollRoot || !sections.length) return;
 
                 const activeId = resolveActiveHorizonId(sections, scrollRoot, getAnchorOffset());
-                if (activeId) setActiveNavId(activeId);
+                setActiveNavId(activeId);
             }, [getSectionList, getAnchorOffset]);
 
             const scrollToNavItem = useCallback((id) => {
@@ -8562,7 +8663,7 @@
                     window.location.href = './contact';
                     return;
                 }
-                if (['supply-chain', 'industry-40', 'analytics', 'about', 'platform'].includes(id)) {
+                if (['proof-foundation', 'supply-chain', 'industry-40', 'analytics', 'about', 'platform'].includes(id)) {
                     scrollToNavItem(id === 'platform' ? 'strategic' : id);
                     return;
                 }
@@ -8723,7 +8824,7 @@
                 <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
                     <LandingCanvasBackground theme={theme} />
 
-                    <nav className="header-bar relative z-20 shrink-0 overflow-visible border-b border-slate-200/50 dark:border-slate-800/50">
+                    <nav className="header-bar relative z-30 shrink-0 overflow-visible border-b border-slate-200/50 dark:border-slate-800/50">
                         <div className="max-w-7xl mx-auto w-full h-16 px-3 sm:px-6 md:px-10 flex items-center gap-2 md:gap-4 overflow-visible">
                         <div className="flex items-center gap-2 sm:gap-3 shrink-0 p-1.5 pr-3 sm:pr-4 md:pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                             <a href="./">
@@ -8895,7 +8996,7 @@
                                 <Reveal delay={125}><SupplyChainFlow content={content} /></Reveal>
                             </div>
                             <div className="mt-16 md:mt-20">
-                                <Reveal delay={150}><SystemIntegrationLoop content={content} /></Reveal>
+                                <SystemIntegrationLoop content={content} />
                             </div>
 
                             <Reveal delay={200}>
@@ -8937,7 +9038,7 @@
                                 </div>
                             </Reveal>
 
-                            <AboutSection content={content} />
+                            <AboutSection content={content} onNav={scrollToNavItem} />
                         </div>
 
                         <SiteFooter content={content} onNav={scrollToId} />
