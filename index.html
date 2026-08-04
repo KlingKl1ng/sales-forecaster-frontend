@@ -1325,6 +1325,29 @@
             z-index: 1;
         }
 
+        /* iPhone / small screens: stacked grid + overflow:hidden clips Pack/Solve content */
+        @media (max-width: 639px) {
+            .proof-build-panel {
+                display: block;
+                overflow: visible;
+            }
+
+            .proof-build-layer {
+                display: none;
+                grid-area: auto;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                pointer-events: auto;
+                transition: none;
+            }
+
+            .proof-build-layer.is-active {
+                display: flex;
+                z-index: auto;
+            }
+        }
+
         .proof-formula-line {
             opacity: 0.28;
             transform: translateX(-4px);
@@ -1418,13 +1441,73 @@
             .proof-pack-scene {
                 gap: 0.65rem;
                 min-height: 0;
+                overflow: visible;
+                width: 100%;
+                max-width: 100%;
+                align-items: stretch;
+            }
+
+            .proof-pack-formula {
+                max-width: 100%;
+                width: 100%;
+                box-sizing: border-box;
             }
 
             .proof-pack-chip {
-                padding-left: 1rem;
-                padding-right: 1rem;
-                padding-top: 0.85rem;
-                padding-bottom: 0.85rem;
+                padding-left: 0.85rem;
+                padding-right: 0.85rem;
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                transform: scale(1) translateY(8px);
+            }
+
+            .proof-pack-chip.is-assembling {
+                animation:
+                    proof-pack-chip-in-mobile 1.2s cubic-bezier(0.33, 1, 0.68, 1) 2.85s forwards,
+                    proof-pack-chip-heartbeat 3s cubic-bezier(0.45, 0, 0.55, 1) 4.2s infinite;
+            }
+
+            .proof-pack-desc {
+                width: 100%;
+                max-width: 100%;
+                text-align: left;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .proof-pack-funnel {
+                height: 2rem;
+            }
+
+            .proof-vrp-earth-frame {
+                min-height: 12.5rem;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .proof-vrp-sol-legend {
+                gap: 0.85rem;
+                width: 100%;
+            }
+        }
+
+        @keyframes proof-pack-chip-in-mobile {
+            0% {
+                transform: scale(0.94) translateY(10px);
+                opacity: 0.65;
+                filter: grayscale(1);
+                border-color: var(--proof-chip-border-from);
+                box-shadow: var(--proof-chip-shadow-from);
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+                filter: grayscale(0);
+                border-color: var(--proof-chip-border-to);
+                box-shadow: var(--proof-chip-shadow-to);
             }
         }
 
@@ -1646,10 +1729,6 @@
 
         /* Mobile: formula is already near full panel width — scale(1.14) overflows the outer block */
         @media (max-width: 639px) {
-            .proof-pack-scene {
-                overflow: hidden;
-            }
-
             .proof-pack-formula {
                 max-width: 100%;
             }
@@ -1963,7 +2042,7 @@
 
             .proof-pack-chip.is-assembling {
                 opacity: 1;
-                transform: scale(1.05);
+                transform: scale(1);
                 filter: none;
                 border-color: rgba(245, 158, 11, 0.48);
                 box-shadow:
@@ -6756,12 +6835,12 @@
                                                 <div className="proof-pack-funnel-line" />
                                             </div>
 
-                                            <div className={`proof-pack-chip inline-flex items-center gap-3 sm:gap-4 md:gap-5 rounded-2xl px-4 py-3.5 sm:px-6 sm:py-4 md:px-8 md:py-5 max-w-full ${packPlaying ? 'is-assembling' : ''}`}>
+                                            <div className={`proof-pack-chip inline-flex items-center gap-3 sm:gap-4 md:gap-5 rounded-2xl px-4 py-3.5 sm:px-6 sm:py-4 md:px-8 md:py-5 w-full max-w-full min-w-0 ${packPlaying ? 'is-assembling' : ''}`}>
                                                 <span className="proof-pack-chip-pulse sc-pulse-ring-gold" aria-hidden="true" />
-                                                <span className="proof-pack-chip-icon flex h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-xl scale-110 sm:scale-125">
+                                                <span className="proof-pack-chip-icon flex h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-xl scale-100 sm:scale-125">
                                                     <VrpIcon />
                                                 </span>
-                                                <div className="min-w-0">
+                                                <div className="min-w-0 flex-1">
                                                     <div className="proof-pack-chip-tag text-[10px] sm:text-[11px] md:text-xs font-mono font-bold uppercase tracking-wider mb-1">
                                                         {packStage.module_tag}
                                                     </div>
@@ -6772,7 +6851,7 @@
                                             </div>
 
                                             {packStage.module_desc && (
-                                                <p className={`proof-pack-desc text-[13px] sm:text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed px-1 ${packPlaying ? 'is-ready' : ''}`}>
+                                                <p className={`proof-pack-desc text-[13px] sm:text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed w-full ${packPlaying ? 'is-ready' : ''}`}>
                                                     {packStage.module_desc}
                                                 </p>
                                             )}
@@ -6781,12 +6860,13 @@
 
                                     {/* Solve */}
                                     <div className={`proof-build-layer ${stageIdx === 2 ? 'is-active' : ''}`} aria-hidden={stageIdx !== 2}>
-                                        <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6 lg:items-center">
-                                            <div className="proof-vrp-earth-frame flex-1 flex items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 px-1 py-1 sm:px-1.5 sm:py-1.5 md:px-2 md:py-2 min-h-[14rem] sm:min-h-[18rem] md:min-h-[22rem]">
+                                        <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6 lg:items-center w-full min-w-0">
+                                            <div className="proof-vrp-earth-frame flex-1 flex items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 px-1 py-1 sm:px-1.5 sm:py-1.5 md:px-2 md:py-2 min-h-[12.5rem] sm:min-h-[18rem] md:min-h-[22rem] w-full min-w-0 overflow-hidden">
                                                 <svg
                                                     key={solvePlaying ? `vrp-solve-${playGen}` : 'vrp-solve-idle'}
                                                     viewBox={`0 0 ${vb.w} ${vb.h}`}
-                                                    className="w-full h-full max-h-[14rem] sm:max-h-[18rem] md:max-h-[22rem]"
+                                                    className="w-full h-auto max-h-[12.5rem] sm:max-h-[18rem] md:max-h-[22rem]"
+                                                    preserveAspectRatio="xMidYMid meet"
                                                     aria-hidden="true"
                                                 >
                                                     {solutionArcs.map((arc) => (
@@ -6876,17 +6956,17 @@
                                                 </svg>
                                             </div>
 
-                                            <div className="min-w-0 lg:w-72 xl:w-80 shrink-0 flex flex-col justify-center">
-                                                <div className="proof-vrp-sol-legend flex flex-col gap-4">
+                                            <div className="min-w-0 w-full lg:w-72 xl:w-80 shrink-0 flex flex-col justify-center">
+                                                <div className="proof-vrp-sol-legend flex flex-col gap-3 sm:gap-4">
                                                     <div>
                                                         <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-gold mb-1.5">
                                                             {solveStage.solution_eyebrow || packStage.module}
                                                         </div>
-                                                        <p className="text-[15px] md:text-base font-bold text-slate-900 dark:text-slate-50 leading-snug tracking-tight">
+                                                        <p className="text-sm sm:text-[15px] md:text-base font-bold text-slate-900 dark:text-slate-50 leading-snug tracking-tight">
                                                             {solveStage.solution_lead}
                                                         </p>
                                                         {solveStage.solution_body && (
-                                                            <p className="mt-2.5 text-xs md:text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                            <p className="mt-2 text-[12px] sm:text-xs md:text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
                                                                 {solveStage.solution_body}
                                                             </p>
                                                         )}
