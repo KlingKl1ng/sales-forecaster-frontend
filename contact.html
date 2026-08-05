@@ -1065,7 +1065,6 @@
                 footer_solutions: 'Solutions',
                 footer_legal: 'Legal',
                 footer_company: 'Company',
-                footer_partner: 'Partner with Operartis',
                 footer_privacy: 'Privacy Policy',
                 footer_imprint: 'Imprint',
                 footer_terms: 'Terms of Services',
@@ -1117,7 +1116,6 @@
                 footer_solutions: 'Giải pháp',
                 footer_legal: 'Pháp lý',
                 footer_company: 'Công ty',
-                footer_partner: 'Hợp tác với Operartis',
                 footer_privacy: 'Chính sách bảo mật',
                 footer_imprint: 'Thông tin pháp lý',
                 footer_terms: 'Điều khoản dịch vụ',
@@ -1169,7 +1167,6 @@
                 footer_solutions: 'Lösungen',
                 footer_legal: 'Rechtliches',
                 footer_company: 'Unternehmen',
-                footer_partner: 'Partner von Operartis werden',
                 footer_privacy: 'Datenschutz',
                 footer_imprint: 'Impressum',
                 footer_terms: 'Nutzungsbedingungen',
@@ -2199,9 +2196,6 @@
                                                 <a href={link.href} className={footerMobileLinkClass}>{link.label}</a>
                                             </li>
                                         ))}
-                                        <li className="opus-site-footer-divider pt-2 mt-1 border-t">
-                                            <a href="./contact" className={footerMobileLinkClass}>{ui.footer_partner}</a>
-                                        </li>
                                     </ul>
                                 </FooterAccordion>
 
@@ -2224,7 +2218,7 @@
                             </a>
                         </div>
 
-                        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 lg:gap-10">
+                        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,1fr))] gap-6 lg:gap-8 xl:gap-10">
                             <div className="md:col-span-2 lg:col-span-1">
                                 <div className="flex items-center gap-3 mb-5">
                                     <img
@@ -2235,7 +2229,7 @@
                                     />
                                     <span className="font-bold text-lg md:text-xl tracking-tight text-slate-900 dark:text-white">OPERARTIS</span>
                                 </div>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs">{ui.footer_tagline}</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm lg:max-w-none">{ui.footer_tagline}</p>
                             </div>
 
                             <div>
@@ -2268,9 +2262,6 @@
                                             <a href={link.href} className={footerLinkClass}>{link.label}</a>
                                         </li>
                                     ))}
-                                    <li className="opus-site-footer-divider pt-3 mt-1 border-t">
-                                        <a href="./contact" className={footerLinkClass}>{ui.footer_partner}</a>
-                                    </li>
                                 </ul>
                             </div>
 
