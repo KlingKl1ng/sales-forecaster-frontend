@@ -31,6 +31,7 @@
     </script>
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
+    <script src="./operartis-nav-indicator.js?v=20260812-cross-page-nav"></script>
     <script>
         window.OPERARTIS_AUTH_AUTO_PROMPT = false;
         window.OPERARTIS_AUTH_FLOATING_ACCOUNT = false;
@@ -1247,6 +1248,10 @@
         const navigateToNavId = (id) => {
             const href = NAV_HREF[id] || './';
             if (id === 'contact') return;
+            if (typeof window.OperartisNavIndicator?.go === 'function') {
+                window.OperartisNavIndicator.go(href);
+                return;
+            }
             window.location.href = href;
         };
 
@@ -1532,7 +1537,26 @@
             const tabRefs = useRef({});
             const triggerRefs = useRef({});
             const [navFits, setNavFits] = useState(true);
-            const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+            const handoffRef = useRef(undefined);
+            if (handoffRef.current === undefined) {
+                handoffRef.current = typeof window.OperartisNavIndicator?.consume === 'function'
+                    ? window.OperartisNavIndicator.consume()
+                    : null;
+            }
+            const handoffPendingRef = useRef(!!handoffRef.current);
+            const [indicator, setIndicator] = useState(() => {
+                const handoff = handoffRef.current;
+                if (handoff) {
+                    return {
+                        left: handoff.left,
+                        top: handoff.top,
+                        width: handoff.width,
+                        height: handoff.height,
+                        ready: true,
+                    };
+                }
+                return { left: 0, top: 0, width: 0, height: 0, ready: false };
+            });
             const [indicatorAnimated, setIndicatorAnimated] = useState(false);
             const [openMenuId, setOpenMenuId] = useState(null);
             const [openNestedId, setOpenNestedId] = useState(null);
@@ -1597,6 +1621,7 @@
             }, [activeId]);
 
             const updateIndicator = useCallback(() => {
+                if (handoffPendingRef.current) return;
                 const track = trackRef.current;
                 const target = tabRefs.current[indicatorTargetId];
                 if (!track || !target) {
@@ -1619,14 +1644,38 @@
 
             useLayoutEffect(() => {
                 if (!navFits) return undefined;
-                updateIndicator();
-                const ro = new ResizeObserver(updateIndicator);
+
+                let cancelled = false;
+                let outerRaf = 0;
+                let innerRaf = 0;
+
+                if (handoffPendingRef.current) {
+                    outerRaf = requestAnimationFrame(() => {
+                        if (cancelled) return;
+                        setIndicatorAnimated(true);
+                        innerRaf = requestAnimationFrame(() => {
+                            if (cancelled) return;
+                            handoffPendingRef.current = false;
+                            updateIndicator();
+                        });
+                    });
+                } else {
+                    updateIndicator();
+                }
+
+                const ro = new ResizeObserver(() => {
+                    if (handoffPendingRef.current) return;
+                    updateIndicator();
+                });
                 if (trackRef.current) ro.observe(trackRef.current);
                 Object.values(tabRefs.current).forEach(el => {
                     if (el) ro.observe(el);
                 });
                 window.addEventListener('resize', updateIndicator);
                 return () => {
+                    cancelled = true;
+                    cancelAnimationFrame(outerRaf);
+                    cancelAnimationFrame(innerRaf);
                     ro.disconnect();
                     window.removeEventListener('resize', updateIndicator);
                 };

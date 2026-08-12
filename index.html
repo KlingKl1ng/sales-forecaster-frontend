@@ -36,6 +36,7 @@
     </script>
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
+    <script src="./operartis-nav-indicator.js?v=20260812-cross-page-nav"></script>
     <script src="./operartis-security.js"></script>
     <script>
         window.OPERARTIS_AUTH_AUTO_PROMPT = false;
@@ -1561,6 +1562,66 @@
             width: 100%;
             min-height: 18rem;
             padding: 0.25rem 0;
+            position: relative;
+            isolation: isolate;
+        }
+
+        .proof-pack-scene > *:not(.proof-pack-matrix) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .proof-pack-matrix {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+            border-radius: 0.75rem;
+            opacity: 0.42;
+            -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 46%, #000 18%, transparent 78%);
+            mask-image: radial-gradient(ellipse 78% 72% at 50% 46%, #000 18%, transparent 78%);
+        }
+
+        .dark .proof-pack-matrix {
+            opacity: 0.58;
+        }
+
+        .proof-pack-matrix-col {
+            position: absolute;
+            top: 0;
+            width: 7.2%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto Mono', ui-monospace, monospace;
+            font-size: 0.62rem;
+            line-height: 1.55;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: rgba(180, 83, 9, 0.38);
+            white-space: pre;
+            user-select: none;
+            will-change: transform;
+            animation: proof-pack-matrix-fall linear infinite;
+        }
+
+        .dark .proof-pack-matrix-col {
+            color: rgba(251, 191, 36, 0.34);
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.18);
+        }
+
+        .proof-pack-matrix-col:nth-child(3n) { color: rgba(146, 64, 14, 0.32); }
+        .dark .proof-pack-matrix-col:nth-child(3n) { color: rgba(253, 230, 138, 0.26); }
+        .proof-pack-matrix-col:nth-child(4n) { opacity: 0.72; }
+        .proof-pack-matrix-col:nth-child(5n) { font-size: 0.55rem; }
+
+        @keyframes proof-pack-matrix-fall {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(0, -50%, 0); }
+        }
+
+        .proof-build-layer:not(.is-active) .proof-pack-matrix-col {
+            animation-play-state: paused;
         }
 
         .proof-pack-formula {
@@ -2046,7 +2107,8 @@
             .proof-pack-chip.is-assembling .proof-pack-chip-icon,
             .proof-pack-chip.is-assembling .proof-pack-chip-tag,
             .proof-pack-chip.is-assembling .proof-pack-chip-title,
-            .proof-pack-desc.is-ready {
+            .proof-pack-desc.is-ready,
+            .proof-pack-matrix-col {
                 animation: none !important;
             }
 
@@ -6610,7 +6672,41 @@
             return { depot, customers, edges, routes, customerRoute, solutionArcs, vb: { w: 300, h: 236 } };
         })();
 
-        // Proof foundation — manifesto + model→module→solve visual (Plan B)
+        const PROOF_PACK_MATRIX_ROWS = [
+            'min Σ c_ij x_ijk',
+            's.t. Σ_k Σ_i x_ijk = 1',
+            'Σ_j x_0jk = 1  ∀k∈K',
+            'Σ_i x_i0k = 1  ∀k∈K',
+            'Σ_j d_j y_jk ≤ Q',
+            'x_ijk ∈ {0,1}',
+            'y_jk ∈ {0,1}',
+            '|K|=3  |C|=10',
+            'Q  capacity',
+            'c_ij  cost',
+            'route k → C',
+            '∀ j ∈ C',
+            '∀ k ∈ K',
+            'i,j ∈ V',
+            'x_0jk  y_jk',
+            'd_j  demand',
+            'opt  VRP',
+            'APS  pack',
+        ];
+
+        const PROOF_PACK_MATRIX_COLS = Array.from({ length: 16 }, (_, col) => {
+            const lines = [];
+            for (let n = 0; n < 24; n += 1) {
+                lines.push(PROOF_PACK_MATRIX_ROWS[(col * 3 + n * 5) % PROOF_PACK_MATRIX_ROWS.length]);
+            }
+            const block = lines.join('\n');
+            return {
+                id: col,
+                left: `${(col / 16) * 100}%`,
+                duration: `${11 + (col % 8) * 1.6}s`,
+                delay: `${-(col * 1.15)}s`,
+                text: `${block}\n${block}`,
+            };
+        });
         const ProofFoundationSection = ({ content }) => {
             const ui = content.ui;
             const pillars = ui.proof_pillars || [];
@@ -6899,6 +6995,19 @@
                                             key={packPlaying ? `pack-anim-${playGen}` : 'pack-idle'}
                                             className="proof-pack-scene"
                                         >
+                                            <div className="proof-pack-matrix" aria-hidden="true">
+                                                {PROOF_PACK_MATRIX_COLS.map((col) => (
+                                                    <pre
+                                                        key={col.id}
+                                                        className="proof-pack-matrix-col"
+                                                        style={{
+                                                            left: col.left,
+                                                            animationDuration: col.duration,
+                                                            animationDelay: col.delay,
+                                                        }}
+                                                    >{col.text}</pre>
+                                                ))}
+                                            </div>
                                             <div className={`proof-pack-formula ${packPlaying ? 'is-running is-merging' : ''}`}>
                                                 <div className="proof-pack-scan" aria-hidden="true" />
                                                 <div className="relative z-[1] font-mono text-[10px] sm:text-[11px] md:text-xs leading-snug md:leading-relaxed text-slate-600 dark:text-slate-300 space-y-1 overflow-x-auto -mx-0.5 px-0.5">
@@ -7169,7 +7278,26 @@
             const tabRefs = useRef({});
             const triggerRefs = useRef({});
             const [navFits, setNavFits] = useState(true);
-            const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+            const handoffRef = useRef(undefined);
+            if (handoffRef.current === undefined) {
+                handoffRef.current = typeof window.OperartisNavIndicator?.consume === 'function'
+                    ? window.OperartisNavIndicator.consume()
+                    : null;
+            }
+            const handoffPendingRef = useRef(!!handoffRef.current);
+            const [indicator, setIndicator] = useState(() => {
+                const handoff = handoffRef.current;
+                if (handoff) {
+                    return {
+                        left: handoff.left,
+                        top: handoff.top,
+                        width: handoff.width,
+                        height: handoff.height,
+                        ready: true,
+                    };
+                }
+                return { left: 0, top: 0, width: 0, height: 0, ready: false };
+            });
             const [indicatorAnimated, setIndicatorAnimated] = useState(false);
             const [openMenuId, setOpenMenuId] = useState(null);
             const [openNestedId, setOpenNestedId] = useState(null);
@@ -7234,6 +7362,7 @@
             }, [activeId]);
 
             const updateIndicator = useCallback(() => {
+                if (handoffPendingRef.current) return;
                 const track = trackRef.current;
                 const target = tabRefs.current[indicatorTargetId];
                 if (!track || !target) {
@@ -7256,14 +7385,38 @@
 
             useLayoutEffect(() => {
                 if (!navFits) return undefined;
-                updateIndicator();
-                const ro = new ResizeObserver(updateIndicator);
+
+                let cancelled = false;
+                let outerRaf = 0;
+                let innerRaf = 0;
+
+                if (handoffPendingRef.current) {
+                    outerRaf = requestAnimationFrame(() => {
+                        if (cancelled) return;
+                        setIndicatorAnimated(true);
+                        innerRaf = requestAnimationFrame(() => {
+                            if (cancelled) return;
+                            handoffPendingRef.current = false;
+                            updateIndicator();
+                        });
+                    });
+                } else {
+                    updateIndicator();
+                }
+
+                const ro = new ResizeObserver(() => {
+                    if (handoffPendingRef.current) return;
+                    updateIndicator();
+                });
                 if (trackRef.current) ro.observe(trackRef.current);
                 Object.values(tabRefs.current).forEach(el => {
                     if (el) ro.observe(el);
                 });
                 window.addEventListener('resize', updateIndicator);
                 return () => {
+                    cancelled = true;
+                    cancelAnimationFrame(outerRaf);
+                    cancelAnimationFrame(innerRaf);
                     ro.disconnect();
                     window.removeEventListener('resize', updateIndicator);
                 };
@@ -8821,12 +8974,15 @@
             const [activeQuickViewBlockId, setActiveQuickViewBlockId] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [navCollapsed, setNavCollapsed] = useState(false);
-            const [activeNavId, setActiveNavId] = useState(null);
+            const [activeNavId, setActiveNavId] = useState(() => window.OperartisNavIndicator?.navIdFromLocation?.() || null);
             const [authUser, setAuthUser] = useState(() => window.OperartisAuth?.getUser?.() || null);
             const [accountMenuOpen, setAccountMenuOpen] = useState(false);
             const headerNavRef = useRef(null);
             const accountMenuRef = useRef(null);
-            const scrollLockRef = useRef(false);
+            const initialHashNavId = typeof window.OperartisNavIndicator?.navIdFromLocation === 'function'
+                ? window.OperartisNavIndicator.navIdFromLocation()
+                : null;
+            const scrollLockRef = useRef(!!(initialHashNavId && initialHashNavId !== 'contact'));
             const scrollEndTimerRef = useRef(null);
             const scrollAnimListenerRef = useRef(null);
 
@@ -8881,13 +9037,20 @@
 
             const scrollToNavItem = useCallback((id) => {
                 if (id === 'contact') {
-                    window.location.href = './contact';
+                    if (typeof window.OperartisNavIndicator?.go === 'function') {
+                        window.OperartisNavIndicator.go('./contact');
+                    } else {
+                        window.location.href = './contact';
+                    }
                     return;
                 }
 
                 const scrollRoot = getMainScrollRoot();
                 const el = document.getElementById(getNavTargetId(id));
-                if (!scrollRoot || !el) return;
+                if (!scrollRoot || !el) {
+                    scrollLockRef.current = false;
+                    return;
+                }
 
                 scrollLockRef.current = true;
                 setActiveNavId(id);
@@ -8921,7 +9084,7 @@
 
             const scrollToId = useCallback((id) => {
                 if (id === 'contact') {
-                    window.location.href = './contact';
+                    scrollToNavItem('contact');
                     return;
                 }
                 if (['proof-foundation', 'supply-chain', 'industry-40', 'analytics', 'about', 'about-why', 'platform'].includes(id)) {
@@ -8933,6 +9096,15 @@
 
             const scrollToHorizon = useCallback((id) => scrollToNavItem(id), [scrollToNavItem]);
             const scrollToAbout = useCallback(() => scrollToNavItem('about'), [scrollToNavItem]);
+
+            const didHashScrollRef = useRef(false);
+            useEffect(() => {
+                if (didHashScrollRef.current) return;
+                const id = window.OperartisNavIndicator?.navIdFromLocation?.();
+                if (!id || id === 'contact') return;
+                didHashScrollRef.current = true;
+                scrollToNavItem(id);
+            }, [scrollToNavItem]);
 
             useEffect(() => {
                 window.persistOperartisLang(lang);
