@@ -36,6 +36,7 @@
     </script>
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
+    <script src="./operartis-nav-indicator.js?v=20260812-cross-page-nav"></script>
     <script src="./operartis-security.js"></script>
     <script>
         window.OPERARTIS_AUTH_AUTO_PROMPT = false;
@@ -427,9 +428,9 @@
 
         .header-nav-glass-indicator.is-animated {
             transition:
-                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                height 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.55s cubic-bezier(0.16, 1, 0.3, 1),
                 opacity 0.2s ease;
         }
 
@@ -974,7 +975,7 @@
             .horizon-pill,
             .page-scroll-target,
             .opus-scroll-target {
-                scroll-margin-top: 4.75rem;
+                scroll-margin-top: 5.25rem;
             }
 
             .reveal-hidden {
@@ -1234,7 +1235,7 @@
             .opus-sticky-info { position: sticky; top: 4.5rem; }
         }
 
-        .opus-scroll-target { scroll-margin-top: 4.5rem; }
+        .opus-scroll-target { scroll-margin-top: 5.25rem; }
 
         .landing-canvas-bg {
             position: fixed;
@@ -1456,11 +1457,32 @@
 
             .proof-pack-scene {
                 gap: 0.65rem;
-                min-height: 0;
+                min-height: 22rem;
                 overflow: visible;
                 width: 100%;
                 max-width: 100%;
                 align-items: center;
+                padding-top: 0.85rem;
+                padding-bottom: 0.85rem;
+            }
+
+            .proof-pack-matrix {
+                opacity: 0.36;
+            }
+
+            .dark .proof-pack-matrix {
+                opacity: 0.5;
+            }
+
+            .proof-pack-matrix-col {
+                display: none;
+            }
+
+            .proof-pack-matrix-col:nth-child(3n+1) {
+                display: block;
+                width: 14%;
+                font-size: 0.55rem;
+                line-height: 1.65;
             }
 
             .proof-pack-formula {
@@ -1561,6 +1583,89 @@
             width: 100%;
             min-height: 18rem;
             padding: 0.25rem 0;
+            position: relative;
+            isolation: isolate;
+        }
+
+        .proof-pack-scene > *:not(.proof-pack-matrix) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .proof-pack-matrix {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+            border-radius: 0.75rem;
+            opacity: 0.42;
+            -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 46%, #000 18%, transparent 78%);
+            mask-image: radial-gradient(ellipse 78% 72% at 50% 46%, #000 18%, transparent 78%);
+        }
+
+        .dark .proof-pack-matrix {
+            opacity: 0.58;
+        }
+
+        .proof-pack-matrix-col {
+            position: absolute;
+            top: 0;
+            width: 11%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto Mono', ui-monospace, monospace;
+            font-size: 0.62rem;
+            line-height: 1.55;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: rgba(180, 83, 9, 0.38);
+            white-space: pre;
+            user-select: none;
+            will-change: transform;
+            animation: proof-pack-matrix-fall linear infinite;
+        }
+
+        .dark .proof-pack-matrix-col {
+            color: rgba(251, 191, 36, 0.34);
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.18);
+        }
+
+        .proof-pack-matrix-col:nth-child(3n) { color: rgba(146, 64, 14, 0.32); }
+        .dark .proof-pack-matrix-col:nth-child(3n) { color: rgba(253, 230, 138, 0.26); }
+        .proof-pack-matrix-col:nth-child(4n) { opacity: 0.72; }
+        .proof-pack-matrix-col:nth-child(5n) { font-size: 0.55rem; }
+
+        /* Tablets (iPad Air / Pro): denser than phones, still lighter than desktop */
+        @media (min-width: 640px) and (max-width: 1199px) {
+            .proof-pack-matrix {
+                opacity: 0.4;
+            }
+
+            .dark .proof-pack-matrix {
+                opacity: 0.54;
+            }
+
+            .proof-pack-matrix-col {
+                display: none;
+            }
+
+            .proof-pack-matrix-col:nth-child(2n+1),
+            .proof-pack-matrix-col:nth-child(8) {
+                display: block;
+                width: 12%;
+                font-size: 0.58rem;
+                line-height: 1.6;
+            }
+        }
+
+        @keyframes proof-pack-matrix-fall {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(0, -50%, 0); }
+        }
+
+        .proof-build-layer:not(.is-active) .proof-pack-matrix-col {
+            animation-play-state: paused;
         }
 
         .proof-pack-formula {
@@ -2046,7 +2151,8 @@
             .proof-pack-chip.is-assembling .proof-pack-chip-icon,
             .proof-pack-chip.is-assembling .proof-pack-chip-tag,
             .proof-pack-chip.is-assembling .proof-pack-chip-title,
-            .proof-pack-desc.is-ready {
+            .proof-pack-desc.is-ready,
+            .proof-pack-matrix-col {
                 animation: none !important;
             }
 
@@ -3746,9 +3852,59 @@
 
         const getMainScrollRoot = () => document.querySelector('main.flex-1.overflow-y-auto');
 
+        const needsWebKitSectionScrollFix = () => {
+            try {
+                if (window.CSS && CSS.supports('-webkit-touch-callout', 'none')) return true;
+            } catch (e) { /* ignore */ }
+            const ua = navigator.userAgent || '';
+            return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Android|Edg|OPR|Firefox/i.test(ua);
+        };
+
         const getSectionTopInRoot = (el, scrollRoot) => {
             if (!el || !scrollRoot) return 0;
             return el.getBoundingClientRect().top - scrollRoot.getBoundingClientRect().top + scrollRoot.scrollTop;
+        };
+
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+        const animateScrollRootTo = (scrollRoot, getTop, durationMs) => {
+            let cancelled = false;
+            const reduced = (() => {
+                try {
+                    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                } catch (e) {
+                    return false;
+                }
+            })();
+            const start = scrollRoot.scrollTop;
+            const initialTarget = getTop();
+            if (reduced || durationMs <= 0 || Math.abs(initialTarget - start) < 1) {
+                scrollRoot.scrollTop = initialTarget;
+                return { promise: Promise.resolve(initialTarget), cancel() { cancelled = true; } };
+            }
+            const startTime = performance.now();
+            const promise = new Promise((resolve) => {
+                const step = (now) => {
+                    if (cancelled) {
+                        resolve(scrollRoot.scrollTop);
+                        return;
+                    }
+                    const t = Math.min(1, (now - startTime) / durationMs);
+                    const dest = getTop();
+                    scrollRoot.scrollTop = start + (dest - start) * easeOutCubic(t);
+                    if (t < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        scrollRoot.scrollTop = getTop();
+                        resolve(scrollRoot.scrollTop);
+                    }
+                };
+                requestAnimationFrame(step);
+            });
+            return {
+                promise,
+                cancel() { cancelled = true; },
+            };
         };
 
         const resolveActiveHorizonId = (sections, scrollRoot, anchorOffset) => {
@@ -6610,7 +6766,42 @@
             return { depot, customers, edges, routes, customerRoute, solutionArcs, vb: { w: 300, h: 236 } };
         })();
 
-        // Proof foundation — manifesto + model→module→solve visual (Plan B)
+        const PROOF_PACK_MATRIX_ROWS = [
+            'min Σ c_ij x_ijk',
+            's.t. Σ_k Σ_i x_ijk = 1',
+            'Σ_j x_0jk = 1  ∀k∈K',
+            'Σ_i x_i0k = 1  ∀k∈K',
+            'Σ_j d_j y_jk ≤ Q',
+            'x_ijk ∈ {0,1}',
+            'y_jk ∈ {0,1}',
+            '|K|=3  |C|=10',
+            'Q  capacity',
+            'c_ij  cost',
+            'route k → C',
+            '∀ j ∈ C',
+            '∀ k ∈ K',
+            'i,j ∈ V',
+            'x_0jk  y_jk',
+            'd_j  demand',
+            'opt  VRP',
+            'APS  pack',
+        ];
+
+        const buildProofPackMatrixCols = (count, lineCount) => Array.from({ length: count }, (_, col) => {
+            const lines = [];
+            for (let n = 0; n < lineCount; n += 1) {
+                lines.push(PROOF_PACK_MATRIX_ROWS[(col * 3 + n * 5) % PROOF_PACK_MATRIX_ROWS.length]);
+            }
+            const block = lines.join('\n');
+            return {
+                id: col,
+                left: `${(col / count) * 100}%`,
+                duration: `${11 + (col % 8) * 1.6}s`,
+                delay: `${-(col * 1.15)}s`,
+                text: `${block}\n${block}`,
+            };
+        });
+        const PROOF_PACK_MATRIX_COLS = buildProofPackMatrixCols(8, 24);
         const ProofFoundationSection = ({ content }) => {
             const ui = content.ui;
             const pillars = ui.proof_pillars || [];
@@ -6899,6 +7090,19 @@
                                             key={packPlaying ? `pack-anim-${playGen}` : 'pack-idle'}
                                             className="proof-pack-scene"
                                         >
+                                            <div className="proof-pack-matrix" aria-hidden="true">
+                                                {PROOF_PACK_MATRIX_COLS.map((col) => (
+                                                    <pre
+                                                        key={col.id}
+                                                        className="proof-pack-matrix-col"
+                                                        style={{
+                                                            left: col.left,
+                                                            animationDuration: col.duration,
+                                                            animationDelay: col.delay,
+                                                        }}
+                                                    >{col.text}</pre>
+                                                ))}
+                                            </div>
                                             <div className={`proof-pack-formula ${packPlaying ? 'is-running is-merging' : ''}`}>
                                                 <div className="proof-pack-scan" aria-hidden="true" />
                                                 <div className="relative z-[1] font-mono text-[10px] sm:text-[11px] md:text-xs leading-snug md:leading-relaxed text-slate-600 dark:text-slate-300 space-y-1 overflow-x-auto -mx-0.5 px-0.5">
@@ -7169,7 +7373,26 @@
             const tabRefs = useRef({});
             const triggerRefs = useRef({});
             const [navFits, setNavFits] = useState(true);
-            const [indicator, setIndicator] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+            const handoffRef = useRef(undefined);
+            if (handoffRef.current === undefined) {
+                handoffRef.current = typeof window.OperartisNavIndicator?.consume === 'function'
+                    ? window.OperartisNavIndicator.consume()
+                    : null;
+            }
+            const handoffPendingRef = useRef(!!handoffRef.current);
+            const [indicator, setIndicator] = useState(() => {
+                const handoff = handoffRef.current;
+                if (handoff) {
+                    return {
+                        left: handoff.left,
+                        top: handoff.top,
+                        width: handoff.width,
+                        height: handoff.height,
+                        ready: true,
+                    };
+                }
+                return { left: 0, top: 0, width: 0, height: 0, ready: false };
+            });
             const [indicatorAnimated, setIndicatorAnimated] = useState(false);
             const [openMenuId, setOpenMenuId] = useState(null);
             const [openNestedId, setOpenNestedId] = useState(null);
@@ -7234,6 +7457,7 @@
             }, [activeId]);
 
             const updateIndicator = useCallback(() => {
+                if (handoffPendingRef.current) return;
                 const track = trackRef.current;
                 const target = tabRefs.current[indicatorTargetId];
                 if (!track || !target) {
@@ -7256,14 +7480,38 @@
 
             useLayoutEffect(() => {
                 if (!navFits) return undefined;
-                updateIndicator();
-                const ro = new ResizeObserver(updateIndicator);
+
+                let cancelled = false;
+                let outerRaf = 0;
+                let innerRaf = 0;
+
+                if (handoffPendingRef.current) {
+                    outerRaf = requestAnimationFrame(() => {
+                        if (cancelled) return;
+                        setIndicatorAnimated(true);
+                        innerRaf = requestAnimationFrame(() => {
+                            if (cancelled) return;
+                            handoffPendingRef.current = false;
+                            updateIndicator();
+                        });
+                    });
+                } else {
+                    updateIndicator();
+                }
+
+                const ro = new ResizeObserver(() => {
+                    if (handoffPendingRef.current) return;
+                    updateIndicator();
+                });
                 if (trackRef.current) ro.observe(trackRef.current);
                 Object.values(tabRefs.current).forEach(el => {
                     if (el) ro.observe(el);
                 });
                 window.addEventListener('resize', updateIndicator);
                 return () => {
+                    cancelled = true;
+                    cancelAnimationFrame(outerRaf);
+                    cancelAnimationFrame(innerRaf);
                     ro.disconnect();
                     window.removeEventListener('resize', updateIndicator);
                 };
@@ -8821,14 +9069,21 @@
             const [activeQuickViewBlockId, setActiveQuickViewBlockId] = useState(null);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [navCollapsed, setNavCollapsed] = useState(false);
-            const [activeNavId, setActiveNavId] = useState(null);
+            const [activeNavId, setActiveNavId] = useState(() => window.OperartisNavIndicator?.navIdFromLocation?.() || null);
             const [authUser, setAuthUser] = useState(() => window.OperartisAuth?.getUser?.() || null);
             const [accountMenuOpen, setAccountMenuOpen] = useState(false);
             const headerNavRef = useRef(null);
             const accountMenuRef = useRef(null);
-            const scrollLockRef = useRef(false);
+            const initialHashNavId = typeof window.OperartisNavIndicator?.navIdFromLocation === 'function'
+                ? window.OperartisNavIndicator.navIdFromLocation()
+                : null;
+            const scrollLockRef = useRef(!!(initialHashNavId && initialHashNavId !== 'contact'));
+            const pinnedNavIdRef = useRef(initialHashNavId && initialHashNavId !== 'contact' ? initialHashNavId : null);
+            const pinnedScrollTopRef = useRef(null);
             const scrollEndTimerRef = useRef(null);
             const scrollAnimListenerRef = useRef(null);
+            const scrollRetryTimersRef = useRef([]);
+            const scrollAnimCancelRef = useRef(null);
 
             // Derived Content
             const content = TRANSLATIONS[lang] || TRANSLATIONS.en;
@@ -8853,7 +9108,10 @@
             }, [content]);
 
             const getAnchorOffset = useCallback(() => {
-                return (headerNavRef.current?.closest('nav')?.offsetHeight ?? 72) + 8;
+                const headerH = headerNavRef.current?.closest('nav')?.offsetHeight ?? 72;
+                // Extra gap so the section heading sits fully below the header.
+                // Safari/WebKit often undershoots overflow-container scroll by ~1 header row.
+                return headerH + (needsWebKitSectionScrollFix() ? 28 : 12);
             }, []);
 
             const getSectionList = useCallback(() => {
@@ -8876,52 +9134,77 @@
                 if (!scrollRoot || !sections.length) return;
 
                 const activeId = resolveActiveHorizonId(sections, scrollRoot, getAnchorOffset());
+                const pinned = pinnedNavIdRef.current;
+                if (pinned) {
+                    const drift = Math.abs(scrollRoot.scrollTop - (pinnedScrollTopRef.current ?? scrollRoot.scrollTop));
+                    if (drift < 64) {
+                        if (activeId === pinned) pinnedNavIdRef.current = null;
+                        return;
+                    }
+                    pinnedNavIdRef.current = null;
+                }
                 setActiveNavId(activeId);
             }, [getSectionList, getAnchorOffset]);
 
             const scrollToNavItem = useCallback((id) => {
                 if (id === 'contact') {
-                    window.location.href = './contact';
+                    if (typeof window.OperartisNavIndicator?.go === 'function') {
+                        window.OperartisNavIndicator.go('./contact');
+                    } else {
+                        window.location.href = './contact';
+                    }
                     return;
                 }
 
                 const scrollRoot = getMainScrollRoot();
                 const el = document.getElementById(getNavTargetId(id));
-                if (!scrollRoot || !el) return;
+                if (!scrollRoot || !el) {
+                    scrollLockRef.current = false;
+                    return;
+                }
+
+                scrollRetryTimersRef.current.forEach((timer) => clearTimeout(timer));
+                scrollRetryTimersRef.current = [];
+                if (scrollAnimCancelRef.current) {
+                    scrollAnimCancelRef.current();
+                    scrollAnimCancelRef.current = null;
+                }
 
                 scrollLockRef.current = true;
+                pinnedNavIdRef.current = id;
                 setActiveNavId(id);
 
-                const targetTop = getSectionTopInRoot(el, scrollRoot) - getAnchorOffset();
-                scrollRoot.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+                const measureTop = () => {
+                    const marginTop = parseFloat(window.getComputedStyle(el).marginTop) || 0;
+                    return Math.max(0, getSectionTopInRoot(el, scrollRoot) - getAnchorOffset() - marginTop);
+                };
+
+                const distance = Math.abs(measureTop() - scrollRoot.scrollTop);
+                const duration = Math.max(420, Math.min(920, 280 + distance * 0.32));
+                const anim = animateScrollRootTo(scrollRoot, measureTop, duration);
+                scrollAnimCancelRef.current = anim.cancel;
+                pinnedScrollTopRef.current = measureTop();
 
                 if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
                 if (scrollAnimListenerRef.current) {
                     scrollRoot.removeEventListener('scroll', scrollAnimListenerRef.current);
+                    scrollAnimListenerRef.current = null;
                 }
 
-                const finishScrollLock = () => {
+                anim.promise.then((finalTop) => {
+                    if (pinnedNavIdRef.current !== id) return;
+                    scrollAnimCancelRef.current = null;
+                    pinnedScrollTopRef.current = finalTop;
                     scrollLockRef.current = false;
-                    if (scrollAnimListenerRef.current) {
-                        scrollRoot.removeEventListener('scroll', scrollAnimListenerRef.current);
-                        scrollAnimListenerRef.current = null;
-                    }
-                    updateActiveFromScroll();
-                };
-
-                const onScrollWhileAnimating = () => {
-                    if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
-                    scrollEndTimerRef.current = setTimeout(finishScrollLock, 120);
-                };
-
-                scrollAnimListenerRef.current = onScrollWhileAnimating;
-                scrollRoot.addEventListener('scroll', onScrollWhileAnimating, { passive: true });
-                scrollEndTimerRef.current = setTimeout(finishScrollLock, 1000);
-            }, [getAnchorOffset, updateActiveFromScroll]);
+                    const resolved = resolveActiveHorizonId(getSectionList(), scrollRoot, getAnchorOffset());
+                    if (resolved === id) pinnedNavIdRef.current = null;
+                    else setActiveNavId(id);
+                });
+            }, [getAnchorOffset, getSectionList]);
 
             const scrollToId = useCallback((id) => {
                 if (id === 'contact') {
-                    window.location.href = './contact';
+                    scrollToNavItem('contact');
                     return;
                 }
                 if (['proof-foundation', 'supply-chain', 'industry-40', 'analytics', 'about', 'about-why', 'platform'].includes(id)) {
@@ -8933,6 +9216,26 @@
 
             const scrollToHorizon = useCallback((id) => scrollToNavItem(id), [scrollToNavItem]);
             const scrollToAbout = useCallback(() => scrollToNavItem('about'), [scrollToNavItem]);
+
+            const didHashScrollRef = useRef(false);
+            useLayoutEffect(() => {
+                if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            }, []);
+
+            useEffect(() => {
+                if (didHashScrollRef.current) return;
+                const id = window.OperartisNavIndicator?.navIdFromLocation?.();
+                if (!id || id === 'contact') return;
+                didHashScrollRef.current = true;
+                let innerRaf = 0;
+                const outerRaf = requestAnimationFrame(() => {
+                    innerRaf = requestAnimationFrame(() => scrollToNavItem(id));
+                });
+                return () => {
+                    cancelAnimationFrame(outerRaf);
+                    cancelAnimationFrame(innerRaf);
+                };
+            }, [scrollToNavItem]);
 
             useEffect(() => {
                 window.persistOperartisLang(lang);
@@ -8984,6 +9287,12 @@
                     scrollRoot.removeEventListener('scroll', onScroll);
                     if (navObserver) navObserver.disconnect();
                     if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
+                    scrollRetryTimersRef.current.forEach((timer) => clearTimeout(timer));
+                    scrollRetryTimersRef.current = [];
+                    if (scrollAnimCancelRef.current) {
+                        scrollAnimCancelRef.current();
+                        scrollAnimCancelRef.current = null;
+                    }
                 };
             }, [content, updateActiveFromScroll]);
 
@@ -9232,7 +9541,7 @@
                         content={content}
                     />
 
-                    <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full min-h-0">
+                    <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full min-h-0 [scroll-padding-top:5.25rem]">
                         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col">
                             <Reveal>
                                 <HeroSection content={content} onExplore={() => scrollToId('matrix-fit')} onWhy={() => scrollToId('about-why')} />
