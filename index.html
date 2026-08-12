@@ -1457,11 +1457,32 @@
 
             .proof-pack-scene {
                 gap: 0.65rem;
-                min-height: 0;
+                min-height: 22rem;
                 overflow: visible;
                 width: 100%;
                 max-width: 100%;
                 align-items: center;
+                padding-top: 0.85rem;
+                padding-bottom: 0.85rem;
+            }
+
+            .proof-pack-matrix {
+                opacity: 0.36;
+            }
+
+            .dark .proof-pack-matrix {
+                opacity: 0.5;
+            }
+
+            .proof-pack-matrix-col {
+                display: none;
+            }
+
+            .proof-pack-matrix-col:nth-child(3n+1) {
+                display: block;
+                width: 14%;
+                font-size: 0.55rem;
+                line-height: 1.65;
             }
 
             .proof-pack-formula {
@@ -1590,7 +1611,7 @@
         .proof-pack-matrix-col {
             position: absolute;
             top: 0;
-            width: 7.2%;
+            width: 11%;
             margin: 0;
             padding: 0;
             font-family: 'Roboto Mono', ui-monospace, monospace;
@@ -1614,6 +1635,29 @@
         .dark .proof-pack-matrix-col:nth-child(3n) { color: rgba(253, 230, 138, 0.26); }
         .proof-pack-matrix-col:nth-child(4n) { opacity: 0.72; }
         .proof-pack-matrix-col:nth-child(5n) { font-size: 0.55rem; }
+
+        /* Tablets (iPad Air / Pro): denser than phones, still lighter than desktop */
+        @media (min-width: 640px) and (max-width: 1199px) {
+            .proof-pack-matrix {
+                opacity: 0.4;
+            }
+
+            .dark .proof-pack-matrix {
+                opacity: 0.54;
+            }
+
+            .proof-pack-matrix-col {
+                display: none;
+            }
+
+            .proof-pack-matrix-col:nth-child(2n+1),
+            .proof-pack-matrix-col:nth-child(8) {
+                display: block;
+                width: 12%;
+                font-size: 0.58rem;
+                line-height: 1.6;
+            }
+        }
 
         @keyframes proof-pack-matrix-fall {
             from { transform: translate3d(0, 0, 0); }
@@ -6743,20 +6787,21 @@
             'APS  pack',
         ];
 
-        const PROOF_PACK_MATRIX_COLS = Array.from({ length: 16 }, (_, col) => {
+        const buildProofPackMatrixCols = (count, lineCount) => Array.from({ length: count }, (_, col) => {
             const lines = [];
-            for (let n = 0; n < 24; n += 1) {
+            for (let n = 0; n < lineCount; n += 1) {
                 lines.push(PROOF_PACK_MATRIX_ROWS[(col * 3 + n * 5) % PROOF_PACK_MATRIX_ROWS.length]);
             }
             const block = lines.join('\n');
             return {
                 id: col,
-                left: `${(col / 16) * 100}%`,
+                left: `${(col / count) * 100}%`,
                 duration: `${11 + (col % 8) * 1.6}s`,
                 delay: `${-(col * 1.15)}s`,
                 text: `${block}\n${block}`,
             };
         });
+        const PROOF_PACK_MATRIX_COLS = buildProofPackMatrixCols(8, 24);
         const ProofFoundationSection = ({ content }) => {
             const ui = content.ui;
             const pillars = ui.proof_pillars || [];
