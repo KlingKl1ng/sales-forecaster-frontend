@@ -428,9 +428,9 @@
 
         .header-nav-glass-indicator.is-animated {
             transition:
-                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                height 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.55s cubic-bezier(0.16, 1, 0.3, 1),
                 opacity 0.2s ease;
         }
 
@@ -975,7 +975,7 @@
             .horizon-pill,
             .page-scroll-target,
             .opus-scroll-target {
-                scroll-margin-top: 4.75rem;
+                scroll-margin-top: 5.25rem;
             }
 
             .reveal-hidden {
@@ -1235,7 +1235,7 @@
             .opus-sticky-info { position: sticky; top: 4.5rem; }
         }
 
-        .opus-scroll-target { scroll-margin-top: 4.5rem; }
+        .opus-scroll-target { scroll-margin-top: 5.25rem; }
 
         .landing-canvas-bg {
             position: fixed;
@@ -3808,9 +3808,59 @@
 
         const getMainScrollRoot = () => document.querySelector('main.flex-1.overflow-y-auto');
 
+        const needsWebKitSectionScrollFix = () => {
+            try {
+                if (window.CSS && CSS.supports('-webkit-touch-callout', 'none')) return true;
+            } catch (e) { /* ignore */ }
+            const ua = navigator.userAgent || '';
+            return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Android|Edg|OPR|Firefox/i.test(ua);
+        };
+
         const getSectionTopInRoot = (el, scrollRoot) => {
             if (!el || !scrollRoot) return 0;
             return el.getBoundingClientRect().top - scrollRoot.getBoundingClientRect().top + scrollRoot.scrollTop;
+        };
+
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+        const animateScrollRootTo = (scrollRoot, getTop, durationMs) => {
+            let cancelled = false;
+            const reduced = (() => {
+                try {
+                    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                } catch (e) {
+                    return false;
+                }
+            })();
+            const start = scrollRoot.scrollTop;
+            const initialTarget = getTop();
+            if (reduced || durationMs <= 0 || Math.abs(initialTarget - start) < 1) {
+                scrollRoot.scrollTop = initialTarget;
+                return { promise: Promise.resolve(initialTarget), cancel() { cancelled = true; } };
+            }
+            const startTime = performance.now();
+            const promise = new Promise((resolve) => {
+                const step = (now) => {
+                    if (cancelled) {
+                        resolve(scrollRoot.scrollTop);
+                        return;
+                    }
+                    const t = Math.min(1, (now - startTime) / durationMs);
+                    const dest = getTop();
+                    scrollRoot.scrollTop = start + (dest - start) * easeOutCubic(t);
+                    if (t < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        scrollRoot.scrollTop = getTop();
+                        resolve(scrollRoot.scrollTop);
+                    }
+                };
+                requestAnimationFrame(step);
+            });
+            return {
+                promise,
+                cancel() { cancelled = true; },
+            };
         };
 
         const resolveActiveHorizonId = (sections, scrollRoot, anchorOffset) => {
@@ -8983,8 +9033,12 @@
                 ? window.OperartisNavIndicator.navIdFromLocation()
                 : null;
             const scrollLockRef = useRef(!!(initialHashNavId && initialHashNavId !== 'contact'));
+            const pinnedNavIdRef = useRef(initialHashNavId && initialHashNavId !== 'contact' ? initialHashNavId : null);
+            const pinnedScrollTopRef = useRef(null);
             const scrollEndTimerRef = useRef(null);
             const scrollAnimListenerRef = useRef(null);
+            const scrollRetryTimersRef = useRef([]);
+            const scrollAnimCancelRef = useRef(null);
 
             // Derived Content
             const content = TRANSLATIONS[lang] || TRANSLATIONS.en;
@@ -9009,7 +9063,10 @@
             }, [content]);
 
             const getAnchorOffset = useCallback(() => {
-                return (headerNavRef.current?.closest('nav')?.offsetHeight ?? 72) + 8;
+                const headerH = headerNavRef.current?.closest('nav')?.offsetHeight ?? 72;
+                // Extra gap so the section heading sits fully below the header.
+                // Safari/WebKit often undershoots overflow-container scroll by ~1 header row.
+                return headerH + (needsWebKitSectionScrollFix() ? 28 : 12);
             }, []);
 
             const getSectionList = useCallback(() => {
@@ -9032,6 +9089,15 @@
                 if (!scrollRoot || !sections.length) return;
 
                 const activeId = resolveActiveHorizonId(sections, scrollRoot, getAnchorOffset());
+                const pinned = pinnedNavIdRef.current;
+                if (pinned) {
+                    const drift = Math.abs(scrollRoot.scrollTop - (pinnedScrollTopRef.current ?? scrollRoot.scrollTop));
+                    if (drift < 64) {
+                        if (activeId === pinned) pinnedNavIdRef.current = null;
+                        return;
+                    }
+                    pinnedNavIdRef.current = null;
+                }
                 setActiveNavId(activeId);
             }, [getSectionList, getAnchorOffset]);
 
@@ -9052,35 +9118,44 @@
                     return;
                 }
 
+                scrollRetryTimersRef.current.forEach((timer) => clearTimeout(timer));
+                scrollRetryTimersRef.current = [];
+                if (scrollAnimCancelRef.current) {
+                    scrollAnimCancelRef.current();
+                    scrollAnimCancelRef.current = null;
+                }
+
                 scrollLockRef.current = true;
+                pinnedNavIdRef.current = id;
                 setActiveNavId(id);
 
-                const targetTop = getSectionTopInRoot(el, scrollRoot) - getAnchorOffset();
-                scrollRoot.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+                const measureTop = () => {
+                    const marginTop = parseFloat(window.getComputedStyle(el).marginTop) || 0;
+                    return Math.max(0, getSectionTopInRoot(el, scrollRoot) - getAnchorOffset() - marginTop);
+                };
+
+                const distance = Math.abs(measureTop() - scrollRoot.scrollTop);
+                const duration = Math.max(420, Math.min(920, 280 + distance * 0.32));
+                const anim = animateScrollRootTo(scrollRoot, measureTop, duration);
+                scrollAnimCancelRef.current = anim.cancel;
+                pinnedScrollTopRef.current = measureTop();
 
                 if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
                 if (scrollAnimListenerRef.current) {
                     scrollRoot.removeEventListener('scroll', scrollAnimListenerRef.current);
+                    scrollAnimListenerRef.current = null;
                 }
 
-                const finishScrollLock = () => {
+                anim.promise.then((finalTop) => {
+                    if (pinnedNavIdRef.current !== id) return;
+                    scrollAnimCancelRef.current = null;
+                    pinnedScrollTopRef.current = finalTop;
                     scrollLockRef.current = false;
-                    if (scrollAnimListenerRef.current) {
-                        scrollRoot.removeEventListener('scroll', scrollAnimListenerRef.current);
-                        scrollAnimListenerRef.current = null;
-                    }
-                    updateActiveFromScroll();
-                };
-
-                const onScrollWhileAnimating = () => {
-                    if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
-                    scrollEndTimerRef.current = setTimeout(finishScrollLock, 120);
-                };
-
-                scrollAnimListenerRef.current = onScrollWhileAnimating;
-                scrollRoot.addEventListener('scroll', onScrollWhileAnimating, { passive: true });
-                scrollEndTimerRef.current = setTimeout(finishScrollLock, 1000);
-            }, [getAnchorOffset, updateActiveFromScroll]);
+                    const resolved = resolveActiveHorizonId(getSectionList(), scrollRoot, getAnchorOffset());
+                    if (resolved === id) pinnedNavIdRef.current = null;
+                    else setActiveNavId(id);
+                });
+            }, [getAnchorOffset, getSectionList]);
 
             const scrollToId = useCallback((id) => {
                 if (id === 'contact') {
@@ -9098,12 +9173,23 @@
             const scrollToAbout = useCallback(() => scrollToNavItem('about'), [scrollToNavItem]);
 
             const didHashScrollRef = useRef(false);
+            useLayoutEffect(() => {
+                if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            }, []);
+
             useEffect(() => {
                 if (didHashScrollRef.current) return;
                 const id = window.OperartisNavIndicator?.navIdFromLocation?.();
                 if (!id || id === 'contact') return;
                 didHashScrollRef.current = true;
-                scrollToNavItem(id);
+                let innerRaf = 0;
+                const outerRaf = requestAnimationFrame(() => {
+                    innerRaf = requestAnimationFrame(() => scrollToNavItem(id));
+                });
+                return () => {
+                    cancelAnimationFrame(outerRaf);
+                    cancelAnimationFrame(innerRaf);
+                };
             }, [scrollToNavItem]);
 
             useEffect(() => {
@@ -9156,6 +9242,12 @@
                     scrollRoot.removeEventListener('scroll', onScroll);
                     if (navObserver) navObserver.disconnect();
                     if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
+                    scrollRetryTimersRef.current.forEach((timer) => clearTimeout(timer));
+                    scrollRetryTimersRef.current = [];
+                    if (scrollAnimCancelRef.current) {
+                        scrollAnimCancelRef.current();
+                        scrollAnimCancelRef.current = null;
+                    }
                 };
             }, [content, updateActiveFromScroll]);
 
@@ -9404,7 +9496,7 @@
                         content={content}
                     />
 
-                    <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full min-h-0">
+                    <main className="flex-1 overflow-y-auto overflow-x-hidden z-10 w-full min-h-0 [scroll-padding-top:5.25rem]">
                         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 flex flex-col">
                             <Reveal>
                                 <HeroSection content={content} onExplore={() => scrollToId('matrix-fit')} onWhy={() => scrollToId('about-why')} />
