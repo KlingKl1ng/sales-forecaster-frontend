@@ -375,6 +375,25 @@
             padding-right: 0.35rem;
         }
 
+        .header-glass-pill--brand {
+            height: auto;
+            min-height: 2.5rem;
+            justify-content: flex-start;
+            padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+        }
+
+        @media (min-width: 640px) {
+            .header-glass-pill--brand {
+                padding-right: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .header-glass-pill--brand {
+                padding-right: 1.25rem;
+            }
+        }
+
         .header-nav-glass-slab {
             width: max-content;
             max-width: 100%;
@@ -2463,15 +2482,15 @@
         .opus-metrics-glass {
             position: relative;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.15);
             /* Real border — Safari light drops masked ::after rings when border is transparent */
             border: 1px solid rgba(100, 116, 139, 0.38);
-            backdrop-filter: blur(18px) saturate(1.06);
-            -webkit-backdrop-filter: blur(18px) saturate(1.06);
+            backdrop-filter: blur(16px) saturate(1.06);
+            -webkit-backdrop-filter: blur(16px) saturate(1.06);
             box-shadow:
                 0 0 0 1px rgba(148, 163, 184, 0.22),
-                0 14px 34px rgba(15, 23, 42, 0.04),
-                inset 0 1px 0 rgba(255, 255, 255, 0.36),
+                0 14px 34px rgba(15, 23, 42, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.45),
                 inset 0 -1px 0 rgba(255, 255, 255, 0.07);
         }
 
@@ -2481,8 +2500,8 @@
             inset: 1px;
             border-radius: inherit;
             background:
-                radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.3), transparent 62%),
-                linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 54%, rgba(245, 158, 11, 0.025));
+                radial-gradient(ellipse 72% 55% at 50% 0%, rgba(255, 255, 255, 0.16), transparent 62%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 54%, rgba(245, 158, 11, 0.02));
             pointer-events: none;
         }
 
@@ -2511,8 +2530,8 @@
                 border-color: rgba(100, 116, 139, 0.45);
                 box-shadow:
                     0 0 0 1px rgba(148, 163, 184, 0.3),
-                    0 14px 34px rgba(15, 23, 42, 0.04),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+                    0 14px 34px rgba(15, 23, 42, 0.06),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.45),
                     inset 0 -1px 0 rgba(255, 255, 255, 0.07);
             }
 
@@ -6532,7 +6551,7 @@
                 : [];
 
             return (
-                <div className="opus-hero-glow relative overflow-hidden rounded-3xl border border-white/40 dark:border-white/10 bg-white/40 dark:bg-brand-obsidian/40 backdrop-blur-2xl ring-1 ring-white/20 dark:ring-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.15)]">
+                <div className="opus-hero-glow relative overflow-hidden rounded-3xl border border-white/40 dark:border-white/10 bg-white/15 dark:bg-brand-obsidian/40 backdrop-blur-xl dark:backdrop-blur-2xl ring-1 ring-white/20 dark:ring-white/5 shadow-[0_8px_32px_rgba(15,23,42,0.08),inset_0_1px_0_0_rgba(255,255,255,0.45)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.15)]">
                     <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/12 rounded-full blur-3xl animate-blob pointer-events-none"></div>
                     <div className="absolute -bottom-24 right-10 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
 
@@ -9398,7 +9417,7 @@
 
                     <nav className="header-bar relative z-30 shrink-0 overflow-visible border-b border-slate-200/50 dark:border-slate-800/50">
                         <div className="max-w-7xl mx-auto w-full h-16 px-3 sm:px-6 md:px-10 flex items-center gap-2 md:gap-4 overflow-visible">
-                        <div className="flex items-center shrink-0 p-1.5 pr-3 sm:pr-4 md:pr-5 rounded-full border border-white/40 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-slate-800/30 dark:to-slate-900/10 shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-md">
+                        <div className="header-glass-pill header-glass-pill--wide header-glass-pill--brand">
                             <a href="./" className="header-brand inline-flex items-center gap-2 sm:gap-3">
                                 <OperartisLogoMark className="h-8 w-8 md:h-10 md:w-10" />
                                 <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-slate-900 dark:text-white leading-none">OPERARTIS</span>
