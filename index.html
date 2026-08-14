@@ -3863,7 +3863,7 @@
     <script src="./operartis-logo-mark.js"></script>
 </head>
 
-<body class="bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-100 transition-colors duration-500">
+<body class="bg-white dark:bg-[#020617] text-slate-800 dark:text-slate-100 transition-colors duration-500">
 
     <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
 
@@ -6383,15 +6383,17 @@
                 };
 
                 const palette = () => (isDark ? {
+                    fill: '#020617',
                     grid: 'rgba(148, 163, 184, 0.07)',
                     line: 'rgba(251, 191, 36, 0.42)',
                     node: 'rgba(245, 158, 11, 0.5)',
                     vignette: 'rgba(2, 6, 23, 0.55)',
                 } : {
-                    grid: 'rgba(148, 163, 184, 0.14)',
-                    line: 'rgba(217, 119, 6, 0.32)',
-                    node: 'rgba(217, 119, 6, 0.38)',
-                    vignette: 'rgba(248, 250, 252, 0.65)',
+                    fill: '#ffffff',
+                    grid: 'rgba(148, 163, 184, 0.08)',
+                    line: 'rgba(217, 119, 6, 0.28)',
+                    node: 'rgba(217, 119, 6, 0.32)',
+                    vignette: 'rgba(255, 255, 255, 0.35)',
                 });
 
                 const seedNodes = (w, h, count) => Array.from({ length: count }, (_, i) => {
@@ -6441,6 +6443,8 @@
 
                     const colors = palette();
                     ctx.clearRect(0, 0, w, h);
+                    ctx.fillStyle = colors.fill;
+                    ctx.fillRect(0, 0, w, h);
 
                     ctx.strokeStyle = colors.grid;
                     ctx.lineWidth = 1;
@@ -9412,7 +9416,7 @@
             }, [resetMatrixBlocks]);
 
             return (
-                <div className="h-full flex flex-col relative bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
+                <div className="h-full flex flex-col relative bg-white dark:bg-[#020617] transition-colors duration-500">
                     <LandingCanvasBackground theme={theme} />
 
                     <nav className="header-bar relative z-30 shrink-0 overflow-visible border-b border-slate-200/50 dark:border-slate-800/50">
