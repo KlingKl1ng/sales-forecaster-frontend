@@ -1,11 +1,13 @@
 import { createReadStream, existsSync, statSync } from 'node:fs';
-import { createServer } from 'node:http';
+import { createServer, request as httpRequest } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('.', import.meta.url)));
 const host = process.env.HOST || '127.0.0.1';
 const port = Number(process.env.PORT || 5174);
+const apiHost = process.env.API_HOST || '127.0.0.1';
+const apiPort = Number(process.env.API_PORT || 8000);
 
 const cleanRoutes = new Set([
   'abcxyz',
@@ -62,6 +64,34 @@ function redirectLocation(slug, search) {
   return `/${slug}${search}`;
 }
 
+function proxyApi(req, res) {
+  const headers = { ...req.headers, host: `${apiHost}:${apiPort}` };
+  delete headers.connection;
+  const proxyReq = httpRequest(
+    {
+      hostname: apiHost,
+      port: apiPort,
+      path: req.url,
+      method: req.method,
+      headers,
+    },
+    (proxyRes) => {
+      const responseHeaders = { ...proxyRes.headers };
+      delete responseHeaders.connection;
+      res.writeHead(proxyRes.statusCode || 502, responseHeaders);
+      proxyRes.pipe(res);
+    },
+  );
+  proxyReq.on('error', () => {
+    if (!res.headersSent) {
+      send(res, 502, 'API unavailable', { 'Content-Type': 'text/plain; charset=utf-8' });
+    } else {
+      res.destroy();
+    }
+  });
+  req.pipe(proxyReq);
+}
+
 const server = createServer((req, res) => {
   try {
     const url = new URL(req.url || '/', `http://${host}:${port}`);
@@ -80,7 +110,7 @@ const server = createServer((req, res) => {
     const target = routeTarget(pathname);
     const fullPath = safeFilePath(target);
     if (!fullPath || !existsSync(fullPath) || !statSync(fullPath).isFile()) {
-      send(res, 404, 'Not Found', { 'Content-Type': 'text/plain; charset=utf-8' });
+      proxyApi(req, res);
       return;
     }
 
@@ -97,5 +127,6 @@ const server = createServer((req, res) => {
 
 server.listen(port, host, () => {
   console.log(`Operartis frontend server running at http://${host}:${port}/`);
+  console.log(`API proxy: /auth, /contact, and other backend routes → http://${apiHost}:${apiPort}`);
   console.log('Clean URLs enabled: /forecaster, /mlforecaster, /inventory, /abcxyz, /dashboard, /contact');
 });
