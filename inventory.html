@@ -1888,7 +1888,7 @@
 
         // --- API CONFIGURATION ---
         const API_ENDPOINTS = {
-            LOCAL: 'http://127.0.0.1:8000',
+            LOCAL: (window.OperartisApi && window.OperartisApi.getDefaultApiBase()) || window.location.origin || 'http://127.0.0.1:8000',
             PROD: window.OperartisApi ? window.OperartisApi.getDefaultApiBase() : 'https://api.operartis.io'
         };
 

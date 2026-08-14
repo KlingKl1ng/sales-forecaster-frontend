@@ -49,7 +49,8 @@
     function getDefaultApiBase() {
         var override = sessionStorage.getItem('operartis_api_base');
         if (override) return override.replace(/\/$/, '');
-        if (isLocalHost(window.location.hostname) || window.location.protocol === 'file:') return 'http://127.0.0.1:8000';
+        if (window.location.protocol === 'file:') return 'http://127.0.0.1:8000';
+        if (isLocalHost(window.location.hostname)) return window.location.origin;
         if (window.location.hostname.indexOf('staging.') === 0) return 'https://api-staging.operartis.io';
         return 'https://api.operartis.io';
     }
