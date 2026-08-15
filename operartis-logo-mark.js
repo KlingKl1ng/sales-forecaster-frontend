@@ -11,21 +11,29 @@
         '.operartis-logo-mark { display: inline-flex; line-height: 0; flex-shrink: 0; }',
         '.operartis-logo-mark svg { width: 100%; height: 100%; display: block; overflow: visible; }',
         '@keyframes olm-in1 {',
-        '  0%   { stroke-dasharray:0.000 207.024; stroke-dashoffset:-207.024; opacity:1; animation-timing-function:cubic-bezier(0.455, 0.03, 0.515, 0.955); }',
-        '  100% { stroke-dasharray:207.024 207.024; stroke-dashoffset:0.000; opacity:1; }',
+        '  0%      { stroke-dasharray:207.024 207.024; stroke-dashoffset:0.000; opacity:1; animation-timing-function:cubic-bezier(0.55, 0.055, 0.675, 0.19); }',
+        '  33.333% { stroke-dasharray:0.000 207.024; stroke-dashoffset:0.000; opacity:1; }',
+        '  33.400% { stroke-dasharray:0.000 207.024; stroke-dashoffset:-207.024; opacity:1; animation-timing-function:cubic-bezier(0.455, 0.03, 0.515, 0.955); }',
+        '  100%    { stroke-dasharray:207.024 207.024; stroke-dashoffset:0.000; opacity:1; }',
         '}',
         '@keyframes olm-in2 {',
-        '  0%   { stroke-dasharray:0.000 205.350; stroke-dashoffset:-205.350; opacity:1; animation-timing-function:cubic-bezier(0.455, 0.03, 0.515, 0.955); }',
-        '  100% { stroke-dasharray:205.350 205.350; stroke-dashoffset:0.000; opacity:1; }',
+        '  0%      { stroke-dasharray:205.350 205.350; stroke-dashoffset:0.000; opacity:1; animation-timing-function:cubic-bezier(0.55, 0.055, 0.675, 0.19); }',
+        '  33.333% { stroke-dasharray:0.000 205.350; stroke-dashoffset:0.000; opacity:1; }',
+        '  33.400% { stroke-dasharray:0.000 205.350; stroke-dashoffset:-205.350; opacity:1; animation-timing-function:cubic-bezier(0.455, 0.03, 0.515, 0.955); }',
+        '  100%    { stroke-dasharray:205.350 205.350; stroke-dashoffset:0.000; opacity:1; }',
         '}',
         '@keyframes olm-in3 {',
-        '  0%   { stroke-dasharray:0.000 242.680; stroke-dashoffset:-242.680; opacity:1; animation-timing-function:cubic-bezier(0.455, 0.03, 0.515, 0.955); }',
-        '  100% { stroke-dasharray:242.680 242.680; stroke-dashoffset:0.000; opacity:1; }',
+        '  0%      { stroke-dasharray:242.680 242.680; stroke-dashoffset:0.000; opacity:1; animation-timing-function:cubic-bezier(0.55, 0.055, 0.675, 0.19); }',
+        '  33.333% { stroke-dasharray:0.000 242.680; stroke-dashoffset:0.000; opacity:1; }',
+        '  33.400% { stroke-dasharray:0.000 242.680; stroke-dashoffset:-242.680; opacity:1; animation-timing-function:cubic-bezier(0.455, 0.03, 0.515, 0.955); }',
+        '  100%    { stroke-dasharray:242.680 242.680; stroke-dashoffset:0.000; opacity:1; }',
         '}',
         '@keyframes olm-in4 {',
-        '  0%      { opacity:0; }',
-        '  81.92%  { opacity:0; }',
-        '  100%    { opacity:1; animation-timing-function:cubic-bezier(0.55, 0.055, 0.675, 0.19); }',
+        '  0%      { opacity:1; animation-timing-function:cubic-bezier(0.55, 0.055, 0.675, 0.19); }',
+        '  28%     { opacity:1; }',
+        '  33.333% { opacity:0; }',
+        '  88%     { opacity:0; animation-timing-function:cubic-bezier(0.55, 0.055, 0.675, 0.19); }',
+        '  100%    { opacity:1; }',
         '}',
         '@keyframes olm-draw1 {',
         '  0%          { stroke-dasharray:0.000 207.024; stroke-dashoffset:-207.024; opacity:1; animation-timing-function:cubic-bezier(0.455, 0.03, 0.515, 0.955); }',
@@ -68,10 +76,10 @@
         '.operartis-logo-mark .intro .p2 { stroke-dasharray: 205.350 205.350; }',
         '.operartis-logo-mark .intro .p3 { stroke-dasharray: 242.680 242.680; }',
         '.operartis-logo-mark .intro .p4 { animation: none !important; opacity: 1; }',
-        '.operartis-logo-mark.is-intro .intro .p1 { animation: olm-in1 1.5s linear 1 forwards !important; }',
-        '.operartis-logo-mark.is-intro .intro .p2 { animation: olm-in2 1.5s linear 1 forwards !important; }',
-        '.operartis-logo-mark.is-intro .intro .p3 { animation: olm-in3 1.5s linear 1 forwards !important; }',
-        '.operartis-logo-mark.is-intro .intro .p4 { animation: olm-in4 1.5s linear 1 forwards !important; }',
+        '.operartis-logo-mark.is-intro .intro .p1 { animation: olm-in1 2.25s linear 1 forwards !important; }',
+        '.operartis-logo-mark.is-intro .intro .p2 { animation: olm-in2 2.25s linear 1 forwards !important; }',
+        '.operartis-logo-mark.is-intro .intro .p3 { animation: olm-in3 2.25s linear 1 forwards !important; }',
+        '.operartis-logo-mark.is-intro .intro .p4 { animation: olm-in4 2.25s linear 1 forwards !important; }',
         '.operartis-logo-mark.is-looping .intro { opacity: 0; }',
         '.operartis-logo-mark.is-looping .loop { opacity: 1; }',
         '.operartis-logo-mark.is-looping .loop .p1 { animation: olm-draw1 3.840s linear infinite; animation-delay: -1.5s; }',
@@ -174,9 +182,6 @@
         var nodeRef = React.useRef(null);
         var playedRef = React.useRef(false);
         var hoverArmedRef = React.useRef(false);
-        var introState = React.useState(false);
-        var isIntro = introState[0];
-        var setIntro = introState[1];
         var loopState = React.useState(false);
         var isLooping = loopState[0];
         var setLooping = loopState[1];
@@ -191,7 +196,8 @@
             function playIntro() {
                 if (playedRef.current) return;
                 playedRef.current = true;
-                setIntro(true);
+                var node = nodeRef.current;
+                if (node) node.classList.add('is-intro');
                 window.removeEventListener('wheel', onWheel, true);
                 window.removeEventListener('keydown', onKeyDown, true);
             }
@@ -264,7 +270,7 @@
         }, []);
 
         var className = 'operartis-logo-mark'
-            + (isIntro ? ' is-intro' : '')
+            + (playedRef.current ? ' is-intro' : '')
             + (isLooping ? ' is-looping' : '')
             + (props && props.className ? ' ' + props.className : '');
         return React.createElement('span', {
