@@ -86,6 +86,14 @@
         '.operartis-logo-mark.is-looping .loop .p2 { animation: olm-draw2 3.840s linear infinite; animation-delay: -1.5s; }',
         '.operartis-logo-mark.is-looping .loop .p3 { animation: olm-draw3 3.840s linear infinite; animation-delay: -1.5s; }',
         '.operartis-logo-mark.is-looping .loop .p4 { animation: olm-draw4 3.840s linear infinite; animation-delay: -1.5s; }',
+        '@media (hover: none), (pointer: coarse) {',
+        '  .operartis-logo-mark.is-looping .intro { opacity: 1; }',
+        '  .operartis-logo-mark.is-looping .loop { opacity: 0 !important; pointer-events: none; }',
+        '  .operartis-logo-mark.is-looping .loop .p1,',
+        '  .operartis-logo-mark.is-looping .loop .p2,',
+        '  .operartis-logo-mark.is-looping .loop .p3,',
+        '  .operartis-logo-mark.is-looping .loop .p4 { animation: none !important; }',
+        '}',
         '@media (prefers-reduced-motion: reduce) {',
         '  .operartis-logo-mark .intro .p1,',
         '  .operartis-logo-mark .intro .p2,',
@@ -159,6 +167,25 @@
         return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     }
 
+    function isMobileUi() {
+        try {
+            if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return true;
+        } catch (e) { }
+        var ua = navigator.userAgent || '';
+        if (/iPhone|iPod|Android.+Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return true;
+        if (/iPad/i.test(ua)) return true;
+        if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+        if (/Android/i.test(ua) && navigator.maxTouchPoints > 1) return true;
+        return false;
+    }
+
+    function getPageScrollY() {
+        var main = document.querySelector('main.flex-1.overflow-y-auto');
+        var mainY = main ? main.scrollTop : 0;
+        var winY = window.pageYOffset || document.documentElement.scrollTop || 0;
+        return Math.max(mainY, winY);
+    }
+
     var SCROLL_KEYS = {
         ArrowDown: 1,
         ArrowUp: 1,
@@ -192,14 +219,22 @@
             var brand = null;
             var readyTimer = 0;
             var introReady = false;
+            var scrollBaseline = 0;
+            var allowHover = !isMobileUi();
+
+            function unbindIntro() {
+                window.removeEventListener('wheel', onWheel, true);
+                window.removeEventListener('keydown', onKeyDown, true);
+                document.removeEventListener('scroll', onPageScroll, true);
+                window.removeEventListener('touchmove', onTouchMove, true);
+            }
 
             function playIntro() {
                 if (playedRef.current) return;
                 playedRef.current = true;
                 var node = nodeRef.current;
                 if (node) node.classList.add('is-intro');
-                window.removeEventListener('wheel', onWheel, true);
-                window.removeEventListener('keydown', onKeyDown, true);
+                unbindIntro();
             }
 
             function onWheel(e) {
@@ -214,13 +249,26 @@
                 playIntro();
             }
 
+            function onPageScroll() {
+                if (!introReady || playedRef.current) return;
+                if (Math.abs(getPageScrollY() - scrollBaseline) < 16) return;
+                playIntro();
+            }
+
+            function onTouchMove(e) {
+                if (!introReady || !e.isTrusted || playedRef.current) return;
+                if (Math.abs(getPageScrollY() - scrollBaseline) < 16) return;
+                playIntro();
+            }
+
             function setLoop(on) {
-                if (!hoverArmedRef.current) return;
+                if (!allowHover || !hoverArmedRef.current) return;
                 setLooping(!!on);
             }
 
             function onPointerMove(e) {
-                if (!e.isTrusted) return;
+                if (!allowHover || !e.isTrusted) return;
+                if (e.pointerType && e.pointerType !== 'mouse') return;
                 hoverArmedRef.current = true;
                 window.removeEventListener('pointermove', onPointerMove, true);
                 var node = nodeRef.current;
@@ -229,7 +277,8 @@
                 }
             }
 
-            function onPointerEnter() {
+            function onPointerEnter(e) {
+                if (e && e.pointerType && e.pointerType !== 'mouse') return;
                 setLoop(true);
             }
 
@@ -238,6 +287,7 @@
             }
 
             function bindHover() {
+                if (!allowHover) return;
                 var node = nodeRef.current;
                 brand = node && node.closest ? node.closest('.header-brand') : null;
                 var hoverRoot = brand || node;
@@ -248,18 +298,22 @@
             }
 
             bindHover();
-            window.addEventListener('pointermove', onPointerMove, { capture: true, passive: true });
+            if (allowHover) {
+                window.addEventListener('pointermove', onPointerMove, { capture: true, passive: true });
+            }
             window.addEventListener('wheel', onWheel, { capture: true, passive: true });
             window.addEventListener('keydown', onKeyDown, true);
+            document.addEventListener('scroll', onPageScroll, { capture: true, passive: true });
+            window.addEventListener('touchmove', onTouchMove, { capture: true, passive: true });
             readyTimer = window.setTimeout(function () {
+                scrollBaseline = getPageScrollY();
                 introReady = true;
             }, 500);
 
             return function () {
                 window.clearTimeout(readyTimer);
+                unbindIntro();
                 window.removeEventListener('pointermove', onPointerMove, true);
-                window.removeEventListener('wheel', onWheel, true);
-                window.removeEventListener('keydown', onKeyDown, true);
                 var node = nodeRef.current;
                 var hoverRoot = brand || node;
                 if (hoverRoot) {
@@ -271,7 +325,7 @@
 
         var className = 'operartis-logo-mark'
             + (playedRef.current ? ' is-intro' : '')
-            + (isLooping ? ' is-looping' : '')
+            + (isLooping && !isMobileUi() ? ' is-looping' : '')
             + (props && props.className ? ' ' + props.className : '');
         return React.createElement('span', {
             ref: nodeRef,
