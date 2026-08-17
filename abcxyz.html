@@ -145,9 +145,16 @@
             margin: 0;
         }
 
+        html.dark {
+            color-scheme: dark;
+        }
+
+        html:not(.dark) {
+            color-scheme: light;
+        }
+
         .scroller {
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
         }
 
         ::-webkit-scrollbar {
@@ -166,6 +173,10 @@
 
         .dark ::-webkit-scrollbar-thumb {
             background: #475569;
+        }
+
+        .scroller::-webkit-scrollbar {
+            width: 4px;
         }
 
         .dark body {
