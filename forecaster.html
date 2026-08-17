@@ -807,6 +807,7 @@
                     progress: "Progress",
                     cancel: "Cancel",
                     canceling: "Canceling...",
+                    status_ready: "Ready",
                     status_queued: "Queued",
                     status_processing: "Processing",
                     status_completed: "Completed",
@@ -947,6 +948,7 @@
                     progress: "Tiến độ",
                     cancel: "Hủy",
                     canceling: "Đang hủy...",
+                    status_ready: "Sẵn sàng",
                     status_queued: "Đang xếp hàng",
                     status_processing: "Đang xử lý",
                     status_completed: "Hoàn tất",
@@ -1087,6 +1089,7 @@
                     progress: "Fortschritt",
                     cancel: "Abbrechen",
                     canceling: "Wird abgebrochen...",
+                    status_ready: "Bereit",
                     status_queued: "In Warteschlange",
                     status_processing: "In Verarbeitung",
                     status_completed: "Abgeschlossen",
@@ -1373,51 +1376,53 @@
                     ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40'
                     : normalizedStatus === 'canceled'
                         ? 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
-                        : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40';
+                        : normalizedStatus === 'ready'
+                            ? 'text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
+                            : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40';
 
             return (
                 <div
-                    className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 sm:px-6 py-2 bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-800 text-[10px] sm:text-xs text-slate-600 dark:text-slate-300"
+                    className="flex items-center gap-3 h-10 px-3 sm:px-6 bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-800 text-[10px] sm:text-xs text-slate-600 dark:text-slate-300 overflow-hidden"
                     role="status"
                     aria-live="polite"
                     aria-atomic="false"
                 >
-                    <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="flex items-center gap-1.5 shrink-0 w-[8.75rem] sm:w-[9.5rem]">
                         <span className="w-3.5 h-3.5 shrink-0 [&_svg]:w-full [&_svg]:h-full" aria-hidden="true"><ServerIcon /></span>
                         <span className="font-semibold whitespace-nowrap">{t('job.execution_backend')}:</span>
-                        <strong className="truncate">{backendLabel}</strong>
+                        <strong className="truncate w-[3.25rem] sm:w-[3.75rem]">{backendLabel}</strong>
                     </div>
-                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 font-bold whitespace-nowrap ${statusClass}`}>
+                    <span className={`inline-flex h-7 items-center justify-center rounded-full border px-2 font-bold whitespace-nowrap shrink-0 min-w-[7.75rem] sm:min-w-[9.5rem] leading-none ${statusClass}`}>
                         {statusLabel}
                     </span>
-                    {hasProgress && (
-                        <div className="order-last basis-full sm:order-none sm:basis-auto sm:flex-1 flex items-center gap-2 min-w-[8rem]">
-                            <span className="font-semibold whitespace-nowrap">
-                                {t('job.progress')}: {safeCompleted}/{safeTotal}
-                            </span>
-                            <div
-                                className="h-1.5 flex-1 min-w-[4rem] overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"
-                                role="progressbar"
-                                aria-label={t('job.progress')}
-                                aria-valuemin="0"
-                                aria-valuemax={safeTotal}
-                                aria-valuenow={Math.min(safeCompleted, safeTotal)}
-                            >
-                                <div className="h-full rounded-full bg-brand-gold transition-[width] duration-300" style={{ width: `${progressPercent}%` }}></div>
-                            </div>
-                        </div>
-                    )}
-                    {canCancel && (
-                        <button
-                            type="button"
-                            onClick={onCancel}
-                            disabled={isCancelling}
-                            className="ml-auto inline-flex min-h-9 items-center justify-center rounded-lg border border-rose-200 dark:border-rose-900/50 px-3 font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:cursor-wait disabled:opacity-60 transition-colors"
-                            aria-label={isCancelling ? t('job.canceling') : t('job.cancel')}
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="font-semibold whitespace-nowrap tabular-nums shrink-0 w-[6.75rem] sm:w-[7.5rem]">
+                            {t('job.progress')}: {hasProgress ? `${safeCompleted}/${safeTotal}` : '0/0'}
+                        </span>
+                        <div
+                            className="h-1.5 flex-1 min-w-0 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"
+                            role="progressbar"
+                            aria-label={t('job.progress')}
+                            aria-valuemin="0"
+                            aria-valuemax={hasProgress ? safeTotal : 0}
+                            aria-valuenow={hasProgress ? Math.min(safeCompleted, safeTotal) : 0}
                         >
-                            {isCancelling ? t('job.canceling') : t('job.cancel')}
-                        </button>
-                    )}
+                            <div className="h-full rounded-full bg-brand-gold transition-[width] duration-300" style={{ width: `${progressPercent}%` }}></div>
+                        </div>
+                    </div>
+                    <div className="w-[6.25rem] shrink-0 flex items-center justify-end">
+                        {canCancel ? (
+                            <button
+                                type="button"
+                                onClick={onCancel}
+                                disabled={isCancelling}
+                                className="inline-flex h-7 w-full items-center justify-center rounded-full border border-rose-200 dark:border-rose-900/50 px-2 font-bold leading-none text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:cursor-wait disabled:opacity-60 transition-colors"
+                                aria-label={isCancelling ? t('job.canceling') : t('job.cancel')}
+                            >
+                                {isCancelling ? t('job.canceling') : t('job.cancel')}
+                            </button>
+                        ) : null}
+                    </div>
                 </div>
             );
         });
@@ -3997,16 +4002,18 @@
                                 </div>
                             </header>
 
+                            {mappingReady && (
                             <JobStatusBar
-                                status={jobStatus}
-                                executionBackend={executionBackend}
-                                completedCount={jobProgress.completed}
-                                totalCount={jobProgress.total}
+                                status={jobStatus || 'ready'}
+                                executionBackend={executionBackend || 'local'}
+                                completedCount={jobStatus ? jobProgress.completed : 0}
+                                totalCount={jobProgress.total > 0 ? jobProgress.total : (selectedSkus.length || mappedSkus.length)}
                                 canCancel={canCancelJob}
                                 isCancelling={isCancelling}
                                 onCancel={handleCancelJob}
                                 t={t}
                             />
+                            )}
 
                             {/* KPI BAR — with Overview tab after mapping confirm */}
                             {mappingReady && (
