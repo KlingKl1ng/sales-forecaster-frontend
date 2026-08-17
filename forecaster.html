@@ -2780,16 +2780,15 @@
                         const parsed = parseForecastCapabilities(await response.json());
                         if (disposed) return;
                         setForecastCapabilities({ status: 'ready', ...parsed });
-                        setModelType((current) => (
-                            isAdvancedModelType(current)
-                            && (
-                                !parsed.cloudEnabled
-                                || (
-                                    parsed.supportedModels.length > 0
-                                    && !parsed.supportedModels.includes(String(current).toLowerCase())
-                                )
-                            )
-                        ) ? 'auto' : current);
+                        setModelType((current) => {
+                            if (!isAdvancedModelType(current)) return current;
+                            if (parsed.supportedModels.length > 0) {
+                                return parsed.supportedModels.includes(String(current).toLowerCase())
+                                    ? current
+                                    : 'auto';
+                            }
+                            return parsed.cloudEnabled ? current : 'auto';
+                        });
                     } catch (capabilityError) {
                         if (disposed) return;
                         setForecastCapabilities({ status: 'unavailable', cloudEnabled: false, supportedModels: [] });
@@ -2847,10 +2846,16 @@
 
             const isForecastModelAvailable = (candidate) => {
                 if (!isAdvancedModelType(candidate)) return true;
-                if (forecastCapabilities.status !== 'ready' || !forecastCapabilities.cloudEnabled) return false;
-                return forecastCapabilities.supportedModels.length === 0
-                    || forecastCapabilities.supportedModels.includes(String(candidate).toLowerCase());
+                if (forecastCapabilities.status !== 'ready') return false;
+                const value = String(candidate || '').toLowerCase();
+                if (forecastCapabilities.supportedModels.length > 0) {
+                    return forecastCapabilities.supportedModels.includes(value);
+                }
+                return forecastCapabilities.cloudEnabled === true;
             };
+            const hasAvailableAdvancedModels = FORECAST_MODEL_OPTIONS.some(
+                (option) => option.advanced && isForecastModelAvailable(option.value)
+            );
 
             // --- POLLING (merge partial results as each SKU completes) ---
             useEffect(() => {
@@ -2863,7 +2868,11 @@
                     let unchangedPolls = 0;
                     let lastCompleted = -1;
                     let lastStatus = '';
-                    let pollBackend = executionBackend || (isAdvancedModelType(jobModelType) ? 'cloud' : 'local');
+                    let pollBackend = executionBackend || (
+                        isAdvancedModelType(jobModelType) && forecastCapabilities.cloudEnabled
+                            ? 'cloud'
+                            : 'local'
+                    );
 
                     const scheduleNextPoll = (hadError) => {
                         if (disposed || generation !== runGenerationRef.current) return;
@@ -3138,7 +3147,11 @@
                 setError(null);
                 setJobStatus("queued");
                 setJobModelType(selectedModelType);
-                setExecutionBackend(isAdvancedModelType(selectedModelType) ? 'cloud' : 'local');
+                setExecutionBackend(
+                    isAdvancedModelType(selectedModelType) && forecastCapabilities.cloudEnabled
+                        ? 'cloud'
+                        : 'local'
+                );
                 setJobProgress({ completed: 0, total: skusToRun.length });
                 setIsCancelling(false);
                 setRunningSkus(skusToRun);
@@ -3179,7 +3192,11 @@
                     setJobStatus(normalizeJobStatus(data.status || 'queued'));
                     setExecutionBackend(
                         normalizeExecutionBackend(data.execution_backend || data.backend)
-                        || (isAdvancedModelType(selectedModelType) ? 'cloud' : 'local')
+                        || (
+                            isAdvancedModelType(selectedModelType) && forecastCapabilities.cloudEnabled
+                                ? 'cloud'
+                                : 'local'
+                        )
                     );
                     setJobProgress((previous) => ({
                         completed: Number.isFinite(Number(data.completed_count)) ? Number(data.completed_count) : previous.completed,
@@ -3676,7 +3693,7 @@
                                                 value={modelType}
                                                 onChange={(e) => setModelType(e.target.value)}
                                                 disabled={isRunning}
-                                                aria-describedby={forecastCapabilities.status !== 'ready' || !forecastCapabilities.cloudEnabled ? 'forecast-cloud-availability' : undefined}
+                                                aria-describedby={forecastCapabilities.status === 'loading' || !hasAvailableAdvancedModels ? 'forecast-cloud-availability' : undefined}
                                                 className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] disabled:cursor-not-allowed disabled:opacity-60"
                                             >
                                                 {FORECAST_MODEL_OPTIONS.map((option) => (
@@ -3693,7 +3710,7 @@
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
                                         </div>
-                                        {(forecastCapabilities.status !== 'ready' || !forecastCapabilities.cloudEnabled) && (
+                                        {(forecastCapabilities.status === 'loading' || !hasAvailableAdvancedModels) && (
                                             <p id="forecast-cloud-availability" className="mt-1.5 text-[9px] leading-3 text-slate-500 dark:text-slate-400">
                                                 {forecastCapabilities.status === 'loading'
                                                     ? t('sidebar.cloud_checking')

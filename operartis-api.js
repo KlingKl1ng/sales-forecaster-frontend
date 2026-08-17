@@ -50,7 +50,11 @@
         var override = sessionStorage.getItem('operartis_api_base');
         if (override) return override.replace(/\/$/, '');
         if (window.location.protocol === 'file:') return 'http://127.0.0.1:8000';
-        if (isLocalHost(window.location.hostname)) return window.location.origin;
+        if (isLocalHost(window.location.hostname)) {
+            var port = String(window.location.port || '');
+            if (port === '8000') return window.location.origin.replace(/\/$/, '');
+            return 'http://127.0.0.1:8000';
+        }
         if (window.location.hostname.indexOf('staging.') === 0) return 'https://api-staging.operartis.io';
         return 'https://api.operartis.io';
     }
