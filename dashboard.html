@@ -33,6 +33,7 @@
             --muted: #94a3b8;
             --muted-2: #64748b;
             --gold: #f59e0b;
+            --gold-dark: #b45309;
             --gold-2: #fbbf24;
             --green: #10b981;
             --red: #ef4444;
@@ -1714,8 +1715,15 @@
         .settings-option.active {
             border-color: rgba(245, 158, 11, .75);
             background: rgba(245, 158, 11, .08);
-            color: var(--text);
+            color: var(--gold-dark);
             box-shadow: 0 0 0 1px rgba(245, 158, 11, .15);
+        }
+        .settings-option.active [data-i18n-theme] {
+            color: var(--gold-dark);
+        }
+        html.dark .settings-option.active,
+        html.dark .settings-option.active [data-i18n-theme] {
+            color: var(--gold);
         }
         .settings-option-icon {
             display: grid;
@@ -1728,9 +1736,11 @@
             box-shadow: var(--shadow-sm);
         }
         .settings-option-icon svg { width: 20px; height: 20px; }
-        .settings-option-icon.theme-light { background: #fff; color: #f59e0b; }
-        .settings-option-icon.theme-dark { background: #0f172a; color: #f8fafc; }
-        .settings-option-icon.theme-system { background: linear-gradient(135deg, #e2e8f0 50%, #0f172a 50%); color: #64748b; }
+        .settings-option-icon.theme-light { background: #fff; color: #64748b; }
+        .settings-option.active .settings-option-icon.theme-light { color: var(--gold-dark); }
+        .settings-option-icon.theme-dark { background: #1e293b; color: #fff; }
+        .settings-option-icon.theme-system { background: #e2e8f0; color: #334155; }
+        html.dark .settings-option-icon.theme-system { background: #334155; color: #cbd5e1; }
         .settings-option.lang-option {
             flex-direction: row;
             justify-content: space-between;
@@ -1757,14 +1767,6 @@
             font-weight: 500;
             margin-top: 2px;
         }
-        .settings-option-check {
-            width: 10px;
-            height: 10px;
-            border-radius: 999px;
-            background: transparent;
-            flex-shrink: 0;
-        }
-        .settings-option.active .settings-option-check { background: var(--gold); }
         @media (max-width: 860px) {
             .settings-options-three { grid-template-columns: 1fr; }
         }
@@ -2630,24 +2632,21 @@
                                 <button type="button" class="settings-option lang-option" data-lang="en" aria-pressed="false">
                                     <span class="lang-copy">
                                         <span class="lang-flag" aria-hidden="true">🇺🇸</span>
-                                        <span><strong>English</strong><span data-i18n-lang-sub="en">US English</span></span>
+                                        <span><strong>English</strong></span>
                                     </span>
-                                    <span class="settings-option-check" aria-hidden="true"></span>
                                 </button>
                                 <button type="button" class="settings-option lang-option" data-lang="vi" aria-pressed="false">
                                     <span class="lang-copy">
                                         <span class="lang-flag" aria-hidden="true">🇻🇳</span>
-                                        <span><strong>Tiếng Việt</strong><span data-i18n-lang-sub="vi">Vietnamese</span></span>
+                                        <span><strong>Tiếng Việt</strong></span>
                                     </span>
-                                    <span class="settings-option-check" aria-hidden="true"></span>
                                 </button>
                                 <!-- German temporarily disabled -->
                                 <button type="button" class="settings-option lang-option hidden" data-lang="de" aria-pressed="false" hidden>
                                     <span class="lang-copy">
                                         <span class="lang-flag" aria-hidden="true">🇩🇪</span>
-                                        <span><strong>Deutsch</strong><span data-i18n-lang-sub="de">German</span></span>
+                                        <span><strong>Deutsch</strong></span>
                                     </span>
-                                    <span class="settings-option-check" aria-hidden="true"></span>
                                 </button>
                             </div>
                         </div>

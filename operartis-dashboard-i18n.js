@@ -352,7 +352,7 @@
             module_cards: {
                 SF: {
                     label: 'ML Forecaster',
-                    desc: 'Demand forecasting from ERP-style sales history.',
+                    desc: 'Demand forecasting with time-series',
                 },
                 ML: {
                     label: 'Advanced ML Forecaster',
@@ -749,7 +749,7 @@
             module_cards: {
                 SF: {
                     label: 'Dự Báo Học Máy',
-                    desc: 'Dự báo nhu cầu từ lịch sử bán hàng kiểu ERP.',
+                    desc: 'Dự báo nhu cầu với chuỗi thời gian',
                 },
                 ML: {
                     label: 'Dự Báo Học Máy Nâng Cao',
@@ -1146,7 +1146,7 @@
             module_cards: {
                 SF: {
                     label: 'ML-Prognose',
-                    desc: 'Nachfrageprognose aus ERP-ähnlicher Verkaufshistorie.',
+                    desc: 'Nachfrageprognose mit Zeitreihen',
                 },
                 ML: {
                     label: 'Erweiterte ML-Prognose',
@@ -1297,9 +1297,6 @@
         document.querySelectorAll('[data-theme]').forEach(function (button) {
             const label = button.querySelector('[data-i18n-theme]');
             if (label) label.textContent = t('theme.' + button.dataset.theme);
-        });
-        document.querySelectorAll('[data-lang] [data-i18n-lang-sub]').forEach(function (el) {
-            el.textContent = t('lang_labels.' + el.dataset.i18nLangSub + '_sub');
         });
         const themeGroup = document.getElementById('theme-options');
         if (themeGroup) themeGroup.setAttribute('aria-label', t('sections.settings.theme_aria'));
