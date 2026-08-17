@@ -379,6 +379,7 @@
         const PlayIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
         const SearchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>;
         const ServerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>;
+        const InfoIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>;
 
         const getDeploymentEnvironment = () => {
             const host = window.location.hostname;
@@ -479,7 +480,56 @@
                     legend_volatile: "Volatile (Z)",
                     sku_label: "SKUs",
                     val_label: "Val",
-                    qty_label: "Qty"
+                    qty_label: "Qty",
+                    guide: {
+                        title: "How to use this tool",
+                        intro: "Every SKU is ranked by inventory value (ABC) and demand regularity (XYZ), then placed in one of nine policy groups. The matrix and Pareto curve above show where value sits; this guide explains how to read them and what to do with each class.",
+                        abc_title: "ABC — value (Pareto)",
+                        abc_desc: "SKUs are sorted from highest to lowest total value (demand × unit cost). Class is assigned by cumulative share of that total, using the limits in Configuration.",
+                        a_name: "Class A — high value",
+                        a_desc: "The first items whose cumulative value reaches {a}% of the total. Few SKUs, most of the money. Tight control, frequent review, accurate records.",
+                        b_name: "Class B — medium value",
+                        b_desc: "The next band, from {a}% up to {b}% of cumulative value ({bBand}% of value). Standard control and periodic review.",
+                        c_name: "Class C — low value",
+                        c_desc: "The remaining tail after {b}% of cumulative value ({cPct}% of value). Many SKUs, little money. Simple rules; do not over-manage.",
+                        xyz_title: "XYZ — demand regularity",
+                        xyz_desc: "Regularity is the coefficient of variation (CV): standard deviation of demand ÷ average demand across the mapped periods. Lower CV means a smoother history.",
+                        x_name: "Class X — stable",
+                        x_desc: "CV ≤ {x}. Demand is predictable. Forecasts are usually reliable; safety stock can stay lean.",
+                        y_name: "Class Y — fluctuating",
+                        y_desc: "CV between {x} and {y}. Demand moves with seasonality or promotions. Use extra buffer and watch the forecast.",
+                        z_name: "Class Z — volatile",
+                        z_desc: "CV > {y}. Demand is erratic or lumpy. Statistical forecasts are weak; plan with buffers, collaboration, or make-to-order.",
+                        combo_title: "What each combination means",
+                        ax_title: "High value, stable",
+                        ax_desc: "Your most important, most forecastable items. Tight inventory, frequent replenishment, lean safety stock.",
+                        ay_title: "High value, fluctuating",
+                        ay_desc: "Protect service level with extra safety stock and close monitoring. Worth a better forecast.",
+                        az_title: "High value, erratic",
+                        az_desc: "Highest-risk items. Review often, keep a deliberate buffer, and consider make-to-order or customer collaboration.",
+                        bx_title: "Medium value, stable",
+                        bx_desc: "Standard MRP or periodic review. Reliable enough for automated replenishment.",
+                        by_title: "Medium value, fluctuating",
+                        by_desc: "Moderate safety stock and a regular forecast check. Do not treat like C items.",
+                        bz_title: "Medium value, erratic",
+                        bz_desc: "Hard to forecast. Use extra buffer or a simpler min-max policy rather than a precise plan.",
+                        cx_title: "Low value, stable",
+                        cx_desc: "Buy in bulk, keep a simple min-max, and minimize admin cost. Stockouts here are cheap.",
+                        cy_title: "Low value, fluctuating",
+                        cy_desc: "Simple min-max or two-bin. Do not spend planning time matching every swing.",
+                        cz_title: "Low value, erratic",
+                        cz_desc: "Lowest control priority. Accept occasional stockouts or buy on demand; excess inventory here is waste.",
+                        pareto_how_title: "How to read the Pareto curve",
+                        pareto_1: "SKUs are lined up from highest to lowest value. The X-axis is the share of SKUs counted so far; the Y-axis is the share of total value they represent.",
+                        pareto_2: "A steep start means a few items carry most of the value (the classic 80/20 shape). A flatter curve means value is spread more evenly.",
+                        pareto_3: "The green dashed line is the A limit ({a}% of value). The blue dashed line is the B limit ({b}%). Green, blue, and grey segments of the curve are classes A, B, and C.",
+                        pareto_4: "Hover a point to see cumulative SKU % and value % at that rank.",
+                        use_title: "Workflow",
+                        use_1: "Upload an Excel or CSV file with SKU, unit cost, and demand by period.",
+                        use_2: "Map those columns, then optionally adjust ABC and XYZ limits in Configuration.",
+                        use_3: "Run Analysis to build the matrix, Pareto curve, and item list.",
+                        use_4: "Click a matrix cell to filter Detailed View. Sort columns, search a SKU, and export the report."
+                    }
                 },
                 list: {
                     col_class: "Class",
@@ -571,7 +621,56 @@
                     legend_volatile: "Bất định (Z)",
                     sku_label: "SKU",
                     val_label: "Giá trị",
-                    qty_label: "SL"
+                    qty_label: "SL",
+                    guide: {
+                        title: "Cách dùng công cụ này",
+                        intro: "Mỗi SKU được xếp theo giá trị tồn kho (ABC) và độ ổn định nhu cầu (XYZ), rồi đặt vào một trong chín nhóm chính sách. Ma trận và đường cong Pareto phía trên cho thấy giá trị nằm ở đâu; phần này giải thích cách đọc chúng và cách xử lý từng nhóm.",
+                        abc_title: "ABC — giá trị (Pareto)",
+                        abc_desc: "SKU được sắp từ giá trị cao nhất đến thấp nhất (nhu cầu × đơn giá vốn). Nhóm được gán theo phần trăm tích lũy trên tổng giá trị, theo ngưỡng trong Cấu hình.",
+                        a_name: "Nhóm A — giá trị cao",
+                        a_desc: "Các mặt hàng đầu tiên có giá trị tích lũy đạt {a}% tổng giá trị. Ít SKU, phần lớn tiền. Kiểm soát chặt, rà soát thường xuyên, dữ liệu phải chính xác.",
+                        b_name: "Nhóm B — giá trị trung bình",
+                        b_desc: "Dải tiếp theo, từ {a}% đến {b}% giá trị tích lũy ({bBand}% giá trị). Kiểm soát chuẩn và rà soát định kỳ.",
+                        c_name: "Nhóm C — giá trị thấp",
+                        c_desc: "Phần còn lại sau {b}% giá trị tích lũy ({cPct}% giá trị). Nhiều SKU, ít tiền. Quy tắc đơn giản; đừng quản lý quá mức.",
+                        xyz_title: "XYZ — độ ổn định nhu cầu",
+                        xyz_desc: "Độ ổn định đo bằng hệ số biến thiên (CV): độ lệch chuẩn nhu cầu ÷ nhu cầu trung bình trên các kỳ đã ánh xạ. CV thấp nghĩa là lịch sử nhu cầu mượt hơn.",
+                        x_name: "Nhóm X — ổn định",
+                        x_desc: "CV ≤ {x}. Nhu cầu dễ dự báo. Dự báo thường tin cậy; tồn kho an toàn có thể giữ ở mức thấp.",
+                        y_name: "Nhóm Y — biến động",
+                        y_desc: "CV từ {x} đến {y}. Nhu cầu thay đổi theo mùa hoặc khuyến mãi. Tăng bộ đệm và theo dõi dự báo.",
+                        z_name: "Nhóm Z — bất định",
+                        z_desc: "CV > {y}. Nhu cầu thất thường hoặc gộp lô. Dự báo thống kê yếu; lập kế hoạch bằng bộ đệm, phối hợp khách hàng, hoặc sản xuất theo đơn.",
+                        combo_title: "Ý nghĩa từng tổ hợp",
+                        ax_title: "Giá trị cao, ổn định",
+                        ax_desc: "Mặt hàng quan trọng nhất và dễ dự báo nhất. Kiểm soát tồn kho chặt, bổ sung thường xuyên, tồn kho an toàn thấp.",
+                        ay_title: "Giá trị cao, biến động",
+                        ay_desc: "Bảo vệ mức dịch vụ bằng tồn kho an toàn cao hơn và theo dõi sát. Đáng đầu tư dự báo tốt hơn.",
+                        az_title: "Giá trị cao, bất định",
+                        az_desc: "Rủi ro cao nhất. Rà soát thường xuyên, giữ bộ đệm có chủ đích, cân nhắc sản xuất theo đơn hoặc phối hợp khách hàng.",
+                        bx_title: "Giá trị trung bình, ổn định",
+                        bx_desc: "MRP chuẩn hoặc rà soát định kỳ. Đủ tin cậy để bổ sung tự động.",
+                        by_title: "Giá trị trung bình, biến động",
+                        by_desc: "Tồn kho an toàn vừa phải và kiểm tra dự báo đều đặn. Không đối xử như nhóm C.",
+                        bz_title: "Giá trị trung bình, bất định",
+                        bz_desc: "Khó dự báo. Dùng bộ đệm lớn hơn hoặc chính sách min-max đơn giản thay vì kế hoạch quá chi tiết.",
+                        cx_title: "Giá trị thấp, ổn định",
+                        cx_desc: "Mua số lượng lớn, min-max đơn giản, giảm chi phí hành chính. Thiếu hàng ở đây ít tổn thất.",
+                        cy_title: "Giá trị thấp, biến động",
+                        cy_desc: "Min-max hoặc hai thùng. Đừng tốn thời gian lập kế hoạch cho từng dao động.",
+                        cz_title: "Giá trị thấp, bất định",
+                        cz_desc: "Ưu tiên kiểm soát thấp nhất. Chấp nhận thiếu hàng thỉnh thoảng hoặc mua khi cần; tồn dư ở đây là lãng phí.",
+                        pareto_how_title: "Cách đọc đường cong Pareto",
+                        pareto_1: "SKU được xếp từ giá trị cao xuống thấp. Trục X là tỷ lệ SKU đã đếm; trục Y là tỷ lệ tổng giá trị chúng đại diện.",
+                        pareto_2: "Đoạn đầu dốc nghĩa là ít mặt hàng chiếm phần lớn giá trị (hình 80/20). Đường cong phẳng hơn nghĩa là giá trị phân tán đều hơn.",
+                        pareto_3: "Đường đứt nét xanh lá là ngưỡng A ({a}% giá trị). Đường đứt nét xanh dương là ngưỡng B ({b}%). Các đoạn xanh lá, xanh dương và xám là nhóm A, B và C.",
+                        pareto_4: "Di chuột lên một điểm để xem % SKU tích lũy và % giá trị tại thứ hạng đó.",
+                        use_title: "Quy trình",
+                        use_1: "Tải lên tệp Excel hoặc CSV có SKU, đơn giá vốn và nhu cầu theo kỳ.",
+                        use_2: "Ánh xạ các cột, rồi tùy chọn chỉnh ngưỡng ABC và XYZ trong Cấu hình.",
+                        use_3: "Chạy phân tích để tạo ma trận, đường cong Pareto và danh sách mặt hàng.",
+                        use_4: "Nhấn một ô ma trận để lọc Chi tiết. Sắp xếp cột, tìm SKU và xuất báo cáo."
+                    }
                 },
                 list: {
                     col_class: "Phân loại",
@@ -659,7 +758,56 @@
                     legend_volatile: "Volatil (Z)",
                     sku_label: "SKUs",
                     val_label: "Wert",
-                    qty_label: "Menge"
+                    qty_label: "Menge",
+                    guide: {
+                        title: "So nutzen Sie dieses Tool",
+                        intro: "Jeder SKU wird nach Bestandswert (ABC) und Nachfragestabilität (XYZ) eingestuft und einer von neun Politikgruppen zugeordnet. Matrix und Pareto-Kurve oben zeigen, wo der Wert liegt; diese Anleitung erklärt, wie Sie sie lesen und jede Klasse steuern.",
+                        abc_title: "ABC — Wert (Pareto)",
+                        abc_desc: "SKUs werden vom höchsten zum niedrigsten Gesamtwert sortiert (Nachfrage × Stückkosten). Die Klasse folgt dem kumulierten Anteil an diesem Gesamtwert gemäß den Grenzwerten in der Konfiguration.",
+                        a_name: "Klasse A — hoher Wert",
+                        a_desc: "Die ersten Artikel, deren kumulierter Wert {a}% der Gesamtsumme erreicht. Wenige SKUs, der Großteil des Geldes. Enge Steuerung, häufige Prüfung, genaue Stammdaten.",
+                        b_name: "Klasse B — mittlerer Wert",
+                        b_desc: "Das nächste Band, von {a}% bis {b}% des kumulierten Werts ({bBand}% des Werts). Standardsteuerung und periodische Prüfung.",
+                        c_name: "Klasse C — niedriger Wert",
+                        c_desc: "Der Rest nach {b}% des kumulierten Werts ({cPct}% des Werts). Viele SKUs, wenig Geld. Einfache Regeln; nicht übersteuern.",
+                        xyz_title: "XYZ — Nachfragestabilität",
+                        xyz_desc: "Stabilität ist der Variationskoeffizient (CV): Standardabweichung der Nachfrage ÷ mittlere Nachfrage über die zugeordneten Perioden. Ein niedriger CV bedeutet einen gleichmäßigeren Verlauf.",
+                        x_name: "Klasse X — stabil",
+                        x_desc: "CV ≤ {x}. Die Nachfrage ist gut prognostizierbar. Prognosen sind meist zuverlässig; der Sicherheitsbestand kann schlank bleiben.",
+                        y_name: "Klasse Y — schwankend",
+                        y_desc: "CV zwischen {x} und {y}. Die Nachfrage folgt Saison oder Aktionen. Mehr Puffer einplanen und die Prognose beobachten.",
+                        z_name: "Klasse Z — volatil",
+                        z_desc: "CV > {y}. Die Nachfrage ist erratisch oder stoßartig. Statistische Prognosen sind schwach; mit Puffern, Abstimmung oder Make-to-Order planen.",
+                        combo_title: "Was jede Kombination bedeutet",
+                        ax_title: "Hoher Wert, stabil",
+                        ax_desc: "Ihre wichtigsten und am besten prognostizierbaren Artikel. Enge Bestandsführung, häufige Nachfüllung, schlanker Sicherheitsbestand.",
+                        ay_title: "Hoher Wert, schwankend",
+                        ay_desc: "Servicegrad mit zusätzlichem Sicherheitsbestand und enger Überwachung schützen. Eine bessere Prognose lohnt sich.",
+                        az_title: "Hoher Wert, erratisch",
+                        az_desc: "Höchstes Risiko. Häufig prüfen, bewusst Puffer halten und Make-to-Order oder Kundenabstimmung erwägen.",
+                        bx_title: "Mittlerer Wert, stabil",
+                        bx_desc: "Standard-MRP oder periodische Prüfung. Zuverlässig genug für automatische Nachfüllung.",
+                        by_title: "Mittlerer Wert, schwankend",
+                        by_desc: "Moderater Sicherheitsbestand und regelmäßige Prognoseprüfung. Nicht wie C-Artikel behandeln.",
+                        bz_title: "Mittlerer Wert, erratisch",
+                        bz_desc: "Schwer zu prognostizieren. Lieber extra Puffer oder eine einfache Min-Max-Politik statt eines präzisen Plans.",
+                        cx_title: "Niedriger Wert, stabil",
+                        cx_desc: "In großen Losen beschaffen, einfaches Min-Max, Verwaltungsaufwand minimieren. Fehlmengen sind hier günstig.",
+                        cy_title: "Niedriger Wert, schwankend",
+                        cy_desc: "Einfaches Min-Max oder Zwei-Behälter. Keine Planungszeit für jede Schwankung aufwenden.",
+                        cz_title: "Niedriger Wert, erratisch",
+                        cz_desc: "Niedrigste Steuerungspriorität. Gelegentliche Fehlmengen akzeptieren oder bei Bedarf kaufen; Überbestand ist hier Verschwendung.",
+                        pareto_how_title: "Die Pareto-Kurve lesen",
+                        pareto_1: "SKUs sind vom höchsten zum niedrigsten Wert gereiht. Die X-Achse ist der bisher gezählte SKU-Anteil; die Y-Achse der Anteil am Gesamtwert.",
+                        pareto_2: "Ein steiler Anfang bedeutet, dass wenige Artikel den Großteil des Werts tragen (klassisches 80/20). Eine flachere Kurve verteilt den Wert gleichmäßiger.",
+                        pareto_3: "Die grüne gestrichelte Linie ist die A-Grenze ({a}% des Werts). Die blaue gestrichelte Linie ist die B-Grenze ({b}%). Grün, Blau und Grau auf der Kurve sind die Klassen A, B und C.",
+                        pareto_4: "Fahren Sie mit der Maus über einen Punkt, um kumulierte SKU-% und Wert-% an diesem Rang zu sehen.",
+                        use_title: "Ablauf",
+                        use_1: "Laden Sie eine Excel- oder CSV-Datei mit SKU, Stückkosten und Nachfrage je Periode hoch.",
+                        use_2: "Ordnen Sie die Spalten zu und passen Sie optional die ABC- und XYZ-Grenzen in der Konfiguration an.",
+                        use_3: "Starten Sie die Analyse, um Matrix, Pareto-Kurve und Artikelliste zu erzeugen.",
+                        use_4: "Klicken Sie eine Matrixzelle, um die Detailansicht zu filtern. Spalten sortieren, SKU suchen und den Bericht exportieren."
+                    }
                 },
                 list: {
                     col_class: "Klasse",
@@ -997,6 +1145,140 @@
             );
         };
 
+        const MATRIX_ABC_HEX = { A: '#10b981', B: '#3b82f6', C: '#64748b' };
+        const MATRIX_XYZ_HEX = { X: '#06b6d4', Y: '#f59e0b', Z: '#f43f5e' };
+
+        const GUIDE_CELL_BG = {
+            AX: 'bg-gradient-to-br from-emerald-100 to-cyan-200 dark:from-emerald-900/40 dark:to-cyan-800/40',
+            AY: 'bg-gradient-to-br from-emerald-50 to-amber-100 dark:from-emerald-900/20 dark:to-amber-900/20',
+            AZ: 'bg-gradient-to-br from-emerald-50 to-rose-100 dark:from-emerald-900/10 dark:to-rose-900/20',
+            BX: 'bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/20',
+            BY: 'bg-gradient-to-br from-blue-50 to-amber-100 dark:from-blue-900/20 dark:to-amber-900/20',
+            BZ: 'bg-gradient-to-br from-blue-50 to-rose-100 dark:from-blue-900/20 dark:to-rose-900/20',
+            CX: 'bg-gradient-to-br from-slate-200 to-cyan-100 dark:from-slate-800 dark:to-cyan-900/20',
+            CY: 'bg-gradient-to-br from-slate-200 to-amber-100 dark:from-slate-800 dark:to-amber-900/20',
+            CZ: 'bg-gradient-to-br from-slate-200 to-rose-100 dark:from-slate-800 dark:to-rose-900/20',
+        };
+
+        const GuideLetter = ({ letter, tone }) => (
+            <span className={`font-black text-lg leading-none ${tone}`}>{letter}</span>
+        );
+
+        const AbcXyzGuide = ({ t, abcThresholds, xyzThresholds }) => {
+            const fmtCv = (v) => {
+                const n = Number(v);
+                if (!Number.isFinite(n)) return String(v);
+                return String(Math.round(n * 100) / 100);
+            };
+            const vars = {
+                a: abcThresholds.a,
+                b: abcThresholds.b,
+                bBand: abcThresholds.b - abcThresholds.a,
+                cPct: 100 - abcThresholds.b,
+                x: fmtCv(xyzThresholds.x),
+                y: fmtCv(xyzThresholds.y),
+            };
+            const abcRows = [
+                { letter: 'A', tone: 'text-emerald-500', name: 'a_name', desc: 'a_desc' },
+                { letter: 'B', tone: 'text-blue-500', name: 'b_name', desc: 'b_desc' },
+                { letter: 'C', tone: 'text-slate-600 dark:text-slate-400', name: 'c_name', desc: 'c_desc' },
+            ];
+            const xyzRows = [
+                { letter: 'X', tone: 'text-cyan-500', name: 'x_name', desc: 'x_desc' },
+                { letter: 'Y', tone: 'text-brand-gold', name: 'y_name', desc: 'y_desc' },
+                { letter: 'Z', tone: 'text-rose-500', name: 'z_name', desc: 'z_desc' },
+            ];
+            const paretoSteps = ['pareto_1', 'pareto_2', 'pareto_3', 'pareto_4'];
+            const workflowSteps = ['use_1', 'use_2', 'use_3', 'use_4'];
+
+            return (
+                <section className="mt-8 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 md:p-6">
+                    <div className="flex items-start gap-3 mb-3">
+                        <span className="mt-0.5 text-brand-gold"><InfoIcon /></span>
+                        <div>
+                            <h3 className="text-lg font-bold">{t('dashboard.guide.title')}</h3>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-4xl">{t('dashboard.guide.intro')}</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+                        {[{ title: 'abc_title', desc: 'abc_desc', rows: abcRows }, { title: 'xyz_title', desc: 'xyz_desc', rows: xyzRows }].map((block) => (
+                            <div key={block.title} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-4">
+                                <h4 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">{t(`dashboard.guide.${block.title}`)}</h4>
+                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{t(`dashboard.guide.${block.desc}`, vars)}</p>
+                                <div className="mt-4 space-y-3">
+                                    {block.rows.map((row) => (
+                                        <div key={row.letter} className="flex gap-3">
+                                            <GuideLetter letter={row.letter} tone={row.tone} />
+                                            <div className="min-w-0">
+                                                <div className="text-sm font-bold text-slate-800 dark:text-slate-100">{t(`dashboard.guide.${row.name}`)}</div>
+                                                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{t(`dashboard.guide.${row.desc}`, vars)}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-6">
+                        <div className="mb-3">
+                            <h4 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">{t('dashboard.guide.combo_title')}</h4>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3">
+                            {['A', 'B', 'C'].flatMap((abc) => ['X', 'Y', 'Z'].map((xyz) => {
+                                const key = `${abc}${xyz}`;
+                                return (
+                                    <div
+                                        key={key}
+                                        className={`rounded-lg border p-3 ${GUIDE_CELL_BG[key]}`}
+                                        style={{
+                                            borderTopColor: MATRIX_ABC_HEX[abc],
+                                            borderLeftColor: MATRIX_ABC_HEX[abc],
+                                            borderRightColor: MATRIX_XYZ_HEX[xyz],
+                                            borderBottomColor: MATRIX_XYZ_HEX[xyz],
+                                        }}
+                                    >
+                                        <div className="flex items-baseline gap-0">
+                                            <GuideLetter letter={abc} tone={abc === 'A' ? 'text-emerald-500' : abc === 'B' ? 'text-blue-500' : 'text-slate-600 dark:text-slate-400'} />
+                                            <GuideLetter letter={xyz} tone={xyz === 'X' ? 'text-cyan-500' : xyz === 'Y' ? 'text-brand-gold' : 'text-rose-500'} />
+                                        </div>
+                                        <div className="mt-1.5 text-xs font-bold text-slate-800 dark:text-slate-100">{t(`dashboard.guide.${key.toLowerCase()}_title`)}</div>
+                                        <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">{t(`dashboard.guide.${key.toLowerCase()}_desc`)}</p>
+                                    </div>
+                                );
+                            }))}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+                        <div className="rounded-lg border border-slate-200 dark:border-slate-800 p-4">
+                            <h4 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">{t('dashboard.guide.pareto_how_title')}</h4>
+                            <ol className="mt-3 space-y-2.5">
+                                {paretoSteps.map((step, i) => (
+                                    <li key={step} className="flex gap-3 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                        <span className="shrink-0 w-5 h-5 rounded-full bg-brand-gold/15 text-brand-gold text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                                        <span>{t(`dashboard.guide.${step}`, vars)}</span>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 dark:border-slate-800 p-4">
+                            <h4 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">{t('dashboard.guide.use_title')}</h4>
+                            <ol className="mt-3 space-y-2.5">
+                                {workflowSteps.map((step, i) => (
+                                    <li key={step} className="flex gap-3 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                        <span className="shrink-0 w-5 h-5 rounded-full bg-brand-gold/15 text-brand-gold text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                                        <span>{t(`dashboard.guide.${step}`)}</span>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
         const MainApp = () => {
             const [theme, setTheme] = useOperartisTheme();
             const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
@@ -1058,6 +1340,8 @@
             const [searchActive, setSearchActive] = useState(false);
             const searchInputRef = useRef(null);
             const [filterClass, setFilterClass] = useState(null);
+            const [sortKey, setSortKey] = useState('class');
+            const [sortDir, setSortDir] = useState('asc');
             const fileInputRef = useRef(null);
 
             const paretoChartData = useMemo(
@@ -1065,6 +1349,69 @@
                 [analysisData, abcThresholds.a, abcThresholds.b]
             );
             const interfaceReady = analysisData.length > 0;
+
+            const handleSort = useCallback((key) => {
+                setSortKey((prev) => {
+                    if (prev === key) {
+                        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                        return prev;
+                    }
+                    setSortDir(key === 'totalValue' || key === 'cv' || key === 'avgDemand' ? 'desc' : 'asc');
+                    return key;
+                });
+            }, []);
+
+            const filteredSortedRows = useMemo(() => {
+                const q = String(searchTerm || '').toLowerCase();
+                const rows = analysisData.filter((item) => {
+                    const matchSearch = String(item.sku).toLowerCase().includes(q);
+                    const matchFilter = filterClass ? item.class === filterClass : true;
+                    return matchSearch && matchFilter;
+                });
+                const dir = sortDir === 'asc' ? 1 : -1;
+                const num = (v) => {
+                    const n = Number(v);
+                    return Number.isFinite(n) ? n : 0;
+                };
+                rows.sort((a, b) => {
+                    let cmp = 0;
+                    if (sortKey === 'sku') {
+                        cmp = String(a.sku).localeCompare(String(b.sku), undefined, { numeric: true, sensitivity: 'base' });
+                    } else if (sortKey === 'class') {
+                        cmp = String(a.class || '').localeCompare(String(b.class || ''));
+                    } else if (sortKey === 'pattern') {
+                        cmp = String(a.xyz || '').localeCompare(String(b.xyz || ''));
+                        if (cmp === 0) cmp = num(a.cv) - num(b.cv);
+                    } else if (sortKey === 'totalValue' || sortKey === 'cv' || sortKey === 'avgDemand') {
+                        cmp = num(a[sortKey]) - num(b[sortKey]);
+                    }
+                    if (cmp === 0) {
+                        cmp = String(a.sku).localeCompare(String(b.sku), undefined, { numeric: true, sensitivity: 'base' });
+                    }
+                    return cmp * dir;
+                });
+                return rows;
+            }, [analysisData, searchTerm, filterClass, sortKey, sortDir]);
+
+            const SortHeader = ({ columnKey, label, align = 'left', thClassName = '' }) => {
+                const active = sortKey === columnKey;
+                const alignClass = align === 'right' ? 'justify-end text-right' : 'justify-start text-left';
+                return (
+                    <th className={`px-6 py-3 ${align === 'right' ? 'text-right' : ''} ${thClassName}`}>
+                        <button
+                            type="button"
+                            onClick={() => handleSort(columnKey)}
+                            className={`inline-flex items-center gap-1 max-w-full uppercase ${alignClass} hover:text-brand-gold transition-colors ${active ? 'text-brand-gold' : ''}`}
+                            aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                        >
+                            <span>{label}</span>
+                            <span className={`shrink-0 text-[9px] leading-none ${active ? 'opacity-100' : 'opacity-35'}`} aria-hidden="true">
+                                {active ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+                            </span>
+                        </button>
+                    </th>
+                );
+            };
 
             // I18n State
             const [lang, setLang] = useState(() => window.getOperartisLang());
@@ -1078,18 +1425,22 @@
                 return () => window.removeEventListener('operartis:lang-change', handler);
             }, []);
 
-            const t = (key) => {
+            const t = (key, vars) => {
                 const keys = key.split('.');
                 let val = TRANSLATIONS[lang] || TRANSLATIONS.en;
                 for (const k of keys) {
                     val = val ? val[k] : null;
                 }
-                if (val != null) return val;
-                let fallback = TRANSLATIONS.en;
-                for (const k of keys) {
-                    fallback = fallback ? fallback[k] : null;
+                if (val == null) {
+                    let fallback = TRANSLATIONS.en;
+                    for (const k of keys) {
+                        fallback = fallback ? fallback[k] : null;
+                    }
+                    val = fallback;
                 }
-                return fallback || key;
+                if (val == null) return key;
+                if (typeof val !== 'string' || !vars) return val;
+                return val.replace(/\{(\w+)\}/g, (_, name) => (vars[name] != null ? String(vars[name]) : `{${name}}`));
             };
 
             const environmentBadge = getEnvironmentBadgeConfig(getDeploymentEnvironment());
@@ -1230,6 +1581,8 @@
                 setIsAnalyzing(false);
                 setActiveTab('dashboard');
                 setSearchTerm('');
+                setSortKey('class');
+                setSortDir('asc');
                 if (fileInputRef.current) fileInputRef.current.value = "";
                 setIsSidebarOpen(false);
             };
@@ -1368,8 +1721,8 @@
                     // Conditional Color for Class (Col 2)
                     let argb = 'FFFFFFFF';
                     const c = item.class;
-                    if (c.startsWith('A')) argb = c.endsWith('X') ? 'FFD1FAE5' : c.endsWith('Y') ? 'FFFEF3C7' : 'FFFFE4E6';
-                    else if (c.startsWith('B')) argb = c.endsWith('X') ? 'FFDBEAFE' : c.endsWith('Y') ? 'FFFEF3C7' : 'FFFFE4E6';
+                    if (c.startsWith('A')) argb = c.endsWith('X') ? 'FFCFFAFE' : c.endsWith('Y') ? 'FFFEF3C7' : 'FFFFE4E6';
+                    else if (c.startsWith('B')) argb = c.endsWith('X') ? 'FFCFFAFE' : c.endsWith('Y') ? 'FFFEF3C7' : 'FFFFE4E6';
                     else if (c.startsWith('C')) argb = 'FFF1F5F9';
 
                     const classCell = row.getCell(2);
@@ -1623,7 +1976,7 @@
                                         <div className="space-y-3">
                                             <div>
                                                 <div className="flex justify-between text-xxs font-bold mb-1">
-                                                    <span className="text-emerald-500">X</span>
+                                                    <span className="text-cyan-500">X</span>
                                                     <span className="text-slate-600 dark:text-slate-300">CV &lt; {xyzThresholds.x}</span>
                                                 </div>
                                                 <input
@@ -1809,30 +2162,36 @@
 
                                                             // Gradient Logic for Matrix Cards
                                                             // A=Emerald, B=Blue, C=Slate
-                                                            // X=Emerald, Y=Amber, Z=Rose
+                                                            // X=Cyan, Y=Amber, Z=Rose
                                                             let bgClass = 'bg-white dark:bg-slate-800'; // Default
 
-                                                            if (key === 'AX') bgClass = 'bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/40 dark:to-emerald-800/40 border-emerald-200 dark:border-emerald-700';
-                                                            else if (key === 'AY') bgClass = 'bg-gradient-to-br from-emerald-50 to-amber-100 dark:from-emerald-900/20 dark:to-amber-900/20 border-emerald-100 dark:border-emerald-800';
-                                                            else if (key === 'AZ') bgClass = 'bg-gradient-to-br from-emerald-50 to-rose-100 dark:from-emerald-900/10 dark:to-rose-900/20 border-rose-100 dark:border-rose-900';
+                                                            if (key === 'AX') bgClass = 'bg-gradient-to-br from-emerald-100 to-cyan-200 dark:from-emerald-900/40 dark:to-cyan-800/40';
+                                                            else if (key === 'AY') bgClass = 'bg-gradient-to-br from-emerald-50 to-amber-100 dark:from-emerald-900/20 dark:to-amber-900/20';
+                                                            else if (key === 'AZ') bgClass = 'bg-gradient-to-br from-emerald-50 to-rose-100 dark:from-emerald-900/10 dark:to-rose-900/20';
 
-                                                            else if (key === 'BX') bgClass = 'bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900/30 dark:to-emerald-900/20 border-blue-200 dark:border-blue-800';
-                                                            else if (key === 'BY') bgClass = 'bg-gradient-to-br from-blue-50 to-amber-100 dark:from-blue-900/20 dark:to-amber-900/20 border-blue-100 dark:border-blue-800';
-                                                            else if (key === 'BZ') bgClass = 'bg-gradient-to-br from-blue-50 to-rose-100 dark:from-blue-900/20 dark:to-rose-900/20 border-rose-100 dark:border-rose-900';
+                                                            else if (key === 'BX') bgClass = 'bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/20';
+                                                            else if (key === 'BY') bgClass = 'bg-gradient-to-br from-blue-50 to-amber-100 dark:from-blue-900/20 dark:to-amber-900/20';
+                                                            else if (key === 'BZ') bgClass = 'bg-gradient-to-br from-blue-50 to-rose-100 dark:from-blue-900/20 dark:to-rose-900/20';
 
-                                                            else if (key === 'CX') bgClass = 'bg-gradient-to-br from-slate-200 to-emerald-100 dark:from-slate-800 dark:to-emerald-900/20 border-slate-300 dark:border-slate-700';
-                                                            else if (key === 'CY') bgClass = 'bg-gradient-to-br from-slate-200 to-amber-100 dark:from-slate-800 dark:to-amber-900/20 border-slate-300 dark:border-slate-700';
-                                                            else if (key === 'CZ') bgClass = 'bg-gradient-to-br from-slate-200 to-rose-100 dark:from-slate-800 dark:to-rose-900/20 border-slate-300 dark:border-slate-700';
+                                                            else if (key === 'CX') bgClass = 'bg-gradient-to-br from-slate-200 to-cyan-100 dark:from-slate-800 dark:to-cyan-900/20';
+                                                            else if (key === 'CY') bgClass = 'bg-gradient-to-br from-slate-200 to-amber-100 dark:from-slate-800 dark:to-amber-900/20';
+                                                            else if (key === 'CZ') bgClass = 'bg-gradient-to-br from-slate-200 to-rose-100 dark:from-slate-800 dark:to-rose-900/20';
 
                                                             return (
                                                                 <div
                                                                     key={key}
                                                                     onClick={() => { setFilterClass(key); setActiveTab('list'); }}
                                                                     className={`rounded-lg border p-2 md:p-4 flex flex-col justify-between relative overflow-hidden transition-all hover:scale-[1.02] hover:shadow-md cursor-pointer ${bgClass}`}
+                                                                    style={{
+                                                                        borderTopColor: MATRIX_ABC_HEX[row],
+                                                                        borderLeftColor: MATRIX_ABC_HEX[row],
+                                                                        borderRightColor: MATRIX_XYZ_HEX[col],
+                                                                        borderBottomColor: MATRIX_XYZ_HEX[col],
+                                                                    }}
                                                                 >
                                                                     <div className="absolute top-1 right-1 md:top-2 md:right-2 text-xl md:text-2xl font-black pointer-events-none flex">
                                                                         <span className={row === 'A' ? 'text-emerald-500' : row === 'B' ? 'text-blue-500' : 'text-slate-600 dark:text-slate-400'}>{row}</span>
-                                                                        <span className={col === 'X' ? 'text-emerald-500' : col === 'Y' ? 'text-brand-gold' : 'text-rose-500'}>{col}</span>
+                                                                        <span className={col === 'X' ? 'text-cyan-500' : col === 'Y' ? 'text-brand-gold' : 'text-rose-500'}>{col}</span>
                                                                     </div>
                                                                     <div>
                                                                         <div className="text-xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">{data.count}</div>
@@ -1923,6 +2282,12 @@
                                             </div>
 
                                         </div>
+
+                                        <AbcXyzGuide
+                                            t={t}
+                                            abcThresholds={abcThresholds}
+                                            xyzThresholds={xyzThresholds}
+                                        />
                                     </div>
                                 )}
 
@@ -1934,30 +2299,26 @@
                                             <table className="w-full text-left text-sm min-w-0 sm:min-w-[600px]">
                                                 <thead className="bg-slate-100 dark:bg-slate-900 sticky top-0 z-10 text-xs font-bold uppercase text-slate-500">
                                                     <tr>
-                                                        <th className="px-6 py-3">{t('list.col_class')}</th>
-                                                        <th className="px-6 py-3">{t('list.col_sku')}</th>
-                                                        <th className="px-6 py-3 text-right">{t('list.col_val')}</th>
-                                                        <th className="hidden sm:table-cell px-6 py-3 text-right">{t('list.col_cv')}</th>
-                                                        <th className="px-6 py-3 text-right">{t('list.col_avg')}</th>
-                                                        <th className="px-6 py-3">{t('list.col_pattern')}</th>
+                                                        <SortHeader columnKey="class" label={t('list.col_class')} />
+                                                        <SortHeader columnKey="sku" label={t('list.col_sku')} />
+                                                        <SortHeader columnKey="totalValue" label={t('list.col_val')} align="right" />
+                                                        <SortHeader columnKey="cv" label={t('list.col_cv')} align="right" thClassName="hidden sm:table-cell" />
+                                                        <SortHeader columnKey="avgDemand" label={t('list.col_avg')} align="right" />
+                                                        <SortHeader columnKey="pattern" label={t('list.col_pattern')} />
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-950">
-                                                    {analysisData
-                                                        .filter(item => {
-                                                            const matchSearch = item.sku.toString().toLowerCase().includes(searchTerm.toLowerCase());
-                                                            const matchFilter = filterClass ? item.class === filterClass : true;
-                                                            return matchSearch && matchFilter;
-                                                        })
-                                                        .slice(0, 100) // Render limit for performance
-                                                        .map((item, idx) => (
-                                                            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                                                    {filteredSortedRows
+                                                        .slice(0, 100)
+                                                        .map((item) => (
+                                                            <tr key={item.sku} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
                                                                 <td className="px-6 py-3">
-                                                                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${item.abc === 'A' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                                                        item.abc === 'B' ? 'bg-blue-50 text-blue-600 border-blue-200' :
-                                                                            'bg-slate-50 text-slate-500 border-slate-200'
+                                                                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${item.abc === 'A' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-800' :
+                                                                        item.abc === 'B' ? 'bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-800' :
+                                                                            'bg-slate-50 border-slate-200 dark:bg-slate-800 dark:border-slate-700'
                                                                         }`}>
-                                                                        {item.class}
+                                                                        <span className={item.abc === 'A' ? 'text-emerald-600 dark:text-emerald-400' : item.abc === 'B' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}>{item.abc}</span>
+                                                                        <span className={item.xyz === 'X' ? 'text-cyan-600 dark:text-cyan-400' : item.xyz === 'Y' ? 'text-amber-600 dark:text-amber-400' : 'text-rose-500 dark:text-rose-400'}>{item.xyz}</span>
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-3 font-mono text-slate-700 dark:text-slate-300 font-bold">{item.sku}</td>
@@ -1968,7 +2329,7 @@
                                                                     {/* Micro Chart */}
                                                                     <ResponsiveContainer width="100%" height="100%">
                                                                         <LineChart data={item.demandHistory.map((d, i) => ({ v: d }))}>
-                                                                            <Line type="monotone" dataKey="v" stroke={item.xyz === 'X' ? '#10b981' : item.xyz === 'Y' ? '#f59e0b' : '#ef4444'} strokeWidth={1.5} dot={false} />
+                                                                            <Line type="monotone" dataKey="v" stroke={item.xyz === 'X' ? '#06b6d4' : item.xyz === 'Y' ? '#f59e0b' : '#ef4444'} strokeWidth={1.5} dot={false} />
                                                                         </LineChart>
                                                                     </ResponsiveContainer>
                                                                 </td>
@@ -1976,9 +2337,9 @@
                                                         ))}
                                                 </tbody>
                                             </table>
-                                            {analysisData.length > 100 && (
+                                            {filteredSortedRows.length > 100 && (
                                                 <div className="p-4 text-center text-xs text-slate-400 italic">
-                                                    {t('list.showing_msg')} 100 {t('list.items_msg')} {analysisData.length}
+                                                    {t('list.showing_msg')} 100 {t('list.items_msg')} {filteredSortedRows.length}
                                                 </div>
                                             )}
                                         </div>
