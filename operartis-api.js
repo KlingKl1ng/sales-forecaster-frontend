@@ -118,6 +118,7 @@
         }
 
         return path === '/batch_init' ||
+            path.indexOf('/batch_cancel/') === 0 ||
             path === '/export' ||
             path === '/export-fast' ||
             path === '/synthesis/init' ||

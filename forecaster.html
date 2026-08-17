@@ -686,7 +686,7 @@
         };
     </script>
     <link rel="stylesheet" href="./operartis-access-shell.css?v=20260622-access-mobile-full">
-    <script src="./operartis-api.js?v=20260622-auth-session-sync"></script>
+    <script src="./operartis-api.js?v=20260817-cloud-forecast"></script>
     <script src="./operartis-auth-ui.js?v=20260623-display-name"></script>
     <script src="./operartis-access-gate.js?v=20260622-access-mobile-full"></script>
     <script src="./vendor/react-17.0.2.production.min.js"></script>
@@ -739,6 +739,14 @@
                     edit_mapping: "Edit Mapping",
                     configuration: "Configuration",
                     action: "Action",
+                    model_profile: "Forecast Profile",
+                    model_basic_auto: "Basic Automatic",
+                    model_advanced_auto: "Advanced Automatic",
+                    model_arma: "ARMA",
+                    model_arima: "ARIMA",
+                    model_mlp: "Neural MLP",
+                    cloud_checking: "Checking cloud forecasting availability...",
+                    cloud_unavailable: "Advanced profiles require cloud forecasting, which is currently unavailable.",
                     val_method: "Validation Method",
                     train_h: "Train Horizon",
                     test_h: "Test Horizon",
@@ -783,6 +791,24 @@
                     title: "MACHINE-LEARNING FORECASTER",
                     local: "LOCAL",
                     cloud: "CLOUD"
+                },
+                job: {
+                    execution_backend: "Execution",
+                    backend_local: "Local",
+                    backend_cloud: "Cloud",
+                    backend_pending: "Pending",
+                    progress: "Progress",
+                    cancel: "Cancel",
+                    canceling: "Canceling...",
+                    status_queued: "Queued",
+                    status_processing: "Processing",
+                    status_completed: "Completed",
+                    status_failed: "Failed",
+                    status_canceled: "Canceled",
+                    status_cancel_requested: "Cancel requested",
+                    advanced_export_required: "Advanced forecasts must finish before they can be exported from persisted results.",
+                    max_skus: "A batch can contain at most 100 SKUs.",
+                    cancel_failed: "The forecast could not be canceled. Status polling has resumed."
                 },
                 dashboard: {
                     batch_overview: "Overview",
@@ -846,6 +872,14 @@
                     edit_mapping: "Chỉnh sửa dữ liệu",
                     configuration: "Cấu hình",
                     action: "Hành động",
+                    model_profile: "Hồ sơ dự báo",
+                    model_basic_auto: "Tự động cơ bản",
+                    model_advanced_auto: "Tự động nâng cao",
+                    model_arma: "ARMA",
+                    model_arima: "ARIMA",
+                    model_mlp: "MLP mạng nơ-ron",
+                    cloud_checking: "Đang kiểm tra khả năng dự báo đám mây...",
+                    cloud_unavailable: "Các hồ sơ nâng cao cần dự báo đám mây, hiện không khả dụng.",
                     val_method: "Phương pháp kiểm định",
                     train_h: "Chu kỳ H.luyện",
                     test_h: "Chu kỳ K.định",
@@ -890,6 +924,24 @@
                     title: "DỰ BÁO HỌC MÁY",
                     local: "LOCAL",
                     cloud: "CLOUD"
+                },
+                job: {
+                    execution_backend: "Nơi thực thi",
+                    backend_local: "Cục bộ",
+                    backend_cloud: "Đám mây",
+                    backend_pending: "Đang chờ",
+                    progress: "Tiến độ",
+                    cancel: "Hủy",
+                    canceling: "Đang hủy...",
+                    status_queued: "Đang xếp hàng",
+                    status_processing: "Đang xử lý",
+                    status_completed: "Hoàn tất",
+                    status_failed: "Thất bại",
+                    status_canceled: "Đã hủy",
+                    status_cancel_requested: "Đã yêu cầu hủy",
+                    advanced_export_required: "Dự báo nâng cao phải hoàn tất trước khi xuất từ kết quả đã lưu.",
+                    max_skus: "Mỗi lô chỉ có thể chứa tối đa 100 SKU.",
+                    cancel_failed: "Không thể hủy dự báo. Việc kiểm tra trạng thái đã tiếp tục."
                 },
                 dashboard: {
                     batch_overview: "Tổng quan",
@@ -953,6 +1005,14 @@
                     edit_mapping: "Zuordnung bearbeiten",
                     configuration: "Konfiguration",
                     action: "Aktion",
+                    model_profile: "Prognoseprofil",
+                    model_basic_auto: "Basis-Automatik",
+                    model_advanced_auto: "Erweiterte Automatik",
+                    model_arma: "ARMA",
+                    model_arima: "ARIMA",
+                    model_mlp: "Neuronales MLP",
+                    cloud_checking: "Cloud-Prognoseverfügbarkeit wird geprüft...",
+                    cloud_unavailable: "Erweiterte Profile benötigen die derzeit nicht verfügbare Cloud-Prognose.",
                     val_method: "Validierungsmethode",
                     train_h: "Train-Horizont",
                     test_h: "Test-Horizont",
@@ -997,6 +1057,24 @@
                     title: "MACHINE-LEARNING FORECASTER",
                     local: "LOCAL",
                     cloud: "CLOUD"
+                },
+                job: {
+                    execution_backend: "Ausführung",
+                    backend_local: "Lokal",
+                    backend_cloud: "Cloud",
+                    backend_pending: "Ausstehend",
+                    progress: "Fortschritt",
+                    cancel: "Abbrechen",
+                    canceling: "Wird abgebrochen...",
+                    status_queued: "In Warteschlange",
+                    status_processing: "In Verarbeitung",
+                    status_completed: "Abgeschlossen",
+                    status_failed: "Fehlgeschlagen",
+                    status_canceled: "Abgebrochen",
+                    status_cancel_requested: "Abbruch angefordert",
+                    advanced_export_required: "Erweiterte Prognosen müssen abgeschlossen sein, bevor persistierte Ergebnisse exportiert werden können.",
+                    max_skus: "Ein Batch darf höchstens 100 SKUs enthalten.",
+                    cancel_failed: "Die Prognose konnte nicht abgebrochen werden. Die Statusabfrage wurde fortgesetzt."
                 },
                 dashboard: {
                     batch_overview: "Batch-Übersicht",
@@ -1092,6 +1170,91 @@
             LOCAL: (window.OperartisApi && window.OperartisApi.getDefaultApiBase()) || window.location.origin || 'http://127.0.0.1:8000',
             PROD: window.OperartisApi ? window.OperartisApi.getDefaultApiBase() : 'https://api.operartis.io'
         };
+        const FORECAST_CAPABILITY_PATH = '/forecast-capabilities';
+        const FORECAST_MODEL_OPTIONS = [
+            { value: 'auto', labelKey: 'sidebar.model_basic_auto', advanced: false },
+            { value: 'advanced_auto', labelKey: 'sidebar.model_advanced_auto', advanced: true },
+            { value: 'arma', labelKey: 'sidebar.model_arma', advanced: true },
+            { value: 'arima', labelKey: 'sidebar.model_arima', advanced: true },
+            { value: 'mlp', labelKey: 'sidebar.model_mlp', advanced: true },
+        ];
+        const ADVANCED_MODEL_TYPES = new Set(
+            FORECAST_MODEL_OPTIONS.filter((option) => option.advanced).map((option) => option.value)
+        );
+        const TERMINAL_JOB_STATUSES = new Set(['completed', 'failed', 'canceled']);
+
+        const isAdvancedModelType = (modelType) => ADVANCED_MODEL_TYPES.has(String(modelType || '').toLowerCase());
+
+        const normalizeJobStatus = (status) => {
+            const normalized = String(status || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+            if (normalized === 'cancelled') return 'canceled';
+            if (normalized === 'cancelling' || normalized === 'canceling') return 'cancel_requested';
+            if (normalized === 'running' || normalized === 'in_progress') return 'processing';
+            if (normalized === 'pending') return 'queued';
+            return normalized || 'queued';
+        };
+
+        const normalizeExecutionBackend = (backend) => {
+            const normalized = String(backend || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+            if (normalized.indexOf('cloud') !== -1 || normalized === 'remote') return 'cloud';
+            if (normalized.indexOf('local') !== -1 || normalized.indexOf('cx32') !== -1 || normalized.indexOf('hetzner') !== -1) return 'local';
+            return null;
+        };
+
+        const parseForecastCapabilities = (data) => {
+            const payload = data && typeof data === 'object' ? data : {};
+            const nested = payload.cloud_forecasting && typeof payload.cloud_forecasting === 'object'
+                ? payload.cloud_forecasting
+                : payload.forecasting && typeof payload.forecasting === 'object'
+                    ? payload.forecasting
+                    : payload;
+            const rawEnabled = [
+                nested.enabled,
+                nested.cloud_enabled,
+                payload.cloud_forecasting_enabled,
+                payload.forecast_cloud_enabled,
+                payload.cloud_enabled,
+            ].find((value) => typeof value === 'boolean' || typeof value === 'string');
+            const cloudEnabled = rawEnabled === true || String(rawEnabled).toLowerCase() === 'true';
+            const declaredModels = nested.available_model_types
+                || nested.available_models
+                || nested.advanced_models
+                || nested.models
+                || payload.available_model_types
+                || payload.available_models
+                || payload.advanced_models
+                || payload.models;
+            const supportedModels = Array.isArray(declaredModels)
+                ? declaredModels.map((item) => String(
+                    item && typeof item === 'object'
+                        ? (item.value || item.model_type || item.id || item.name || '')
+                        : item
+                ).toLowerCase()).filter(Boolean)
+                : declaredModels && typeof declaredModels === 'object'
+                    ? Object.keys(declaredModels).filter((model) => {
+                        const config = declaredModels[model];
+                        return !config || typeof config !== 'object' || config.available !== false;
+                    }).map((model) => model.toLowerCase())
+                    : [];
+            return { cloudEnabled, supportedModels };
+        };
+
+        const readResponseError = async (response, fallback) => {
+            try {
+                const data = await response.json();
+                const detail = data && (data.detail || data.message || data.error);
+                if (typeof detail === 'string' && detail.trim()) return detail;
+            } catch (_) { }
+            return fallback;
+        };
+
+        const getAdaptivePollDelay = ({ cloud, unchangedPolls, hadError }) => {
+            const baseDelay = cloud ? 2000 : 1000;
+            const maxDelay = cloud ? 15000 : 5000;
+            const exponent = Math.min(Math.max(unchangedPolls, 0), cloud ? 6 : 4);
+            const errorMultiplier = hadError ? 2 : 1;
+            return Math.min(maxDelay, Math.round(baseDelay * Math.pow(1.5, exponent) * errorMultiplier));
+        };
 
         const getDeploymentEnvironment = () => {
             const host = window.location.hostname;
@@ -1117,6 +1280,74 @@
             }
             return null;
         };
+
+        const JobStatusBar = memo(({ status, executionBackend, completedCount, totalCount, canCancel, isCancelling, onCancel, t }) => {
+            if (!status) return null;
+            const normalizedStatus = normalizeJobStatus(status);
+            const safeCompleted = Number.isFinite(Number(completedCount)) ? Math.max(0, Number(completedCount)) : 0;
+            const safeTotal = Number.isFinite(Number(totalCount)) ? Math.max(0, Number(totalCount)) : 0;
+            const hasProgress = safeTotal > 0;
+            const progressPercent = hasProgress ? Math.min(100, Math.round((safeCompleted / safeTotal) * 100)) : 0;
+            const backendLabel = executionBackend === 'cloud'
+                ? t('job.backend_cloud')
+                : executionBackend === 'local'
+                    ? t('job.backend_local')
+                    : t('job.backend_pending');
+            const statusLabel = t(`job.status_${normalizedStatus}`);
+            const statusClass = normalizedStatus === 'failed'
+                ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40'
+                : normalizedStatus === 'completed'
+                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40'
+                    : normalizedStatus === 'canceled'
+                        ? 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
+                        : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40';
+
+            return (
+                <div
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 sm:px-6 py-2 bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-800 text-[10px] sm:text-xs text-slate-600 dark:text-slate-300"
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="false"
+                >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="w-3.5 h-3.5 shrink-0 [&_svg]:w-full [&_svg]:h-full" aria-hidden="true"><ServerIcon /></span>
+                        <span className="font-semibold whitespace-nowrap">{t('job.execution_backend')}:</span>
+                        <strong className="truncate">{backendLabel}</strong>
+                    </div>
+                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 font-bold whitespace-nowrap ${statusClass}`}>
+                        {statusLabel}
+                    </span>
+                    {hasProgress && (
+                        <div className="order-last basis-full sm:order-none sm:basis-auto sm:flex-1 flex items-center gap-2 min-w-[8rem]">
+                            <span className="font-semibold whitespace-nowrap">
+                                {t('job.progress')}: {safeCompleted}/{safeTotal}
+                            </span>
+                            <div
+                                className="h-1.5 flex-1 min-w-[4rem] overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"
+                                role="progressbar"
+                                aria-label={t('job.progress')}
+                                aria-valuemin="0"
+                                aria-valuemax={safeTotal}
+                                aria-valuenow={Math.min(safeCompleted, safeTotal)}
+                            >
+                                <div className="h-full rounded-full bg-brand-gold transition-[width] duration-300" style={{ width: `${progressPercent}%` }}></div>
+                            </div>
+                        </div>
+                    )}
+                    {canCancel && (
+                        <button
+                            type="button"
+                            onClick={onCancel}
+                            disabled={isCancelling}
+                            className="ml-auto inline-flex min-h-9 items-center justify-center rounded-lg border border-rose-200 dark:border-rose-900/50 px-3 font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:cursor-wait disabled:opacity-60 transition-colors"
+                            aria-label={isCancelling ? t('job.canceling') : t('job.cancel')}
+                        >
+                            {isCancelling ? t('job.canceling') : t('job.cancel')}
+                        </button>
+                    )}
+                </div>
+            );
+        });
 
         const MetricTile = memo(({ label, shortLabel, value, subValue, type, isDark, variant = 'default', highlight }) => {
             const colorClass = type === 'pos' ? 'text-emerald-600 dark:text-emerald-400' : type === 'neg' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-white';
@@ -1566,7 +1797,7 @@
                                 </div>
                                 <div className="min-w-0">
                                     <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
-                                    <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate">{r.best_ts_model || '-'}</p>
+                                    <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</p>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
@@ -1623,7 +1854,7 @@
                             <span className="block truncate" title={validationLabel}>{validationLabel}</span>
                         </td>
                         <td className="p-2 lg:p-3 w-24 lg:w-28 text-slate-600 dark:text-slate-300 uppercase text-center overflow-hidden">
-                            <span className="block truncate">{r.best_ts_model || '-'}</span>
+                            <span className="block truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</span>
                         </td>
                         <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(r.mae_validation)}</td>
                         <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(r.mse_validation)}</td>
@@ -2413,6 +2644,7 @@
             const [startColIdx, setStartColIdx] = useState(-1);
             const [endColIdx, setEndColIdx] = useState(-1);
 
+            const [modelType, setModelType] = useState("auto");
             const [trainHorizon, setTrainHorizon] = useState("24");
             const [testHorizon, setTestHorizon] = useState("6");
             const [validationMethod, setValidationMethod] = useState("simple");
@@ -2424,9 +2656,14 @@
 
             // Job State
             const [jobId, setJobId] = useState(null);
+            const [completedJobIds, setCompletedJobIds] = useState([]);
             const [isPolling, setIsPolling] = useState(false);
             const [batchResults, setBatchResults] = useState(null);
             const [jobStatus, setJobStatus] = useState(null);
+            const [jobModelType, setJobModelType] = useState(null);
+            const [executionBackend, setExecutionBackend] = useState(null);
+            const [jobProgress, setJobProgress] = useState({ completed: 0, total: 0 });
+            const [isCancelling, setIsCancelling] = useState(false);
             const [error, setError] = useState(null);
             const [isExporting, setIsExporting] = useState(false);
             // Invalidates in-flight polls when a newer run starts (avoids toggling isPolling off).
@@ -2474,6 +2711,12 @@
             // API State
             const [apiUrl, setApiUrl] = useState(API_ENDPOINTS.PROD);
             const [connectionStatus, setConnectionStatus] = useState('checking');
+            const [forecastCapabilities, setForecastCapabilities] = useState({
+                status: 'loading',
+                cloudEnabled: false,
+                supportedModels: [],
+            });
+            const [capabilityRefreshToken, setCapabilityRefreshToken] = useState(0);
             const deploymentEnvironment = getDeploymentEnvironment();
             const environmentBadge = getEnvironmentBadgeConfig(deploymentEnvironment);
             const BASE_URL = apiUrl;
@@ -2515,6 +2758,58 @@
                 checkConnection();
             }, [deploymentEnvironment]);
 
+            useEffect(() => {
+                const refreshCapabilities = () => setCapabilityRefreshToken((current) => current + 1);
+                window.addEventListener('operartis:authenticated', refreshCapabilities);
+                return () => window.removeEventListener('operartis:authenticated', refreshCapabilities);
+            }, []);
+
+            useEffect(() => {
+                let disposed = false;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const loadForecastCapabilities = async () => {
+                    setForecastCapabilities({ status: 'loading', cloudEnabled: false, supportedModels: [] });
+                    try {
+                        const response = await fetch(`${BASE_URL}${FORECAST_CAPABILITY_PATH}`, {
+                            method: 'GET',
+                            signal: controller.signal,
+                        });
+                        if (!response.ok) throw new Error(`Capability request failed (${response.status})`);
+                        const parsed = parseForecastCapabilities(await response.json());
+                        if (disposed) return;
+                        setForecastCapabilities({ status: 'ready', ...parsed });
+                        setModelType((current) => (
+                            isAdvancedModelType(current)
+                            && (
+                                !parsed.cloudEnabled
+                                || (
+                                    parsed.supportedModels.length > 0
+                                    && !parsed.supportedModels.includes(String(current).toLowerCase())
+                                )
+                            )
+                        ) ? 'auto' : current);
+                    } catch (capabilityError) {
+                        if (disposed) return;
+                        setForecastCapabilities({ status: 'unavailable', cloudEnabled: false, supportedModels: [] });
+                        setModelType((current) => isAdvancedModelType(current) ? 'auto' : current);
+                        if (capabilityError.name !== 'AbortError') {
+                            console.warn('Cloud forecasting capabilities unavailable:', capabilityError);
+                        }
+                    } finally {
+                        clearTimeout(timeoutId);
+                    }
+                };
+
+                loadForecastCapabilities();
+                return () => {
+                    disposed = true;
+                    clearTimeout(timeoutId);
+                    controller.abort();
+                };
+            }, [BASE_URL, capabilityRefreshToken]);
+
             // Toggle mobile scroll behavior based on results presence - DISABLE for fixed view
             // useEffect(() => {
             //     if (batchResults && batchResults.length > 0) {
@@ -2550,20 +2845,59 @@
                 return fallback || key;
             };
 
+            const isForecastModelAvailable = (candidate) => {
+                if (!isAdvancedModelType(candidate)) return true;
+                if (forecastCapabilities.status !== 'ready' || !forecastCapabilities.cloudEnabled) return false;
+                return forecastCapabilities.supportedModels.length === 0
+                    || forecastCapabilities.supportedModels.includes(String(candidate).toLowerCase());
+            };
+
             // --- POLLING (merge partial results as each SKU completes) ---
             useEffect(() => {
-                let cancelled = false;
-                let interval;
+                let disposed = false;
+                let timeoutId = null;
+                let activeController = null;
                 if (isPolling && jobId) {
                     const polledJobId = jobId;
                     const generation = runGenerationRef.current;
-                    const pollOnce = async () => {
-                        try {
-                            const res = await fetch(`${BASE_URL}/batch_status/${polledJobId}`);
-                            const data = await res.json();
-                            if (cancelled || generation !== runGenerationRef.current) return;
+                    let unchangedPolls = 0;
+                    let lastCompleted = -1;
+                    let lastStatus = '';
+                    let pollBackend = executionBackend || (isAdvancedModelType(jobModelType) ? 'cloud' : 'local');
 
-                            setJobStatus(data.status);
+                    const scheduleNextPoll = (hadError) => {
+                        if (disposed || generation !== runGenerationRef.current) return;
+                        const delay = getAdaptivePollDelay({
+                            cloud: pollBackend === 'cloud',
+                            unchangedPolls,
+                            hadError,
+                        });
+                        timeoutId = setTimeout(pollOnce, delay);
+                    };
+
+                    const pollOnce = async () => {
+                        let shouldContinue = true;
+                        let hadError = false;
+                        activeController = new AbortController();
+                        try {
+                            const res = await fetch(`${BASE_URL}/batch_status/${encodeURIComponent(polledJobId)}`, {
+                                method: 'GET',
+                                signal: activeController.signal,
+                            });
+                            if (!res.ok) {
+                                throw new Error(await readResponseError(res, `Status request failed (${res.status})`));
+                            }
+                            const data = await res.json();
+                            if (disposed || generation !== runGenerationRef.current) {
+                                shouldContinue = false;
+                                return;
+                            }
+
+                            const responseBackend = normalizeExecutionBackend(data.execution_backend || data.backend);
+                            if (responseBackend) {
+                                pollBackend = responseBackend;
+                                setExecutionBackend(responseBackend);
+                            }
 
                             const incoming = data.result?.results || [];
                             if (incoming.length > 0) {
@@ -2576,48 +2910,85 @@
                                 setRunningSkus((prev) => prev.filter((sku) => !done.has(String(sku))));
                             }
 
-                            const totalCount = data.total_count != null ? Number(data.total_count) : 0;
-                            const completedCount = data.completed_count != null
-                                ? Number(data.completed_count)
-                                : incoming.length;
-                            const allSkusFinished = totalCount > 0 && completedCount >= totalCount;
-                            const jobFinished = data.status === 'completed' || data.status === 'failed' || allSkusFinished;
+                            const parsedTotal = data.total_count != null ? Number(data.total_count) : null;
+                            const parsedCompleted = data.completed_count != null ? Number(data.completed_count) : incoming.length;
+                            const totalCount = Number.isFinite(parsedTotal) && parsedTotal >= 0 ? parsedTotal : 0;
+                            const completedCount = Number.isFinite(parsedCompleted) && parsedCompleted >= 0 ? parsedCompleted : incoming.length;
+                            setJobProgress((previous) => ({
+                                completed: Math.max(previous.completed, completedCount),
+                                total: totalCount > 0 ? totalCount : previous.total,
+                            }));
 
-                            if (jobFinished) {
+                            const responseStatus = normalizeJobStatus(data.status);
+                            const effectiveStatus = responseStatus;
+                            setJobStatus(effectiveStatus);
+
+                            const progressChanged = completedCount > lastCompleted || effectiveStatus !== lastStatus;
+                            unchangedPolls = progressChanged ? 0 : unchangedPolls + 1;
+                            lastCompleted = Math.max(lastCompleted, completedCount);
+                            lastStatus = effectiveStatus;
+
+                            if (TERMINAL_JOB_STATUSES.has(effectiveStatus)) {
+                                shouldContinue = false;
                                 setIsPolling(false);
                                 setRunningSkus([]);
-                                if (data.status === 'failed') {
-                                    setError("Job Failed: " + data.error);
-                                } else {
+                                if (effectiveStatus === 'failed') {
+                                    setError(data.error || "Job failed");
+                                } else if (effectiveStatus === 'completed') {
+                                    setCompletedJobIds((previous) => (
+                                        previous.includes(polledJobId)
+                                            ? previous
+                                            : [...previous, polledJobId]
+                                    ));
                                     window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-completed');
+                                } else {
+                                    window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-canceled');
                                 }
                             }
                         } catch (e) {
-                            if (!cancelled && generation === runGenerationRef.current) console.error(e);
+                            if (disposed || generation !== runGenerationRef.current || e.name === 'AbortError') {
+                                shouldContinue = false;
+                                return;
+                            }
+                            hadError = true;
+                            unchangedPolls += 1;
+                            console.error('Forecast status polling failed:', e);
+                        } finally {
+                            activeController = null;
+                            if (shouldContinue) scheduleNextPoll(hadError);
                         }
                     };
                     pollOnce();
-                    interval = setInterval(pollOnce, 1000);
                 }
                 return () => {
-                    cancelled = true;
-                    clearInterval(interval);
+                    disposed = true;
+                    clearTimeout(timeoutId);
+                    if (activeController) activeController.abort();
                 };
-            }, [isPolling, jobId, BASE_URL]);
+            }, [isPolling, jobId, BASE_URL, jobModelType]);
 
             // --- HANDLERS ---
             const handleFileChange = (e) => {
                 const f = e.target.files[0];
                 if (!f) return;
                 try {
-                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.xls'] });
+                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.csv'] });
                 } catch (err) {
                     setError(err.message);
                     e.target.value = null;
                     return;
                 }
+                ++runGenerationRef.current;
                 setFile(f);
                 setError(null);
+                setJobId(null);
+                setCompletedJobIds([]);
+                setIsPolling(false);
+                setJobStatus(null);
+                setJobModelType(null);
+                setExecutionBackend(null);
+                setJobProgress({ completed: 0, total: 0 });
+                setIsCancelling(false);
                 setAvailableCols([]);
                 setSheetRows([]);
                 setMappedSkus([]);
@@ -2715,6 +3086,15 @@
                 setActiveTab("overview");
                 setCurrentSku(null);
                 setBatchResults(null);
+                ++runGenerationRef.current;
+                setJobId(null);
+                setCompletedJobIds([]);
+                setIsPolling(false);
+                setJobStatus(null);
+                setJobModelType(null);
+                setExecutionBackend(null);
+                setJobProgress({ completed: 0, total: 0 });
+                setIsCancelling(false);
 
                 // Calculate total time series from column range
                 const total = endIdx - startIdx + 1;
@@ -2730,6 +3110,11 @@
 
             const startBatchForSkus = async (skusToRun) => {
                 if (!skusToRun.length) return;
+                const selectedModelType = modelType;
+                if (!isForecastModelAvailable(selectedModelType)) {
+                    setAlertMessage(t('sidebar.cloud_unavailable'));
+                    return;
+                }
 
                 const rerunSet = new Set(skusToRun.map(String));
                 // Bump generation so any in-flight poll from a prior job is ignored.
@@ -2752,6 +3137,10 @@
 
                 setError(null);
                 setJobStatus("queued");
+                setJobModelType(selectedModelType);
+                setExecutionBackend(isAdvancedModelType(selectedModelType) ? 'cloud' : 'local');
+                setJobProgress({ completed: 0, total: skusToRun.length });
+                setIsCancelling(false);
                 setRunningSkus(skusToRun);
                 setSkuValidationMethods((prev) => {
                     const next = { ...prev };
@@ -2767,7 +3156,7 @@
                 fd.append('start_col_idx', startColIdx);
                 fd.append('end_col_idx', endColIdx);
                 fd.append('data_format', 'horizontal');
-                fd.append('model_type', 'auto');
+                fd.append('model_type', selectedModelType);
                 fd.append('validation_method', validationMethod);
                 fd.append('train_horizon', parseInt(trainHorizon) || 24);
                 fd.append('test_horizon', parseInt(testHorizon) || 6);
@@ -2778,23 +3167,33 @@
                     const res = await fetch(`${BASE_URL}/batch_init`, { method: 'POST', body: fd });
                     if (generation !== runGenerationRef.current) return;
                     if (!res.ok) {
-                        let message = "Failed to start job";
-                        try {
-                            const errBody = await res.json();
-                            message = errBody.detail || errBody.message || message;
-                        } catch (_) {}
+                        const message = await readResponseError(res, "Failed to start job");
                         setIsPolling(false);
                         setRunningSkus([]);
                         throw new Error(typeof message === 'string' ? message : "Failed to start job");
                     }
                     const data = await res.json();
                     if (generation !== runGenerationRef.current) return;
+                    if (!data.job_id) throw new Error("Forecast job ID was not returned");
                     setJobId(data.job_id);
+                    setJobStatus(normalizeJobStatus(data.status || 'queued'));
+                    setExecutionBackend(
+                        normalizeExecutionBackend(data.execution_backend || data.backend)
+                        || (isAdvancedModelType(selectedModelType) ? 'cloud' : 'local')
+                    );
+                    setJobProgress((previous) => ({
+                        completed: Number.isFinite(Number(data.completed_count)) ? Number(data.completed_count) : previous.completed,
+                        total: Number.isFinite(Number(data.total_count)) && Number(data.total_count) > 0
+                            ? Number(data.total_count)
+                            : previous.total,
+                    }));
                 } catch (e) {
                     if (generation !== runGenerationRef.current) return;
                     setIsPolling(false);
                     setRunningSkus([]);
+                    setJobStatus('failed');
                     setError(e.message);
+                    setAlertMessage(e.message);
                 }
             };
 
@@ -2803,6 +3202,10 @@
                 if (skuColIdx < 0 || startColIdx < 0 || endColIdx < 0) { setError("Invalid column mapping. Please re-map columns."); return; }
                 if (!selectedSkus.length) {
                     setAlertMessage(t('dashboard.select_required'));
+                    return;
+                }
+                if (selectedSkus.length > 100) {
+                    setAlertMessage(t('job.max_skus'));
                     return;
                 }
 
@@ -2821,9 +3224,73 @@
                 await startBatchForSkus(selectedSkus);
             };
 
+            const handleCancelJob = async () => {
+                if (!jobId || isCancelling || TERMINAL_JOB_STATUSES.has(normalizeJobStatus(jobStatus))) return;
+                const cancelJobId = jobId;
+                const previousStatus = jobStatus;
+                const previousRunningSkus = [...runningSkus];
+                const generation = ++runGenerationRef.current;
+
+                setIsCancelling(true);
+                setIsPolling(false);
+                setJobStatus('cancel_requested');
+                setRunningSkus([]);
+
+                try {
+                    const response = await fetch(`${BASE_URL}/batch_cancel/${encodeURIComponent(cancelJobId)}`, {
+                        method: 'POST',
+                    });
+                    if (!response.ok) {
+                        throw new Error(await readResponseError(response, t('job.cancel_failed')));
+                    }
+                    const data = await response.json().catch(() => ({}));
+                    if (generation !== runGenerationRef.current) return;
+
+                    const canceledStatus = normalizeJobStatus(data.status || 'canceled');
+                    const responseBackend = normalizeExecutionBackend(data.execution_backend || data.backend);
+                    if (responseBackend) setExecutionBackend(responseBackend);
+                    setJobStatus(canceledStatus);
+                    setJobProgress((previous) => ({
+                        completed: Number.isFinite(Number(data.completed_count))
+                            ? Math.max(previous.completed, Number(data.completed_count))
+                            : previous.completed,
+                        total: Number.isFinite(Number(data.total_count)) && Number(data.total_count) > 0
+                            ? Number(data.total_count)
+                            : previous.total,
+                    }));
+
+                    if (TERMINAL_JOB_STATUSES.has(canceledStatus)) {
+                        setIsPolling(false);
+                        setRunningSkus([]);
+                    } else {
+                        setIsPolling(true);
+                    }
+                } catch (cancelError) {
+                    if (generation !== runGenerationRef.current) return;
+                    setError(cancelError.message);
+                    setAlertMessage(t('job.cancel_failed'));
+                    setJobStatus(previousStatus || 'processing');
+                    setRunningSkus(previousRunningSkus);
+                    setIsPolling(true);
+                } finally {
+                    if (generation === runGenerationRef.current) setIsCancelling(false);
+                }
+            };
+
             const handleExport = async () => {
                 if (!file || !skuCol || !startCol || !endCol) { setError("Please load and map data first."); return; }
                 if (isExporting) return;
+                const exportModelType = jobId && jobModelType ? jobModelType : modelType;
+                const advancedExport = isAdvancedModelType(exportModelType);
+                if (advancedExport && (
+                    normalizeJobStatus(jobStatus) !== 'completed'
+                    || completedJobIds.length === 0
+                    || !batchResults
+                    || batchResults.length === 0
+                )) {
+                    setAlertMessage(t('job.advanced_export_required'));
+                    return;
+                }
                 setIsExporting(true);
 
                 // Use fast export if cached results are available
@@ -2837,11 +3304,12 @@
                     fd.append('end_col_idx', endColIdx);
                     fd.append('data_format', 'horizontal');
                     fd.append('cached_results', JSON.stringify(batchResults));
-                    fd.append('job_id', jobId);
+                    fd.append('job_id', jobId || '');
+                    fd.append('job_ids', JSON.stringify(completedJobIds));
 
                     try {
                         const res = await fetch(`${BASE_URL}/export-fast`, { method: 'POST', body: fd });
-                        if (!res.ok) throw new Error("Export failed");
+                        if (!res.ok) throw new Error(await readResponseError(res, "Export failed"));
                         const inputBaseName = file.name.replace(/\.[^/.]+$/, "");
                         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
                         let filename = `Operartis_Forecast_${inputBaseName}_${timestamp}.xlsx`;
@@ -2858,10 +3326,15 @@
                     } catch (e) { setError(e.message); }
                     finally { setIsExporting(false); }
                 } else {
-                    // Fallback to slow export if no cached results
+                    // Basic/local-only fallback. Advanced profiles must use persisted /export-fast results.
+                    if (advancedExport) {
+                        setIsExporting(false);
+                        setAlertMessage(t('job.advanced_export_required'));
+                        return;
+                    }
                     const fd = new FormData();
                     fd.append('file', file);
-                    fd.append('model_type', 'auto');
+                    fd.append('model_type', modelType);
                     fd.append('validation_method', validationMethod);
                     fd.append('train_horizon', parseInt(trainHorizon) || 24);
                     fd.append('test_horizon', parseInt(testHorizon) || 6);
@@ -2873,7 +3346,7 @@
 
                     try {
                         const res = await fetch(`${BASE_URL}/export`, { method: 'POST', body: fd });
-                        if (!res.ok) throw new Error("Export failed");
+                        if (!res.ok) throw new Error(await readResponseError(res, "Export failed"));
                         const inputBaseName = file.name.replace(/\.[^/.]+$/, "");
                         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
                         let filename = `Operartis_Forecast_${inputBaseName}_${timestamp}.xlsx`;
@@ -2893,7 +3366,10 @@
             };
 
             const handleReset = () => {
-                setFile(null); setBatchResults(null); setJobId(null); setIsPolling(false); setError(null);
+                ++runGenerationRef.current;
+                setFile(null); setBatchResults(null); setJobId(null); setCompletedJobIds([]); setIsPolling(false); setError(null);
+                setJobStatus(null); setJobModelType(null); setExecutionBackend(null);
+                setJobProgress({ completed: 0, total: 0 }); setIsCancelling(false);
                 setSkuCol(""); setStartCol(""); setEndCol("");
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
                 setTotalTimeSeries(0); setAvailableCols([]);
@@ -2974,7 +3450,12 @@
             const mappingReady = mappedSkus.length > 0;
             const isDetailTab = activeTab !== 'overview' && !!skuData;
             // Keep Run button in sync with Overview row status (not only the poll flag).
-            const isRunning = isPolling || runningSkus.length > 0;
+            const isRunning = isPolling || runningSkus.length > 0 || isCancelling;
+            const normalizedJobStatus = jobStatus ? normalizeJobStatus(jobStatus) : null;
+            const canCancelJob = !!jobId
+                && !!normalizedJobStatus
+                && !TERMINAL_JOB_STATUSES.has(normalizedJobStatus)
+                && normalizedJobStatus !== 'cancel_requested';
 
             const openDetailedView = () => {
                 if (!interfaceReady || !batchResults?.length) return;
@@ -3073,7 +3554,7 @@
 
                     {/* SIDEBAR */}
                     <div className={`fc-sidebar-shell ${isFullScreen ? 'hidden' : ''} fixed lg:relative inset-y-0 left-0 z-50 w-64 ${isSidebarCollapsed ? 'lg:w-[76px]' : 'lg:w-64'} transform transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
+                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.csv" onChange={handleFileChange} />
                         <button
                             onClick={() => setIsSidebarCollapsed(prev => !prev)}
                             className="fc-sidebar-toggle hidden lg:flex items-center justify-center h-6 w-6 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold shadow-md transition-colors"
@@ -3096,7 +3577,8 @@
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className={`relative flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${file ? (skuCol && startCol && endCol ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500' : 'border-brand-gold/40 bg-amber-500/10 text-brand-gold') : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
+                                disabled={isRunning}
+                                className={`relative flex items-center justify-center h-11 w-11 rounded-xl border transition-all disabled:cursor-not-allowed disabled:opacity-60 ${file ? (skuCol && startCol && endCol ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500' : 'border-brand-gold/40 bg-amber-500/10 text-brand-gold') : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
                                 title={file ? file.name : t('sidebar.upload_label')}
                             >
                                 <UploadIcon width="18" height="18" />
@@ -3105,7 +3587,8 @@
                             {file && (
                                 <button
                                     onClick={() => setIsMappingModalOpen(true)}
-                                    className="flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold transition-all"
+                                    disabled={isRunning}
+                                    className="flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                     title={t('sidebar.edit_mapping')}
                                 >
                                     <ColumnsIcon width="18" height="18" />
@@ -3130,7 +3613,8 @@
                             </button>
                             <button
                                 onClick={handleReset}
-                                className="mt-auto flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20 transition-all box-border"
+                                disabled={isRunning}
+                                className="mt-auto flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20 transition-all box-border disabled:cursor-not-allowed disabled:opacity-60"
                                 title={t('sidebar.reset_btn')}
                             >
                                 <TrashIcon />
@@ -3147,19 +3631,21 @@
                                     <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
                                         {file ? (
                                             <div className="flex flex-col items-center gap-1">
-                                                <div onClick={() => fileInputRef.current?.click()} className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 cursor-pointer hover:underline mb-1">{file.name}</div>
+                                                <div onClick={() => !isRunning && fileInputRef.current?.click()} className={`text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 mb-1 ${isRunning ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:underline'}`}>{file.name}</div>
                                                 <div className="text-[10px] text-emerald-500 font-bold uppercase">{skuCol && startCol && endCol ? t('sidebar.uploaded_mapped') : t('sidebar.action_required')}</div>
                                                 <div className="flex gap-2 mt-2 justify-center">
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
+                                                        disabled={isRunning}
+                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                                         title={t('sidebar.reupload_file')}
                                                     >
                                                         <UploadIcon width="14" height="14" />
                                                     </button>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); setIsMappingModalOpen(true); }}
-                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
+                                                        disabled={isRunning}
+                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                                         title={t('sidebar.edit_mapping')}
                                                     >
                                                         <ColumnsIcon width="14" height="14" />
@@ -3180,6 +3666,41 @@
                             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
                                 <form className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800" onSubmit={(e) => e.preventDefault()}>
+                                    <div>
+                                        <label htmlFor="forecast-model-profile" className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">
+                                            {t('sidebar.model_profile')}
+                                        </label>
+                                        <div className="fc-sidebar-select-wrap">
+                                            <select
+                                                id="forecast-model-profile"
+                                                value={modelType}
+                                                onChange={(e) => setModelType(e.target.value)}
+                                                disabled={isRunning}
+                                                aria-describedby={forecastCapabilities.status !== 'ready' || !forecastCapabilities.cloudEnabled ? 'forecast-cloud-availability' : undefined}
+                                                className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
+                                                {FORECAST_MODEL_OPTIONS.map((option) => (
+                                                    <option
+                                                        key={option.value}
+                                                        value={option.value}
+                                                        disabled={!isForecastModelAvailable(option.value)}
+                                                    >
+                                                        {t(option.labelKey)}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <svg className="fc-sidebar-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9" />
+                                            </svg>
+                                        </div>
+                                        {(forecastCapabilities.status !== 'ready' || !forecastCapabilities.cloudEnabled) && (
+                                            <p id="forecast-cloud-availability" className="mt-1.5 text-[9px] leading-3 text-slate-500 dark:text-slate-400">
+                                                {forecastCapabilities.status === 'loading'
+                                                    ? t('sidebar.cloud_checking')
+                                                    : t('sidebar.cloud_unavailable')}
+                                            </p>
+                                        )}
+                                    </div>
                                     <div>
                                         <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.val_method')}</label>
                                         <div className="fc-sidebar-select-wrap">
@@ -3204,7 +3725,9 @@
                                                 type="number"
                                                 value={trainHorizon}
                                                 onChange={(e) => setTrainHorizon(e.target.value)}
-                                                onBlur={() => setTrainHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
+                                                onBlur={() => setTrainHorizon(prev => Math.min(240, Math.max(4, parseInt(prev) || 4)).toString())}
+                                                min="4"
+                                                max="240"
                                                 className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
@@ -3220,8 +3743,9 @@
                                                         setTrainHorizon((totalTimeSeries - newTest).toString());
                                                     }
                                                 }}
-                                                onBlur={() => setTestHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
+                                                onBlur={() => setTestHorizon(prev => Math.min(60, Math.max(1, parseInt(prev) || 1)).toString())}
                                                 min="1"
+                                                max="60"
                                                 className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
@@ -3240,8 +3764,9 @@
                                             type="number"
                                             value={forecastSteps}
                                             onChange={(e) => setForecastSteps(e.target.value)}
-                                            onBlur={() => setForecastSteps(prev => Math.max(1, parseInt(prev) || 1).toString())}
+                                            onBlur={() => setForecastSteps(prev => Math.min(60, Math.max(1, parseInt(prev) || 1)).toString())}
                                             min="1"
+                                            max="60"
                                             className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
@@ -3276,7 +3801,7 @@
                             {/* Reset Button Area - Inside Body, Pushed to Bottom */}
                             <div className="pt-4 pb-1 !mt-auto">
                                 <div className="p-2">
-                                    <button type="button" onClick={handleReset} className="w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20"><TrashIcon width="16" height="16" /> {t('sidebar.reset_btn')}</button>
+                                    <button type="button" onClick={handleReset} disabled={isRunning} className="w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20 disabled:cursor-not-allowed disabled:opacity-60"><TrashIcon width="16" height="16" /> {t('sidebar.reset_btn')}</button>
                                 </div>
                             </div>
                         </div>
@@ -3312,6 +3837,17 @@
                                     <div id="operartis-auth-topbar-slot"></div>
                                 </div>
                             </header>
+
+                            <JobStatusBar
+                                status={jobStatus}
+                                executionBackend={executionBackend}
+                                completedCount={jobProgress.completed}
+                                totalCount={jobProgress.total}
+                                canCancel={canCancelJob}
+                                isCancelling={isCancelling}
+                                onCancel={handleCancelJob}
+                                t={t}
+                            />
 
                             {/* KPI BAR — with Overview tab after mapping confirm */}
                             {mappingReady && (
