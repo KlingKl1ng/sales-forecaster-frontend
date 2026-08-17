@@ -752,6 +752,13 @@
                     test_h: "Test Horizon",
                     fc_h: "Forecast Horizon",
                     total_periods: "Total time periods",
+                    detected_frequency: "Detected frequency",
+                    history_too_long: "This {frequency} file has {count} periods; the maximum is {max}.",
+                    freq_hourly: "Hourly",
+                    freq_daily: "Daily",
+                    freq_weekly: "Weekly",
+                    freq_monthly: "Monthly",
+                    freq_quarterly: "Quarterly",
                     horizon_mismatch: "Train + Test must equal",
                     execute_btn: "Execute Forecast",
                     processing: "Processing...",
@@ -885,6 +892,13 @@
                     test_h: "Chu kỳ K.định",
                     fc_h: "Chu kỳ dự báo",
                     total_periods: "Tổng số chu kỳ",
+                    detected_frequency: "Tần suất phát hiện",
+                    history_too_long: "Tệp {frequency} này có {count} chu kỳ; tối đa là {max}.",
+                    freq_hourly: "Theo giờ",
+                    freq_daily: "Theo ngày",
+                    freq_weekly: "Theo tuần",
+                    freq_monthly: "Theo tháng",
+                    freq_quarterly: "Theo quý",
                     horizon_mismatch: "Huấn luyện + Thử nghiệm phải bằng",
                     execute_btn: "Chạy dự báo",
                     processing: "Đang xử lý...",
@@ -1018,6 +1032,13 @@
                     test_h: "Test-Horizont",
                     fc_h: "Prognose-Horizont",
                     total_periods: "Gesamtzeiträume",
+                    detected_frequency: "Erkannte Frequenz",
+                    history_too_long: "Diese {frequency}-Datei hat {count} Perioden; das Maximum ist {max}.",
+                    freq_hourly: "Stündlich",
+                    freq_daily: "Täglich",
+                    freq_weekly: "Wöchentlich",
+                    freq_monthly: "Monatlich",
+                    freq_quarterly: "Vierteljährlich",
                     horizon_mismatch: "Training + Test muss gleich sein",
                     execute_btn: "Prognose ausführen",
                     processing: "Verarbeitung...",
@@ -1174,12 +1195,16 @@
         const FORECAST_MODEL_OPTIONS = [
             { value: 'auto', labelKey: 'sidebar.model_basic_auto', advanced: false },
             { value: 'advanced_auto', labelKey: 'sidebar.model_advanced_auto', advanced: true },
-            { value: 'arma', labelKey: 'sidebar.model_arma', advanced: true },
-            { value: 'arima', labelKey: 'sidebar.model_arima', advanced: true },
-            { value: 'mlp', labelKey: 'sidebar.model_mlp', advanced: true },
+            { value: 'arma', labelKey: 'sidebar.model_arma', advanced: true, hidden: true },
+            { value: 'arima', labelKey: 'sidebar.model_arima', advanced: true, hidden: true },
+            { value: 'mlp', labelKey: 'sidebar.model_mlp', advanced: true, hidden: true },
         ];
+        const VISIBLE_FORECAST_MODEL_OPTIONS = FORECAST_MODEL_OPTIONS.filter((option) => !option.hidden);
         const ADVANCED_MODEL_TYPES = new Set(
             FORECAST_MODEL_OPTIONS.filter((option) => option.advanced).map((option) => option.value)
+        );
+        const HIDDEN_MANUAL_MODEL_TYPES = new Set(
+            FORECAST_MODEL_OPTIONS.filter((option) => option.hidden).map((option) => option.value)
         );
         const TERMINAL_JOB_STATUSES = new Set(['completed', 'failed', 'canceled']);
 
@@ -1199,6 +1224,48 @@
             if (normalized.indexOf('cloud') !== -1 || normalized === 'remote') return 'cloud';
             if (normalized.indexOf('local') !== -1 || normalized.indexOf('cx32') !== -1 || normalized.indexOf('hetzner') !== -1) return 'local';
             return null;
+        };
+
+        const DEFAULT_FREQUENCY_PROFILES = {
+            hourly: { label: 'Hourly', max_history_columns: 720, max_train_horizon: 720, max_test_horizon: 48, max_forecast_horizon: 48, mlp_lag_window: 24, prophet_min_points: 336 },
+            daily: { label: 'Daily', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 14, prophet_min_points: 730 },
+            weekly: { label: 'Weekly', max_history_columns: 312, max_train_horizon: 312, max_test_horizon: 52, max_forecast_horizon: 52, mlp_lag_window: 52, prophet_min_points: 104 },
+            monthly: { label: 'Monthly', max_history_columns: 240, max_train_horizon: 240, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 12, prophet_min_points: 24 },
+            quarterly: { label: 'Quarterly', max_history_columns: 80, max_train_horizon: 80, max_test_horizon: 16, max_forecast_horizon: 16, mlp_lag_window: 4, prophet_min_points: 8 },
+        };
+
+        const parseFrequencyProfiles = (rawProfiles) => {
+            const profiles = {};
+            Object.keys(DEFAULT_FREQUENCY_PROFILES).forEach((name) => {
+                const fallback = DEFAULT_FREQUENCY_PROFILES[name];
+                const incoming = rawProfiles && typeof rawProfiles === 'object' ? rawProfiles[name] : null;
+                profiles[name] = incoming && typeof incoming === 'object'
+                    ? { ...fallback, ...incoming }
+                    : { ...fallback };
+            });
+            return profiles;
+        };
+
+        const inferFrequencyFromHeaders = (headers) => {
+            const dates = [];
+            (headers || []).forEach((header) => {
+                const parsed = Date.parse(header);
+                if (!Number.isNaN(parsed)) dates.push(parsed);
+            });
+            if (dates.length < 2) return 'monthly';
+            dates.sort((left, right) => left - right);
+            const diffs = [];
+            for (let index = 1; index < dates.length; index += 1) {
+                diffs.push((dates[index] - dates[index - 1]) / 1000);
+            }
+            diffs.sort((left, right) => left - right);
+            const median = diffs[Math.floor(diffs.length / 2)];
+            if (median >= 3400 && median <= 3800) return 'hourly';
+            if (median >= 86000 && median <= 87000) return 'daily';
+            if (median >= 600000 && median <= 610000) return 'weekly';
+            if (median >= 2400000 && median <= 2700000) return 'monthly';
+            if (median >= 7700000 && median <= 8000000) return 'quarterly';
+            return 'monthly';
         };
 
         const parseForecastCapabilities = (data) => {
@@ -1236,7 +1303,13 @@
                         return !config || typeof config !== 'object' || config.available !== false;
                     }).map((model) => model.toLowerCase())
                     : [];
-            return { cloudEnabled, supportedModels };
+            return {
+                cloudEnabled,
+                supportedModels,
+                frequencyProfiles: parseFrequencyProfiles(
+                    nested.frequency_profiles || payload.frequency_profiles
+                ),
+            };
         };
 
         const readResponseError = async (response, fallback) => {
@@ -2715,7 +2788,9 @@
                 status: 'loading',
                 cloudEnabled: false,
                 supportedModels: [],
+                frequencyProfiles: parseFrequencyProfiles(),
             });
+            const [inferredFrequency, setInferredFrequency] = useState('monthly');
             const [capabilityRefreshToken, setCapabilityRefreshToken] = useState(0);
             const deploymentEnvironment = getDeploymentEnvironment();
             const environmentBadge = getEnvironmentBadgeConfig(deploymentEnvironment);
@@ -2770,7 +2845,12 @@
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
 
                 const loadForecastCapabilities = async () => {
-                    setForecastCapabilities({ status: 'loading', cloudEnabled: false, supportedModels: [] });
+                    setForecastCapabilities({
+                        status: 'loading',
+                        cloudEnabled: false,
+                        supportedModels: [],
+                        frequencyProfiles: parseFrequencyProfiles(),
+                    });
                     try {
                         const response = await fetch(`${BASE_URL}${FORECAST_CAPABILITY_PATH}`, {
                             method: 'GET',
@@ -2781,17 +2861,24 @@
                         if (disposed) return;
                         setForecastCapabilities({ status: 'ready', ...parsed });
                         setModelType((current) => {
-                            if (!isAdvancedModelType(current)) return current;
-                            if (parsed.supportedModels.length > 0) {
-                                return parsed.supportedModels.includes(String(current).toLowerCase())
-                                    ? current
-                                    : 'auto';
+                            const value = String(current || '').toLowerCase();
+                            const advancedAvailable = parsed.supportedModels.length > 0
+                                ? parsed.supportedModels.includes('advanced_auto')
+                                : parsed.cloudEnabled === true;
+                            if (HIDDEN_MANUAL_MODEL_TYPES.has(value)) {
+                                return advancedAvailable ? 'advanced_auto' : 'auto';
                             }
-                            return parsed.cloudEnabled ? current : 'auto';
+                            if (value === 'advanced_auto' && !advancedAvailable) return 'auto';
+                            return current;
                         });
                     } catch (capabilityError) {
                         if (disposed) return;
-                        setForecastCapabilities({ status: 'unavailable', cloudEnabled: false, supportedModels: [] });
+                        setForecastCapabilities({
+                            status: 'unavailable',
+                            cloudEnabled: false,
+                            supportedModels: [],
+                            frequencyProfiles: parseFrequencyProfiles(),
+                        });
                         setModelType((current) => isAdvancedModelType(current) ? 'auto' : current);
                         if (capabilityError.name !== 'AbortError') {
                             console.warn('Cloud forecasting capabilities unavailable:', capabilityError);
@@ -2853,9 +2940,19 @@
                 }
                 return forecastCapabilities.cloudEnabled === true;
             };
-            const hasAvailableAdvancedModels = FORECAST_MODEL_OPTIONS.some(
+            const hasAvailableAdvancedModels = VISIBLE_FORECAST_MODEL_OPTIONS.some(
                 (option) => option.advanced && isForecastModelAvailable(option.value)
             );
+            const selectedProfile = HIDDEN_MANUAL_MODEL_TYPES.has(String(modelType || '').toLowerCase())
+                ? (isForecastModelAvailable('advanced_auto') ? 'advanced_auto' : 'auto')
+                : modelType;
+            const frequencyProfiles = forecastCapabilities.frequencyProfiles || parseFrequencyProfiles();
+            const activeFrequencyProfile = frequencyProfiles[inferredFrequency] || frequencyProfiles.monthly;
+            const maxTrainHorizon = Number(activeFrequencyProfile.max_train_horizon) || 240;
+            const maxTestHorizon = Number(activeFrequencyProfile.max_test_horizon) || 60;
+            const maxForecastHorizon = Number(activeFrequencyProfile.max_forecast_horizon) || 60;
+            const maxHistoryColumns = Number(activeFrequencyProfile.max_history_columns) || 240;
+            const historyTooLong = totalTimeSeries > 0 && totalTimeSeries > maxHistoryColumns;
 
             // --- POLLING (merge partial results as each SKU completes) ---
             useEffect(() => {
@@ -3012,6 +3109,7 @@
                 setSkuColIdx(-1);
                 setStartColIdx(-1);
                 setEndColIdx(-1);
+                setInferredFrequency("monthly");
                 setActiveTab("overview");
                 const reader = new FileReader();
                 reader.onload = (evt) => {
@@ -3023,10 +3121,16 @@
                         const rawHeaders = rawRows[0] || [];
 
                         // Convert headers - handle Date objects and other types
+                        const formatHeaderDate = (value) => {
+                            const pad = (part) => String(part).padStart(2, '0');
+                            const hasTime = value.getHours() || value.getMinutes() || value.getSeconds();
+                            const datePart = `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+                            if (!hasTime) return datePart;
+                            return `${datePart} ${pad(value.getHours())}:${pad(value.getMinutes())}:${pad(value.getSeconds())}`;
+                        };
                         const normalizeCell = (h) => {
                             if (h instanceof Date) {
-                                // Format Date as YYYY-MM-DD
-                                return h.toISOString().split('T')[0];
+                                return formatHeaderDate(h);
                             } else if (typeof h === 'number') {
                                 // Could be Excel serial date number - try to convert
                                 // Excel serial date: days since 1900-01-01
@@ -3034,7 +3138,7 @@
                                 const possibleDate = new Date(excelEpoch.getTime() + h * 24 * 60 * 60 * 1000);
                                 // Check if it's a reasonable date (between 1990 and 2100)
                                 if (possibleDate.getFullYear() >= 1990 && possibleDate.getFullYear() <= 2100) {
-                                    return possibleDate.toISOString().split('T')[0];
+                                    return formatHeaderDate(possibleDate);
                                 }
                                 return String(h);
                             }
@@ -3107,19 +3211,42 @@
 
                 // Calculate total time series from column range
                 const total = endIdx - startIdx + 1;
+                const dateHeaders = startIdx >= 0 && endIdx >= startIdx
+                    ? availableCols.slice(startIdx, endIdx + 1)
+                    : [];
+                const frequency = inferFrequencyFromHeaders(dateHeaders);
+                const profile = (forecastCapabilities.frequencyProfiles || parseFrequencyProfiles())[frequency]
+                    || DEFAULT_FREQUENCY_PROFILES.monthly;
+                setInferredFrequency(frequency);
                 setTotalTimeSeries(total);
 
                 // Set initial values: Test = 6, Train = Total - 6, Forecast = Test
-                const initialTest = Math.min(6, Math.floor(total / 2));
-                const initialTrain = total - initialTest;
+                const initialTest = Math.min(
+                    6,
+                    Math.floor(total / 2),
+                    Number(profile.max_test_horizon) || 6
+                );
+                const initialTrain = Math.min(
+                    Math.max(4, total - initialTest),
+                    Number(profile.max_train_horizon) || total
+                );
                 setTestHorizon(initialTest.toString());
                 setTrainHorizon(initialTrain.toString());
-                setForecastSteps(initialTest.toString());
+                setForecastSteps(Math.min(initialTest, Number(profile.max_forecast_horizon) || initialTest).toString());
             };
 
             const startBatchForSkus = async (skusToRun) => {
                 if (!skusToRun.length) return;
-                const selectedModelType = modelType;
+                if (historyTooLong) {
+                    setAlertMessage(
+                        t('sidebar.history_too_long')
+                            .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
+                            .replace('{count}', String(totalTimeSeries))
+                            .replace('{max}', String(maxHistoryColumns))
+                    );
+                    return;
+                }
+                const selectedModelType = selectedProfile;
                 if (!isForecastModelAvailable(selectedModelType)) {
                     setAlertMessage(t('sidebar.cloud_unavailable'));
                     return;
@@ -3223,6 +3350,15 @@
                 }
                 if (selectedSkus.length > 100) {
                     setAlertMessage(t('job.max_skus'));
+                    return;
+                }
+                if (historyTooLong) {
+                    setAlertMessage(
+                        t('sidebar.history_too_long')
+                            .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
+                            .replace('{count}', String(totalTimeSeries))
+                            .replace('{max}', String(maxHistoryColumns))
+                    );
                     return;
                 }
 
@@ -3390,6 +3526,7 @@
                 setSkuCol(""); setStartCol(""); setEndCol("");
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
                 setTotalTimeSeries(0); setAvailableCols([]);
+                setInferredFrequency('monthly');
                 setSheetRows([]); setMappedSkus([]); setItemTabs([]);
                 setSelectedSkus([]);
                 setRunningSkus([]);
@@ -3614,7 +3751,7 @@
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
                                 onClick={handleExecute}
-                                disabled={!file || isRunning}
+                                disabled={!file || isRunning || historyTooLong}
                                 className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${isRunning ? 'bg-amber-50 dark:bg-amber-950/40 text-brand-gold cursor-not-allowed' : !file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
                                 title={isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
                             >
@@ -3644,11 +3781,11 @@
                             {/* 1. Source Data */}
                             <div>
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
-                                <div className={`relative border border-dashed rounded-lg px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
-                                    <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
+                                <div className={`relative border border-dashed rounded-lg px-3 py-6 text-center transition-colors group min-w-0 overflow-hidden ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
+                                    <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : "min-w-0 w-full"}>
                                         {file ? (
-                                            <div className="flex flex-col items-center gap-1">
-                                                <div onClick={() => !isRunning && fileInputRef.current?.click()} className={`text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 mb-1 ${isRunning ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:underline'}`}>{file.name}</div>
+                                            <div className="flex flex-col items-center gap-1 min-w-0 w-full max-w-full">
+                                                <div onClick={() => !isRunning && fileInputRef.current?.click()} title={file.name} className={`text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 mb-1 w-full min-w-0 max-w-full ${isRunning ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:underline'}`}>{file.name}</div>
                                                 <div className="text-[10px] text-emerald-500 font-bold uppercase">{skuCol && startCol && endCol ? t('sidebar.uploaded_mapped') : t('sidebar.action_required')}</div>
                                                 <div className="flex gap-2 mt-2 justify-center">
                                                     <button
@@ -3690,13 +3827,13 @@
                                         <div className="fc-sidebar-select-wrap">
                                             <select
                                                 id="forecast-model-profile"
-                                                value={modelType}
+                                                value={selectedProfile}
                                                 onChange={(e) => setModelType(e.target.value)}
                                                 disabled={isRunning}
                                                 aria-describedby={forecastCapabilities.status === 'loading' || !hasAvailableAdvancedModels ? 'forecast-cloud-availability' : undefined}
                                                 className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] disabled:cursor-not-allowed disabled:opacity-60"
                                             >
-                                                {FORECAST_MODEL_OPTIONS.map((option) => (
+                                                {VISIBLE_FORECAST_MODEL_OPTIONS.map((option) => (
                                                     <option
                                                         key={option.value}
                                                         value={option.value}
@@ -3742,9 +3879,9 @@
                                                 type="number"
                                                 value={trainHorizon}
                                                 onChange={(e) => setTrainHorizon(e.target.value)}
-                                                onBlur={() => setTrainHorizon(prev => Math.min(240, Math.max(4, parseInt(prev) || 4)).toString())}
+                                                onBlur={() => setTrainHorizon(prev => Math.min(maxTrainHorizon, Math.max(4, parseInt(prev) || 4)).toString())}
                                                 min="4"
-                                                max="240"
+                                                max={maxTrainHorizon}
                                                 className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
@@ -3760,18 +3897,23 @@
                                                         setTrainHorizon((totalTimeSeries - newTest).toString());
                                                     }
                                                 }}
-                                                onBlur={() => setTestHorizon(prev => Math.min(60, Math.max(1, parseInt(prev) || 1)).toString())}
+                                                onBlur={() => setTestHorizon(prev => Math.min(maxTestHorizon, Math.max(1, parseInt(prev) || 1)).toString())}
                                                 min="1"
-                                                max="60"
+                                                max={maxTestHorizon}
                                                 className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                     </div>
                                     {totalTimeSeries > 0 && (
-                                        <div className={`text-[9px] ${horizonMismatch ? 'text-red-500' : 'text-slate-400'}`}>
-                                            {horizonMismatch
+                                        <div className={`text-[9px] ${horizonMismatch || historyTooLong ? 'text-red-500' : 'text-slate-400'}`}>
+                                            {historyTooLong
+                                                ? `⚠️ ${t('sidebar.history_too_long')
+                                                    .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
+                                                    .replace('{count}', String(totalTimeSeries))
+                                                    .replace('{max}', String(maxHistoryColumns))}`
+                                                : horizonMismatch
                                                 ? `⚠️ ${t('sidebar.horizon_mismatch')} ${totalTimeSeries}`
-                                                : `${t('sidebar.total_periods')}: ${totalTimeSeries}`
+                                                : `${t('sidebar.total_periods')}: ${totalTimeSeries} · ${t('sidebar.detected_frequency')}: ${t(`sidebar.freq_${inferredFrequency}`)}`
                                             }
                                         </div>
                                     )}
@@ -3781,9 +3923,9 @@
                                             type="number"
                                             value={forecastSteps}
                                             onChange={(e) => setForecastSteps(e.target.value)}
-                                            onBlur={() => setForecastSteps(prev => Math.min(60, Math.max(1, parseInt(prev) || 1)).toString())}
+                                            onBlur={() => setForecastSteps(prev => Math.min(maxForecastHorizon, Math.max(1, parseInt(prev) || 1)).toString())}
                                             min="1"
-                                            max="60"
+                                            max={maxForecastHorizon}
                                             className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
@@ -3797,7 +3939,7 @@
                                     <button
                                         type="button"
                                         onClick={handleExecute}
-                                        disabled={!file || isRunning}
+                                        disabled={!file || isRunning || historyTooLong}
                                         className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isRunning ? 'bg-amber-50 dark:bg-amber-950/40 text-brand-gold cursor-not-allowed' : !file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
                                     >
                                         {isRunning ? <RunningSpinnerIcon size={14} /> : <PlayIcon />}
