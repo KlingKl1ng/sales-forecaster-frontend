@@ -1495,7 +1495,7 @@
                                     <button
                                         type="button"
                                         onClick={handleReset}
-                                        className="mt-auto flex items-center justify-center h-11 w-11 rounded-xl border border-transparent text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 transition-all"
+                                        className="mt-auto flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20 transition-all box-border"
                                         title={t('sidebar.reset_btn')}
                                     >
                                         <TrashIcon width="18" height="18" />
@@ -1668,9 +1668,9 @@
                             </div>
 
                             {/* Reset Button Area - Inside Body, Pushed to Bottom */}
-                            <div className="px-3 pb-1 pt-4 !mt-auto">
-                                <div className="pt-4">
-                                    <button type="button" onClick={handleReset} className="w-full py-2 text-xxs font-bold text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 rounded-xl transition-colors uppercase tracking-wide flex items-center justify-center gap-2 transition-all"><TrashIcon width="16" height="16" /> {t('sidebar.reset_btn')}</button>
+                            <div className="pt-4 pb-1 !mt-auto">
+                                <div className="p-2">
+                                    <button type="button" onClick={handleReset} className="w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20"><TrashIcon width="16" height="16" /> {t('sidebar.reset_btn')}</button>
                                 </div>
                             </div>
 
