@@ -100,13 +100,73 @@
             flex: 1 1 0%;
             min-width: 0;
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             align-items: stretch;
         }
 
         .fc-kpi-metric {
             min-width: 0;
             overflow: hidden;
+        }
+
+        .fc-kpi-metric.fc-kpi-metric-select {
+            overflow: visible;
+        }
+
+        .fc-kpi-metric-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.15rem;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+            color: inherit;
+        }
+
+        .fc-kpi-metric-trigger:hover,
+        .fc-kpi-metric-trigger:focus-visible {
+            color: #d97706;
+        }
+
+        .dark .fc-kpi-metric-trigger:hover,
+        .dark .fc-kpi-metric-trigger:focus-visible {
+            color: #f59e0b;
+        }
+
+        .fc-kpi-metric-chevron {
+            width: 0.7rem;
+            height: 0.7rem;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+
+        .fc-kpi-metric-trigger[aria-expanded="true"] .fc-kpi-metric-chevron {
+            transform: rotate(180deg);
+        }
+
+        .fc-kpi-metric-menu {
+            position: absolute;
+            z-index: 70;
+            top: calc(100% + 0.2rem);
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 6.75rem;
+            padding: 0.3rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+        }
+
+        .dark .fc-kpi-metric-menu {
+            border-color: #334155;
+            background: #020617;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
         }
 
         .fc-kpi-search {
@@ -865,6 +925,11 @@
                     val_simple: "Simple Split (Fast)",
                     val_walk_forward: "Walk-Forward (Adaptive)",
                     val_rolling_window: "Rolling Window (Adaptive)",
+                    eval_metric: "Evaluation Metric",
+                    eval_rmse: "RMSE",
+                    eval_mae: "MAE",
+                    eval_mse: "MSE",
+                    eval_mape: "MAPE",
                     train_h: "Train Horizon",
                     test_h: "Test Horizon",
                     fc_h: "Forecast Horizon",
@@ -946,6 +1011,8 @@
                     avg_mae_short: "MAE",
                     avg_mse: "Avg. MSE",
                     avg_mse_short: "MSE",
+                    avg_eval: "Avg. {metric}",
+                    avg_eval_short: "{metric}",
                     search_placeholder: "Search",
                     no_results: "No Results Loaded",
                     running_algo: "Running Analytics Algorithms",
@@ -1017,6 +1084,11 @@
                     val_simple: "Tách đơn giản (Nhanh)",
                     val_walk_forward: "Tịnh tiến (Thích ứng)",
                     val_rolling_window: "Cửa sổ trượt (Thích ứng)",
+                    eval_metric: "Chỉ số đánh giá",
+                    eval_rmse: "RMSE",
+                    eval_mae: "MAE",
+                    eval_mse: "MSE",
+                    eval_mape: "MAPE",
                     train_h: "Chu kỳ H.luyện",
                     test_h: "Chu kỳ K.định",
                     fc_h: "Chu kỳ dự báo",
@@ -1098,6 +1170,8 @@
                     avg_mae_short: "MAE",
                     avg_mse: "MSE trung bình",
                     avg_mse_short: "MSE",
+                    avg_eval: "{metric} trung bình",
+                    avg_eval_short: "{metric}",
                     search_placeholder: "Tìm kiếm",
                     no_results: "Chưa có kết quả",
                     running_algo: "Đang chạy thuật toán phân tích",
@@ -1169,6 +1243,11 @@
                     val_simple: "Einfacher Split (Schnell)",
                     val_walk_forward: "Walk-Forward (Adaptiv)",
                     val_rolling_window: "Rolling Window (Adaptiv)",
+                    eval_metric: "Bewertungskennzahl",
+                    eval_rmse: "RMSE",
+                    eval_mae: "MAE",
+                    eval_mse: "MSE",
+                    eval_mape: "MAPE",
                     train_h: "Train-Horizont",
                     test_h: "Test-Horizont",
                     fc_h: "Prognose-Horizont",
@@ -1250,6 +1329,8 @@
                     avg_mae_short: "MAE",
                     avg_mse: "Ø MSE",
                     avg_mse_short: "MSE",
+                    avg_eval: "Ø {metric}",
+                    avg_eval_short: "{metric}",
                     search_placeholder: "SKU suchen...",
                     no_results: "Keine Ergebnisse geladen",
                     running_algo: "Analytik-Algorithmen laufen",
@@ -1348,6 +1429,41 @@
             { value: 'walk_forward', labelKey: 'sidebar.val_walk_forward' },
             { value: 'rolling_window', labelKey: 'sidebar.val_rolling_window' },
         ];
+        const EVALUATION_METRIC_OPTIONS = [
+            { value: 'rmse', labelKey: 'sidebar.eval_rmse' },
+            { value: 'mae', labelKey: 'sidebar.eval_mae' },
+            { value: 'mse', labelKey: 'sidebar.eval_mse' },
+            { value: 'mape', labelKey: 'sidebar.eval_mape' },
+        ];
+        const CONTEST_EVALUATION_METRIC_OPTIONS = EVALUATION_METRIC_OPTIONS.filter(
+            (option) => option.value === 'rmse' || option.value === 'mae'
+        );
+        const normalizeContestMetric = (code) => (
+            String(code || '').toLowerCase() === 'mae' ? 'mae' : 'rmse'
+        );
+        const EVALUATION_METRIC_FIELDS = {
+            rmse: 'rmse_validation',
+            mae: 'mae_validation',
+            mse: 'mse_validation',
+            mape: 'mape_validation',
+        };
+        const evaluationMetricField = (code) => (
+            EVALUATION_METRIC_FIELDS[String(code || '').toLowerCase()] || 'rmse_validation'
+        );
+        const evaluationMetricValue = (row, code) => {
+            if (!row) return null;
+            const field = evaluationMetricField(code);
+            const direct = row[field];
+            if (direct != null && direct !== '') {
+                const numeric = Number(direct);
+                return Number.isNaN(numeric) ? null : numeric;
+            }
+            if (String(code || '').toLowerCase() === 'rmse' && row.mse_validation != null) {
+                const mse = Number(row.mse_validation);
+                return Number.isNaN(mse) ? null : Math.sqrt(mse);
+            }
+            return null;
+        };
         const SELECTABLE_MODEL_ORDER = SELECTABLE_FORECAST_MODELS.map((option) => option.value);
         const HEAVY_SELECTABLE_MODELS = new Set(['arma', 'arima', 'mlp']);
         const HEAVY_MODEL_TYPES = new Set(['advanced_auto', 'arma', 'arima', 'mlp']);
@@ -1634,12 +1750,87 @@
             );
         });
 
+        const MetricSelectTile = memo(({ label, shortLabel, value, options, selected, onSelect, t }) => {
+            const [open, setOpen] = useState(false);
+            const wrapRef = useRef(null);
+            const mobileLabel = shortLabel || label;
+
+            useEffect(() => {
+                if (!open) return undefined;
+                const onPointer = (event) => {
+                    if (wrapRef.current && !wrapRef.current.contains(event.target)) {
+                        setOpen(false);
+                    }
+                };
+                const onKey = (event) => {
+                    if (event.key === 'Escape') setOpen(false);
+                };
+                document.addEventListener('mousedown', onPointer);
+                document.addEventListener('keydown', onKey);
+                return () => {
+                    document.removeEventListener('mousedown', onPointer);
+                    document.removeEventListener('keydown', onKey);
+                };
+            }, [open]);
+
+            return (
+                <div
+                    ref={wrapRef}
+                    className="fc-kpi-metric fc-kpi-metric-select relative flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 bg-white/40 dark:bg-white/5 backdrop-blur-md px-1 py-1.5 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
+                    title={label}
+                >
+                    <button
+                        type="button"
+                        className="fc-kpi-metric-trigger text-slate-500/80 dark:text-slate-400"
+                        aria-haspopup="listbox"
+                        aria-expanded={open}
+                        aria-label={t('sidebar.eval_metric')}
+                        onClick={() => setOpen((prev) => !prev)}
+                    >
+                        <span className="sm:hidden text-[7px] uppercase font-bold tracking-wide leading-[1.1] min-w-0 truncate">{mobileLabel}</span>
+                        <span className="hidden sm:block text-[9px] uppercase font-bold tracking-wider leading-[1.1] min-w-0 truncate">{label}</span>
+                        <svg className="fc-kpi-metric-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </button>
+                    <div className="flex items-baseline gap-1 justify-center min-w-0 max-w-full">
+                        <span className="text-xs sm:text-base md:text-lg font-bold font-mono leading-none truncate text-slate-700 dark:text-white drop-shadow-sm">{value}</span>
+                    </div>
+                    {open && (
+                        <div className="fc-kpi-metric-menu" role="listbox" aria-label={t('sidebar.eval_metric')}>
+                            {options.map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    role="option"
+                                    aria-selected={selected === option.value}
+                                    className={`fc-model-picker-option${selected === option.value ? ' is-selected' : ''}`}
+                                    onClick={() => {
+                                        onSelect(option.value);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    {t(option.labelKey)}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        });
+
         // Number formatter helper function
         const fmtNumber = (val, minFrac = 0, maxFrac = 0) => {
             if (val === null || val === undefined || val === '-') return '-';
             const num = Number(val);
             if (isNaN(num)) return val;
             return num.toLocaleString('en-US', { minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
+        };
+
+        const formatEvaluationValue = (value, code) => {
+            if (value === null || value === undefined || value === '-' || Number.isNaN(Number(value))) return '-';
+            if (String(code || '').toLowerCase() === 'mape') return `${fmtNumber(value, 1, 1)}%`;
+            return fmtNumber(value, 0, 0);
         };
 
         const ForecastingLoader = memo(({ t, validationMethod, testHorizon }) => {
@@ -1670,23 +1861,25 @@
             );
         });
 
-        const KPICards = memo(({ results, skuCount = 0, searchQuery, onSearchQueryChange, t }) => {
+        const KPICards = memo(({ results, skuCount = 0, searchQuery, onSearchQueryChange, evaluationMetric = 'rmse', onEvaluationMetricChange, t }) => {
             const hasData = results && results.length > 0;
+            const metricCode = evaluationMetric || 'rmse';
+            const metricLabel = t(`sidebar.eval_${metricCode}`);
+            const avgEvalLabel = t('dashboard.avg_eval').replace('{metric}', metricLabel);
+            const avgEvalShort = t('dashboard.avg_eval_short').replace('{metric}', metricLabel);
 
             // Memoize expensive calculations
-            const { totalSeries, avgMse, avgMae, totalForecastVolume } = useMemo(() => {
+            const { totalSeries, avgEval, totalForecastVolume } = useMemo(() => {
                 if (!hasData) {
                     return {
                         totalSeries: skuCount > 0 ? skuCount : '-',
-                        avgMse: '-',
-                        avgMae: '-',
+                        avgEval: '-',
                         totalForecastVolume: '-',
                     };
                 }
 
                 const total = results.length;
-                const mseSum = results.reduce((sum, r) => sum + (r.mse_validation || 0), 0);
-                const maeSum = results.reduce((sum, r) => sum + (r.mae_validation || 0), 0);
+                const evalSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, metricCode) || 0), 0);
                 const fcVolume = results.reduce((sum, r) => {
                     const fcSum = r.forecast_data ? r.forecast_data.reduce((s, d) => s + (d.future_forecast || 0), 0) : 0;
                     return sum + fcSum;
@@ -1694,11 +1887,10 @@
 
                 return {
                     totalSeries: skuCount > 0 ? skuCount : total,
-                    avgMse: mseSum / total,
-                    avgMae: maeSum / total,
+                    avgEval: evalSum / total,
                     totalForecastVolume: fcVolume
                 };
-            }, [results, hasData, skuCount]);
+            }, [results, hasData, skuCount, metricCode]);
 
             const [searchActive, setSearchActive] = useState(false);
             const inputRef = React.useRef(null);
@@ -1714,8 +1906,15 @@
                     <div className="fc-kpi-metrics min-h-12 sm:min-h-16">
                         <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} />
                         <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
-                        <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={fmtNumber(avgMae, 0, 0)} />
-                        <MetricTile label={t('dashboard.avg_mse')} shortLabel={t('dashboard.avg_mse_short')} value={fmtNumber(avgMse, 0, 0)} />
+                        <MetricSelectTile
+                            label={avgEvalLabel}
+                            shortLabel={avgEvalShort}
+                            value={formatEvaluationValue(avgEval, metricCode)}
+                            options={EVALUATION_METRIC_OPTIONS}
+                            selected={metricCode}
+                            onSelect={onEvaluationMetricChange}
+                            t={t}
+                        />
                     </div>
 
                     <div className="fc-kpi-search flex items-center justify-center sm:justify-end border-l border-white/20 dark:border-white/10 px-2 sm:px-4">
@@ -1923,8 +2122,10 @@
             );
         });
 
-        const BatchOverview = memo(({ results, onSelectSku, selectedSkus, onToggleSku, onToggleSelectAll, t }) => {
-            const formatMetric = (value) => (value == null || value === '' ? '-' : Number(value).toLocaleString());
+        const BatchOverview = memo(({ results, onSelectSku, selectedSkus, onToggleSku, onToggleSelectAll, evaluationMetric = 'rmse', t }) => {
+            const formatMetric = (value, code) => formatEvaluationValue(value, code);
+            const metricCode = evaluationMetric || 'rmse';
+            const metricLabel = t(`sidebar.eval_${metricCode}`);
             const selectAllDesktopRef = useRef(null);
             const selectAllMobileRef = useRef(null);
             const selectedSet = useMemo(() => new Set(selectedSkus), [selectedSkus]);
@@ -1939,9 +2140,8 @@
                 { key: 'status', label: t('dashboard.table_status') },
                 { key: 'validation', label: t('dashboard.table_validation') },
                 { key: 'model', label: t('dashboard.table_best_model') },
-                { key: 'mae', label: t('dashboard.table_mae') },
-                { key: 'mse', label: t('dashboard.table_mse') },
-            ]), [t]);
+                { key: 'eval', label: metricLabel },
+            ]), [t, metricLabel]);
 
             const activeSortLabel = useMemo(() => {
                 const match = sortOptions.find((opt) => opt.key === sortKey);
@@ -1985,10 +2185,9 @@
                         cmp = toStr(a.validation_method || '').localeCompare(toStr(b.validation_method || ''), undefined, { sensitivity: 'base' });
                     } else if (sortKey === 'model') {
                         cmp = toStr(a.best_ts_model || '').localeCompare(toStr(b.best_ts_model || ''), undefined, { sensitivity: 'base' });
-                    } else if (sortKey === 'mae' || sortKey === 'mse') {
-                        const field = sortKey === 'mae' ? 'mae_validation' : 'mse_validation';
-                        const av = toNum(a[field]);
-                        const bv = toNum(b[field]);
+                    } else if (sortKey === 'eval' || sortKey === 'mse') {
+                        const av = evaluationMetricValue(a, metricCode);
+                        const bv = evaluationMetricValue(b, metricCode);
                         if (av == null && bv == null) cmp = 0;
                         else if (av == null) cmp = 1;
                         else if (bv == null) cmp = -1;
@@ -1999,7 +2198,7 @@
                     }
                     return cmp * dir;
                 });
-            }, [results, sortKey, sortDir]);
+            }, [results, sortKey, sortDir, metricCode]);
 
             const SortHeader = ({ columnKey, label, align = 'left', thClassName = '' }) => {
                 const active = sortKey === columnKey;
@@ -2066,20 +2265,14 @@
                                     <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
-                                    <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mae_validation)}</span>
-                                </div>
-                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mse')}</span>
-                                    <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mse_validation)}</span>
-                                </div>
+                            <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{metricLabel}</span>
+                                <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(evaluationMetricValue(r, metricCode), metricCode)}</span>
                             </div>
                         </button>
                     </div>
                 );
-            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
+            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t, metricCode, metricLabel]);
 
             const tableRows = useMemo(() => sortedResults.map((r, i) => {
                 const isReady = r.status === 'success';
@@ -2122,11 +2315,10 @@
                         <td className="p-2 lg:p-3 w-24 lg:w-28 text-slate-600 dark:text-slate-300 uppercase text-center overflow-hidden">
                             <span className="block truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</span>
                         </td>
-                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(r.mae_validation)}</td>
-                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(r.mse_validation)}</td>
+                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(evaluationMetricValue(r, metricCode), metricCode)}</td>
                     </tr>
                 );
-            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
+            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t, metricCode]);
 
             return (
                 <div className="fc-overview-shell w-full h-full">
@@ -2229,8 +2421,7 @@
                                 <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[8.75rem]" />
                                 <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-28 lg:w-32" />
                                 <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-24 lg:w-28" />
-                                <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" thClassName="w-20 lg:w-24" />
-                                <SortHeader columnKey="mse" label={t('dashboard.table_mse')} align="right" thClassName="w-20 lg:w-24" />
+                                <SortHeader columnKey="eval" label={metricLabel} align="right" thClassName="w-20 lg:w-24" />
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -2913,11 +3104,15 @@
             const [selectedModels, setSelectedModels] = useState(() => [...SELECTABLE_MODEL_ORDER]);
             const [modelPickerOpen, setModelPickerOpen] = useState(false);
             const [validationPickerOpen, setValidationPickerOpen] = useState(false);
+            const [metricPickerOpen, setMetricPickerOpen] = useState(false);
             const modelPickerRef = useRef(null);
             const validationPickerRef = useRef(null);
+            const metricPickerRef = useRef(null);
             const [trainHorizon, setTrainHorizon] = useState("24");
             const [testHorizon, setTestHorizon] = useState("6");
             const [validationMethod, setValidationMethod] = useState("simple");
+            const [evaluationMetric, setEvaluationMetric] = useState("rmse");
+            const [displayMetric, setDisplayMetric] = useState("rmse");
             const [forecastSteps, setForecastSteps] = useState("6");
             const [totalTimeSeries, setTotalTimeSeries] = useState(0);
 
@@ -3122,7 +3317,7 @@
             }, []);
             useEffect(() => { window.persistOperartisLang(lang); }, [lang]);
             useEffect(() => {
-                if (!modelPickerOpen && !validationPickerOpen) return undefined;
+                if (!modelPickerOpen && !validationPickerOpen && !metricPickerOpen) return undefined;
                 const onPointer = (event) => {
                     if (modelPickerRef.current && !modelPickerRef.current.contains(event.target)) {
                         setModelPickerOpen(false);
@@ -3130,11 +3325,15 @@
                     if (validationPickerRef.current && !validationPickerRef.current.contains(event.target)) {
                         setValidationPickerOpen(false);
                     }
+                    if (metricPickerRef.current && !metricPickerRef.current.contains(event.target)) {
+                        setMetricPickerOpen(false);
+                    }
                 };
                 const onKey = (event) => {
                     if (event.key === 'Escape') {
                         setModelPickerOpen(false);
                         setValidationPickerOpen(false);
+                        setMetricPickerOpen(false);
                     }
                 };
                 document.addEventListener('mousedown', onPointer);
@@ -3143,11 +3342,12 @@
                     document.removeEventListener('mousedown', onPointer);
                     document.removeEventListener('keydown', onKey);
                 };
-            }, [modelPickerOpen, validationPickerOpen]);
+            }, [modelPickerOpen, validationPickerOpen, metricPickerOpen]);
             useEffect(() => {
                 if (isPolling || runningSkus.length > 0 || isCancelling) {
                     setModelPickerOpen(false);
                     setValidationPickerOpen(false);
+                    setMetricPickerOpen(false);
                 }
             }, [isPolling, runningSkus, isCancelling]);
 
@@ -3527,6 +3727,7 @@
                     for (const sku of skusToRun) next[String(sku)] = validationMethod;
                     return next;
                 });
+                setDisplayMetric(normalizeContestMetric(evaluationMetric));
 
                 console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus, skusToRun });
 
@@ -3539,6 +3740,7 @@
                 fd.append('model_type', selectedModelType);
                 fd.append('selected_models', JSON.stringify(selectedModels));
                 fd.append('validation_method', validationMethod);
+                fd.append('evaluation_metric', normalizeContestMetric(evaluationMetric));
                 fd.append('train_horizon', parseInt(trainHorizon) || 24);
                 fd.append('test_horizon', parseInt(testHorizon) || 6);
                 fd.append('forecast_steps', parseInt(forecastSteps) || 6);
@@ -3734,6 +3936,7 @@
                     fd.append('model_type', exportModelType);
                     fd.append('selected_models', JSON.stringify(exportSelected));
                     fd.append('validation_method', validationMethod);
+                    fd.append('evaluation_metric', normalizeContestMetric(evaluationMetric));
                     fd.append('train_horizon', parseInt(trainHorizon) || 24);
                     fd.append('test_horizon', parseInt(testHorizon) || 6);
                     fd.append('forecast_steps', parseInt(forecastSteps) || 6);
@@ -3769,6 +3972,7 @@
                 setJobStatus(null); setJobModelType(null); setJobSelectedModels(null); setExecutionBackend(null);
                 setModelPickerOpen(false);
                 setValidationPickerOpen(false);
+                setMetricPickerOpen(false);
                 setJobProgress({ completed: 0, total: 0 }); setIsCancelling(false);
                 setSkuCol(""); setStartCol(""); setEndCol("");
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
@@ -3781,6 +3985,7 @@
                 setOverviewSearchQuery("");
                 setActiveTab("overview");
                 setSkuValidationMethods({});
+                setDisplayMetric(evaluationMetric);
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
 
@@ -3912,6 +4117,8 @@
                             best_ts_model: null,
                             mae_validation: null,
                             mse_validation: null,
+                            rmse_validation: null,
+                            mape_validation: null,
                         };
                     }
                     if (result) {
@@ -3928,6 +4135,8 @@
                         best_ts_model: null,
                         mae_validation: null,
                         mse_validation: null,
+                        rmse_validation: null,
+                        mape_validation: null,
                     };
                 });
             }, [mappedSkus, batchResults, runningSkus, skuValidationMethods]);
@@ -4112,6 +4321,7 @@
                                                 disabled={isRunning}
                                                 onClick={() => {
                                                     setValidationPickerOpen(false);
+                                                    setMetricPickerOpen(false);
                                                     setModelPickerOpen((open) => !open);
                                                 }}
                                                 className="fc-sidebar-control fc-model-picker-trigger w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
@@ -4174,6 +4384,7 @@
                                                 aria-expanded={validationPickerOpen}
                                                 onClick={() => {
                                                     setModelPickerOpen(false);
+                                                    setMetricPickerOpen(false);
                                                     setValidationPickerOpen((open) => !open);
                                                 }}
                                                 className="fc-sidebar-control fc-model-picker-trigger w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors"
@@ -4197,6 +4408,52 @@
                                                             onClick={() => {
                                                                 setValidationMethod(option.value);
                                                                 setValidationPickerOpen(false);
+                                                            }}
+                                                        >
+                                                            {t(option.labelKey)}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="forecast-evaluation-metric" className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.eval_metric')}</label>
+                                        <div className="fc-sidebar-select-wrap" ref={metricPickerRef}>
+                                            <button
+                                                type="button"
+                                                id="forecast-evaluation-metric"
+                                                aria-haspopup="listbox"
+                                                aria-expanded={metricPickerOpen}
+                                                onClick={() => {
+                                                    setModelPickerOpen(false);
+                                                    setValidationPickerOpen(false);
+                                                    setMetricPickerOpen((open) => !open);
+                                                }}
+                                                className="fc-sidebar-control fc-model-picker-trigger w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors"
+                                            >
+                                                <span className="min-w-0 truncate">
+                                                    {t((CONTEST_EVALUATION_METRIC_OPTIONS.find((option) => option.value === normalizeContestMetric(evaluationMetric)) || CONTEST_EVALUATION_METRIC_OPTIONS[0]).labelKey)}
+                                                </span>
+                                            </button>
+                                            <svg className="fc-sidebar-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9" />
+                                            </svg>
+                                            {metricPickerOpen && (
+                                                <div className="fc-model-picker-menu" role="listbox" aria-labelledby="forecast-evaluation-metric">
+                                                    {CONTEST_EVALUATION_METRIC_OPTIONS.map((option) => (
+                                                        <button
+                                                            key={option.value}
+                                                            type="button"
+                                                            role="option"
+                                                            aria-selected={normalizeContestMetric(evaluationMetric) === option.value}
+                                                            className={`fc-model-picker-option${normalizeContestMetric(evaluationMetric) === option.value ? ' is-selected' : ''}`}
+                                                            onClick={() => {
+                                                                setEvaluationMetric(option.value);
+                                                                if (!(batchResults && batchResults.length)) {
+                                                                    setDisplayMetric(option.value);
+                                                                }
+                                                                setMetricPickerOpen(false);
                                                             }}
                                                         >
                                                             {t(option.labelKey)}
@@ -4351,8 +4608,8 @@
 
                             {/* KPI BAR — with Overview tab after mapping confirm */}
                             {mappingReady && (
-                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden relative">
-                                <KPICards results={batchResults} skuCount={mappedSkus.length} searchQuery={overviewSearchQuery} onSearchQueryChange={handleOverviewSearchChange} t={t} />
+                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-visible relative">
+                                <KPICards results={batchResults} skuCount={mappedSkus.length} searchQuery={overviewSearchQuery} onSearchQueryChange={handleOverviewSearchChange} evaluationMetric={displayMetric} onEvaluationMetricChange={setDisplayMetric} t={t} />
                             </div>
                             )}
                         </div>
@@ -4401,6 +4658,7 @@
                                                     selectedSkus={selectedSkus}
                                                     onToggleSku={handleToggleSkuSelection}
                                                     onToggleSelectAll={handleToggleSelectAll}
+                                                    evaluationMetric={displayMetric}
                                                     t={t}
                                                 />
                                             )}
@@ -4429,8 +4687,8 @@
                                                                     <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{skuData.best_ts_model.toUpperCase()}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
-                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
-                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
+                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t(`sidebar.eval_${displayMetric}`)}</span>
+                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{formatEvaluationValue(evaluationMetricValue(skuData, displayMetric), displayMetric)}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
