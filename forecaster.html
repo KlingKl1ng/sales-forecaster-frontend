@@ -190,6 +190,112 @@
             color: #94a3b8;
         }
 
+        .fc-model-picker-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            padding-right: 1.75rem;
+        }
+
+        .fc-model-picker-trigger[aria-expanded="true"] + .fc-sidebar-select-chevron {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .fc-model-picker-menu {
+            position: absolute;
+            z-index: 40;
+            top: calc(100% + 0.3rem);
+            left: 0;
+            right: 0;
+            padding: 0.3rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+            max-height: 16.5rem;
+            overflow-y: auto;
+        }
+
+        .dark .fc-model-picker-menu {
+            border-color: #334155;
+            background: #020617;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+        }
+
+        .fc-model-picker-option {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            width: 100%;
+            padding: 0.32rem 0.4rem;
+            border-radius: 0.5rem;
+            font-size: 0.65rem;
+            line-height: 1rem;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .dark .fc-model-picker-option {
+            color: #e2e8f0;
+        }
+
+        .fc-model-picker-option:hover,
+        .fc-model-picker-option:focus-within {
+            background: #f8fafc;
+        }
+
+        .dark .fc-model-picker-option:hover,
+        .dark .fc-model-picker-option:focus-within {
+            background: #1e293b;
+        }
+
+        .fc-model-picker-option.is-disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        button.fc-model-picker-option {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .fc-model-picker-option.is-selected {
+            color: #d97706;
+            font-weight: 700;
+        }
+
+        .dark .fc-model-picker-option.is-selected {
+            color: #f59e0b;
+        }
+
+        .fc-model-picker-option input {
+            width: 0.8rem;
+            height: 0.8rem;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .fc-model-picker-select-all {
+            margin-bottom: 0.15rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+        }
+
+        .dark .fc-model-picker-select-all {
+            border-bottom-color: #334155;
+            color: #94a3b8;
+        }
+
         /* Interface tab buttons — match dashboard .nav-btn / .nav-btn.active */
         .fc-iface-btn {
             display: flex;
@@ -739,15 +845,26 @@
                     edit_mapping: "Edit Mapping",
                     configuration: "Configuration",
                     action: "Action",
-                    model_profile: "Forecast Profile",
+                    model_profile: "Forecast Model",
                     model_basic_auto: "Basic Automatic",
                     model_advanced_auto: "Advanced Automatic",
                     model_arma: "ARMA",
                     model_arima: "ARIMA",
-                    model_mlp: "Neural MLP",
+                    model_mlp: "MLP",
+                    model_ses: "SES",
+                    model_des: "DES",
+                    model_tes: "TES",
+                    model_prophet: "Prophet",
+                    models_all: "All models",
+                    models_selected: "{count} selected",
+                    models_select_all: "Select all",
+                    models_required: "Select at least one model.",
                     cloud_checking: "Checking cloud forecasting availability...",
                     cloud_unavailable: "Advanced profiles require cloud forecasting, which is currently unavailable.",
                     val_method: "Validation Method",
+                    val_simple: "Simple Split (Fast)",
+                    val_walk_forward: "Walk-Forward (Adaptive)",
+                    val_rolling_window: "Rolling Window (Adaptive)",
                     train_h: "Train Horizon",
                     test_h: "Test Horizon",
                     fc_h: "Forecast Horizon",
@@ -825,9 +942,9 @@
                     total_skus_short: "SKUs",
                     total_vol: "Total Forecast Vol",
                     total_vol_short: "Forecast Vol",
-                    avg_mae: "Avg. Validation MAE",
+                    avg_mae: "Avg. MAE",
                     avg_mae_short: "MAE",
-                    avg_mse: "Avg. Validation MSE",
+                    avg_mse: "Avg. MSE",
                     avg_mse_short: "MSE",
                     search_placeholder: "Search",
                     no_results: "No Results Loaded",
@@ -836,8 +953,8 @@
                     table_status: "Status",
                     table_validation: "Validation",
                     table_best_model: "Best Model",
-                    table_mae: "MAE (Val)",
-                    table_mse: "MSE (Val)",
+                    table_mae: "MAE",
+                    table_mse: "MSE",
                     table_action: "Action",
                     table_select: "Select",
                     select_all: "Select all",
@@ -858,7 +975,7 @@
                     select_required_ok: "OK",
                     view_details: "View Details",
                     best_model: "Model",
-                    val_mse: "Val. MSE"
+                    val_mse: "MSE"
                 },
                 charts: {
                     act_train: "Actual (Train)",
@@ -880,15 +997,26 @@
                     edit_mapping: "Chỉnh sửa dữ liệu",
                     configuration: "Cấu hình",
                     action: "Hành động",
-                    model_profile: "Hồ sơ dự báo",
+                    model_profile: "Mô hình dự báo",
                     model_basic_auto: "Tự động cơ bản",
                     model_advanced_auto: "Tự động nâng cao",
                     model_arma: "ARMA",
                     model_arima: "ARIMA",
-                    model_mlp: "MLP mạng nơ-ron",
+                    model_mlp: "MLP",
+                    model_ses: "SES",
+                    model_des: "DES",
+                    model_tes: "TES",
+                    model_prophet: "Prophet",
+                    models_all: "Tất cả mô hình",
+                    models_selected: "{count} đã chọn",
+                    models_select_all: "Chọn tất cả",
+                    models_required: "Hãy chọn ít nhất một mô hình.",
                     cloud_checking: "Đang kiểm tra khả năng dự báo đám mây...",
                     cloud_unavailable: "Các hồ sơ nâng cao cần dự báo đám mây, hiện không khả dụng.",
                     val_method: "Phương pháp kiểm định",
+                    val_simple: "Tách đơn giản (Nhanh)",
+                    val_walk_forward: "Walk-Forward (Thích ứng)",
+                    val_rolling_window: "Cửa sổ trượt (Thích ứng)",
                     train_h: "Chu kỳ H.luyện",
                     test_h: "Chu kỳ K.định",
                     fc_h: "Chu kỳ dự báo",
@@ -966,9 +1094,9 @@
                     total_skus_short: "SKU",
                     total_vol: "Tổng lượng dự báo",
                     total_vol_short: "Tổng dự báo",
-                    avg_mae: "MAE trung bình (Val)",
+                    avg_mae: "MAE trung bình",
                     avg_mae_short: "MAE",
-                    avg_mse: "MSE trung bình (Val)",
+                    avg_mse: "MSE trung bình",
                     avg_mse_short: "MSE",
                     search_placeholder: "Tìm kiếm",
                     no_results: "Chưa có kết quả",
@@ -977,8 +1105,8 @@
                     table_status: "Trạng thái",
                     table_validation: "Kiểm định",
                     table_best_model: "Mô hình tốt nhất",
-                    table_mae: "MAE (Val)",
-                    table_mse: "MSE (Val)",
+                    table_mae: "MAE",
+                    table_mse: "MSE",
                     table_action: "Hành động",
                     table_select: "Chọn",
                     select_all: "Chọn tất cả",
@@ -999,7 +1127,7 @@
                     select_required_ok: "OK",
                     view_details: "Xem chi tiết",
                     best_model: "Mô hình",
-                    val_mse: "MSE (Val)"
+                    val_mse: "MSE"
                 },
                 charts: {
                     act_train: "Thực tế (Train)",
@@ -1021,15 +1149,26 @@
                     edit_mapping: "Zuordnung bearbeiten",
                     configuration: "Konfiguration",
                     action: "Aktion",
-                    model_profile: "Prognoseprofil",
+                    model_profile: "Prognosemodell",
                     model_basic_auto: "Basis-Automatik",
                     model_advanced_auto: "Erweiterte Automatik",
                     model_arma: "ARMA",
                     model_arima: "ARIMA",
-                    model_mlp: "Neuronales MLP",
+                    model_mlp: "MLP",
+                    model_ses: "SES",
+                    model_des: "DES",
+                    model_tes: "TES",
+                    model_prophet: "Prophet",
+                    models_all: "Alle Modelle",
+                    models_selected: "{count} ausgewählt",
+                    models_select_all: "Alle auswählen",
+                    models_required: "Bitte mindestens ein Modell auswählen.",
                     cloud_checking: "Cloud-Prognoseverfügbarkeit wird geprüft...",
                     cloud_unavailable: "Erweiterte Profile benötigen die derzeit nicht verfügbare Cloud-Prognose.",
                     val_method: "Validierungsmethode",
+                    val_simple: "Einfacher Split (Schnell)",
+                    val_walk_forward: "Walk-Forward (Adaptiv)",
+                    val_rolling_window: "Rolling Window (Adaptiv)",
                     train_h: "Train-Horizont",
                     test_h: "Test-Horizont",
                     fc_h: "Prognose-Horizont",
@@ -1107,9 +1246,9 @@
                     total_skus_short: "SKUs",
                     total_vol: "Gesamtprognosevolumen",
                     total_vol_short: "Prognose",
-                    avg_mae: "Ø Validierungs-MAE",
+                    avg_mae: "Ø MAE",
                     avg_mae_short: "MAE",
-                    avg_mse: "Ø Validierungs-MSE",
+                    avg_mse: "Ø MSE",
                     avg_mse_short: "MSE",
                     search_placeholder: "SKU suchen...",
                     no_results: "Keine Ergebnisse geladen",
@@ -1118,8 +1257,8 @@
                     table_status: "Status",
                     table_validation: "Validierung",
                     table_best_model: "Bestes Modell",
-                    table_mae: "MAE (Val)",
-                    table_mse: "MSE (Val)",
+                    table_mae: "MAE",
+                    table_mse: "MSE",
                     table_action: "Aktion",
                     table_select: "Auswählen",
                     select_all: "Alle auswählen",
@@ -1140,7 +1279,7 @@
                     select_required_ok: "OK",
                     view_details: "Details ansehen",
                     best_model: "Modell",
-                    val_mse: "Val. MSE"
+                    val_mse: "MSE"
                 },
                 charts: {
                     act_train: "Ist (Training)",
@@ -1195,23 +1334,43 @@
             PROD: window.OperartisApi ? window.OperartisApi.getDefaultApiBase() : 'https://api.operartis.io'
         };
         const FORECAST_CAPABILITY_PATH = '/forecast-capabilities';
-        const FORECAST_MODEL_OPTIONS = [
-            { value: 'auto', labelKey: 'sidebar.model_basic_auto', advanced: false },
-            { value: 'advanced_auto', labelKey: 'sidebar.model_advanced_auto', advanced: true },
-            { value: 'arma', labelKey: 'sidebar.model_arma', advanced: true, hidden: true },
-            { value: 'arima', labelKey: 'sidebar.model_arima', advanced: true, hidden: true },
-            { value: 'mlp', labelKey: 'sidebar.model_mlp', advanced: true, hidden: true },
+        const SELECTABLE_FORECAST_MODELS = [
+            { value: 'ses', labelKey: 'sidebar.model_ses', advanced: false },
+            { value: 'des', labelKey: 'sidebar.model_des', advanced: false },
+            { value: 'tes', labelKey: 'sidebar.model_tes', advanced: false },
+            { value: 'prophet', labelKey: 'sidebar.model_prophet', advanced: false },
+            { value: 'arma', labelKey: 'sidebar.model_arma', advanced: true },
+            { value: 'arima', labelKey: 'sidebar.model_arima', advanced: true },
+            { value: 'mlp', labelKey: 'sidebar.model_mlp', advanced: true },
         ];
-        const VISIBLE_FORECAST_MODEL_OPTIONS = FORECAST_MODEL_OPTIONS.filter((option) => !option.hidden);
-        const ADVANCED_MODEL_TYPES = new Set(
-            FORECAST_MODEL_OPTIONS.filter((option) => option.advanced).map((option) => option.value)
-        );
-        const HIDDEN_MANUAL_MODEL_TYPES = new Set(
-            FORECAST_MODEL_OPTIONS.filter((option) => option.hidden).map((option) => option.value)
-        );
-        const TERMINAL_JOB_STATUSES = new Set(['completed', 'failed', 'canceled']);
+        const VALIDATION_METHOD_OPTIONS = [
+            { value: 'simple', labelKey: 'sidebar.val_simple' },
+            { value: 'walk_forward', labelKey: 'sidebar.val_walk_forward' },
+            { value: 'rolling_window', labelKey: 'sidebar.val_rolling_window' },
+        ];
+        const SELECTABLE_MODEL_ORDER = SELECTABLE_FORECAST_MODELS.map((option) => option.value);
+        const HEAVY_SELECTABLE_MODELS = new Set(['arma', 'arima', 'mlp']);
+        const HEAVY_MODEL_TYPES = new Set(['advanced_auto', 'arma', 'arima', 'mlp']);
 
-        const isAdvancedModelType = (modelType) => ADVANCED_MODEL_TYPES.has(String(modelType || '').toLowerCase());
+        const orderedSelectedModels = (selected) => (
+            SELECTABLE_MODEL_ORDER.filter((code) => (selected || []).includes(code))
+        );
+
+        const deriveModelType = (selected) => {
+            const codes = orderedSelectedModels(selected);
+            if (codes.length === 1) return codes[0];
+            return 'custom';
+        };
+
+        const selectionUsesHeavy = (selected) => (
+            (selected || []).some((code) => HEAVY_SELECTABLE_MODELS.has(String(code || '').toLowerCase()))
+        );
+
+        const isAdvancedModelType = (modelType, selected) => {
+            if (Array.isArray(selected) && selected.length) return selectionUsesHeavy(selected);
+            return HEAVY_MODEL_TYPES.has(String(modelType || '').toLowerCase());
+        };
+        const TERMINAL_JOB_STATUSES = new Set(['completed', 'failed', 'canceled']);
 
         const normalizeJobStatus = (status) => {
             const normalized = String(status || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
@@ -1249,10 +1408,39 @@
             return profiles;
         };
 
+        const FORECAST_MONTH_NAMES = {
+            january: 0, february: 1, march: 2, april: 3, june: 5, july: 6,
+            august: 7, september: 8, october: 9, november: 10, december: 11,
+            sept: 8, jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6,
+            aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+        };
+
+        const parseForecastHeaderDate = (header) => {
+            const text = String(header == null ? '' : header).trim();
+            if (!text) return NaN;
+            if (/(?:19|20)\d{2}/.test(text)) {
+                const parsed = Date.parse(text);
+                if (!Number.isNaN(parsed)) return parsed;
+            }
+            const lowered = text.toLowerCase();
+            const monthNames = Object.keys(FORECAST_MONTH_NAMES).sort((left, right) => right.length - left.length);
+            for (let index = 0; index < monthNames.length; index += 1) {
+                const monthName = monthNames[index];
+                if (!new RegExp(`(?:^|[^a-z])${monthName}(?:$|[^a-z])`).test(lowered)) continue;
+                const yearMatch = text.match(/\b(20\d{2}|19\d{2}|\d{2})\b/);
+                if (!yearMatch) return NaN;
+                let year = parseInt(yearMatch[1], 10);
+                if (yearMatch[1].length === 2) year = year < 70 ? 2000 + year : 1900 + year;
+                return Date.UTC(year, FORECAST_MONTH_NAMES[monthName], 1);
+            }
+            const parsed = Date.parse(text);
+            return Number.isNaN(parsed) ? NaN : parsed;
+        };
+
         const inferFrequencyFromHeaders = (headers) => {
             const dates = [];
             (headers || []).forEach((header) => {
-                const parsed = Date.parse(header);
+                const parsed = parseForecastHeaderDate(header);
                 if (!Number.isNaN(parsed)) dates.push(parsed);
             });
             if (dates.length < 2) return 'monthly';
@@ -2722,7 +2910,11 @@
             const [startColIdx, setStartColIdx] = useState(-1);
             const [endColIdx, setEndColIdx] = useState(-1);
 
-            const [modelType, setModelType] = useState("auto");
+            const [selectedModels, setSelectedModels] = useState(() => [...SELECTABLE_MODEL_ORDER]);
+            const [modelPickerOpen, setModelPickerOpen] = useState(false);
+            const [validationPickerOpen, setValidationPickerOpen] = useState(false);
+            const modelPickerRef = useRef(null);
+            const validationPickerRef = useRef(null);
             const [trainHorizon, setTrainHorizon] = useState("24");
             const [testHorizon, setTestHorizon] = useState("6");
             const [validationMethod, setValidationMethod] = useState("simple");
@@ -2739,6 +2931,7 @@
             const [batchResults, setBatchResults] = useState(null);
             const [jobStatus, setJobStatus] = useState(null);
             const [jobModelType, setJobModelType] = useState(null);
+            const [jobSelectedModels, setJobSelectedModels] = useState(null);
             const [executionBackend, setExecutionBackend] = useState(null);
             const [jobProgress, setJobProgress] = useState({ completed: 0, total: 0 });
             const [isCancelling, setIsCancelling] = useState(false);
@@ -2865,16 +3058,16 @@
                         const parsed = parseForecastCapabilities(await response.json());
                         if (disposed) return;
                         setForecastCapabilities({ status: 'ready', ...parsed });
-                        setModelType((current) => {
-                            const value = String(current || '').toLowerCase();
-                            const advancedAvailable = parsed.supportedModels.length > 0
-                                ? parsed.supportedModels.includes('advanced_auto')
-                                : parsed.cloudEnabled === true;
-                            if (HIDDEN_MANUAL_MODEL_TYPES.has(value)) {
-                                return advancedAvailable ? 'advanced_auto' : 'auto';
-                            }
-                            if (value === 'advanced_auto' && !advancedAvailable) return 'auto';
-                            return current;
+                        const heavyAvailable = parsed.supportedModels.length > 0
+                            ? parsed.supportedModels.some((model) => HEAVY_SELECTABLE_MODELS.has(model) || model === 'advanced_auto')
+                            : parsed.cloudEnabled === true;
+                        setSelectedModels((current) => {
+                            const next = orderedSelectedModels(current).filter((code) => (
+                                !HEAVY_SELECTABLE_MODELS.has(code) || heavyAvailable
+                            ));
+                            return next.length ? next : SELECTABLE_MODEL_ORDER.filter((code) => (
+                                !HEAVY_SELECTABLE_MODELS.has(code) || heavyAvailable
+                            ));
                         });
                     } catch (capabilityError) {
                         if (disposed) return;
@@ -2884,7 +3077,14 @@
                             supportedModels: [],
                             frequencyProfiles: parseFrequencyProfiles(),
                         });
-                        setModelType((current) => isAdvancedModelType(current) ? 'auto' : current);
+                        setSelectedModels((current) => {
+                            const next = orderedSelectedModels(current).filter((code) => (
+                                !HEAVY_SELECTABLE_MODELS.has(code)
+                            ));
+                            return next.length ? next : SELECTABLE_MODEL_ORDER.filter((code) => (
+                                !HEAVY_SELECTABLE_MODELS.has(code)
+                            ));
+                        });
                         if (capabilityError.name !== 'AbortError') {
                             console.warn('Cloud forecasting capabilities unavailable:', capabilityError);
                         }
@@ -2921,6 +3121,35 @@
                 return () => window.removeEventListener('operartis:lang-change', handler);
             }, []);
             useEffect(() => { window.persistOperartisLang(lang); }, [lang]);
+            useEffect(() => {
+                if (!modelPickerOpen && !validationPickerOpen) return undefined;
+                const onPointer = (event) => {
+                    if (modelPickerRef.current && !modelPickerRef.current.contains(event.target)) {
+                        setModelPickerOpen(false);
+                    }
+                    if (validationPickerRef.current && !validationPickerRef.current.contains(event.target)) {
+                        setValidationPickerOpen(false);
+                    }
+                };
+                const onKey = (event) => {
+                    if (event.key === 'Escape') {
+                        setModelPickerOpen(false);
+                        setValidationPickerOpen(false);
+                    }
+                };
+                document.addEventListener('mousedown', onPointer);
+                document.addEventListener('keydown', onKey);
+                return () => {
+                    document.removeEventListener('mousedown', onPointer);
+                    document.removeEventListener('keydown', onKey);
+                };
+            }, [modelPickerOpen, validationPickerOpen]);
+            useEffect(() => {
+                if (isPolling || runningSkus.length > 0 || isCancelling) {
+                    setModelPickerOpen(false);
+                    setValidationPickerOpen(false);
+                }
+            }, [isPolling, runningSkus, isCancelling]);
 
             const t = (key) => {
                 const keys = key.split('.');
@@ -2941,16 +3170,15 @@
                 if (forecastCapabilities.status !== 'ready') return false;
                 const value = String(candidate || '').toLowerCase();
                 if (forecastCapabilities.supportedModels.length > 0) {
-                    return forecastCapabilities.supportedModels.includes(value);
+                    return forecastCapabilities.supportedModels.includes(value)
+                        || forecastCapabilities.supportedModels.includes('advanced_auto');
                 }
                 return forecastCapabilities.cloudEnabled === true;
             };
-            const hasAvailableAdvancedModels = VISIBLE_FORECAST_MODEL_OPTIONS.some(
+            const hasAvailableAdvancedModels = SELECTABLE_FORECAST_MODELS.some(
                 (option) => option.advanced && isForecastModelAvailable(option.value)
             );
-            const selectedProfile = HIDDEN_MANUAL_MODEL_TYPES.has(String(modelType || '').toLowerCase())
-                ? (isForecastModelAvailable('advanced_auto') ? 'advanced_auto' : 'auto')
-                : modelType;
+            const modelType = deriveModelType(selectedModels);
             const frequencyProfiles = forecastCapabilities.frequencyProfiles || parseFrequencyProfiles();
             const activeFrequencyProfile = frequencyProfiles[inferredFrequency] || frequencyProfiles.monthly;
             const maxTrainHorizon = Number(activeFrequencyProfile.max_train_horizon) || 240;
@@ -2971,7 +3199,7 @@
                     let lastCompleted = -1;
                     let lastStatus = '';
                     let pollBackend = executionBackend || (
-                        isAdvancedModelType(jobModelType) && forecastCapabilities.cloudEnabled
+                        isAdvancedModelType(jobModelType, jobSelectedModels) && forecastCapabilities.cloudEnabled
                             ? 'cloud'
                             : 'local'
                     );
@@ -3076,7 +3304,7 @@
                     clearTimeout(timeoutId);
                     if (activeController) activeController.abort();
                 };
-            }, [isPolling, jobId, BASE_URL, jobModelType]);
+            }, [isPolling, jobId, BASE_URL, jobModelType, jobSelectedModels]);
 
             // --- HANDLERS ---
             const handleFileChange = (e) => {
@@ -3251,8 +3479,14 @@
                     );
                     return;
                 }
-                const selectedModelType = selectedProfile;
-                if (!isForecastModelAvailable(selectedModelType)) {
+                const selectedModelType = deriveModelType(selectedModels);
+                if (!selectedModels.length) {
+                    setAlertMessage(t('sidebar.models_required'));
+                    return;
+                }
+                if (selectionUsesHeavy(selectedModels) && selectedModels.some((code) => (
+                    HEAVY_SELECTABLE_MODELS.has(code) && !isForecastModelAvailable(code)
+                ))) {
                     setAlertMessage(t('sidebar.cloud_unavailable'));
                     return;
                 }
@@ -3279,8 +3513,9 @@
                 setError(null);
                 setJobStatus("queued");
                 setJobModelType(selectedModelType);
+                setJobSelectedModels([...selectedModels]);
                 setExecutionBackend(
-                    isAdvancedModelType(selectedModelType) && forecastCapabilities.cloudEnabled
+                    selectionUsesHeavy(selectedModels) && forecastCapabilities.cloudEnabled
                         ? 'cloud'
                         : 'local'
                 );
@@ -3302,6 +3537,7 @@
                 fd.append('end_col_idx', endColIdx);
                 fd.append('data_format', 'horizontal');
                 fd.append('model_type', selectedModelType);
+                fd.append('selected_models', JSON.stringify(selectedModels));
                 fd.append('validation_method', validationMethod);
                 fd.append('train_horizon', parseInt(trainHorizon) || 24);
                 fd.append('test_horizon', parseInt(testHorizon) || 6);
@@ -3325,7 +3561,7 @@
                     setExecutionBackend(
                         normalizeExecutionBackend(data.execution_backend || data.backend)
                         || (
-                            isAdvancedModelType(selectedModelType) && forecastCapabilities.cloudEnabled
+                            selectionUsesHeavy(selectedModels) && forecastCapabilities.cloudEnabled
                                 ? 'cloud'
                                 : 'local'
                         )
@@ -3438,8 +3674,11 @@
             const handleExport = async () => {
                 if (!file || !skuCol || !startCol || !endCol) { setError("Please load and map data first."); return; }
                 if (isExporting) return;
+                const exportSelected = jobId && jobSelectedModels && jobSelectedModels.length
+                    ? jobSelectedModels
+                    : selectedModels;
                 const exportModelType = jobId && jobModelType ? jobModelType : modelType;
-                const advancedExport = isAdvancedModelType(exportModelType);
+                const advancedExport = isAdvancedModelType(exportModelType, exportSelected);
                 if (advancedExport && (
                     normalizeJobStatus(jobStatus) !== 'completed'
                     || completedJobIds.length === 0
@@ -3492,7 +3731,8 @@
                     }
                     const fd = new FormData();
                     fd.append('file', file);
-                    fd.append('model_type', modelType);
+                    fd.append('model_type', exportModelType);
+                    fd.append('selected_models', JSON.stringify(exportSelected));
                     fd.append('validation_method', validationMethod);
                     fd.append('train_horizon', parseInt(trainHorizon) || 24);
                     fd.append('test_horizon', parseInt(testHorizon) || 6);
@@ -3526,7 +3766,9 @@
             const handleReset = () => {
                 ++runGenerationRef.current;
                 setFile(null); setBatchResults(null); setJobId(null); setCompletedJobIds([]); setIsPolling(false); setError(null);
-                setJobStatus(null); setJobModelType(null); setExecutionBackend(null);
+                setJobStatus(null); setJobModelType(null); setJobSelectedModels(null); setExecutionBackend(null);
+                setModelPickerOpen(false);
+                setValidationPickerOpen(false);
                 setJobProgress({ completed: 0, total: 0 }); setIsCancelling(false);
                 setSkuCol(""); setStartCol(""); setEndCol("");
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
@@ -3615,6 +3857,37 @@
                 && !!normalizedJobStatus
                 && !TERMINAL_JOB_STATUSES.has(normalizedJobStatus)
                 && normalizedJobStatus !== 'cancel_requested';
+            const availableSelectableCodes = SELECTABLE_FORECAST_MODELS
+                .filter((option) => isForecastModelAvailable(option.value))
+                .map((option) => option.value);
+            const allAvailableSelected = availableSelectableCodes.length > 0
+                && availableSelectableCodes.every((code) => selectedModels.includes(code));
+            const modelPickerSummary = (() => {
+                const selected = orderedSelectedModels(selectedModels);
+                if (!selected.length) return t('sidebar.models_required');
+                if (allAvailableSelected) return t('sidebar.models_all');
+                if (selected.length <= 4) {
+                    return selected.map((code) => {
+                        const option = SELECTABLE_FORECAST_MODELS.find((item) => item.value === code);
+                        return option ? t(option.labelKey) : code.toUpperCase();
+                    }).join(', ');
+                }
+                return t('sidebar.models_selected').replace('{count}', String(selected.length));
+            })();
+            const toggleSelectedModel = (code, available) => {
+                if (!available || isRunning) return;
+                setSelectedModels((current) => {
+                    if (current.includes(code)) {
+                        if (current.length <= 1) return current;
+                        return orderedSelectedModels(current.filter((item) => item !== code));
+                    }
+                    return orderedSelectedModels(current.concat(code));
+                });
+            };
+            const toggleSelectAllModels = () => {
+                if (isRunning || !availableSelectableCodes.length) return;
+                setSelectedModels(availableSelectableCodes);
+            };
 
             const openDetailedView = () => {
                 if (!interfaceReady || !batchResults?.length) return;
@@ -3829,28 +4102,59 @@
                                         <label htmlFor="forecast-model-profile" className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">
                                             {t('sidebar.model_profile')}
                                         </label>
-                                        <div className="fc-sidebar-select-wrap">
-                                            <select
+                                        <div className="fc-sidebar-select-wrap" ref={modelPickerRef}>
+                                            <button
+                                                type="button"
                                                 id="forecast-model-profile"
-                                                value={selectedProfile}
-                                                onChange={(e) => setModelType(e.target.value)}
-                                                disabled={isRunning}
+                                                aria-haspopup="listbox"
+                                                aria-expanded={modelPickerOpen}
                                                 aria-describedby={forecastCapabilities.status === 'loading' || !hasAvailableAdvancedModels ? 'forecast-cloud-availability' : undefined}
-                                                className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] disabled:cursor-not-allowed disabled:opacity-60"
+                                                disabled={isRunning}
+                                                onClick={() => {
+                                                    setValidationPickerOpen(false);
+                                                    setModelPickerOpen((open) => !open);
+                                                }}
+                                                className="fc-sidebar-control fc-model-picker-trigger w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                                             >
-                                                {VISIBLE_FORECAST_MODEL_OPTIONS.map((option) => (
-                                                    <option
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        disabled={!isForecastModelAvailable(option.value)}
-                                                    >
-                                                        {t(option.labelKey)}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                <span className="min-w-0 truncate">{modelPickerSummary}</span>
+                                            </button>
                                             <svg className="fc-sidebar-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
+                                            {modelPickerOpen && (
+                                                <div className="fc-model-picker-menu" role="listbox" aria-multiselectable="true" aria-labelledby="forecast-model-profile">
+                                                    <label className="fc-model-picker-option fc-model-picker-select-all">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="fc-row-check"
+                                                            checked={allAvailableSelected}
+                                                            disabled={isRunning || !availableSelectableCodes.length}
+                                                            onChange={toggleSelectAllModels}
+                                                        />
+                                                        <span>{t('sidebar.models_select_all')}</span>
+                                                    </label>
+                                                    {SELECTABLE_FORECAST_MODELS.map((option) => {
+                                                        const available = isForecastModelAvailable(option.value);
+                                                        const checked = selectedModels.includes(option.value);
+                                                        return (
+                                                            <label
+                                                                key={option.value}
+                                                                className={`fc-model-picker-option${available ? '' : ' is-disabled'}`}
+                                                                title={available ? undefined : t('sidebar.cloud_unavailable')}
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="fc-row-check"
+                                                                    checked={checked}
+                                                                    disabled={!available || isRunning}
+                                                                    onChange={() => toggleSelectedModel(option.value, available)}
+                                                                />
+                                                                <span>{t(option.labelKey)}</span>
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
                                         </div>
                                         {(forecastCapabilities.status === 'loading' || !hasAvailableAdvancedModels) && (
                                             <p id="forecast-cloud-availability" className="mt-1.5 text-[9px] leading-3 text-slate-500 dark:text-slate-400">
@@ -3861,20 +4165,45 @@
                                         )}
                                     </div>
                                     <div>
-                                        <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.val_method')}</label>
-                                        <div className="fc-sidebar-select-wrap">
-                                            <select
-                                                value={validationMethod}
-                                                onChange={(e) => setValidationMethod(e.target.value)}
-                                                className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
+                                        <label htmlFor="forecast-validation-method" className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.val_method')}</label>
+                                        <div className="fc-sidebar-select-wrap" ref={validationPickerRef}>
+                                            <button
+                                                type="button"
+                                                id="forecast-validation-method"
+                                                aria-haspopup="listbox"
+                                                aria-expanded={validationPickerOpen}
+                                                onClick={() => {
+                                                    setModelPickerOpen(false);
+                                                    setValidationPickerOpen((open) => !open);
+                                                }}
+                                                className="fc-sidebar-control fc-model-picker-trigger w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors"
                                             >
-                                                <option value="simple">Simple Split (Fast)</option>
-                                                <option value="walk_forward">Walk-Forward (Adaptive)</option>
-                                                <option value="rolling_window">Rolling Window (Adaptive)</option>
-                                            </select>
+                                                <span className="min-w-0 truncate">
+                                                    {t((VALIDATION_METHOD_OPTIONS.find((option) => option.value === validationMethod) || VALIDATION_METHOD_OPTIONS[0]).labelKey)}
+                                                </span>
+                                            </button>
                                             <svg className="fc-sidebar-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
+                                            {validationPickerOpen && (
+                                                <div className="fc-model-picker-menu" role="listbox" aria-labelledby="forecast-validation-method">
+                                                    {VALIDATION_METHOD_OPTIONS.map((option) => (
+                                                        <button
+                                                            key={option.value}
+                                                            type="button"
+                                                            role="option"
+                                                            aria-selected={validationMethod === option.value}
+                                                            className={`fc-model-picker-option${validationMethod === option.value ? ' is-selected' : ''}`}
+                                                            onClick={() => {
+                                                                setValidationMethod(option.value);
+                                                                setValidationPickerOpen(false);
+                                                            }}
+                                                        >
+                                                            {t(option.labelKey)}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
@@ -3910,7 +4239,7 @@
                                         </div>
                                     </div>
                                     {totalTimeSeries > 0 && (
-                                        <div className={`text-[9px] ${horizonMismatch || historyTooLong ? 'text-red-500' : 'text-slate-400'}`}>
+                                        <div className={`text-[9px] leading-4 ${horizonMismatch || historyTooLong ? 'text-red-500' : 'text-slate-400'}`}>
                                             {historyTooLong
                                                 ? `⚠️ ${t('sidebar.history_too_long')
                                                     .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
@@ -3918,7 +4247,12 @@
                                                     .replace('{max}', String(maxHistoryColumns))}`
                                                 : horizonMismatch
                                                 ? `⚠️ ${t('sidebar.horizon_mismatch')} ${totalTimeSeries}`
-                                                : `${t('sidebar.total_periods')}: ${totalTimeSeries} · ${t('sidebar.detected_frequency')}: ${t(`sidebar.freq_${inferredFrequency}`)}`
+                                                : (
+                                                    <>
+                                                        <div>{t('sidebar.total_periods')}: {totalTimeSeries}</div>
+                                                        <div>{t('sidebar.detected_frequency')}: {t(`sidebar.freq_${inferredFrequency}`)}</div>
+                                                    </>
+                                                )
                                             }
                                         </div>
                                     )}
@@ -4092,7 +4426,7 @@
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
-                                                                    <span className="text-[10px] lg:text-xs font-bold text-brand-gold">{skuData.best_ts_model.toUpperCase()}</span>
+                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{skuData.best_ts_model.toUpperCase()}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
