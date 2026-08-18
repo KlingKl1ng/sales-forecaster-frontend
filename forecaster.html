@@ -981,10 +981,10 @@
                     act_train: "Actual (Train)",
                     act_test: "Actual (Test)",
                     fitted: "Fitted (Train)",
-                    val_fc: "Validation Forecast",
-                    history: "History",
-                    final_fit: "Final Fit",
-                    future_fc: "Future Forecast"
+                    val_fc: "Forecast (Validation)",
+                    history: "Actual",
+                    final_fit: "Fit",
+                    future_fc: "Forecast"
                 }
             },
             vi: {
@@ -1130,13 +1130,13 @@
                     val_mse: "MSE"
                 },
                 charts: {
-                    act_train: "Thực tế (Train)",
-                    act_test: "Thực tế (Test)",
-                    fitted: "Khớp (Train)",
-                    val_fc: "Dự báo thử nghiệm",
-                    history: "Lịch sử",
-                    final_fit: "Khớp cuối cùng",
-                    future_fc: "Dự báo tương lai"
+                    act_train: "Thực tế (Huấn luyện)",
+                    act_test: "Thực tế (Kiểm tra)",
+                    fitted: "Khớp (Huấn luyện)",
+                    val_fc: "Dự báo (Kiểm định)",
+                    history: "Thực tế",
+                    final_fit: "Khớp",
+                    future_fc: "Dự báo"
                 }
             },
             de: {
@@ -1285,10 +1285,10 @@
                     act_train: "Ist (Training)",
                     act_test: "Ist (Test)",
                     fitted: "Angepasst (Training)",
-                    val_fc: "Validierungsprognose",
-                    history: "Verlauf",
-                    final_fit: "Endgültige Anpassung",
-                    future_fc: "Zukunftsprognose"
+                    val_fc: "Prognose (Validierung)",
+                    history: "Ist",
+                    final_fit: "Anpassung",
+                    future_fc: "Prognose"
                 }
             }
         };
@@ -4430,7 +4430,7 @@
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
-                                                                    <span className="text-[10px] lg:text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
+                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
