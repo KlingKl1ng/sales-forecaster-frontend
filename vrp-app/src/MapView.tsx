@@ -88,6 +88,46 @@ function markerImage(label: string, color: string, shape: 'circle' | 'square' = 
   return context.getImageData(0, 0, size, size);
 }
 
+function clusterImage(count: number): ImageData {
+  const width = 152;
+  const height = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d')!;
+  context.clearRect(0, 0, width, height);
+  context.shadowColor = 'rgba(15, 23, 42, 0.34)';
+  context.shadowBlur = 8;
+  context.shadowOffsetY = 4;
+  context.beginPath();
+  context.roundRect(5, 5, width - 10, height - 14, 25);
+  context.fillStyle = '#0f172a';
+  context.fill();
+  context.shadowColor = 'transparent';
+  context.lineWidth = 4;
+  context.strokeStyle = '#fbbf24';
+  context.stroke();
+
+  context.fillStyle = '#fbbf24';
+  context.beginPath();
+  context.arc(27, 25, 10, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.arc(39, 25, 10, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = '#0f172a';
+  context.beginPath();
+  context.arc(33, 25, 7, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = '#ffffff';
+  context.font = '800 18px Inter, Arial, sans-serif';
+  context.textAlign = 'left';
+  context.textBaseline = 'middle';
+  context.fillText(`${count} STOPS`, 55, 26);
+  return context.getImageData(0, 0, width, height);
+}
+
 function registerPointImages(map: MapLibreMap) {
   customers.forEach((customer, globalIndex) => {
     const route = routes.find((item) => item.id === customer.routeId)!;
@@ -97,7 +137,7 @@ function registerPointImages(map: MapLibreMap) {
     if (!map.hasImage(routeIcon)) map.addImage(routeIcon, markerImage(String(customer.sequence), route.color), { pixelRatio: 2 });
   });
   for (let count = 2; count <= customers.length; count += 1) {
-    map.addImage(`cluster-${count}`, markerImage(String(count), '#f59e0b'), { pixelRatio: 2 });
+    map.addImage(`cluster-${count}`, clusterImage(count), { pixelRatio: 2 });
   }
   map.addImage('depot-marker', markerImage('D', '#fbbf24', 'square'), { pixelRatio: 2 });
 }
@@ -213,6 +253,7 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
         layout: {
           'icon-image': ['concat', 'cluster-', ['to-string', ['get', 'point_count']]],
           'icon-size': 1,
+          'icon-offset': [0, -18],
           'icon-allow-overlap': true,
         },
       });
@@ -262,8 +303,20 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
           map.easeTo({ center: feature.geometry.coordinates as [number, number], zoom });
         });
       });
-      map.on('mouseenter', 'customer-clusters', () => { map.getCanvas().style.cursor = 'zoom-in'; });
-      map.on('mouseleave', 'customer-clusters', () => { map.getCanvas().style.cursor = ''; });
+      map.on('mouseenter', 'customer-clusters', (event) => {
+        map.getCanvas().style.cursor = 'zoom-in';
+        const feature = event.features?.[0];
+        if (!feature || feature.geometry.type !== 'Point') return;
+        const count = Number(feature.properties?.point_count);
+        popup
+          .setLngLat(feature.geometry.coordinates as [number, number])
+          .setHTML(`<strong>${count} nearby customers</strong><small>Click to expand this group</small>`)
+          .addTo(map);
+      });
+      map.on('mouseleave', 'customer-clusters', () => {
+        map.getCanvas().style.cursor = '';
+        popup.remove();
+      });
 
       const initialRoute = selectedRouteRef.current;
       if (initialRoute) {

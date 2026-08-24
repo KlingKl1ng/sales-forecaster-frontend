@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 import { customers, depots, routes, trips, validationItems, vehicles, vehicleTypes } from './mock-data';
 import type { DataKind, InspectorTab } from './types';
+import operartisLogo from '../../operartis-logo.svg';
 
 const MapView = lazy(() => import('./MapView'));
 
@@ -162,7 +163,7 @@ function App() {
             <Menu size={19} />
           </button>
           <a className="brand-lockup" href="/" aria-label="Operartis home">
-            <img src="/icononly_transparent_nobuffer.png" alt="" />
+            <img src={operartisLogo} alt="" />
             <span>OPERARTIS</span>
           </a>
           <span className="header-divider" />
@@ -286,6 +287,7 @@ function App() {
             <div className="map-legend glass-panel" aria-label="Map legend">
               <span><i className="legend-depot" /> Depot</span>
               <span><i className="legend-stop" /> Customer</span>
+              <span><i className="legend-cluster" /> Grouped stops</span>
               <span><i className="legend-route" /> Vehicle route</span>
             </div>
 
