@@ -108,6 +108,7 @@ function App() {
   const [optimizationStage, setOptimizationStage] = useState('Verified plan');
   const [progress, setProgress] = useState(100);
   const [toast, setToast] = useState<string | null>(null);
+  const [mapFitRequest, setMapFitRequest] = useState(0);
 
   const selectedRoute = routes.find((route) => route.id === selectedRouteId) || null;
   const selectedCustomer = customers.find((customer) => customer.id === selectedCustomerId) || null;
@@ -265,13 +266,13 @@ function App() {
         <main className="planning-workspace">
           <section className="map-workspace">
             <Suspense fallback={<div className="map-loading"><LoaderCircle className="spin" size={22} /><span>Loading route map</span></div>}>
-              <MapView selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} onSelectCustomer={handleSelectCustomer} dark={dark} />
+              <MapView selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} onSelectCustomer={handleSelectCustomer} dark={dark} fitRequest={mapFitRequest} />
             </Suspense>
 
             <div className="map-toolbar map-toolbar-left glass-panel">
-              <button className="toolbar-back" type="button" onClick={() => { setSelectedRouteId(null); setSelectedCustomerId(null); }} aria-label="Show all routes"><ArrowLeft size={17} /></button>
+              <button className="toolbar-back" type="button" onClick={() => { setSelectedRouteId(null); setSelectedCustomerId(null); setMapFitRequest((value) => value + 1); }} aria-label="Show all routes"><ArrowLeft size={17} /></button>
               <span />
-              <button type="button" onClick={() => setSelectedRouteId(null)}><Focus size={16} /> All routes</button>
+              <button type="button" onClick={() => { setSelectedRouteId(null); setMapFitRequest((value) => value + 1); }}><Focus size={16} /> All routes</button>
               <span />
               <button type="button" onClick={() => setDataManager('customers')}><Table2 size={16} /> Data table</button>
             </div>
@@ -279,7 +280,7 @@ function App() {
             <div className="map-toolbar map-toolbar-right glass-panel">
               <button type="button" onClick={() => setToast('Route and stop layers are visible')}><Layers3 size={16} /> Layers</button>
               <button type="button" onClick={() => setToast('Map filters cleared')} aria-label="Filter map"><Filter size={16} /></button>
-              <button type="button" onClick={() => setToast('Map centered on scenario')} aria-label="Fit map"><Focus size={16} /></button>
+              <button type="button" onClick={() => { setMapFitRequest((value) => value + 1); setToast('Map centered on scenario'); }} aria-label="Fit map"><Focus size={16} /></button>
             </div>
 
             <div className="map-legend glass-panel" aria-label="Map legend">

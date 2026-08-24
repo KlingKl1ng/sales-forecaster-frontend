@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import maplibregl, { type GeoJSONSource, type Map as MapLibreMap, type Marker } from 'maplibre-gl';
+import maplibregl, { type GeoJSONSource, type Map as MapLibreMap, type MapLayerMouseEvent, type Popup } from 'maplibre-gl';
 import { customers, depots, routes } from './mock-data';
 
 interface MapViewProps {
@@ -7,27 +7,150 @@ interface MapViewProps {
   onSelectRoute: (routeId: string | null) => void;
   onSelectCustomer: (customerId: string) => void;
   dark: boolean;
+  fitRequest: number;
 }
+
+type PointFeature = {
+  type: 'Feature';
+  properties: Record<string, string | number>;
+  geometry: { type: 'Point'; coordinates: [number, number] };
+};
 
 const isLocal = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
 const tileUrl = import.meta.env.VITE_VRP_TILE_URL || (isLocal ? 'https://tile.openstreetmap.org/{z}/{x}/{y}.png' : '/map-tiles/{z}/{x}/{y}.png');
 
-function routeFeature(routeId: string) {
+const routeFeature = (routeId: string) => {
   const route = routes.find((item) => item.id === routeId)!;
   return {
     type: 'Feature' as const,
     properties: { id: route.id },
-    geometry: {
-      type: 'LineString' as const,
-      coordinates: route.coordinates,
-    },
+    geometry: { type: 'LineString' as const, coordinates: route.coordinates },
   };
+};
+
+const featureCollection = (features: PointFeature[]) => ({ type: 'FeatureCollection' as const, features });
+
+const customerFeatures = (routeId: string | null = null) => featureCollection(
+  customers
+    .filter((customer) => !routeId || customer.routeId === routeId)
+    .map((customer, index) => {
+      const route = routes.find((item) => item.id === customer.routeId)!;
+      const globalIndex = customers.findIndex((item) => item.id === customer.id) + 1;
+      return {
+        type: 'Feature' as const,
+        properties: {
+          id: customer.id,
+          name: customer.name,
+          routeId: route.id,
+          routeLabel: route.label,
+          sequence: customer.sequence,
+          timeWindow: customer.timeWindow,
+          demand: customer.demand,
+          iconAll: `customer-all-${globalIndex}`,
+          iconRoute: `customer-route-${route.id}-${customer.sequence}`,
+          sourceIndex: index,
+        },
+        geometry: { type: 'Point' as const, coordinates: customer.coordinate },
+      };
+    }),
+);
+
+const depotFeatures = featureCollection(depots.map((depot) => ({
+  type: 'Feature' as const,
+  properties: { id: depot.id, name: depot.name, window: depot.window, icon: 'depot-marker' },
+  geometry: { type: 'Point' as const, coordinates: depot.coordinate },
+})));
+
+function markerImage(label: string, color: string, shape: 'circle' | 'square' = 'circle'): ImageData {
+  const size = 72;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext('2d')!;
+  context.clearRect(0, 0, size, size);
+  context.shadowColor = 'rgba(15, 23, 42, 0.32)';
+  context.shadowBlur = 8;
+  context.shadowOffsetY = 4;
+  context.beginPath();
+  if (shape === 'square') context.roundRect(10, 10, 52, 52, 13);
+  else context.arc(36, 36, 25, 0, Math.PI * 2);
+  context.fillStyle = shape === 'square' ? '#0f172a' : '#ffffff';
+  context.fill();
+  context.shadowColor = 'transparent';
+  context.lineWidth = 7;
+  context.strokeStyle = color;
+  context.stroke();
+  context.fillStyle = shape === 'square' ? '#fbbf24' : '#0f172a';
+  context.font = `${label.length > 2 ? 700 : 800} ${label.length > 2 ? 19 : 24}px Inter, Arial, sans-serif`;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(label, 36, 37);
+  return context.getImageData(0, 0, size, size);
 }
 
-export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustomer, dark }: MapViewProps) {
+function registerPointImages(map: MapLibreMap) {
+  customers.forEach((customer, globalIndex) => {
+    const route = routes.find((item) => item.id === customer.routeId)!;
+    const allIcon = `customer-all-${globalIndex + 1}`;
+    const routeIcon = `customer-route-${route.id}-${customer.sequence}`;
+    if (!map.hasImage(allIcon)) map.addImage(allIcon, markerImage(String(globalIndex + 1), route.color), { pixelRatio: 2 });
+    if (!map.hasImage(routeIcon)) map.addImage(routeIcon, markerImage(String(customer.sequence), route.color), { pixelRatio: 2 });
+  });
+  for (let count = 2; count <= customers.length; count += 1) {
+    map.addImage(`cluster-${count}`, markerImage(String(count), '#f59e0b'), { pixelRatio: 2 });
+  }
+  map.addImage('depot-marker', markerImage('D', '#fbbf24', 'square'), { pixelRatio: 2 });
+}
+
+function scenarioBounds() {
+  const bounds = new maplibregl.LngLatBounds();
+  depots.forEach((item) => bounds.extend(item.coordinate));
+  customers.forEach((item) => bounds.extend(item.coordinate));
+  return bounds;
+}
+
+function fitMap(map: MapLibreMap, routeId: string | null, animated: boolean) {
+  const bounds = new maplibregl.LngLatBounds();
+  if (routeId) {
+    routes.find((item) => item.id === routeId)?.coordinates.forEach((coordinate) => bounds.extend(coordinate));
+  } else {
+    const allBounds = scenarioBounds();
+    bounds.extend(allBounds.getSouthWest());
+    bounds.extend(allBounds.getNorthEast());
+  }
+  const compact = map.getContainer().clientWidth < 640;
+  map.fitBounds(bounds, {
+    padding: compact ? { top: 78, right: 42, bottom: 92, left: 42 } : { top: 78, right: 58, bottom: 82, left: 58 },
+    duration: animated ? 600 : 0,
+    maxZoom: routeId ? 12.4 : 10.8,
+  });
+}
+
+const escapeHtml = (value: string | number) => String(value)
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#039;');
+
+function showPointPopup(map: MapLibreMap, popup: Popup, event: MapLayerMouseEvent, kind: 'customer' | 'depot') {
+  const feature = event.features?.[0];
+  if (!feature || feature.geometry.type !== 'Point') return;
+  const properties = feature.properties as Record<string, string | number>;
+  const details = kind === 'customer'
+    ? `${escapeHtml(properties.timeWindow)} · ${escapeHtml(properties.demand)} units · ${escapeHtml(properties.routeLabel)}`
+    : `${escapeHtml(properties.id)} · ${escapeHtml(properties.window)}`;
+  popup
+    .setLngLat(feature.geometry.coordinates as [number, number])
+    .setHTML(`<strong>${escapeHtml(properties.name)}</strong><small>${details}</small>`)
+    .addTo(map);
+}
+
+export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustomer, dark, fitRequest }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
-  const markersRef = useRef<Marker[]>([]);
+  const selectedRouteRef = useRef(selectedRouteId);
+  selectedRouteRef.current = selectedRouteId;
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -49,86 +172,107 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
             attribution: '© OpenStreetMap contributors',
           },
         },
-        layers: [
-          { id: 'osm', type: 'raster', source: 'osm', paint: { 'raster-saturation': -0.45, 'raster-contrast': 0.04 } },
-        ],
+        layers: [{
+          id: 'osm', type: 'raster', source: 'osm',
+          paint: { 'raster-saturation': -0.45, 'raster-contrast': 0.04 },
+        }],
       },
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+    const popup = new maplibregl.Popup({ offset: 20, closeButton: false, closeOnClick: false });
 
     map.on('load', () => {
+      registerPointImages(map);
       routes.forEach((route) => {
-        map.addSource(`route-${route.id}`, {
-          type: 'geojson',
-          data: routeFeature(route.id),
+        map.addSource(`route-${route.id}`, { type: 'geojson', data: routeFeature(route.id) });
+        map.addLayer({
+          id: `route-shadow-${route.id}`, type: 'line', source: `route-${route.id}`,
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-color': '#0f172a', 'line-width': 8, 'line-opacity': 0.12 },
         });
         map.addLayer({
-          id: `route-shadow-${route.id}`,
-          type: 'line',
-          source: `route-${route.id}`,
+          id: `route-line-${route.id}`, type: 'line', source: `route-${route.id}`,
           layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: {
-            'line-color': '#0f172a',
-            'line-width': 8,
-            'line-opacity': 0.12,
-          },
-        });
-        map.addLayer({
-          id: `route-line-${route.id}`,
-          type: 'line',
-          source: `route-${route.id}`,
-          layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: {
-            'line-color': route.color,
-            'line-width': 4.5,
-            'line-opacity': 0.82,
-          },
+          paint: { 'line-color': route.color, 'line-width': 4.5, 'line-opacity': 0.88 },
         });
         map.on('click', `route-line-${route.id}`, () => onSelectRoute(route.id));
-        map.on('mouseenter', `route-line-${route.id}`, () => { map.getCanvas().style.cursor = 'pointer'; });
-        map.on('mouseleave', `route-line-${route.id}`, () => { map.getCanvas().style.cursor = ''; });
       });
 
-      depots.forEach((depot) => {
-        const element = document.createElement('button');
-        element.type = 'button';
-        element.className = 'map-depot-marker';
-        element.setAttribute('aria-label', depot.name);
-        element.innerHTML = '<span aria-hidden="true"></span>';
-        const marker = new maplibregl.Marker({ element, anchor: 'center' })
-          .setLngLat(depot.coordinate)
-          .setPopup(new maplibregl.Popup({ offset: 22, closeButton: false }).setHTML(`<strong>${depot.name}</strong><small>${depot.id} · ${depot.window}</small>`))
-          .addTo(map);
-        markersRef.current.push(marker);
+      map.addSource('customers-all', {
+        type: 'geojson',
+        data: customerFeatures(),
+        cluster: true,
+        clusterRadius: 34,
+        clusterMaxZoom: 10,
+      });
+      map.addLayer({
+        id: 'customer-clusters', type: 'symbol', source: 'customers-all',
+        filter: ['has', 'point_count'],
+        layout: {
+          'icon-image': ['concat', 'cluster-', ['to-string', ['get', 'point_count']]],
+          'icon-size': 1,
+          'icon-allow-overlap': true,
+        },
+      });
+      map.addLayer({
+        id: 'customer-points', type: 'symbol', source: 'customers-all',
+        filter: ['!', ['has', 'point_count']],
+        layout: { 'icon-image': ['get', 'iconAll'], 'icon-size': 1, 'icon-allow-overlap': true },
+      });
+      map.addSource('customers-selected', { type: 'geojson', data: customerFeatures('__none__') });
+      map.addLayer({
+        id: 'customer-points-selected', type: 'symbol', source: 'customers-selected',
+        layout: { 'icon-image': ['get', 'iconRoute'], 'icon-size': 1.08, 'icon-allow-overlap': true, visibility: 'none' },
+      });
+      map.addSource('depots', { type: 'geojson', data: depotFeatures });
+      map.addLayer({
+        id: 'depot-points', type: 'symbol', source: 'depots',
+        layout: { 'icon-image': 'depot-marker', 'icon-size': 1.08, 'icon-allow-overlap': true },
       });
 
-      customers.forEach((customer) => {
-        const route = routes.find((item) => item.id === customer.routeId)!;
-        const element = document.createElement('button');
-        element.type = 'button';
-        element.className = 'map-customer-marker';
-        element.style.setProperty('--route-color', route.color);
-        element.textContent = String(customer.sequence);
-        element.setAttribute('aria-label', `${customer.name}, stop ${customer.sequence}`);
-        element.dataset.routeId = route.id;
-        element.addEventListener('click', (event) => {
-          event.stopPropagation();
-          onSelectRoute(route.id);
-          onSelectCustomer(customer.id);
+      const interactiveLayers = ['customer-points', 'customer-points-selected', 'depot-points'];
+      interactiveLayers.forEach((layerId) => {
+        map.on('mouseenter', layerId, (event) => {
+          map.getCanvas().style.cursor = 'pointer';
+          showPointPopup(map, popup, event, layerId === 'depot-points' ? 'depot' : 'customer');
         });
-        const marker = new maplibregl.Marker({ element, anchor: 'center' })
-          .setLngLat(customer.coordinate)
-          .setPopup(new maplibregl.Popup({ offset: 18, closeButton: false }).setHTML(`<strong>${customer.name}</strong><small>${customer.timeWindow} · ${customer.demand} units</small>`))
-          .addTo(map);
-        markersRef.current.push(marker);
+        map.on('mouseleave', layerId, () => {
+          map.getCanvas().style.cursor = '';
+          popup.remove();
+        });
       });
+      map.on('click', 'customer-points', (event) => {
+        const properties = event.features?.[0]?.properties as Record<string, string> | undefined;
+        if (!properties) return;
+        onSelectRoute(properties.routeId);
+        onSelectCustomer(properties.id);
+      });
+      map.on('click', 'customer-points-selected', (event) => {
+        const properties = event.features?.[0]?.properties as Record<string, string> | undefined;
+        if (properties) onSelectCustomer(properties.id);
+      });
+      map.on('click', 'customer-clusters', (event) => {
+        const feature = event.features?.[0];
+        if (!feature || feature.geometry.type !== 'Point') return;
+        const source = map.getSource('customers-all') as GeoJSONSource;
+        const clusterId = Number(feature.properties?.cluster_id);
+        void source.getClusterExpansionZoom(clusterId).then((zoom) => {
+          map.easeTo({ center: feature.geometry.coordinates as [number, number], zoom });
+        });
+      });
+      map.on('mouseenter', 'customer-clusters', () => { map.getCanvas().style.cursor = 'zoom-in'; });
+      map.on('mouseleave', 'customer-clusters', () => { map.getCanvas().style.cursor = ''; });
 
-      const bounds = new maplibregl.LngLatBounds();
-      depots.forEach((item) => bounds.extend(item.coordinate));
-      customers.forEach((item) => bounds.extend(item.coordinate));
-      map.fitBounds(bounds, { padding: { top: 80, right: 60, bottom: 80, left: 60 }, duration: 0 });
+      const initialRoute = selectedRouteRef.current;
+      if (initialRoute) {
+        (map.getSource('customers-selected') as GeoJSONSource).setData(customerFeatures(initialRoute));
+        map.setLayoutProperty('customer-clusters', 'visibility', 'none');
+        map.setLayoutProperty('customer-points', 'visibility', 'none');
+        map.setLayoutProperty('customer-points-selected', 'visibility', 'visible');
+      }
+      fitMap(map, initialRoute, false);
     });
 
     mapRef.current = map;
@@ -137,8 +281,7 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
 
     return () => {
       observer.disconnect();
-      markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = [];
+      popup.remove();
       map.remove();
       mapRef.current = null;
     };
@@ -146,31 +289,26 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
-
+    if (!map || !map.isStyleLoaded() || !map.getSource('customers-selected')) return;
+    const hasSelection = Boolean(selectedRouteId);
+    (map.getSource('customers-selected') as GeoJSONSource).setData(customerFeatures(selectedRouteId || '__none__'));
+    map.setLayoutProperty('customer-clusters', 'visibility', hasSelection ? 'none' : 'visible');
+    map.setLayoutProperty('customer-points', 'visibility', hasSelection ? 'none' : 'visible');
+    map.setLayoutProperty('customer-points-selected', 'visibility', hasSelection ? 'visible' : 'none');
     routes.forEach((route) => {
       const selected = !selectedRouteId || selectedRouteId === route.id;
-      if (map.getLayer(`route-line-${route.id}`)) {
-        map.setPaintProperty(`route-line-${route.id}`, 'line-opacity', selected ? 0.9 : 0.15);
-        map.setPaintProperty(`route-line-${route.id}`, 'line-width', selectedRouteId === route.id ? 6.5 : 4.5);
-      }
+      map.setPaintProperty(`route-line-${route.id}`, 'line-opacity', selected ? 0.92 : 0.11);
+      map.setPaintProperty(`route-line-${route.id}`, 'line-width', selectedRouteId === route.id ? 6.5 : 4.5);
+      map.setPaintProperty(`route-shadow-${route.id}`, 'line-opacity', selected ? 0.14 : 0.03);
     });
-
-    markersRef.current.forEach((marker) => {
-      const element = marker.getElement();
-      const routeId = element.dataset.routeId;
-      if (routeId) element.classList.toggle('is-muted', Boolean(selectedRouteId && selectedRouteId !== routeId));
-    });
-
-    if (selectedRouteId) {
-      const route = routes.find((item) => item.id === selectedRouteId);
-      if (route) {
-        const bounds = new maplibregl.LngLatBounds();
-        route.coordinates.forEach((coordinate) => bounds.extend(coordinate));
-        map.fitBounds(bounds, { padding: { top: 100, right: 100, bottom: 100, left: 100 }, duration: 650, maxZoom: 11.8 });
-      }
-    }
+    fitMap(map, selectedRouteId, true);
   }, [selectedRouteId]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+    fitMap(map, selectedRouteRef.current, true);
+  }, [fitRequest]);
 
   useEffect(() => {
     const map = mapRef.current;
