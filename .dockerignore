@@ -1,5 +1,7 @@
 .git
 .DS_Store
+node_modules/
+.vite/
 ~$*.xlsx
 vercel.json
 COOLIFY_DEPLOYMENT.md
