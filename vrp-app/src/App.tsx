@@ -364,12 +364,6 @@ function App() {
               <span><i className="legend-cluster" /> Grouped stops</span>
               <span><i className="legend-route" /> Vehicle route</span>
             </div>
-
-            <div className="plan-status glass-panel">
-              <span className="verified-icon"><Check size={13} /></span>
-              <span><small>Current solution</small><strong>{optimizationStage}</strong></span>
-              <span className="status-metric"><b>18/18</b><small>served</small></span>
-            </div>
           </section>
 
           <aside className="route-inspector">
@@ -523,13 +517,13 @@ function RoutesPanel({ selectedRouteId, onSelectRoute }: { selectedRouteId: stri
   return (
     <div className="route-list">
       <div className="route-list-tools">
-        <label><Search size={15} /><input placeholder="Find route or vehicle" /></label>
-        <button type="button" aria-label="Filter routes"><ListFilter size={16} /></button>
+        <label><Search size={16} /><input placeholder="Find route or vehicle" /></label>
+        <button type="button" aria-label="Filter routes"><ListFilter size={17} /></button>
       </div>
       <button className={`route-card route-card-all ${selectedRouteId === null ? 'is-selected' : ''}`} type="button" onClick={() => onSelectRoute(null)}>
-        <span className="route-overview-icon"><LayoutDashboard size={17} /></span>
+        <span className="route-overview-icon"><LayoutDashboard size={18} /></span>
         <span><strong>All vehicle routes</strong><small>5 vehicles · 7 trips · 18 stops</small></span>
-        <ChevronRight size={15} />
+        <ChevronRight size={16} />
       </button>
       {routes.map((route) => {
         const vehicle = vehicles.find((item) => item.id === route.vehicleId)!;
@@ -537,7 +531,7 @@ function RoutesPanel({ selectedRouteId, onSelectRoute }: { selectedRouteId: stri
           <button key={route.id} className={`route-card ${selectedRouteId === route.id ? 'is-selected' : ''}`} type="button" onClick={() => onSelectRoute(route.id)} style={{ '--route-color': route.color } as CSSProperties}>
             <span className="route-number"><i />{route.id.replace('R-', '')}</span>
             <span className="route-card-copy"><strong>{vehicle.plate}</strong><small>{route.label} · {route.trips} {route.trips === 1 ? 'trip' : 'trips'}</small><em>{route.stops} stops · {route.distanceKm} km · {route.duration}</em></span>
-            <span className="route-cost">€{route.cost}<ChevronRight size={14} /></span>
+            <span className="route-cost">€{route.cost}<ChevronRight size={15} /></span>
           </button>
         );
       })}
@@ -549,16 +543,16 @@ function ValidationPanel() {
   return (
     <div className="validation-stack">
       <div className="validation-score-card">
-        <span className="score-ring"><b>100</b><small>/100</small></span>
+        <span className="score-ring" aria-label="Feasibility score 100 out of 100"><b>100</b><small>/100</small></span>
         <div><span className="eyebrow">Feasibility score</span><strong>Verified solution</strong><p>All launch-version hard constraints passed.</p></div>
       </div>
       <div className="constraint-pills">
-        <span><CheckCircle2 size={13} /> Capacity</span><span><CheckCircle2 size={13} /> Time windows</span><span><CheckCircle2 size={13} /> Shifts</span><span><CheckCircle2 size={13} /> Reloads</span>
+        <span><CheckCircle2 size={14} /> Capacity</span><span><CheckCircle2 size={14} /> Time windows</span><span><CheckCircle2 size={14} /> Shifts</span><span><CheckCircle2 size={14} /> Reloads</span>
       </div>
       {validationItems.map((item) => (
         <article key={item.id} className={`validation-item level-${item.level}`}>
-          <span className="validation-item-icon">{item.level === 'warning' ? <AlertTriangle size={17} /> : item.level === 'success' ? <ShieldCheck size={17} /> : <Info size={17} />}</span>
-          <div><strong>{item.title}</strong><p>{item.detail}</p>{item.entity && <button type="button">Open {item.entity} <ChevronRight size={13} /></button>}</div>
+          <span className="validation-item-icon">{item.level === 'warning' ? <AlertTriangle size={18} /> : item.level === 'success' ? <ShieldCheck size={18} /> : <Info size={18} />}</span>
+          <div><strong>{item.title}</strong><p>{item.detail}</p>{item.entity && <button type="button">Open {item.entity} <ChevronRight size={14} /></button>}</div>
         </article>
       ))}
     </div>
