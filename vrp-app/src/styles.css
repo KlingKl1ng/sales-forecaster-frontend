@@ -204,12 +204,16 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .sidebar-heading { min-height: 76px; display: flex; align-items: center; flex: 0 0 76px; padding: 14px 18px 12px; border-bottom: 1px solid var(--border); }
 .sidebar-heading h2 { margin: 2px 0 0; font-size: 16px; letter-spacing: -0.02em; }
 .mobile-sidebar-close { display: none; }
+.sidebar-scroll { display: flex; flex: 1; flex-direction: column; min-height: 0; overflow-y: auto; }
+.scenario-sidebar.is-collapsed .sidebar-bottom,
 .scenario-sidebar.is-collapsed .sidebar-heading,
 .scenario-sidebar.is-collapsed .data-nav-copy,
 .scenario-sidebar.is-collapsed .count-pill,
 .scenario-sidebar.is-collapsed .nav-chevron,
 .scenario-sidebar.is-collapsed .sidebar-section,
 .scenario-sidebar.is-collapsed .sidebar-ready-card { display: none; }
+.scenario-sidebar.is-collapsed .sidebar-scroll { overflow: visible; }
+.scenario-sidebar.is-collapsed .data-navigation { gap: 8px; padding: 14px 8px 12px; }
 
 .data-navigation { display: grid; gap: 4px; padding: 14px 10px 12px; }
 .data-nav-item { width: 100%; gap: 11px; padding: 9px 8px; border: 1px solid transparent; border-radius: 10px; background: transparent; text-align: left; cursor: pointer; }
@@ -234,7 +238,7 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .rule-row small { color: var(--muted); font-size: 8px; }
 .rule-row > svg:last-child { color: #10b981; }
 
-.sidebar-ready-card { margin: auto 14px 14px; padding: 13px; border: 1px solid rgba(16, 185, 129, 0.22); border-radius: 12px; background: linear-gradient(145deg, rgba(16, 185, 129, 0.09), rgba(16, 185, 129, 0.02)); }
+.sidebar-ready-card { margin: 14px 14px 16px; padding: 13px; border: 1px solid rgba(16, 185, 129, 0.22); border-radius: 12px; background: linear-gradient(145deg, rgba(16, 185, 129, 0.09), rgba(16, 185, 129, 0.02)); }
 .ready-card-head { gap: 9px; color: #059669; }
 .ready-card-head div { display: flex; flex-direction: column; gap: 2px; }
 .ready-card-head strong { color: var(--text); font-size: 10px; }
@@ -242,6 +246,12 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .ready-progress { height: 3px; margin: 11px 0 8px; overflow: hidden; border-radius: 99px; background: rgba(16, 185, 129, 0.15); }
 .ready-progress span { display: block; height: 100%; background: #10b981; }
 .sidebar-ready-card button { display: flex; align-items: center; gap: 3px; padding: 0; border: 0; background: none; color: #059669; font-size: 9px; font-weight: 700; cursor: pointer; }
+.sidebar-bottom { position: sticky; bottom: 0; z-index: 20; flex: 0 0 auto; border-top: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.8); box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.02); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.dark .sidebar-bottom { border-top-color: rgba(255, 255, 255, 0.1); background: rgba(15, 23, 42, 0.8); }
+.sidebar-bottom-copy { padding: 16px; text-align: center; }
+.sidebar-bottom-title { margin: 0; color: #334155; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.dark .sidebar-bottom-title { color: #e2e8f0; }
+.sidebar-bottom-tagline { margin: 4px 0 0; color: var(--brand-gold); font-size: 10px; font-style: italic; font-weight: 500; }
 
 .planning-workspace { position: relative; flex: 1; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: minmax(300px, 1fr) auto; overflow: hidden; background: var(--surface); }
 .map-workspace { position: relative; min-width: 0; min-height: 0; overflow: hidden; border-right: 1px solid var(--border); }
@@ -573,6 +583,8 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
   .scenario-sidebar.is-collapsed { width: 100%; }
   .scenario-sidebar.is-collapsed .brand-lockup span { display: inline; }
   .scenario-sidebar.is-collapsed .sidebar-brand-header { padding: 0 16px; }
+  .scenario-sidebar.is-collapsed .sidebar-scroll { display: flex; }
+  .scenario-sidebar.is-collapsed .sidebar-bottom { display: block; }
   .scenario-sidebar.is-collapsed .sidebar-heading > div:first-child,
   .scenario-sidebar.is-collapsed .data-nav-copy,
   .scenario-sidebar.is-collapsed .count-pill,

@@ -240,57 +240,66 @@ function App() {
               <button className="icon-button mobile-sidebar-close" type="button" onClick={() => setMobileSidebarOpen(false)} aria-label="Close scenario navigation"><X size={18} /></button>
             </div>
 
-          <div className="sidebar-heading">
-            <div>
-              <span className="eyebrow">Scenario data</span>
-              <h2>Berlin pilot</h2>
-            </div>
-          </div>
+            <div className="sidebar-scroll scroller">
+              <div className="sidebar-heading">
+                <div>
+                  <span className="eyebrow">Scenario data</span>
+                  <h2>Berlin pilot</h2>
+                </div>
+              </div>
 
-          <nav className="data-navigation" aria-label="Scenario data">
-            {dataNav.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button key={item.kind} className="data-nav-item" type="button" onClick={() => { setDataManager(item.kind); setMobileSidebarOpen(false); }}>
-                  <span className="data-nav-icon"><Icon size={18} /></span>
-                  <span className="data-nav-copy">
-                    <strong>{item.label}</strong>
-                    <small>{item.description}</small>
-                  </span>
-                  <span className="count-pill">{item.count}</span>
-                  <ChevronRight className="nav-chevron" size={15} />
+              <nav className="data-navigation" aria-label="Scenario data">
+                {dataNav.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button key={item.kind} className="data-nav-item" type="button" onClick={() => { setDataManager(item.kind); setMobileSidebarOpen(false); }}>
+                      <span className="data-nav-icon"><Icon size={18} /></span>
+                      <span className="data-nav-copy">
+                        <strong>{item.label}</strong>
+                        <small>{item.description}</small>
+                      </span>
+                      <span className="count-pill">{item.count}</span>
+                      <ChevronRight className="nav-chevron" size={15} />
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <div className="sidebar-section">
+                <span className="sidebar-section-label">Planning rules</span>
+                <button className="rule-row" type="button" onClick={() => setToast('Fixed home-depot policy is active')}>
+                  <RouteIcon size={17} />
+                  <span><strong>Fixed home depots</strong><small>Return & reload at home</small></span>
+                  <Check size={14} />
                 </button>
-              );
-            })}
-          </nav>
+                <button className="rule-row" type="button" onClick={() => setToast('All customer windows are hard constraints')}>
+                  <Clock3 size={17} />
+                  <span><strong>Hard time windows</strong><small>No lateness allowed</small></span>
+                  <Check size={14} />
+                </button>
+                <button className="rule-row" type="button" onClick={() => setToast('One delivery-capacity dimension is active')}>
+                  <PackageCheck size={17} />
+                  <span><strong>Delivery demand</strong><small>Single capacity unit</small></span>
+                  <Check size={14} />
+                </button>
+              </div>
 
-          <div className="sidebar-section">
-            <span className="sidebar-section-label">Planning rules</span>
-            <button className="rule-row" type="button" onClick={() => setToast('Fixed home-depot policy is active')}>
-              <RouteIcon size={17} />
-              <span><strong>Fixed home depots</strong><small>Return & reload at home</small></span>
-              <Check size={14} />
-            </button>
-            <button className="rule-row" type="button" onClick={() => setToast('All customer windows are hard constraints')}>
-              <Clock3 size={17} />
-              <span><strong>Hard time windows</strong><small>No lateness allowed</small></span>
-              <Check size={14} />
-            </button>
-            <button className="rule-row" type="button" onClick={() => setToast('One delivery-capacity dimension is active')}>
-              <PackageCheck size={17} />
-              <span><strong>Delivery demand</strong><small>Single capacity unit</small></span>
-              <Check size={14} />
-            </button>
-          </div>
-
-          <div className="sidebar-ready-card">
-            <div className="ready-card-head">
-              <ShieldCheck size={19} />
-              <div><strong>Ready to optimize</strong><small>0 blocking errors</small></div>
+              <div className="sidebar-ready-card">
+                <div className="ready-card-head">
+                  <ShieldCheck size={19} />
+                  <div><strong>Ready to optimize</strong><small>0 blocking errors</small></div>
+                </div>
+                <div className="ready-progress"><span style={{ width: '100%' }} /></div>
+                <button type="button" onClick={() => setInspectorTab('validation')}>Review 2 warnings <ChevronRight size={14} /></button>
+              </div>
             </div>
-            <div className="ready-progress"><span style={{ width: '100%' }} /></div>
-            <button type="button" onClick={() => setInspectorTab('validation')}>Review 2 warnings <ChevronRight size={14} /></button>
-          </div>
+
+            <div className="sidebar-bottom">
+              <div className="sidebar-bottom-copy">
+                <p className="sidebar-bottom-title">Operartis Analytics</p>
+                <p className="sidebar-bottom-tagline">Optimizing Today, Growing Tomorrow</p>
+              </div>
+            </div>
           </aside>
         </div>
         {mobileSidebarOpen && <button className="mobile-backdrop" type="button" onClick={() => setMobileSidebarOpen(false)} aria-label="Close navigation" />}
