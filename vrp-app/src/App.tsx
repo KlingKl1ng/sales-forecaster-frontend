@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   CircleDollarSign,
   Clock3,
   CloudUpload,
@@ -25,8 +26,6 @@ import {
   Menu,
   MoreHorizontal,
   PackageCheck,
-  PanelBottomClose,
-  PanelBottomOpen,
   Plus,
   Route as RouteIcon,
   Save,
@@ -222,7 +221,7 @@ function App() {
       <div className="app-body">
         <div className={`scenario-sidebar-shell ${sidebarCollapsed ? 'is-collapsed' : ''} ${mobileSidebarOpen ? 'is-mobile-open' : ''}`}>
           <button
-            className="sidebar-boundary-toggle"
+            className="boundary-toggle sidebar-boundary-toggle"
             type="button"
             onClick={() => setSidebarCollapsed((value) => !value)}
             aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -405,8 +404,8 @@ function App() {
           <section className={`timeline-panel ${timelineCollapsed ? 'is-collapsed' : ''}`}>
             <div className="timeline-header">
               <div className="timeline-title">
-                <button className="icon-button" type="button" onClick={() => setTimelineCollapsed((value) => !value)} aria-label={timelineCollapsed ? 'Expand vehicle timeline' : 'Collapse vehicle timeline'}>
-                  {timelineCollapsed ? <PanelBottomOpen size={19} /> : <PanelBottomClose size={19} />}
+                <button className="boundary-toggle" type="button" onClick={() => setTimelineCollapsed((value) => !value)} aria-label={timelineCollapsed ? 'Expand vehicle timeline' : 'Collapse vehicle timeline'}>
+                  {timelineCollapsed ? <ChevronUp size={16} strokeWidth={2} /> : <ChevronDown size={16} strokeWidth={2} />}
                 </button>
                 <div><span className="eyebrow">Vehicle schedule</span><h3>Trips & reloads</h3></div>
               </div>
@@ -483,7 +482,7 @@ function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
       </div>
 
       <div className="inspector-card objective-card">
-        <div className="card-heading"><span><BarChart3 size={17} /> Objective</span><span className="verified-badge"><Check size={12} /> Verified</span></div>
+        <div className="card-heading"><span><BarChart3 size={18} /> Objective</span></div>
         <div className="objective-row"><span>Vehicle activation</span><strong>€ 262</strong><i><b style={{ width: '54%' }} /></i></div>
         <div className="objective-row"><span>Distance cost</span><strong>€ 188</strong><i><b style={{ width: '39%' }} /></i></div>
         <div className="objective-row"><span>Working time</span><strong>€ 32</strong><i><b style={{ width: '7%' }} /></i></div>
@@ -491,7 +490,7 @@ function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
 
       {selectedRoute ? (
         <div className="inspector-card selected-route-card" style={{ '--route-color': selectedRoute.color } as CSSProperties}>
-          <div className="card-heading"><span><i className="route-color-dot" /> {selectedRoute.label}</span><button type="button" onClick={onOpenRoutes}>Details <ChevronRight size={13} /></button></div>
+          <div className="card-heading"><span><i className="route-color-dot" /> {selectedRoute.label}</span><button type="button" onClick={onOpenRoutes}>Details <ChevronRight size={14} /></button></div>
           <div className="route-kpis"><span><strong>{selectedRoute.stops}</strong><small>stops</small></span><span><strong>{selectedRoute.distanceKm} km</strong><small>distance</small></span><span><strong>{selectedRoute.duration}</strong><small>duration</small></span></div>
         </div>
       ) : (
@@ -502,7 +501,7 @@ function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
       )}
 
       <div className="inspector-card carbon-card">
-        <span className="carbon-icon"><Zap size={17} /></span>
+        <span className="carbon-icon"><Zap size={18} /></span>
         <div><small>Vehicle reuse</small><strong>2 vehicles perform a second trip</strong><p>One additional activation avoided by depot reload scheduling.</p></div>
       </div>
     </div>
