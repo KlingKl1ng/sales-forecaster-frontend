@@ -23,7 +23,6 @@ import {
   LoaderCircle,
   MapPin,
   Menu,
-  Moon,
   MoreHorizontal,
   PackageCheck,
   PanelBottomClose,
@@ -35,7 +34,6 @@ import {
   Settings2,
   ShieldCheck,
   Sparkles,
-  Sun,
   Table2,
   Truck,
   Upload,
@@ -46,6 +44,7 @@ import {
 } from 'lucide-react';
 import { customers, depots, routes, trips, validationItems, vehicles, vehicleTypes } from './mock-data';
 import type { DataKind, InspectorTab } from './types';
+import { SettingsModal } from './SettingsModal';
 import operartisLogo from '../../operartis-logo.svg';
 
 const MapView = lazy(() => import('./MapView'));
@@ -84,20 +83,48 @@ function useTheme() {
     return () => window.removeEventListener('operartis:theme-change', handler);
   }, []);
 
-  const toggle = () => {
-    const next = dark ? 'light' : 'dark';
-    window.setOperartisTheme?.(next);
-    if (!window.setOperartisTheme) {
-      document.documentElement.classList.toggle('dark', next === 'dark');
-      setThemeState(next);
+  const setTheme = (next: 'light' | 'dark' | 'system') => {
+    if (window.setOperartisTheme) {
+      window.setOperartisTheme(next);
+      return;
     }
+    window.persistOperartisTheme?.(next);
+    window.applyOperartisThemeClass?.(next);
+    document.documentElement.classList.toggle('dark', next === 'dark' || (next === 'system' && systemDark));
+    setThemeState(next);
   };
 
-  return { dark, toggle };
+  return { theme, dark, setTheme };
+}
+
+function useLang() {
+  const [lang, setLangState] = useState<'en' | 'vi' | 'de'>(() => window.getOperartisLang?.() || 'en');
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const next = (event as CustomEvent<{ lang?: 'en' | 'vi' | 'de' }>).detail?.lang || window.getOperartisLang?.() || 'en';
+      setLangState(next);
+    };
+    window.addEventListener('operartis:lang-change', handler);
+    return () => window.removeEventListener('operartis:lang-change', handler);
+  }, []);
+
+  const setLang = (next: 'en' | 'vi' | 'de') => {
+    if (window.setOperartisLang) {
+      window.setOperartisLang(next);
+      return;
+    }
+    window.persistOperartisLang?.(next);
+    setLangState(next);
+  };
+
+  return { lang, setLang };
 }
 
 function App() {
-  const { dark, toggle: toggleTheme } = useTheme();
+  const { theme, dark, setTheme } = useTheme();
+  const { lang, setLang } = useLang();
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>('R-01');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>('summary');
@@ -121,6 +148,12 @@ function App() {
     const timer = window.setTimeout(() => setToast(null), 3600);
     return () => window.clearTimeout(timer);
   }, [toast]);
+
+  useEffect(() => {
+    const openSettings = () => setSettingsOpen(true);
+    window.addEventListener('operartis:open-settings', openSettings);
+    return () => window.removeEventListener('operartis:open-settings', openSettings);
+  }, []);
 
   const handleSelectRoute = useCallback((routeId: string | null) => {
     setSelectedRouteId(routeId);
@@ -256,9 +289,6 @@ function App() {
               <button className="icon-button hide-compact" type="button" onClick={() => setToast('Scenario draft saved locally')} aria-label="Save scenario">
                 <Save size={17} />
               </button>
-              <button className="icon-button" type="button" onClick={toggleTheme} aria-label={dark ? 'Use light theme' : 'Use dark theme'}>
-                {dark ? <Sun size={17} /> : <Moon size={17} />}
-              </button>
               <button className="button button-primary" type="button" onClick={runOptimization} disabled={optimizing}>
                 {optimizing ? <LoaderCircle className="spin" size={17} /> : <Sparkles size={17} />}
                 <span>{optimizing ? 'Optimizing' : 'Optimize'}</span>
@@ -362,6 +392,7 @@ function App() {
       )}
       {entityDialog && <EntityDialog kind={entityDialog} onClose={() => setEntityDialog(null)} onSaved={(message) => { setEntityDialog(null); setToast(message); }} />}
       {importOpen && <ImportDialog onClose={() => setImportOpen(false)} onImported={() => { setImportOpen(false); setToast('Scenario workbook validated · 27 records ready'); }} />}
+      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} />
 
       {toast && (
         <div className="toast" role="status">

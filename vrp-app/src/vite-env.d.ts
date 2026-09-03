@@ -9,4 +9,9 @@ interface Window {
   };
   getOperartisTheme?: () => 'light' | 'dark' | 'system';
   setOperartisTheme?: (theme: 'light' | 'dark' | 'system') => string;
+  persistOperartisTheme?: (theme: 'light' | 'dark' | 'system') => string;
+  applyOperartisThemeClass?: (theme: 'light' | 'dark' | 'system') => boolean;
+  getOperartisLang?: () => 'en' | 'vi' | 'de';
+  setOperartisLang?: (lang: 'en' | 'vi' | 'de') => string;
+  persistOperartisLang?: (lang: 'en' | 'vi' | 'de') => string;
 }
