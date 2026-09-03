@@ -35,7 +35,7 @@ const customerFeatures = (routeId: string | null = null) => featureCollection(
     .filter((customer) => !routeId || customer.routeId === routeId)
     .map((customer, index) => {
       const route = routes.find((item) => item.id === customer.routeId)!;
-      const globalIndex = customers.findIndex((item) => item.id === customer.id) + 1;
+      const icon = `customer-route-${route.id}-${customer.sequence}`;
       return {
         type: 'Feature' as const,
         properties: {
@@ -46,8 +46,8 @@ const customerFeatures = (routeId: string | null = null) => featureCollection(
           sequence: customer.sequence,
           timeWindow: customer.timeWindow,
           demand: customer.demand,
-          iconAll: `customer-all-${globalIndex}`,
-          iconRoute: `customer-route-${route.id}-${customer.sequence}`,
+          iconAll: icon,
+          iconRoute: icon,
           sourceIndex: index,
         },
         geometry: { type: 'Point' as const, coordinates: customer.coordinate },
@@ -129,12 +129,10 @@ function clusterImage(count: number): ImageData {
 }
 
 function registerPointImages(map: MapLibreMap) {
-  customers.forEach((customer, globalIndex) => {
+  customers.forEach((customer) => {
     const route = routes.find((item) => item.id === customer.routeId)!;
-    const allIcon = `customer-all-${globalIndex + 1}`;
-    const routeIcon = `customer-route-${route.id}-${customer.sequence}`;
-    if (!map.hasImage(allIcon)) map.addImage(allIcon, markerImage(String(globalIndex + 1), route.color), { pixelRatio: 2 });
-    if (!map.hasImage(routeIcon)) map.addImage(routeIcon, markerImage(String(customer.sequence), route.color), { pixelRatio: 2 });
+    const icon = `customer-route-${route.id}-${customer.sequence}`;
+    if (!map.hasImage(icon)) map.addImage(icon, markerImage(String(customer.sequence), route.color), { pixelRatio: 2 });
   });
   for (let count = 2; count <= customers.length; count += 1) {
     map.addImage(`cluster-${count}`, clusterImage(count), { pixelRatio: 2 });
@@ -180,9 +178,12 @@ function showPointPopup(map: MapLibreMap, popup: Popup, event: MapLayerMouseEven
   const details = kind === 'customer'
     ? `${escapeHtml(properties.timeWindow)} · ${escapeHtml(properties.demand)} units · ${escapeHtml(properties.routeLabel)}`
     : `${escapeHtml(properties.id)} · ${escapeHtml(properties.window)}`;
+  const title = kind === 'customer'
+    ? `${escapeHtml(properties.id)} · ${escapeHtml(properties.name)}`
+    : escapeHtml(properties.name);
   popup
     .setLngLat(feature.geometry.coordinates as [number, number])
-    .setHTML(`<strong>${escapeHtml(properties.name)}</strong><small>${details}</small>`)
+    .setHTML(`<strong>${title}</strong><small>${details}</small>`)
     .addTo(map);
 }
 
