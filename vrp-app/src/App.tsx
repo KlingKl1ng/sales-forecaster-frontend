@@ -504,7 +504,7 @@ function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
       <div className="inspector-stack">
         <div className="selection-card">
           <div className="selection-card-head">
-            <span className="selection-icon"><MapPin size={18} /></span>
+            <span className="selection-icon"><MapPin size={20} /></span>
             <div><small>Selected customer</small><strong>{selectedCustomer.name}</strong><span>{selectedCustomer.id}</span></div>
           </div>
           <dl className="detail-list">
@@ -513,9 +513,9 @@ function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
             <div><dt>Service</dt><dd>{selectedCustomer.serviceMinutes} min</dd></div>
             <div><dt>Assigned depot</dt><dd>{selectedCustomer.depotId}</dd></div>
           </dl>
-          <div className="feasible-banner"><CheckCircle2 size={15} /> Hard-window feasible</div>
+          <div className="feasible-banner"><CheckCircle2 size={16} /> Hard-window feasible</div>
         </div>
-        <button className="button button-quiet button-full" type="button" onClick={onOpenRoutes}><RouteIcon size={16} /> View assigned route</button>
+        <button className="button button-quiet button-full" type="button" onClick={onOpenRoutes}><RouteIcon size={18} /> View assigned route</button>
       </div>
     );
   }
