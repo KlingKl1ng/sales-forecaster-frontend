@@ -245,8 +245,8 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
         type: 'geojson',
         data: customerFeatures(),
         cluster: true,
-        clusterRadius: 34,
-        clusterMaxZoom: 10,
+        clusterRadius: 24,
+        clusterMaxZoom: 8,
       });
       map.addLayer({
         id: 'customer-clusters', type: 'symbol', source: 'customers-all',
