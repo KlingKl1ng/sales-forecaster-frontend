@@ -52,10 +52,19 @@ export interface Trip {
   startMinute: number;
   endMinute: number;
   customerIds: string[];
+  visits: TripVisit[];
   distanceKm: number;
   load: number;
   capacity: number;
   color: string;
+}
+
+export interface TripVisit {
+  customerId: string;
+  arrival: string;
+  departure: string;
+  arrivalMinute: number;
+  departureMinute: number;
 }
 
 export interface Route {

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState, type CSSProperties, type FormEvent } from 'react';
+import { Fragment, lazy, memo, Suspense, useCallback, useEffect, useState, type CSSProperties, type FormEvent } from 'react';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -28,8 +28,6 @@ import {
   PackageCheck,
   PanelBottomClose,
   PanelBottomOpen,
-  PanelLeftClose,
-  PanelLeftOpen,
   Plus,
   Route as RouteIcon,
   Save,
@@ -51,6 +49,10 @@ import type { DataKind, InspectorTab } from './types';
 import operartisLogo from '../../operartis-logo.svg';
 
 const MapView = lazy(() => import('./MapView'));
+
+const OperartisAuthTopbarSlot = memo(function OperartisAuthTopbarSlot() {
+  return <div id="operartis-auth-topbar-slot" className="auth-slot" />;
+});
 
 const dataNav: Array<{ kind: DataKind; label: string; description: string; count: number; icon: typeof Warehouse }> = [
   { kind: 'depots', label: 'Depots', description: 'Dispatch & reload', count: depots.length, icon: Warehouse },
@@ -157,64 +159,26 @@ function App() {
 
   return (
     <div className="vrp-app">
-      <header className="app-header glass-chrome">
-        <div className="header-brand-group">
-          <button className="icon-button mobile-menu-button" type="button" onClick={() => setMobileSidebarOpen(true)} aria-label="Open scenario navigation">
-            <Menu size={19} />
-          </button>
-          <a className="brand-lockup" href="/" aria-label="Operartis home">
-            <img src={operartisLogo} alt="" />
-            <span>OPERARTIS</span>
-          </a>
-          <span className="header-divider" />
-          <div className="module-identity">
-            <span className="eyebrow">Operational planning</span>
-            <strong>Vehicle Routing</strong>
-          </div>
-        </div>
-
-        <button className="scenario-selector" type="button" aria-label="Choose scenario">
-          <span className="scenario-status-dot" />
-          <span>
-            <small>Scenario</small>
-            <strong>Berlin pilot · 24 Aug</strong>
-          </span>
-          <ChevronDown size={15} />
-        </button>
-
-        <div className="header-actions">
-          <button className="button button-quiet hide-compact" type="button" onClick={() => setImportOpen(true)}>
-            <Upload size={16} /> Import
-          </button>
-          <button className="icon-button hide-compact" type="button" onClick={() => setToast('Scenario draft saved locally')} aria-label="Save scenario">
-            <Save size={17} />
-          </button>
-          <button className="icon-button" type="button" onClick={toggleTheme} aria-label={dark ? 'Use light theme' : 'Use dark theme'}>
-            {dark ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
-          <button className="button button-primary" type="button" onClick={runOptimization} disabled={optimizing}>
-            {optimizing ? <LoaderCircle className="spin" size={17} /> : <Sparkles size={17} />}
-            <span>{optimizing ? 'Optimizing' : 'Optimize'}</span>
-          </button>
-          <div id="operartis-auth-topbar-slot" className="auth-slot">
-            <button className="account-fallback" type="button" aria-label="Account menu">
-              <span>LT</span><ChevronDown size={14} />
-            </button>
-          </div>
-        </div>
-      </header>
-
       <div className="app-body">
-        <aside className={`scenario-sidebar ${sidebarCollapsed ? 'is-collapsed' : ''} ${mobileSidebarOpen ? 'is-mobile-open' : ''}`}>
+        <div className={`scenario-sidebar-shell ${sidebarCollapsed ? 'is-collapsed' : ''} ${mobileSidebarOpen ? 'is-mobile-open' : ''}`}>
+          <button className="sidebar-boundary-toggle" type="button" onClick={() => setSidebarCollapsed((value) => !value)} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {sidebarCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          </button>
+
+          <aside className={`scenario-sidebar ${sidebarCollapsed ? 'is-collapsed' : ''}`}>
+            <div className="sidebar-brand-header">
+              <a className="brand-lockup" href="/" aria-label="Operartis home">
+                <img src={operartisLogo} alt="" />
+                <span>OPERARTIS</span>
+              </a>
+              <button className="icon-button mobile-sidebar-close" type="button" onClick={() => setMobileSidebarOpen(false)} aria-label="Close scenario navigation"><X size={18} /></button>
+            </div>
+
           <div className="sidebar-heading">
             <div>
               <span className="eyebrow">Scenario data</span>
               <h2>Berlin pilot</h2>
             </div>
-            <button className="icon-button" type="button" onClick={() => setSidebarCollapsed((value) => !value)} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
-              {sidebarCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
-            </button>
-            <button className="icon-button mobile-sidebar-close" type="button" onClick={() => setMobileSidebarOpen(false)} aria-label="Close scenario navigation"><X size={18} /></button>
           </div>
 
           <nav className="data-navigation" aria-label="Scenario data">
@@ -261,10 +225,49 @@ function App() {
             <div className="ready-progress"><span style={{ width: '100%' }} /></div>
             <button type="button" onClick={() => setInspectorTab('validation')}>Review 2 warnings <ChevronRight size={14} /></button>
           </div>
-        </aside>
+          </aside>
+        </div>
         {mobileSidebarOpen && <button className="mobile-backdrop" type="button" onClick={() => setMobileSidebarOpen(false)} aria-label="Close navigation" />}
 
-        <main className="planning-workspace">
+        <div className="vrp-main-shell">
+          <header className="app-header glass-chrome">
+            <div className="header-leading">
+              <button className="icon-button mobile-menu-button" type="button" onClick={() => setMobileSidebarOpen(true)} aria-label="Open scenario navigation">
+                <Menu size={19} />
+              </button>
+              <button className="scenario-selector" type="button" aria-label="Choose scenario">
+                <span className="scenario-status-dot" />
+                <span>
+                  <small>Scenario</small>
+                  <strong>Berlin pilot · 24 Aug</strong>
+                </span>
+                <ChevronDown size={15} />
+              </button>
+            </div>
+
+            <div className="module-identity module-title">
+              <strong>Vehicle Routing</strong>
+            </div>
+
+            <div className="header-actions">
+              <button className="button button-quiet hide-compact" type="button" onClick={() => setImportOpen(true)}>
+                <Upload size={16} /> Import
+              </button>
+              <button className="icon-button hide-compact" type="button" onClick={() => setToast('Scenario draft saved locally')} aria-label="Save scenario">
+                <Save size={17} />
+              </button>
+              <button className="icon-button" type="button" onClick={toggleTheme} aria-label={dark ? 'Use light theme' : 'Use dark theme'}>
+                {dark ? <Sun size={17} /> : <Moon size={17} />}
+              </button>
+              <button className="button button-primary" type="button" onClick={runOptimization} disabled={optimizing}>
+                {optimizing ? <LoaderCircle className="spin" size={17} /> : <Sparkles size={17} />}
+                <span>{optimizing ? 'Optimizing' : 'Optimize'}</span>
+              </button>
+              <OperartisAuthTopbarSlot />
+            </div>
+          </header>
+
+          <main className="planning-workspace">
           <section className="map-workspace">
             <Suspense fallback={<div className="map-loading"><LoaderCircle className="spin" size={22} /><span>Loading route map</span></div>}>
               <MapView selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} onSelectCustomer={handleSelectCustomer} dark={dark} fitRequest={mapFitRequest} />
@@ -342,7 +345,8 @@ function App() {
             </div>
             {!timelineCollapsed && <VehicleTimeline selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} />}
           </section>
-        </main>
+          </main>
+        </div>
       </div>
 
       {optimizing && (
@@ -496,7 +500,11 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
     <div className="timeline-body scroller">
       <div className="timeline-axis-row">
         <div className="vehicle-column-head"><Truck size={14} /> Physical vehicle</div>
-        <div className="timeline-axis">{timeLabels.map((label) => <span key={label}>{label}</span>)}</div>
+        <div className="timeline-axis">
+          {timeLabels.map((label, index) => (
+            <span key={label} className={index === timeLabels.length - 1 ? 'axis-end' : ''} style={{ left: minutesToPercent(index * 120) }}>{label}</span>
+          ))}
+        </div>
       </div>
       {timelineVehicles.map((vehicle) => {
         const route = routes.find((item) => item.id === vehicle.routeId)!;
@@ -505,14 +513,48 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
           <button key={vehicle.id} className="timeline-row" type="button" onClick={() => onSelectRoute(vehicle.routeId)} style={{ '--route-color': route.color } as CSSProperties}>
             <span className="vehicle-label"><i /><span><strong>{vehicle.plate}</strong><small>{vehicle.id} · {vehicle.utilization}% utilized</small></span><em>{vehicleTrips.length}T</em></span>
             <span className="timeline-track">
-              {timeLabels.slice(0, -1).map((label) => <i className="timeline-gridline" key={label} />)}
-              {vehicleTrips.map((trip, index) => (
-                <span key={trip.id} className="trip-block" style={{ left: minutesToPercent(trip.startMinute), width: minutesToPercent(trip.endMinute - trip.startMinute) }}>
-                  <span className="trip-main"><Warehouse size={12} /><b>{trip.label}</b><small>{trip.start}–{trip.end}</small></span>
-                  <span className="trip-stop-dots">{trip.customerIds.map((id, stopIndex) => <i key={id} title={id}>{stopIndex + 1}</i>)}</span>
-                  {index < vehicleTrips.length - 1 && <span className="reload-label">reload</span>}
-                </span>
-              ))}
+              {timeLabels.map((label, gridIndex) => <i className="timeline-gridline" key={label} style={{ left: minutesToPercent(gridIndex * 120) }} />)}
+              {vehicleTrips.map((trip, index) => {
+                const depot = depots.find((item) => item.id === trip.depotId)!;
+                const nextTrip = vehicleTrips[index + 1];
+                return (
+                  <Fragment key={trip.id}>
+                    <span className="trip-journey-line" style={{ left: minutesToPercent(trip.startMinute), width: minutesToPercent(trip.endMinute - trip.startMinute) }} aria-hidden="true" />
+                    {index === 0 && (
+                      <span className="timeline-event depot-event event-start" data-time={trip.start} style={{ left: minutesToPercent(trip.startMinute) }} title={`${trip.label}: depart ${depot.name} at ${trip.start}`}>
+                        <Warehouse size={13} />
+                        <span><b>{depot.id} · Depart</b><small>{trip.start}</small></span>
+                      </span>
+                    )}
+                    {trip.visits.map((visit, stopIndex) => {
+                      const customer = customers.find((item) => item.id === visit.customerId)!;
+                      return (
+                        <span
+                          key={visit.customerId}
+                          className="timeline-event customer-event"
+                          data-time={visit.arrival}
+                          style={{ left: minutesToPercent(visit.arrivalMinute), width: minutesToPercent(visit.departureMinute - visit.arrivalMinute) }}
+                          title={`${customer.name}: arrive ${visit.arrival}, depart ${visit.departure}; hard window ${customer.timeWindow}`}
+                        >
+                          <i>{customer.sequence}</i>
+                          <span><b>{customer.name}</b><small>{visit.arrival}–{visit.departure}</small></span>
+                        </span>
+                      );
+                    })}
+                    {nextTrip ? (
+                      <span className="timeline-event depot-event reload-event" data-time={trip.end} style={{ left: minutesToPercent(trip.endMinute), width: minutesToPercent(nextTrip.startMinute - trip.endMinute) }} title={`Return and reload at ${depot.name} from ${trip.end} to ${nextTrip.start}`}>
+                        <Warehouse size={13} />
+                        <span><b>{depot.id} · Reload</b><small>{trip.end}–{nextTrip.start}</small></span>
+                      </span>
+                    ) : (
+                      <span className="timeline-event depot-event event-end" data-time={trip.end} style={{ left: minutesToPercent(trip.endMinute) }} title={`${trip.label}: return to ${depot.name} at ${trip.end}`}>
+                        <Warehouse size={13} />
+                        <span><b>{depot.id} · Return</b><small>{trip.end}</small></span>
+                      </span>
+                    )}
+                  </Fragment>
+                );
+              })}
             </span>
           </button>
         );
