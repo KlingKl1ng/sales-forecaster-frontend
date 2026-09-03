@@ -1,4 +1,4 @@
-import { Fragment, lazy, memo, Suspense, useCallback, useEffect, useState, type CSSProperties, type FormEvent } from 'react';
+import { Fragment, lazy, memo, Suspense, useCallback, useEffect, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -93,6 +93,60 @@ const timelineTicks = Array.from(
     return { minute, label: formatTimelineMinute(minute), isHour: minute % 60 === 0 };
   },
 );
+
+const TOOLTIP_GAP = 8;
+const TOOLTIP_EDGE_PADDING = 8;
+
+function positionTimelineTooltip(event: MouseEvent<HTMLElement>) {
+  const host = event.currentTarget;
+  const tooltip = host.querySelector(':scope > span');
+  const scroller = host.closest('.timeline-body');
+  if (!(tooltip instanceof HTMLElement) || !(scroller instanceof HTMLElement)) return;
+
+  host.classList.remove('is-tooltip-above');
+  tooltip.style.removeProperty('--tooltip-shift-x');
+
+  const place = () => {
+    const hostRect = host.getBoundingClientRect();
+    const scrollerRect = scroller.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const visibleTop = scrollerRect.top + scroller.clientTop;
+    const visibleLeft = scrollerRect.left + scroller.clientLeft;
+    const visibleBottom = visibleTop + scroller.clientHeight;
+    const visibleRight = visibleLeft + scroller.clientWidth;
+    const needed = tooltipRect.height + TOOLTIP_GAP;
+    const spaceBelow = visibleBottom - hostRect.bottom;
+    const spaceAbove = hostRect.top - visibleTop;
+
+    if (spaceBelow < needed && spaceAbove > spaceBelow) {
+      host.classList.add('is-tooltip-above');
+    }
+
+    const placedRect = tooltip.getBoundingClientRect();
+    const minLeft = visibleLeft + TOOLTIP_EDGE_PADDING;
+    const maxRight = visibleRight - TOOLTIP_EDGE_PADDING;
+    let shift = 0;
+    if (placedRect.left < minLeft) shift += minLeft - placedRect.left;
+    if (placedRect.right + shift > maxRight) shift -= placedRect.right + shift - maxRight;
+    tooltip.style.setProperty('--tooltip-shift-x', `${shift}px`);
+  };
+
+  requestAnimationFrame(place);
+}
+
+function TimelineEvent({ className, style, time, children }: { className: string; style?: CSSProperties; time: string; children: ReactNode }) {
+  return (
+    <span
+      className={`timeline-event ${className}`}
+      data-time={time}
+      style={style}
+      onMouseEnter={positionTimelineTooltip}
+      onFocus={positionTimelineTooltip}
+    >
+      {children}
+    </span>
+  );
+}
 
 function useTheme() {
   const initialTheme = window.getOperartisTheme?.() || 'system';
@@ -624,18 +678,18 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
                       <Fragment key={trip.id}>
                         <span className="trip-journey-line" style={{ left: minutesToOffset(trip.startMinute), width: minutesToSize(trip.endMinute - trip.startMinute) }} aria-hidden="true" />
                         {index === 0 && (
-                          <span className="timeline-event depot-event event-start" data-time={trip.start} style={{ left: minutesToOffset(trip.startMinute) }}>
+                          <TimelineEvent className="depot-event event-start" time={trip.start} style={{ left: minutesToOffset(trip.startMinute) }}>
                             <Warehouse size={18} />
                             <span><b>{trip.label}: depart {depot.name}</b><small>Departure at {trip.start}</small></span>
-                          </span>
+                          </TimelineEvent>
                         )}
                         {trip.visits.map((visit) => {
                           const customer = customers.find((item) => item.id === visit.customerId)!;
                           return (
-                            <span
+                            <TimelineEvent
                               key={visit.customerId}
-                              className="timeline-event customer-event"
-                              data-time={visit.arrival}
+                              className="customer-event"
+                              time={visit.arrival}
                               style={{ left: minutesToOffset(visit.arrivalMinute), width: minutesToSize(visit.departureMinute - visit.arrivalMinute) }}
                             >
                               <i>{customer.sequence}</i>
@@ -644,19 +698,19 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
                                 <small>Arrive {visit.arrival}, depart {visit.departure}</small>
                                 <small>Hard window {customer.timeWindow}</small>
                               </span>
-                            </span>
+                            </TimelineEvent>
                           );
                         })}
                         {nextTrip ? (
-                          <span className="timeline-event depot-event reload-event" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute), width: minutesToSize(nextTrip.startMinute - trip.endMinute) }}>
+                          <TimelineEvent className="depot-event reload-event" time={trip.end} style={{ left: minutesToOffset(trip.endMinute), width: minutesToSize(nextTrip.startMinute - trip.endMinute) }}>
                             <Warehouse size={18} />
                             <span><b>Return and reload at {depot.name}</b><small>{trip.end}–{nextTrip.start}</small></span>
-                          </span>
+                          </TimelineEvent>
                         ) : (
-                          <span className="timeline-event depot-event event-end" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute) }}>
+                          <TimelineEvent className="depot-event event-end" time={trip.end} style={{ left: minutesToOffset(trip.endMinute) }}>
                             <Warehouse size={18} />
                             <span><b>{trip.label}: return to {depot.name}</b><small>Arrival at {trip.end}</small></span>
-                          </span>
+                          </TimelineEvent>
                         )}
                       </Fragment>
                     );
