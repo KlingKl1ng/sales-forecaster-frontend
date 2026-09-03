@@ -624,9 +624,9 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
                       <Fragment key={trip.id}>
                         <span className="trip-journey-line" style={{ left: minutesToOffset(trip.startMinute), width: minutesToSize(trip.endMinute - trip.startMinute) }} aria-hidden="true" />
                         {index === 0 && (
-                          <span className="timeline-event depot-event event-start" data-time={trip.start} style={{ left: minutesToOffset(trip.startMinute) }} title={`${trip.label}: depart ${depot.name} at ${trip.start}`}>
+                          <span className="timeline-event depot-event event-start" data-time={trip.start} style={{ left: minutesToOffset(trip.startMinute) }}>
                             <Warehouse size={18} />
-                            <span><b>{depot.id} · Depart</b><small>{trip.start}</small></span>
+                            <span><b>{trip.label}: depart {depot.name}</b><small>Departure at {trip.start}</small></span>
                           </span>
                         )}
                         {trip.visits.map((visit) => {
@@ -637,22 +637,25 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
                               className="timeline-event customer-event"
                               data-time={visit.arrival}
                               style={{ left: minutesToOffset(visit.arrivalMinute), width: minutesToSize(visit.departureMinute - visit.arrivalMinute) }}
-                              title={`${customer.name}: arrive ${visit.arrival}, depart ${visit.departure}; hard window ${customer.timeWindow}`}
                             >
                               <i>{customer.sequence}</i>
-                              <span><b>{customer.name}</b><small>{visit.arrival}–{visit.departure}</small></span>
+                              <span>
+                                <b>{customer.name}</b>
+                                <small>Arrive {visit.arrival}, depart {visit.departure}</small>
+                                <small>Hard window {customer.timeWindow}</small>
+                              </span>
                             </span>
                           );
                         })}
                         {nextTrip ? (
-                          <span className="timeline-event depot-event reload-event" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute), width: minutesToSize(nextTrip.startMinute - trip.endMinute) }} title={`Return and reload at ${depot.name} from ${trip.end} to ${nextTrip.start}`}>
+                          <span className="timeline-event depot-event reload-event" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute), width: minutesToSize(nextTrip.startMinute - trip.endMinute) }}>
                             <Warehouse size={18} />
-                            <span><b>{depot.id} · Reload</b><small>{trip.end}–{nextTrip.start}</small></span>
+                            <span><b>Return and reload at {depot.name}</b><small>{trip.end}–{nextTrip.start}</small></span>
                           </span>
                         ) : (
-                          <span className="timeline-event depot-event event-end" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute) }} title={`${trip.label}: return to ${depot.name} at ${trip.end}`}>
+                          <span className="timeline-event depot-event event-end" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute) }}>
                             <Warehouse size={18} />
-                            <span><b>{depot.id} · Return</b><small>{trip.end}</small></span>
+                            <span><b>{trip.label}: return to {depot.name}</b><small>Arrival at {trip.end}</small></span>
                           </span>
                         )}
                       </Fragment>

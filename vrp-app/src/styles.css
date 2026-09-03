@@ -266,10 +266,10 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .map-workspace .maplibregl-ctrl-bottom-right { right: 14px; bottom: 10px; }
 .maplibregl-ctrl-group button { width: 32px !important; height: 32px !important; }
 .dark .maplibregl-ctrl-icon { filter: invert(1); }
-.maplibregl-popup-content { padding: 10px 12px !important; border: 1px solid var(--border); border-radius: 9px !important; background: var(--surface) !important; color: var(--text); box-shadow: var(--shadow-soft) !important; }
+.maplibregl-popup-content { padding: 12px 14px !important; border: 1px solid var(--border); border-radius: 10px !important; background: var(--surface) !important; color: var(--text); box-shadow: var(--shadow-soft) !important; }
 .maplibregl-popup-content strong, .maplibregl-popup-content small { display: block; }
-.maplibregl-popup-content strong { margin-bottom: 3px; font-size: 11px; }
-.maplibregl-popup-content small { color: var(--muted); font-size: 9px; }
+.maplibregl-popup-content strong { margin-bottom: 4px; font-size: 14px; line-height: 1.3; }
+.maplibregl-popup-content small { color: var(--muted); font-size: 11px; line-height: 1.45; }
 
 .map-customer-marker, .map-depot-marker { position: relative; display: grid; place-items: center; border: 0; cursor: pointer; transition: opacity 0.18s ease, transform 0.18s ease; }
 .map-customer-marker { width: 25px; height: 25px; border: 3px solid var(--route-color); border-radius: 50%; background: var(--surface); color: var(--route-color); box-shadow: 0 2px 7px rgba(15, 23, 42, 0.28); font: 800 9px 'Roboto Mono', monospace; }
@@ -430,10 +430,10 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .timeline-gridline.is-hour { background: var(--border); }
 .trip-journey-line { position: absolute; z-index: 1; top: calc(var(--timeline-row-height) * 0.475); height: 4px; min-width: 2px; border-radius: 99px; background: color-mix(in srgb, var(--route-color) 52%, var(--surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--route-color) 9%, transparent); }
 .timeline-event { position: absolute; z-index: 3; top: calc(var(--timeline-row-height) * 0.25); height: calc(var(--timeline-row-height) * 0.5); min-width: 10px; display: flex; align-items: center; justify-content: center; padding: 0; box-sizing: border-box; border: 1px solid color-mix(in srgb, var(--route-color) 75%, #0f172a); border-radius: 6px; background: var(--route-color); box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12); color: #fff; }
-.timeline-event > span { position: absolute; z-index: 20; top: calc(100% + 8px); left: 50%; width: max-content; max-width: 200px; display: none; flex-direction: column; gap: 3px; padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface-elevated); box-shadow: var(--shadow-float); color: var(--text); pointer-events: none; transform: translateX(-50%); }
+.timeline-event > span { position: absolute; z-index: 20; top: calc(100% + 8px); left: 50%; width: max-content; max-width: 260px; display: none; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface-elevated); box-shadow: var(--shadow-float); color: var(--text); pointer-events: none; transform: translateX(-50%); }
 .timeline-event:hover > span { display: flex; }
-.timeline-event b { font-size: 11px; line-height: 1.15; white-space: nowrap; }
-.timeline-event small { color: var(--muted); font: 650 10px 'Roboto Mono', monospace; white-space: nowrap; }
+.timeline-event b { font-size: 13px; line-height: 1.25; white-space: normal; }
+.timeline-event small { color: var(--muted); font: 500 11px/1.4 'Roboto Mono', monospace; white-space: normal; }
 .customer-event { min-width: 44px; }
 .customer-event > i { display: grid; width: 100%; height: 100%; place-items: center; color: #fff; font: 800 11px 'Roboto Mono', monospace; font-style: normal; }
 .depot-event { z-index: 4; border-color: color-mix(in srgb, var(--route-color) 78%, #0f172a); background: var(--surface); color: var(--route-color); }
