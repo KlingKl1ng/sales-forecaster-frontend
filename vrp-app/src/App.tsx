@@ -66,7 +66,34 @@ const inspectorTabs: Array<{ id: InspectorTab; label: string }> = [
   { id: 'validation', label: 'Validation' },
 ];
 
-const minutesToPercent = (minutes: number) => `${Math.max(0, Math.min(100, (minutes / 720) * 100))}%`;
+const TIMELINE_DURATION_MINUTES = 720;
+const TIMELINE_INTERVAL_MINUTES = 30;
+const TIMELINE_PX_PER_MINUTE = 5;
+const TIMELINE_TRACK_WIDTH = TIMELINE_DURATION_MINUTES * TIMELINE_PX_PER_MINUTE;
+const TIMELINE_TICK_WIDTH = TIMELINE_INTERVAL_MINUTES * TIMELINE_PX_PER_MINUTE;
+
+const minutesToOffset = (minutes: number) => `${Math.max(0, Math.min(TIMELINE_TRACK_WIDTH, minutes * TIMELINE_PX_PER_MINUTE))}px`;
+const minutesToSize = (minutes: number) => `${Math.max(0, minutes * TIMELINE_PX_PER_MINUTE)}px`;
+
+const timelineStyle = {
+  '--timeline-track-width': `${TIMELINE_TRACK_WIDTH}px`,
+  '--timeline-tick-width': `${TIMELINE_TICK_WIDTH}px`,
+} as CSSProperties;
+
+const formatTimelineMinute = (minute: number) => {
+  const totalMinutes = 6 * 60 + minute;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+};
+
+const timelineTicks = Array.from(
+  { length: TIMELINE_DURATION_MINUTES / TIMELINE_INTERVAL_MINUTES + 1 },
+  (_, index) => {
+    const minute = index * TIMELINE_INTERVAL_MINUTES;
+    return { minute, label: formatTimelineMinute(minute), isHour: minute % 60 === 0 };
+  },
+);
 
 function useTheme() {
   const initialTheme = window.getOperartisTheme?.() || 'system';
@@ -364,13 +391,13 @@ function App() {
             <div className="timeline-header">
               <div className="timeline-title">
                 <button className="icon-button" type="button" onClick={() => setTimelineCollapsed((value) => !value)} aria-label={timelineCollapsed ? 'Expand vehicle timeline' : 'Collapse vehicle timeline'}>
-                  {timelineCollapsed ? <PanelBottomOpen size={17} /> : <PanelBottomClose size={17} />}
+                  {timelineCollapsed ? <PanelBottomOpen size={19} /> : <PanelBottomClose size={19} />}
                 </button>
                 <div><span className="eyebrow">Vehicle schedule</span><h3>Trips & reloads</h3></div>
               </div>
               <div className="timeline-actions">
                 <span className="timeline-note"><span /> Hard-window feasible</span>
-                <button className="button button-quiet" type="button" onClick={() => setToast('Timeline exported as part of the operational workbook')}><Download size={15} /> Export</button>
+                <button className="button button-quiet" type="button" onClick={() => setToast('Timeline exported as part of the operational workbook')}><Download size={17} /> Export</button>
               </div>
             </div>
             {!timelineCollapsed && <VehicleTimeline selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} />}
@@ -525,71 +552,110 @@ function ValidationPanel() {
 }
 
 function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: string | null; onSelectRoute: (routeId: string | null) => void }) {
+  const [hoveredVehicleId, setHoveredVehicleId] = useState<string | null>(null);
   const timelineVehicles = vehicles.filter((vehicle) => !selectedRouteId || vehicle.routeId === selectedRouteId);
-  const timeLabels = ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00'];
+
   return (
-    <div className="timeline-body scroller">
-      <div className="timeline-axis-row">
-        <div className="vehicle-column-head"><Truck size={14} /> Physical vehicle</div>
-        <div className="timeline-axis">
-          {timeLabels.map((label, index) => (
-            <span key={label} className={index === timeLabels.length - 1 ? 'axis-end' : ''} style={{ left: minutesToPercent(index * 120) }}>{label}</span>
-          ))}
+    <div className="timeline-body" style={timelineStyle}>
+      <div className="timeline-layout">
+        <div className="timeline-vehicle-column">
+          <div className="vehicle-column-head"><Truck size={16} /> Physical vehicle</div>
+          {timelineVehicles.map((vehicle) => {
+            const route = routes.find((item) => item.id === vehicle.routeId)!;
+            const vehicleTrips = trips.filter((trip) => trip.vehicleId === vehicle.id);
+            const isHovered = hoveredVehicleId === vehicle.id;
+            return (
+              <button
+                key={vehicle.id}
+                className={`vehicle-label${isHovered ? ' is-hovered' : ''}`}
+                type="button"
+                onClick={() => onSelectRoute(vehicle.routeId)}
+                onMouseEnter={() => setHoveredVehicleId(vehicle.id)}
+                onMouseLeave={() => setHoveredVehicleId(null)}
+                style={{ '--route-color': route.color } as CSSProperties}
+              >
+                <i /><span><strong>{vehicle.plate}</strong><small>{vehicle.id} · {vehicle.utilization}% utilized</small></span><em>{vehicleTrips.length}T</em>
+              </button>
+            );
+          })}
+        </div>
+        <div className="timeline-schedule scroller">
+          <div className="timeline-axis-row">
+            <div className="timeline-axis">
+              {timelineTicks.map((tick, index) => (
+                <span
+                  key={tick.minute}
+                  className={[index === timelineTicks.length - 1 ? 'axis-end' : '', tick.isHour ? 'axis-hour' : 'axis-half'].filter(Boolean).join(' ')}
+                  style={{ left: minutesToOffset(tick.minute) }}
+                >
+                  {tick.label}
+                </span>
+              ))}
+            </div>
+          </div>
+          {timelineVehicles.map((vehicle) => {
+            const route = routes.find((item) => item.id === vehicle.routeId)!;
+            const vehicleTrips = trips.filter((trip) => trip.vehicleId === vehicle.id);
+            const isHovered = hoveredVehicleId === vehicle.id;
+            return (
+              <button
+                key={vehicle.id}
+                className={`timeline-row${isHovered ? ' is-hovered' : ''}`}
+                type="button"
+                onClick={() => onSelectRoute(vehicle.routeId)}
+                onMouseEnter={() => setHoveredVehicleId(vehicle.id)}
+                onMouseLeave={() => setHoveredVehicleId(null)}
+                style={{ '--route-color': route.color } as CSSProperties}
+              >
+                <span className="timeline-track">
+                  {timelineTicks.map((tick) => <i className={`timeline-gridline${tick.isHour ? ' is-hour' : ''}`} key={tick.minute} style={{ left: minutesToOffset(tick.minute) }} />)}
+                  {vehicleTrips.map((trip, index) => {
+                    const depot = depots.find((item) => item.id === trip.depotId)!;
+                    const nextTrip = vehicleTrips[index + 1];
+                    return (
+                      <Fragment key={trip.id}>
+                        <span className="trip-journey-line" style={{ left: minutesToOffset(trip.startMinute), width: minutesToSize(trip.endMinute - trip.startMinute) }} aria-hidden="true" />
+                        {index === 0 && (
+                          <span className="timeline-event depot-event event-start" data-time={trip.start} style={{ left: minutesToOffset(trip.startMinute) }} title={`${trip.label}: depart ${depot.name} at ${trip.start}`}>
+                            <Warehouse size={16} />
+                            <span><b>{depot.id} · Depart</b><small>{trip.start}</small></span>
+                          </span>
+                        )}
+                        {trip.visits.map((visit) => {
+                          const customer = customers.find((item) => item.id === visit.customerId)!;
+                          return (
+                            <span
+                              key={visit.customerId}
+                              className="timeline-event customer-event"
+                              data-time={visit.arrival}
+                              style={{ left: minutesToOffset(visit.arrivalMinute), width: minutesToSize(visit.departureMinute - visit.arrivalMinute) }}
+                              title={`${customer.name}: arrive ${visit.arrival}, depart ${visit.departure}; hard window ${customer.timeWindow}`}
+                            >
+                              <i>{customer.sequence}</i>
+                              <span><b>{customer.name}</b><small>{visit.arrival}–{visit.departure}</small></span>
+                            </span>
+                          );
+                        })}
+                        {nextTrip ? (
+                          <span className="timeline-event depot-event reload-event" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute), width: minutesToSize(nextTrip.startMinute - trip.endMinute) }} title={`Return and reload at ${depot.name} from ${trip.end} to ${nextTrip.start}`}>
+                            <Warehouse size={16} />
+                            <span><b>{depot.id} · Reload</b><small>{trip.end}–{nextTrip.start}</small></span>
+                          </span>
+                        ) : (
+                          <span className="timeline-event depot-event event-end" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute) }} title={`${trip.label}: return to ${depot.name} at ${trip.end}`}>
+                            <Warehouse size={16} />
+                            <span><b>{depot.id} · Return</b><small>{trip.end}</small></span>
+                          </span>
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
-      {timelineVehicles.map((vehicle) => {
-        const route = routes.find((item) => item.id === vehicle.routeId)!;
-        const vehicleTrips = trips.filter((trip) => trip.vehicleId === vehicle.id);
-        return (
-          <button key={vehicle.id} className="timeline-row" type="button" onClick={() => onSelectRoute(vehicle.routeId)} style={{ '--route-color': route.color } as CSSProperties}>
-            <span className="vehicle-label"><i /><span><strong>{vehicle.plate}</strong><small>{vehicle.id} · {vehicle.utilization}% utilized</small></span><em>{vehicleTrips.length}T</em></span>
-            <span className="timeline-track">
-              {timeLabels.map((label, gridIndex) => <i className="timeline-gridline" key={label} style={{ left: minutesToPercent(gridIndex * 120) }} />)}
-              {vehicleTrips.map((trip, index) => {
-                const depot = depots.find((item) => item.id === trip.depotId)!;
-                const nextTrip = vehicleTrips[index + 1];
-                return (
-                  <Fragment key={trip.id}>
-                    <span className="trip-journey-line" style={{ left: minutesToPercent(trip.startMinute), width: minutesToPercent(trip.endMinute - trip.startMinute) }} aria-hidden="true" />
-                    {index === 0 && (
-                      <span className="timeline-event depot-event event-start" data-time={trip.start} style={{ left: minutesToPercent(trip.startMinute) }} title={`${trip.label}: depart ${depot.name} at ${trip.start}`}>
-                        <Warehouse size={13} />
-                        <span><b>{depot.id} · Depart</b><small>{trip.start}</small></span>
-                      </span>
-                    )}
-                    {trip.visits.map((visit, stopIndex) => {
-                      const customer = customers.find((item) => item.id === visit.customerId)!;
-                      return (
-                        <span
-                          key={visit.customerId}
-                          className="timeline-event customer-event"
-                          data-time={visit.arrival}
-                          style={{ left: minutesToPercent(visit.arrivalMinute), width: minutesToPercent(visit.departureMinute - visit.arrivalMinute) }}
-                          title={`${customer.name}: arrive ${visit.arrival}, depart ${visit.departure}; hard window ${customer.timeWindow}`}
-                        >
-                          <i>{customer.sequence}</i>
-                          <span><b>{customer.name}</b><small>{visit.arrival}–{visit.departure}</small></span>
-                        </span>
-                      );
-                    })}
-                    {nextTrip ? (
-                      <span className="timeline-event depot-event reload-event" data-time={trip.end} style={{ left: minutesToPercent(trip.endMinute), width: minutesToPercent(nextTrip.startMinute - trip.endMinute) }} title={`Return and reload at ${depot.name} from ${trip.end} to ${nextTrip.start}`}>
-                        <Warehouse size={13} />
-                        <span><b>{depot.id} · Reload</b><small>{trip.end}–{nextTrip.start}</small></span>
-                      </span>
-                    ) : (
-                      <span className="timeline-event depot-event event-end" data-time={trip.end} style={{ left: minutesToPercent(trip.endMinute) }} title={`${trip.label}: return to ${depot.name} at ${trip.end}`}>
-                        <Warehouse size={13} />
-                        <span><b>{depot.id} · Return</b><small>{trip.end}</small></span>
-                      </span>
-                    )}
-                  </Fragment>
-                );
-              })}
-            </span>
-          </button>
-        );
-      })}
     </div>
   );
 }
