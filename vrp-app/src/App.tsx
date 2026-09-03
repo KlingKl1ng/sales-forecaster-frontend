@@ -110,20 +110,24 @@ function positionTimelineTooltip(event: MouseEvent<HTMLElement>) {
     const hostRect = host.getBoundingClientRect();
     const scrollerRect = scroller.getBoundingClientRect();
     const tooltipRect = tooltip.getBoundingClientRect();
+    const axis = scroller.querySelector('.timeline-axis-row');
+    const vehicleCol = scroller.querySelector('.timeline-vehicle-column');
     const visibleTop = scrollerRect.top + scroller.clientTop;
     const visibleLeft = scrollerRect.left + scroller.clientLeft;
     const visibleBottom = visibleTop + scroller.clientHeight;
     const visibleRight = visibleLeft + scroller.clientWidth;
+    const axisBottom = axis instanceof HTMLElement ? axis.getBoundingClientRect().bottom : visibleTop;
+    const colRight = vehicleCol instanceof HTMLElement ? vehicleCol.getBoundingClientRect().right : visibleLeft;
     const needed = tooltipRect.height + TOOLTIP_GAP;
     const spaceBelow = visibleBottom - hostRect.bottom;
-    const spaceAbove = hostRect.top - visibleTop;
+    const spaceAbove = hostRect.top - axisBottom;
 
     if (spaceBelow < needed && spaceAbove > spaceBelow) {
       host.classList.add('is-tooltip-above');
     }
 
     const placedRect = tooltip.getBoundingClientRect();
-    const minLeft = visibleLeft + TOOLTIP_EDGE_PADDING;
+    const minLeft = Math.max(visibleLeft, colRight) + TOOLTIP_EDGE_PADDING;
     const maxRight = visibleRight - TOOLTIP_EDGE_PADDING;
     let shift = 0;
     if (placedRect.left < minLeft) shift += minLeft - placedRect.left;
