@@ -171,6 +171,18 @@ const escapeHtml = (value: string | number) => String(value)
   .replaceAll('"', '&quot;')
   .replaceAll("'", '&#039;');
 
+function applyBasemapTheme(map: MapLibreMap, dark: boolean) {
+  if (!map.getLayer('osm')) return;
+  if (map.getLayer('basemap-bg')) {
+    map.setPaintProperty('basemap-bg', 'background-color', dark ? '#0b1220' : '#dbe4ea');
+  }
+  map.setPaintProperty('osm', 'raster-saturation', dark ? -0.12 : -0.45);
+  map.setPaintProperty('osm', 'raster-contrast', dark ? 0.22 : 0.04);
+  map.setPaintProperty('osm', 'raster-brightness-min', 0);
+  map.setPaintProperty('osm', 'raster-brightness-max', dark ? 0.5 : 1);
+  map.setPaintProperty('osm', 'raster-opacity', dark ? 0.88 : 1);
+}
+
 function showPointPopup(map: MapLibreMap, popup: Popup, event: MapLayerMouseEvent, kind: 'customer' | 'depot') {
   const feature = event.features?.[0];
   if (!feature || feature.geometry.type !== 'Point') return;
@@ -191,7 +203,9 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const selectedRouteRef = useRef(selectedRouteId);
+  const darkRef = useRef(dark);
   selectedRouteRef.current = selectedRouteId;
+  darkRef.current = dark;
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -213,10 +227,13 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
             attribution: '© OpenStreetMap contributors',
           },
         },
-        layers: [{
-          id: 'osm', type: 'raster', source: 'osm',
-          paint: { 'raster-saturation': -0.45, 'raster-contrast': 0.04 },
-        }],
+        layers: [
+          { id: 'basemap-bg', type: 'background', paint: { 'background-color': darkRef.current ? '#0b1220' : '#dbe4ea' } },
+          {
+            id: 'osm', type: 'raster', source: 'osm',
+            paint: { 'raster-saturation': -0.45, 'raster-contrast': 0.04 },
+          },
+        ],
       },
     });
 
@@ -226,6 +243,7 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
 
     map.on('load', () => {
       registerPointImages(map);
+      applyBasemapTheme(map, darkRef.current);
       routes.forEach((route) => {
         map.addSource(`route-${route.id}`, { type: 'geojson', data: routeFeature(route.id) });
         map.addLayer({
@@ -366,10 +384,10 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded() || !map.getLayer('osm')) return;
-    map.setPaintProperty('osm', 'raster-brightness-max', dark ? 0.62 : 1);
-    map.setPaintProperty('osm', 'raster-brightness-min', dark ? 0.11 : 0);
-    map.setPaintProperty('osm', 'raster-saturation', dark ? -0.72 : -0.45);
+    if (!map) return;
+    const apply = () => applyBasemapTheme(map, dark);
+    if (map.isStyleLoaded()) apply();
+    else map.once('load', apply);
   }, [dark]);
 
   return <div ref={containerRef} className="map-canvas" aria-label="Interactive route map" />;
