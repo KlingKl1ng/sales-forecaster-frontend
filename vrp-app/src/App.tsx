@@ -221,8 +221,14 @@ function App() {
     <div className="vrp-app">
       <div className="app-body">
         <div className={`scenario-sidebar-shell ${sidebarCollapsed ? 'is-collapsed' : ''} ${mobileSidebarOpen ? 'is-mobile-open' : ''}`}>
-          <button className="sidebar-boundary-toggle" type="button" onClick={() => setSidebarCollapsed((value) => !value)} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
-            {sidebarCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          <button
+            className="sidebar-boundary-toggle"
+            type="button"
+            onClick={() => setSidebarCollapsed((value) => !value)}
+            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {sidebarCollapsed ? <ChevronRight size={16} strokeWidth={2} /> : <ChevronLeft size={16} strokeWidth={2} />}
           </button>
 
           <aside className={`scenario-sidebar ${sidebarCollapsed ? 'is-collapsed' : ''}`}>
@@ -556,7 +562,7 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
   const timelineVehicles = vehicles.filter((vehicle) => !selectedRouteId || vehicle.routeId === selectedRouteId);
 
   return (
-    <div className="timeline-body" style={timelineStyle}>
+    <div className="timeline-body scroller" style={timelineStyle}>
       <div className="timeline-layout">
         <div className="timeline-vehicle-column">
           <div className="vehicle-column-head"><Truck size={16} /> Physical vehicle</div>
@@ -579,7 +585,7 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
             );
           })}
         </div>
-        <div className="timeline-schedule scroller">
+        <div className="timeline-schedule">
           <div className="timeline-axis-row">
             <div className="timeline-axis">
               {timelineTicks.map((tick, index) => (
@@ -617,7 +623,7 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
                         <span className="trip-journey-line" style={{ left: minutesToOffset(trip.startMinute), width: minutesToSize(trip.endMinute - trip.startMinute) }} aria-hidden="true" />
                         {index === 0 && (
                           <span className="timeline-event depot-event event-start" data-time={trip.start} style={{ left: minutesToOffset(trip.startMinute) }} title={`${trip.label}: depart ${depot.name} at ${trip.start}`}>
-                            <Warehouse size={16} />
+                            <Warehouse size={18} />
                             <span><b>{depot.id} · Depart</b><small>{trip.start}</small></span>
                           </span>
                         )}
@@ -638,12 +644,12 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
                         })}
                         {nextTrip ? (
                           <span className="timeline-event depot-event reload-event" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute), width: minutesToSize(nextTrip.startMinute - trip.endMinute) }} title={`Return and reload at ${depot.name} from ${trip.end} to ${nextTrip.start}`}>
-                            <Warehouse size={16} />
+                            <Warehouse size={18} />
                             <span><b>{depot.id} · Reload</b><small>{trip.end}–{nextTrip.start}</small></span>
                           </span>
                         ) : (
                           <span className="timeline-event depot-event event-end" data-time={trip.end} style={{ left: minutesToOffset(trip.endMinute) }} title={`${trip.label}: return to ${depot.name} at ${trip.end}`}>
-                            <Warehouse size={16} />
+                            <Warehouse size={18} />
                             <span><b>{depot.id} · Return</b><small>{trip.end}</small></span>
                           </span>
                         )}

@@ -219,7 +219,7 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
       },
     });
 
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
     const popup = new maplibregl.Popup({ offset: 20, closeButton: false, closeOnClick: false });
 

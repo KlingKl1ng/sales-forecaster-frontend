@@ -54,22 +54,22 @@ export const vehicles: Vehicle[] = [
   { id: 'VEH-05', plate: 'B-OP 2502', typeId: 'VT-S', depotId: 'BER-02', shift: '07:30–16:30', trips: 1, utilization: 64, routeId: 'R-05' },
 ];
 
-const routeCoordinates = (depotId: string, customerIds: string[]): [number, number][] => {
-  const depot = depots.find((item) => item.id === depotId)!;
-  return [
-    depot.coordinate,
-    ...customerIds.map((id) => customers.find((item) => item.id === id)!.coordinate),
-    depot.coordinate,
-  ];
-};
+const routeCoordinatesFromTrips = (vehicleId: string): [number, number][] => {
+  const coordinates: [number, number][] = [];
 
-export const routes: Route[] = [
-  { id: 'R-01', vehicleId: 'VEH-01', label: 'Central amber', color: '#f59e0b', distanceKm: 31.8, duration: '3h 18m', stops: 4, trips: 2, cost: 116, coordinates: routeCoordinates('BER-01', ['C-001', 'C-002', 'C-003', 'C-004']) },
-  { id: 'R-02', vehicleId: 'VEH-02', label: 'East cyan', color: '#0891b2', distanceKm: 38.6, duration: '3h 42m', stops: 4, trips: 2, cost: 104, coordinates: routeCoordinates('BER-01', ['C-005', 'C-006', 'C-007', 'C-008']) },
-  { id: 'R-03', vehicleId: 'VEH-03', label: 'North violet', color: '#7c3aed', distanceKm: 27.4, duration: '2h 51m', stops: 3, trips: 1, cost: 63, coordinates: routeCoordinates('BER-01', ['C-009', 'C-010', 'C-011']) },
-  { id: 'R-04', vehicleId: 'VEH-04', label: 'Southwest rose', color: '#e11d48', distanceKm: 58.2, duration: '4h 26m', stops: 4, trips: 1, cost: 138, coordinates: routeCoordinates('BER-02', ['C-012', 'C-013', 'C-014', 'C-015']) },
-  { id: 'R-05', vehicleId: 'VEH-05', label: 'Northwest emerald', color: '#059669', distanceKm: 30.4, duration: '2h 38m', stops: 3, trips: 1, cost: 61, coordinates: routeCoordinates('BER-02', ['C-016', 'C-017', 'C-018']) },
-];
+  trips
+    .filter((trip) => trip.vehicleId === vehicleId)
+    .forEach((trip, index) => {
+      const depot = depots.find((item) => item.id === trip.depotId)!.coordinate;
+      if (index === 0) coordinates.push(depot);
+      trip.customerIds.forEach((customerId) => {
+        coordinates.push(customers.find((item) => item.id === customerId)!.coordinate);
+      });
+      coordinates.push(depot);
+    });
+
+  return coordinates;
+};
 
 export const trips: Trip[] = [
   { id: 'T-01A', label: 'Trip 1', vehicleId: 'VEH-01', depotId: 'BER-01', start: '06:50', end: '10:02', startMinute: 50, endMinute: 242, customerIds: ['C-001', 'C-002'], visits: [{ customerId: 'C-001', arrival: '07:30', departure: '07:42', arrivalMinute: 90, departureMinute: 102 }, { customerId: 'C-002', arrival: '08:18', departure: '08:28', arrivalMinute: 138, departureMinute: 148 }], distanceKm: 14.1, load: 30, capacity: 108, color: '#f59e0b' },
@@ -79,6 +79,14 @@ export const trips: Trip[] = [
   { id: 'T-03A', label: 'Trip 1', vehicleId: 'VEH-03', depotId: 'BER-01', start: '07:30', end: '10:21', startMinute: 90, endMinute: 261, customerIds: ['C-009', 'C-010', 'C-011'], visits: [{ customerId: 'C-009', arrival: '08:00', departure: '08:12', arrivalMinute: 120, departureMinute: 132 }, { customerId: 'C-010', arrival: '09:30', departure: '09:50', arrivalMinute: 210, departureMinute: 230 }, { customerId: 'C-011', arrival: '10:02', departure: '10:12', arrivalMinute: 242, departureMinute: 252 }], distanceKm: 27.4, load: 60, capacity: 64, color: '#7c3aed' },
   { id: 'T-04A', label: 'Trip 1', vehicleId: 'VEH-04', depotId: 'BER-02', start: '06:55', end: '11:21', startMinute: 55, endMinute: 321, customerIds: ['C-012', 'C-013', 'C-014', 'C-015'], visits: [{ customerId: 'C-012', arrival: '07:30', departure: '07:45', arrivalMinute: 90, departureMinute: 105 }, { customerId: 'C-013', arrival: '08:15', departure: '08:27', arrivalMinute: 135, departureMinute: 147 }, { customerId: 'C-014', arrival: '09:20', departure: '09:38', arrivalMinute: 200, departureMinute: 218 }, { customerId: 'C-015', arrival: '10:30', departure: '10:50', arrivalMinute: 270, departureMinute: 290 }], distanceKm: 58.2, load: 101, capacity: 108, color: '#e11d48' },
   { id: 'T-05A', label: 'Trip 1', vehicleId: 'VEH-05', depotId: 'BER-02', start: '08:00', end: '10:38', startMinute: 120, endMinute: 278, customerIds: ['C-016', 'C-017', 'C-018'], visits: [{ customerId: 'C-016', arrival: '08:18', departure: '08:30', arrivalMinute: 138, departureMinute: 150 }, { customerId: 'C-017', arrival: '09:15', departure: '09:30', arrivalMinute: 195, departureMinute: 210 }, { customerId: 'C-018', arrival: '10:05', departure: '10:17', arrivalMinute: 245, departureMinute: 257 }], distanceKm: 30.4, load: 56, capacity: 64, color: '#059669' },
+];
+
+export const routes: Route[] = [
+  { id: 'R-01', vehicleId: 'VEH-01', label: 'Central amber', color: '#f59e0b', distanceKm: 31.8, duration: '3h 18m', stops: 4, trips: 2, cost: 116, coordinates: routeCoordinatesFromTrips('VEH-01') },
+  { id: 'R-02', vehicleId: 'VEH-02', label: 'East cyan', color: '#0891b2', distanceKm: 38.6, duration: '3h 42m', stops: 4, trips: 2, cost: 104, coordinates: routeCoordinatesFromTrips('VEH-02') },
+  { id: 'R-03', vehicleId: 'VEH-03', label: 'North violet', color: '#7c3aed', distanceKm: 27.4, duration: '2h 51m', stops: 3, trips: 1, cost: 63, coordinates: routeCoordinatesFromTrips('VEH-03') },
+  { id: 'R-04', vehicleId: 'VEH-04', label: 'Southwest rose', color: '#e11d48', distanceKm: 58.2, duration: '4h 26m', stops: 4, trips: 1, cost: 138, coordinates: routeCoordinatesFromTrips('VEH-04') },
+  { id: 'R-05', vehicleId: 'VEH-05', label: 'Northwest emerald', color: '#059669', distanceKm: 30.4, duration: '2h 38m', stops: 3, trips: 1, cost: 61, coordinates: routeCoordinatesFromTrips('VEH-05') },
 ];
 
 export const validationItems: ValidationItem[] = [
