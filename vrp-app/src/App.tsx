@@ -35,6 +35,7 @@ import {
   ShieldCheck,
   Sparkles,
   Table2,
+  Trash2,
   Truck,
   Upload,
   UsersRound,
@@ -372,6 +373,29 @@ function App() {
     setToast('Optimization cancelled');
   };
 
+  const handleReset = () => {
+    const controller = optimizationAbortRef.current;
+    if (activeJobId) void cancelJob(activeJobId).catch(() => undefined);
+    controller?.abort();
+    optimizationAbortRef.current = null;
+    setOptimizing(false);
+    setScenario(structuredClone(sampleScenario));
+    setSolution(null);
+    setValidation(null);
+    setSelectedRouteId(null);
+    setSelectedCustomerId(null);
+    setInspectorTab('summary');
+    setDataManager(null);
+    setEntityDialog(null);
+    setImportOpen(false);
+    setOptimizationStage('Ready to optimize');
+    setProgress(0);
+    setActiveJobId(null);
+    setCompletedJobId(null);
+    setMapFitRequest((value) => value + 1);
+    setToast('Scenario reset');
+  };
+
   const handleExport = async (format: 'xlsx' | 'json' | 'geojson' = 'xlsx') => {
     if (!completedJobId) {
       setToast('Run an optimization before exporting a plan');
@@ -410,6 +434,14 @@ function App() {
             </div>
 
             <div className="sidebar-scroll scroller">
+              <div className="sidebar-import">
+                <span className="sidebar-section-label">Scenario file</span>
+                <button className="button button-quiet sidebar-import-button" type="button" onClick={() => { setImportOpen(true); setMobileSidebarOpen(false); }}>
+                  <Upload size={16} />
+                  Import
+                </button>
+              </div>
+
               <div className="sidebar-heading">
                 <div>
                   <span className="eyebrow">Scenario data</span>
@@ -461,6 +493,13 @@ function App() {
                 <div className="ready-progress"><span style={{ width: blockingErrors ? '28%' : '100%' }} /></div>
                 <button type="button" onClick={() => setInspectorTab('validation')}>Review {warningCount} warning{warningCount === 1 ? '' : 's'} <ChevronRight size={14} /></button>
               </div>
+
+              <div className="sidebar-reset">
+                <button type="button" className="sidebar-reset-button" onClick={handleReset}>
+                  <Trash2 size={16} />
+                  Reset
+                </button>
+              </div>
             </div>
 
             <div className="sidebar-bottom">
@@ -494,9 +533,6 @@ function App() {
             </div>
 
             <div className="header-actions">
-              <button className="button button-quiet hide-compact" type="button" onClick={() => setImportOpen(true)}>
-                <Upload size={16} /> Import
-              </button>
               <button className="icon-button hide-compact" type="button" onClick={() => setToast('Scenario draft saved locally')} aria-label="Save scenario">
                 <Save size={17} />
               </button>
