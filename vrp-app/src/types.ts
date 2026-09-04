@@ -82,8 +82,206 @@ export interface Route {
 
 export interface ValidationItem {
   id: string;
-  level: 'warning' | 'info' | 'success';
+  level: 'error' | 'warning' | 'info' | 'success';
   title: string;
   detail: string;
   entity?: string;
+}
+
+export interface ApiTimeWindow {
+  start: number;
+  end: number;
+}
+
+export interface ApiDepot {
+  id: string;
+  name: string;
+  coordinates: [number, number];
+  operating_window: ApiTimeWindow;
+  reload_duration_seconds: number;
+  supported_vehicle_type_ids: string[] | null;
+}
+
+export interface ApiCustomer {
+  id: string;
+  name: string;
+  coordinates: [number, number];
+  demand: number;
+  service_duration_seconds: number;
+  time_window: ApiTimeWindow;
+  required: true;
+  compatible_depot_ids: string[] | null;
+  compatible_vehicle_type_ids: string[] | null;
+  address_label: string | null;
+}
+
+export interface ApiVehicleType {
+  id: string;
+  name: string;
+  capacity: number;
+  fixed_activation_cost: number;
+  distance_cost_per_km: number;
+  working_time_cost_per_hour: number;
+  routing_profile: string;
+  speed_factor: number;
+  compatible_depot_ids: string[] | null;
+}
+
+export interface ApiPhysicalVehicle {
+  id: string;
+  name: string | null;
+  vehicle_type_id: string;
+  home_depot_id: string;
+  shift_window: ApiTimeWindow;
+  enabled: boolean;
+}
+
+export interface VrpScenario {
+  schema_version: '1.0';
+  name: string;
+  description: string | null;
+  planning_date: string;
+  timezone: string;
+  currency: string;
+  demand_unit: string;
+  depots: ApiDepot[];
+  customers: ApiCustomer[];
+  vehicle_types: ApiVehicleType[];
+  vehicles: ApiPhysicalVehicle[];
+  objective: {
+    distance_weight: number;
+    working_time_weight: number;
+    waiting_weight: number;
+  };
+  solver: {
+    seed: number;
+    time_limit_seconds: number;
+    matrix_provider: 'auto' | 'osrm' | 'precomputed' | 'haversine';
+    include_geometry: boolean;
+  };
+  matrix?: unknown;
+}
+
+export interface ApiValidationIssue {
+  severity: 'error' | 'warning';
+  code: string;
+  message: string;
+  entity_type?: string | null;
+  entity_id?: string | null;
+  field?: string | null;
+  details?: Record<string, unknown> | null;
+}
+
+export interface ValidationResponse {
+  valid: boolean;
+  schema_version: string;
+  normalized_scenario: VrpScenario;
+  errors: ApiValidationIssue[];
+  warnings: ApiValidationIssue[];
+  counts: Record<string, number>;
+  matrix?: Record<string, unknown> | null;
+}
+
+export interface SolveAccepted {
+  job_id: string;
+  status: string;
+  status_url: string;
+  result_url: string;
+}
+
+export interface VrpJobStatus {
+  job_id: string;
+  module: string;
+  job_type: string;
+  status: string;
+  progress: number;
+  stage: string;
+  error: string | null;
+  created_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  warnings: ApiValidationIssue[];
+}
+
+export interface SolutionStop {
+  customer_id: string;
+  sequence: number;
+  arrival_time: number;
+  service_start_time: number;
+  departure_time: number;
+  waiting_seconds: number;
+  delivered_demand: number;
+  load_after: number;
+  time_window: ApiTimeWindow;
+}
+
+export interface SolutionTrip {
+  id: string;
+  sequence: number;
+  depot_id: string;
+  vehicle_type_id: string;
+  departure_time: number;
+  return_time: number;
+  latest_departure: number;
+  distance_meters: number;
+  duration_seconds: number;
+  waiting_seconds: number;
+  load: number;
+  reload_before_seconds: number;
+  stops: SolutionStop[];
+  geometry: { type: 'LineString'; coordinates: [number, number][] } | null;
+  geometry_error?: string;
+}
+
+export interface SolutionVehicle {
+  vehicle_id: string;
+  vehicle_name: string | null;
+  vehicle_type_id: string;
+  home_depot_id: string;
+  shift_window: ApiTimeWindow;
+  trips: SolutionTrip[];
+}
+
+export interface VrpSolution {
+  schema_version: string;
+  status: 'feasible' | 'infeasible';
+  input_hash: string;
+  metadata: {
+    solver_version: string;
+    seed: number;
+    runtime_seconds: number;
+    matrix: Record<string, unknown>;
+    configuration: Record<string, unknown>;
+  };
+  summary: {
+    customers_total: number;
+    customers_served: number;
+    customers_unserved: number;
+    vehicles_used: number;
+    trips: number;
+    activation_cost: number;
+    distance_cost: number;
+    working_time_cost: number;
+    total_cost: number;
+    distance_meters: number;
+    waiting_seconds: number;
+  };
+  objective: Record<string, number>;
+  vehicles: SolutionVehicle[];
+  unserved: Array<{ customer_id: string; reason_code: string; details: Record<string, unknown> }>;
+  verification: {
+    passed: boolean;
+    errors: Array<Record<string, unknown>>;
+    warnings: Array<Record<string, unknown>>;
+  };
+}
+
+export interface VrpViewData {
+  depots: Depot[];
+  customers: Customer[];
+  vehicleTypes: VehicleType[];
+  vehicles: Vehicle[];
+  routes: Route[];
+  trips: Trip[];
+  validationItems: ValidationItem[];
 }

@@ -1,4 +1,4 @@
-import { Fragment, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from 'react';
+import { createContext, Fragment, lazy, memo, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -42,8 +42,10 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-import { customers, depots, routes, trips, validationItems, vehicles, vehicleTypes } from './mock-data';
-import type { DataKind, InspectorTab } from './types';
+import { cancelJob, downloadJobExport, importScenarioFile, submitSolve, validateScenario, waitForJob } from './api';
+import { sampleScenario } from './sample-scenario';
+import type { Customer, DataKind, Depot, InspectorTab, Route, ValidationResponse, Vehicle, VehicleType, VrpScenario, VrpSolution, VrpViewData } from './types';
+import { buildViewData } from './view-model';
 import { SettingsModal } from './SettingsModal';
 import operartisLogo from '../../operartis-logo.svg';
 
@@ -53,12 +55,29 @@ const OperartisAuthTopbarSlot = memo(function OperartisAuthTopbarSlot() {
   return <div id="operartis-auth-topbar-slot" className="auth-slot" />;
 });
 
-const dataNav: Array<{ kind: DataKind; label: string; description: string; count: number; icon: typeof Warehouse }> = [
-  { kind: 'depots', label: 'Depots', description: 'Dispatch & reload', count: depots.length, icon: Warehouse },
-  { kind: 'customers', label: 'Customers', description: 'Demand & windows', count: customers.length, icon: UsersRound },
-  { kind: 'vehicleTypes', label: 'Vehicle types', description: 'Capacity & costs', count: vehicleTypes.length, icon: Truck },
-  { kind: 'vehicles', label: 'Physical fleet', description: 'Home depot & shift', count: vehicles.length, icon: Gauge },
+type DataNavItem = { kind: DataKind; label: string; description: string; count: number; icon: typeof Warehouse };
+
+const createDataNav = (viewData: VrpViewData): DataNavItem[] => [
+  { kind: 'depots', label: 'Depots', description: 'Dispatch & reload', count: viewData.depots.length, icon: Warehouse },
+  { kind: 'customers', label: 'Customers', description: 'Demand & windows', count: viewData.customers.length, icon: UsersRound },
+  { kind: 'vehicleTypes', label: 'Vehicle types', description: 'Capacity & costs', count: viewData.vehicleTypes.length, icon: Truck },
+  { kind: 'vehicles', label: 'Physical fleet', description: 'Home depot & shift', count: viewData.vehicles.length, icon: Gauge },
 ];
+
+type VrpRuntimeContextValue = {
+  scenario: VrpScenario;
+  solution: VrpSolution | null;
+  validation: ValidationResponse | null;
+  viewData: VrpViewData;
+};
+
+const VrpRuntimeContext = createContext<VrpRuntimeContextValue | null>(null);
+
+function useVrpRuntime() {
+  const value = useContext(VrpRuntimeContext);
+  if (!value) throw new Error('VRP runtime context is unavailable');
+  return value;
+}
 
 const inspectorTabs: Array<{ id: InspectorTab; label: string }> = [
   { id: 'summary', label: 'Summary' },
@@ -98,7 +117,7 @@ const timelineTicks = Array.from(
 const TOOLTIP_GAP = 8;
 const TOOLTIP_EDGE_PADDING = 8;
 
-function positionTimelineTooltip(event: MouseEvent<HTMLElement>) {
+function positionTimelineTooltip(event: { currentTarget: HTMLElement }) {
   const host = event.currentTarget;
   const tooltip = host.querySelector(':scope > span');
   const scroller = host.closest('.timeline-body');
@@ -209,8 +228,11 @@ function useLang() {
 function App() {
   const { theme, dark, setTheme } = useTheme();
   const { lang, setLang } = useLang();
+  const [scenario, setScenario] = useState<VrpScenario>(sampleScenario);
+  const [solution, setSolution] = useState<VrpSolution | null>(null);
+  const [validation, setValidation] = useState<ValidationResponse | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>('R-01');
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>('summary');
   const [dataManager, setDataManager] = useState<DataKind | null>(null);
@@ -220,13 +242,21 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [optimizing, setOptimizing] = useState(false);
-  const [optimizationStage, setOptimizationStage] = useState('Verified plan');
-  const [progress, setProgress] = useState(100);
+  const [optimizationStage, setOptimizationStage] = useState('Ready to optimize');
+  const [progress, setProgress] = useState(0);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+  const [completedJobId, setCompletedJobId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [mapFitRequest, setMapFitRequest] = useState(0);
+  const optimizationAbortRef = useRef<AbortController | null>(null);
 
-  const selectedRoute = routes.find((route) => route.id === selectedRouteId) || null;
-  const selectedCustomer = customers.find((customer) => customer.id === selectedCustomerId) || null;
+  const viewData = useMemo(() => buildViewData(scenario, solution, validation), [scenario, solution, validation]);
+  const dataNav = useMemo(() => createDataNav(viewData), [viewData]);
+  const selectedRoute = viewData.routes.find((route) => route.id === selectedRouteId) || null;
+  const selectedCustomer = viewData.customers.find((customer) => customer.id === selectedCustomerId) || null;
+  const blockingErrors = validation?.errors.length || 0;
+  const warningCount = (validation?.warnings.length || 0) + (solution?.verification.warnings.length || 0) + (solution?.unserved.length || 0);
+  const runtimeValue = useMemo<VrpRuntimeContextValue>(() => ({ scenario, solution, validation, viewData }), [scenario, solution, validation, viewData]);
 
   useEffect(() => {
     if (!toast) return;
@@ -251,31 +281,112 @@ function App() {
     setInspectorTab('summary');
   }, []);
 
+  const prepareScenarioForRuntime = useCallback((value: VrpScenario): VrpScenario => {
+    const local = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+    if (!local || value.solver.matrix_provider !== 'auto') return value;
+    return { ...value, solver: { ...value.solver, matrix_provider: 'haversine' } };
+  }, []);
+
+  const handleImported = useCallback(async (report: ValidationResponse) => {
+    const imported = prepareScenarioForRuntime(report.normalized_scenario);
+    const checked = imported.solver.matrix_provider === report.normalized_scenario.solver.matrix_provider
+      ? report
+      : await validateScenario(imported);
+    setScenario(checked.normalized_scenario);
+    setValidation(checked);
+    setSolution(null);
+    setCompletedJobId(null);
+    setSelectedRouteId(null);
+    setSelectedCustomerId(null);
+    setMapFitRequest((value) => value + 1);
+    setInspectorTab(checked.valid ? 'summary' : 'validation');
+    setOptimizationStage(checked.valid ? 'Scenario validated' : 'Input corrections required');
+    setProgress(0);
+    setImportOpen(false);
+    setToast(checked.valid
+      ? `${checked.counts.customers || imported.customers.length} customers imported and validated`
+      : `Import completed with ${checked.errors.length} blocking error${checked.errors.length === 1 ? '' : 's'}`);
+  }, [prepareScenarioForRuntime]);
+
   const runOptimization = async () => {
     if (optimizing) return;
+    const controller = new AbortController();
+    optimizationAbortRef.current = controller;
     setOptimizing(true);
-    setProgress(8);
-    const stages = [
-      ['Building road matrix', 24],
-      ['Assigning customer depots', 42],
-      ['Constructing feasible trips', 63],
-      ['Packing physical vehicles', 79],
-      ['Verifying hard constraints', 94],
-      ['Verified plan', 100],
-    ] as const;
-    for (const [label, value] of stages) {
-      setOptimizationStage(label);
-      setProgress(value);
-      await new Promise((resolve) => window.setTimeout(resolve, value === 100 ? 300 : 420));
+    setProgress(5);
+    setOptimizationStage('Validating scenario');
+    setSolution(null);
+    setCompletedJobId(null);
+    try {
+      const runtimeScenario = prepareScenarioForRuntime(scenario);
+      const report = await validateScenario(runtimeScenario);
+      setScenario(report.normalized_scenario);
+      setValidation(report);
+      if (!report.valid) {
+        setInspectorTab('validation');
+        throw new Error(`Scenario validation found ${report.errors.length} blocking error${report.errors.length === 1 ? '' : 's'}`);
+      }
+
+      setProgress(10);
+      setOptimizationStage('Submitting optimization job');
+      const accepted = await submitSolve(report.normalized_scenario);
+      setActiveJobId(accepted.job_id);
+      const result = await waitForJob(accepted.job_id, (job) => {
+        const stageLabels: Record<string, string> = {
+          queued: 'Waiting for solver capacity',
+          matrix: 'Building road matrix',
+          constructing: 'Constructing feasible trips',
+          improving: 'Improving trip sequences',
+          packing: 'Packing trips into physical vehicles',
+          verifying: 'Verifying hard constraints',
+          cancelling: 'Cancelling optimization',
+        };
+        setOptimizationStage(stageLabels[job.status] || job.status.replaceAll('_', ' '));
+        setProgress(job.progress);
+      }, controller.signal);
+      setSolution(result);
+      setCompletedJobId(accepted.job_id);
+      setProgress(100);
+      setOptimizationStage(result.verification.passed ? 'Verified plan' : 'Verification failed');
+      setInspectorTab(result.verification.passed ? 'summary' : 'validation');
+      setSelectedRouteId(null);
+      setToast(`${result.verification.passed ? 'Verified' : 'Completed'} route plan generated · ${result.summary.customers_served} customers served`);
+      window.OperartisApi?.broadcastDashboardDataChanged('vrp');
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === 'AbortError')) {
+        setToast(error instanceof Error ? error.message : 'Optimization failed');
+      }
+    } finally {
+      optimizationAbortRef.current = null;
+      setActiveJobId(null);
+      setOptimizing(false);
     }
-    setOptimizing(false);
-    setInspectorTab('summary');
-    setSelectedRouteId(null);
-    setToast('Verified route plan generated · 18 customers served');
-    window.OperartisApi?.broadcastDashboardDataChanged('vrp');
+  };
+
+  const cancelOptimization = async () => {
+    const controller = optimizationAbortRef.current;
+    setOptimizationStage('Cancelling optimization');
+    if (activeJobId) await cancelJob(activeJobId).catch(() => undefined);
+    controller?.abort();
+    setProgress(0);
+    setToast('Optimization cancelled');
+  };
+
+  const handleExport = async (format: 'xlsx' | 'json' | 'geojson' = 'xlsx') => {
+    if (!completedJobId) {
+      setToast('Run an optimization before exporting a plan');
+      return;
+    }
+    try {
+      await downloadJobExport(completedJobId, format);
+      setToast(`Operational ${format.toUpperCase()} export downloaded`);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : 'Export failed');
+    }
   };
 
   return (
+    <VrpRuntimeContext.Provider value={runtimeValue}>
     <div className="vrp-app">
       <div className="app-body">
         <div className={`scenario-sidebar-shell ${sidebarCollapsed ? 'is-collapsed' : ''} ${mobileSidebarOpen ? 'is-mobile-open' : ''}`}>
@@ -302,7 +413,7 @@ function App() {
               <div className="sidebar-heading">
                 <div>
                   <span className="eyebrow">Scenario data</span>
-                  <h2>Berlin pilot</h2>
+                  <h2>{scenario.name}</h2>
                 </div>
               </div>
 
@@ -345,10 +456,10 @@ function App() {
               <div className="sidebar-ready-card">
                 <div className="ready-card-head">
                   <ShieldCheck size={19} />
-                  <div><strong>Ready to optimize</strong><small>0 blocking errors</small></div>
+                  <div><strong>{blockingErrors ? 'Input corrections required' : validation ? 'Ready to optimize' : 'Ready for validation'}</strong><small>{blockingErrors} blocking error{blockingErrors === 1 ? '' : 's'}</small></div>
                 </div>
-                <div className="ready-progress"><span style={{ width: '100%' }} /></div>
-                <button type="button" onClick={() => setInspectorTab('validation')}>Review 2 warnings <ChevronRight size={14} /></button>
+                <div className="ready-progress"><span style={{ width: blockingErrors ? '28%' : '100%' }} /></div>
+                <button type="button" onClick={() => setInspectorTab('validation')}>Review {warningCount} warning{warningCount === 1 ? '' : 's'} <ChevronRight size={14} /></button>
               </div>
             </div>
 
@@ -372,7 +483,7 @@ function App() {
                 <span className="scenario-status-dot" />
                 <span>
                   <small>Scenario</small>
-                  <strong>Berlin pilot · 24 Aug</strong>
+                  <strong>{scenario.name} · {new Date(`${scenario.planning_date}T00:00:00`).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}</strong>
                 </span>
                 <ChevronDown size={15} />
               </button>
@@ -400,7 +511,7 @@ function App() {
           <main className="planning-workspace">
           <section className="map-workspace">
             <Suspense fallback={<div className="map-loading"><LoaderCircle className="spin" size={22} /><span>Loading route map</span></div>}>
-              <MapView selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} onSelectCustomer={handleSelectCustomer} dark={dark} fitRequest={mapFitRequest} />
+              <MapView customers={viewData.customers} depots={viewData.depots} routes={viewData.routes} selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} onSelectCustomer={handleSelectCustomer} dark={dark} fitRequest={mapFitRequest} />
             </Suspense>
 
             <div className="map-toolbar map-toolbar-left glass-panel">
@@ -438,7 +549,7 @@ function App() {
               {inspectorTabs.map((tab) => (
                 <button key={tab.id} className={inspectorTab === tab.id ? 'is-active' : ''} type="button" onClick={() => setInspectorTab(tab.id)} role="tab" aria-selected={inspectorTab === tab.id}>
                   {tab.label}
-                  {tab.id === 'validation' && <span className="tab-count">2</span>}
+                  {tab.id === 'validation' && <span className="tab-count">{blockingErrors + warningCount}</span>}
                 </button>
               ))}
             </div>
@@ -464,7 +575,7 @@ function App() {
               </div>
               <div className="timeline-actions">
                 <span className="timeline-note"><span /> Hard-window feasible</span>
-                <button className="button button-quiet" type="button" onClick={() => setToast('Timeline exported as part of the operational workbook')}><Download size={17} /> Export</button>
+                <button className="button button-quiet" type="button" onClick={() => void handleExport('xlsx')} disabled={!completedJobId}><Download size={17} /> Export</button>
               </div>
             </div>
             {!timelineCollapsed && <VehicleTimeline selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} />}
@@ -478,6 +589,7 @@ function App() {
           <span className="optimization-copy"><LoaderCircle className="spin" size={16} /> {optimizationStage}</span>
           <span className="optimization-progress"><i style={{ width: `${progress}%` }} /></span>
           <b>{progress}%</b>
+          <button className="button button-quiet" type="button" onClick={() => void cancelOptimization()}>Cancel</button>
         </div>
       )}
 
@@ -485,7 +597,7 @@ function App() {
         <DataManager kind={dataManager} onClose={() => setDataManager(null)} onAdd={() => setEntityDialog(dataManager)} onToast={setToast} />
       )}
       {entityDialog && <EntityDialog kind={entityDialog} onClose={() => setEntityDialog(null)} onSaved={(message) => { setEntityDialog(null); setToast(message); }} />}
-      {importOpen && <ImportDialog onClose={() => setImportOpen(false)} onImported={() => { setImportOpen(false); setToast('Scenario workbook validated · 27 records ready'); }} />}
+      {importOpen && <ImportDialog onClose={() => setImportOpen(false)} onImported={handleImported} />}
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} />
 
       {toast && (
@@ -496,14 +608,31 @@ function App() {
         </div>
       )}
     </div>
+    </VrpRuntimeContext.Provider>
   );
 }
 
 function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
-  selectedRoute: (typeof routes)[number] | null;
-  selectedCustomer: (typeof customers)[number] | null;
+  selectedRoute: Route | null;
+  selectedCustomer: Customer | null;
   onOpenRoutes: () => void;
 }) {
+  const { scenario, solution } = useVrpRuntime();
+  const summary = solution?.summary;
+  const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: scenario.currency, maximumFractionDigits: 0 });
+  const totalCost = summary?.total_cost || 0;
+  const distanceKm = (summary?.distance_meters || 0) / 1000;
+  const costPerKm = distanceKm ? totalCost / distanceKm : 0;
+  const objectiveParts = [summary?.activation_cost || 0, summary?.distance_cost || 0, summary?.working_time_cost || 0];
+  const objectiveTotal = objectiveParts.reduce((total, value) => total + value, 0) || 1;
+  const depotWorkload = scenario.depots.map((depot) => {
+    const assignedVehicles = solution?.vehicles.filter((vehicle) => vehicle.home_depot_id === depot.id) || [];
+    const stops = assignedVehicles.reduce((total, vehicle) => total + vehicle.trips.reduce((subtotal, trip) => subtotal + trip.stops.length, 0), 0);
+    return { depot, vehicles: assignedVehicles.length, stops };
+  });
+  const maximumStops = Math.max(1, ...depotWorkload.map((item) => item.stops));
+  const reusedVehicles = solution?.vehicles.filter((vehicle) => vehicle.trips.length > 1).length || 0;
+
   if (selectedCustomer) {
     return (
       <div className="inspector-stack">
@@ -514,11 +643,11 @@ function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
           </div>
           <dl className="detail-list">
             <div><dt>Time window</dt><dd>{selectedCustomer.timeWindow}</dd></div>
-            <div><dt>Demand</dt><dd>{selectedCustomer.demand} units</dd></div>
+            <div><dt>Demand</dt><dd>{selectedCustomer.demand} {scenario.demand_unit}</dd></div>
             <div><dt>Service</dt><dd>{selectedCustomer.serviceMinutes} min</dd></div>
             <div><dt>Assigned depot</dt><dd>{selectedCustomer.depotId}</dd></div>
           </dl>
-          <div className="feasible-banner"><CheckCircle2 size={16} /> Hard-window feasible</div>
+          <div className="feasible-banner"><CheckCircle2 size={16} /> {selectedCustomer.routeId ? 'Scheduled by verified plan' : 'Awaiting optimization'}</div>
         </div>
         <button className="button button-quiet button-full" type="button" onClick={onOpenRoutes}><RouteIcon size={18} /> View assigned route</button>
       </div>
@@ -528,17 +657,17 @@ function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
   return (
     <div className="inspector-stack">
       <div className="metric-grid">
-        <MetricCard icon={MapPin} label="Customers" value="18 / 18" meta="100% served" accent="emerald" />
-        <MetricCard icon={Truck} label="Fleet used" value="5 / 5" meta="7 trips" />
-        <MetricCard icon={RouteIcon} label="Distance" value="186.4" meta="kilometres" />
-        <MetricCard icon={CircleDollarSign} label="Plan cost" value="€ 482" meta="€2.59 / km" accent="gold" />
+        <MetricCard icon={MapPin} label="Customers" value={`${summary?.customers_served || 0} / ${scenario.customers.length}`} meta={solution ? `${Math.round(((summary?.customers_served || 0) / scenario.customers.length) * 100)}% served` : 'Awaiting solution'} accent="emerald" />
+        <MetricCard icon={Truck} label="Fleet used" value={`${summary?.vehicles_used || 0} / ${scenario.vehicles.filter((vehicle) => vehicle.enabled).length}`} meta={`${summary?.trips || 0} trips`} />
+        <MetricCard icon={RouteIcon} label="Distance" value={distanceKm.toFixed(1)} meta="kilometres" />
+        <MetricCard icon={CircleDollarSign} label="Plan cost" value={currency.format(totalCost)} meta={`${currency.format(costPerKm)} / km`} accent="gold" />
       </div>
 
       <div className="inspector-card objective-card">
         <div className="card-heading"><span><BarChart3 size={18} /> Objective</span></div>
-        <div className="objective-row"><span>Vehicle activation</span><strong>€ 262</strong><i><b style={{ width: '54%' }} /></i></div>
-        <div className="objective-row"><span>Distance cost</span><strong>€ 188</strong><i><b style={{ width: '39%' }} /></i></div>
-        <div className="objective-row"><span>Working time</span><strong>€ 32</strong><i><b style={{ width: '7%' }} /></i></div>
+        <div className="objective-row"><span>Vehicle activation</span><strong>{currency.format(objectiveParts[0])}</strong><i><b style={{ width: `${objectiveParts[0] / objectiveTotal * 100}%` }} /></i></div>
+        <div className="objective-row"><span>Distance cost</span><strong>{currency.format(objectiveParts[1])}</strong><i><b style={{ width: `${objectiveParts[1] / objectiveTotal * 100}%` }} /></i></div>
+        <div className="objective-row"><span>Working time</span><strong>{currency.format(objectiveParts[2])}</strong><i><b style={{ width: `${objectiveParts[2] / objectiveTotal * 100}%` }} /></i></div>
       </div>
 
       {selectedRoute ? (
@@ -549,13 +678,13 @@ function SummaryPanel({ selectedRoute, selectedCustomer, onOpenRoutes }: {
       ) : (
         <div className="inspector-card coverage-card">
           <div className="card-heading"><span><Warehouse size={17} /> Depot workload</span><button type="button">Balanced</button></div>
-          <div className="depot-workload"><span><b>BER-01</b><i><em style={{ width: '62%' }} /></i><small>11 stops · 3 vehicles</small></span><span><b>BER-02</b><i><em style={{ width: '38%' }} /></i><small>7 stops · 2 vehicles</small></span></div>
+          <div className="depot-workload">{depotWorkload.map((item) => <span key={item.depot.id}><b>{item.depot.id}</b><i><em style={{ width: `${item.stops / maximumStops * 100}%` }} /></i><small>{item.stops} stops · {item.vehicles} vehicles</small></span>)}</div>
         </div>
       )}
 
       <div className="inspector-card carbon-card">
         <span className="carbon-icon"><Zap size={18} /></span>
-        <div><small>Vehicle reuse</small><strong>2 vehicles perform a second trip</strong><p>One additional activation avoided by depot reload scheduling.</p></div>
+        <div><small>Vehicle reuse</small><strong>{reusedVehicles} vehicle{reusedVehicles === 1 ? '' : 's'} perform multiple trips</strong><p>{solution ? 'Calculated from the verified depot reload schedule.' : 'Vehicle reuse is calculated after optimization.'}</p></div>
       </div>
     </div>
   );
@@ -573,6 +702,10 @@ function MetricCard({ icon: Icon, label, value, meta, accent }: { icon: typeof M
 }
 
 function RoutesPanel({ selectedRouteId, onSelectRoute }: { selectedRouteId: string | null; onSelectRoute: (routeId: string | null) => void }) {
+  const { viewData } = useVrpRuntime();
+  const { routes, vehicles } = viewData;
+  const tripCount = routes.reduce((total, route) => total + route.trips, 0);
+  const stopCount = routes.reduce((total, route) => total + route.stops, 0);
   return (
     <div className="route-list">
       <div className="route-list-tools">
@@ -581,36 +714,41 @@ function RoutesPanel({ selectedRouteId, onSelectRoute }: { selectedRouteId: stri
       </div>
       <button className={`route-card route-card-all ${selectedRouteId === null ? 'is-selected' : ''}`} type="button" onClick={() => onSelectRoute(null)}>
         <span className="route-overview-icon"><LayoutDashboard size={18} /></span>
-        <span><strong>All vehicle routes</strong><small>5 vehicles · 7 trips · 18 stops</small></span>
+        <span><strong>All vehicle routes</strong><small>{routes.length} vehicles · {tripCount} trips · {stopCount} stops</small></span>
         <ChevronRight size={16} />
       </button>
       {routes.map((route) => {
-        const vehicle = vehicles.find((item) => item.id === route.vehicleId)!;
+        const vehicle = vehicles.find((item) => item.id === route.vehicleId);
         return (
           <button key={route.id} className={`route-card ${selectedRouteId === route.id ? 'is-selected' : ''}`} type="button" onClick={() => onSelectRoute(route.id)} style={{ '--route-color': route.color } as CSSProperties}>
             <span className="route-number"><i />{route.id.replace('R-', '')}</span>
-            <span className="route-card-copy"><strong>{vehicle.plate}</strong><small>{route.label} · {route.trips} {route.trips === 1 ? 'trip' : 'trips'}</small><em>{route.stops} stops · {route.distanceKm} km · {route.duration}</em></span>
+            <span className="route-card-copy"><strong>{vehicle?.plate || route.vehicleId}</strong><small>{route.label} · {route.trips} {route.trips === 1 ? 'trip' : 'trips'}</small><em>{route.stops} stops · {route.distanceKm} km · {route.duration}</em></span>
             <span className="route-cost">€{route.cost}<ChevronRight size={15} /></span>
           </button>
         );
       })}
+      {!routes.length && <div className="inspector-card"><strong>No solved routes yet</strong><p>Validate the scenario and run Optimize to create a route plan.</p></div>}
     </div>
   );
 }
 
 function ValidationPanel() {
+  const { solution, validation, viewData } = useVrpRuntime();
+  const validationItems = viewData.validationItems;
+  const verified = Boolean(solution?.verification.passed);
+  const score = verified ? 100 : validation?.valid ? 75 : validation ? 25 : 0;
   return (
     <div className="validation-stack">
       <div className="validation-score-card">
-        <span className="score-ring" aria-label="Feasibility score 100 out of 100"><b>100</b><small>/100</small></span>
-        <div><span className="eyebrow">Feasibility score</span><strong>Verified solution</strong><p>All launch-version hard constraints passed.</p></div>
+        <span className="score-ring" aria-label={`Feasibility score ${score} out of 100`}><b>{score}</b><small>/100</small></span>
+        <div><span className="eyebrow">Feasibility score</span><strong>{verified ? 'Verified solution' : validation?.valid ? 'Scenario validated' : 'Validation required'}</strong><p>{verified ? 'All launch-version hard constraints passed.' : 'The backend verifier runs after optimization.'}</p></div>
       </div>
       <div className="constraint-pills">
         <span><CheckCircle2 size={14} /> Capacity</span><span><CheckCircle2 size={14} /> Time windows</span><span><CheckCircle2 size={14} /> Shifts</span><span><CheckCircle2 size={14} /> Reloads</span>
       </div>
       {validationItems.map((item) => (
         <article key={item.id} className={`validation-item level-${item.level}`}>
-          <span className="validation-item-icon">{item.level === 'warning' ? <AlertTriangle size={18} /> : item.level === 'success' ? <ShieldCheck size={18} /> : <Info size={18} />}</span>
+          <span className="validation-item-icon">{item.level === 'warning' || item.level === 'error' ? <AlertTriangle size={18} /> : item.level === 'success' ? <ShieldCheck size={18} /> : <Info size={18} />}</span>
           <div><strong>{item.title}</strong><p>{item.detail}</p>{item.entity && <button type="button">Open {item.entity} <ChevronRight size={14} /></button>}</div>
         </article>
       ))}
@@ -619,8 +757,29 @@ function ValidationPanel() {
 }
 
 function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: string | null; onSelectRoute: (routeId: string | null) => void }) {
+  const { scenario, viewData } = useVrpRuntime();
+  const { customers, depots, routes, trips, vehicles } = viewData;
   const [hoveredVehicleId, setHoveredVehicleId] = useState<string | null>(null);
-  const timelineVehicles = vehicles.filter((vehicle) => !selectedRouteId || vehicle.routeId === selectedRouteId);
+  const timelineVehicles = vehicles.filter((vehicle) => vehicle.routeId && (!selectedRouteId || vehicle.routeId === selectedRouteId));
+  const enabledVehicles = scenario.vehicles.filter((vehicle) => vehicle.enabled);
+  const timelineStartMinute = Math.floor(Math.min(...enabledVehicles.map((vehicle) => vehicle.shift_window.start), 6 * 3600) / 3600) * 60;
+  const timelineEndMinute = Math.ceil(Math.max(...enabledVehicles.map((vehicle) => vehicle.shift_window.end), 18 * 3600) / 3600) * 60;
+  const timelineDurationMinutes = Math.max(60, timelineEndMinute - timelineStartMinute);
+  const timelinePxPerMinute = 5;
+  const timelineTrackWidth = timelineDurationMinutes * timelinePxPerMinute;
+  const timelineTickWidth = 30 * timelinePxPerMinute;
+  const timelineStyle = {
+    '--timeline-track-width': `${timelineTrackWidth}px`,
+    '--timeline-tick-width': `${timelineTickWidth}px`,
+  } as CSSProperties;
+  const timelineTicks = Array.from({ length: timelineDurationMinutes / 30 + 1 }, (_, index) => {
+    const minute = timelineStartMinute + index * 30;
+    const hours = Math.floor(minute / 60);
+    const minutes = minute % 60;
+    return { minute, label: `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`, isHour: minute % 60 === 0 };
+  });
+  const minutesToOffset = (minute: number) => `${Math.max(0, Math.min(timelineTrackWidth, (minute - timelineStartMinute) * timelinePxPerMinute))}px`;
+  const minutesToSize = (minutes: number) => `${Math.max(0, minutes * timelinePxPerMinute)}px`;
 
   return (
     <div className="timeline-body scroller" style={timelineStyle}>
@@ -747,25 +906,27 @@ function cloneScenarioTables(tables: ScenarioTables): ScenarioTables {
   };
 }
 
-function createScenarioTables(): ScenarioTables {
+function createScenarioTables(viewData: VrpViewData): ScenarioTables {
   return {
-    depots: getDataRows('depots'),
-    customers: getDataRows('customers'),
-    vehicleTypes: getDataRows('vehicleTypes'),
-    vehicles: getDataRows('vehicles'),
+    depots: getDataRows('depots', viewData),
+    customers: getDataRows('customers', viewData),
+    vehicleTypes: getDataRows('vehicleTypes', viewData),
+    vehicles: getDataRows('vehicles', viewData),
   };
 }
 
-let committedScenarioTables = createScenarioTables();
-
 function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClose: () => void; onAdd: () => void; onToast: (message: string) => void }) {
+  const { viewData } = useVrpRuntime();
+  const dataNav = useMemo(() => createDataNav(viewData), [viewData]);
+  const initialTables = useMemo(() => createScenarioTables(viewData), [viewData]);
   const [activeKind, setActiveKind] = useState(kind);
   const [query, setQuery] = useState('');
-  const [tables, setTables] = useState(() => cloneScenarioTables(committedScenarioTables));
+  const [committedTables, setCommittedTables] = useState(() => cloneScenarioTables(initialTables));
+  const [tables, setTables] = useState(() => cloneScenarioTables(initialTables));
   const [editingRow, setEditingRow] = useState<number | null>(null);
   const [editingRowSnapshot, setEditingRowSnapshot] = useState<Record<string, string> | null>(null);
   const [openMenuRow, setOpenMenuRow] = useState<number | null>(null);
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(() => new Set(committedScenarioTables[kind].map((_, index) => index)));
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(() => new Set(initialTables[kind].map((_, index) => index)));
   const [sortKey, setSortKey] = useState('ID');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const tableRef = useRef<HTMLTableElement>(null);
@@ -786,7 +947,7 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
     });
   }, [rows, query, activeSortKey, sortDir]);
   const blocking = rows.filter((row) => Object.values(row).some((value) => !String(value).trim())).length;
-  const dirty = JSON.stringify(tables) !== JSON.stringify(committedScenarioTables);
+  const dirty = JSON.stringify(tables) !== JSON.stringify(committedTables);
   const visibleIndexes = visibleRows.map(({ index }) => index);
   const selectedVisibleCount = visibleIndexes.filter((index) => selectedRows.has(index)).length;
   const allVisibleSelected = visibleIndexes.length > 0 && selectedVisibleCount === visibleIndexes.length;
@@ -807,7 +968,7 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
 
   useEffect(() => {
     if (openMenuRow === null) return undefined;
-    const closeMenu = (event: MouseEvent) => {
+    const closeMenu = (event: globalThis.MouseEvent) => {
       if (!(event.target as Element).closest('.data-row-menu')) setOpenMenuRow(null);
     };
     document.addEventListener('mousedown', closeMenu);
@@ -886,7 +1047,7 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
   };
 
   const discardAndClose = () => {
-    setTables(cloneScenarioTables(committedScenarioTables));
+    setTables(cloneScenarioTables(committedTables));
     setEditingRow(null);
     setEditingRowSnapshot(null);
     setOpenMenuRow(null);
@@ -898,7 +1059,7 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
       onToast(`${blocking} record${blocking === 1 ? '' : 's'} still need values before they can be applied`);
       return;
     }
-    committedScenarioTables = cloneScenarioTables(tables);
+    setCommittedTables(cloneScenarioTables(tables));
     onToast(dirty ? `${title} changes applied` : `${title} is already up to date`);
     onClose();
   };
@@ -1042,15 +1203,31 @@ function EntityDialog({ kind, onClose, onSaved }: { kind: DataKind; onClose: () 
   );
 }
 
-function ImportDialog({ onClose, onImported }: { onClose: () => void; onImported: () => void }) {
-  const [fileName, setFileName] = useState<string | null>(null);
+function ImportDialog({ onClose, onImported }: { onClose: () => void; onImported: (report: ValidationResponse) => Promise<void> | void }) {
+  const [file, setFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const validateAndImport = async () => {
+    if (!file || importing) return;
+    setImporting(true);
+    setError(null);
+    try {
+      const report = await importScenarioFile(file);
+      await onImported(report);
+    } catch (importError) {
+      setError(importError instanceof Error ? importError.message : 'Scenario import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
   return (
     <div className="modal-layer modal-layer-top" role="presentation">
       <div className="import-dialog" role="dialog" aria-modal="true" aria-label="Import scenario data">
         <header><div><span className="entity-dialog-icon"><FileSpreadsheet size={20} /></span><span><small>Scenario data</small><h2>Import routing workbook</h2></span></div><button className="icon-button" type="button" onClick={onClose} aria-label="Close dialog"><X size={18} /></button></header>
-        <label className={`drop-zone ${fileName ? 'has-file' : ''}`}><input type="file" accept=".xlsx,.xls,.csv,.json" onChange={(event) => setFileName(event.target.files?.[0]?.name || null)} />{fileName ? <><CheckCircle2 size={30} /><strong>{fileName}</strong><span>Ready for schema and constraint validation</span></> : <><CloudUpload size={32} /><strong>Drop a workbook here</strong><span>or click to browse · XLSX, CSV, or JSON</span></>}</label>
-        <div className="import-structure"><span className="eyebrow">Expected workbook sheets</span><div><span><Warehouse size={16} /> Depots <b>2</b></span><span><UsersRound size={16} /> Customers <b>18</b></span><span><Truck size={16} /> Vehicles <b>5</b></span><span><Settings2 size={16} /> Settings <b>1</b></span></div></div>
-        <footer><button className="button button-quiet" type="button" onClick={onClose}>Cancel</button><button className="button button-primary" type="button" onClick={onImported} disabled={!fileName}><ShieldCheck size={16} /> Validate & import</button></footer>
+        <label className={`drop-zone ${file ? 'has-file' : ''}`}><input type="file" accept=".xlsx,.json" onChange={(event) => { setFile(event.target.files?.[0] || null); setError(null); }} />{file ? <><CheckCircle2 size={30} /><strong>{file.name}</strong><span>Ready for backend schema and constraint validation</span></> : <><CloudUpload size={32} /><strong>Drop a workbook here</strong><span>or click to browse · XLSX or JSON</span></>}</label>
+        <div className="import-structure"><span className="eyebrow">Required workbook sheets</span><div><span><Warehouse size={16} /> Depots</span><span><UsersRound size={16} /> Customers</span><span><Truck size={16} /> Vehicle Types</span><span><Settings2 size={16} /> Objective & Solver</span></div></div>
+        {error && <p className="import-error" role="alert"><AlertTriangle size={16} /> {error}</p>}
+        <footer><button className="button button-quiet" type="button" onClick={onClose} disabled={importing}>Cancel</button><button className="button button-primary" type="button" onClick={() => void validateAndImport()} disabled={!file || importing}>{importing ? <LoaderCircle className="spin" size={16} /> : <ShieldCheck size={16} />} {importing ? 'Validating' : 'Validate & import'}</button></footer>
       </div>
     </div>
   );
@@ -1060,11 +1237,11 @@ function singular(kind: DataKind) {
   return kind === 'depots' ? 'depot' : kind === 'customers' ? 'customer' : kind === 'vehicleTypes' ? 'vehicle type' : 'vehicle';
 }
 
-function getDataRows(kind: DataKind): Array<Record<string, string>> {
-  if (kind === 'depots') return depots.map((item) => ({ ID: item.id, Name: item.name, 'Operating window': item.window, Reload: `${item.reloadMinutes} min`, Fleet: String(item.vehicles), Coordinates: `${item.coordinate[1].toFixed(4)}, ${item.coordinate[0].toFixed(4)}` }));
-  if (kind === 'customers') return customers.map((item) => ({ ID: item.id, Customer: item.name, Depot: item.depotId, Demand: `${item.demand} units`, 'Time window': item.timeWindow, Service: `${item.serviceMinutes} min`, Route: item.routeId }));
-  if (kind === 'vehicleTypes') return vehicleTypes.map((item) => ({ ID: item.id, Type: item.name, Capacity: `${item.capacity} units`, 'Fixed cost': `€${item.fixedCost}`, 'Distance cost': `€${item.distanceCost.toFixed(2)} / km`, Profile: item.profile }));
-  return vehicles.map((item) => ({ ID: item.id, Plate: item.plate, Type: item.typeId, 'Home depot': item.depotId, Shift: item.shift, Trips: String(item.trips), Utilization: `${item.utilization}%` }));
+function getDataRows(kind: DataKind, viewData: VrpViewData): Array<Record<string, string>> {
+  if (kind === 'depots') return viewData.depots.map((item) => ({ ID: item.id, Name: item.name, 'Operating window': item.window, Reload: `${item.reloadMinutes} min`, Fleet: String(item.vehicles), Coordinates: `${item.coordinate[1].toFixed(4)}, ${item.coordinate[0].toFixed(4)}` }));
+  if (kind === 'customers') return viewData.customers.map((item) => ({ ID: item.id, Customer: item.name, Depot: item.depotId, Demand: String(item.demand), 'Time window': item.timeWindow, Service: `${item.serviceMinutes} min`, Route: item.routeId || 'Unassigned' }));
+  if (kind === 'vehicleTypes') return viewData.vehicleTypes.map((item) => ({ ID: item.id, Type: item.name, Capacity: String(item.capacity), 'Fixed cost': String(item.fixedCost), 'Distance cost': String(item.distanceCost), Profile: item.profile }));
+  return viewData.vehicles.map((item) => ({ ID: item.id, Plate: item.plate, Type: item.typeId, 'Home depot': item.depotId, Shift: item.shift, Trips: String(item.trips), Utilization: `${item.utilization}%` }));
 }
 
 export default App;

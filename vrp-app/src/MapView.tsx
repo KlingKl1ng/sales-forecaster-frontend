@@ -1,8 +1,11 @@
 import { useEffect, useRef } from 'react';
 import maplibregl, { type GeoJSONSource, type Map as MapLibreMap, type MapLayerMouseEvent, type Popup } from 'maplibre-gl';
-import { customers, depots, routes } from './mock-data';
+import type { Customer, Depot, Route } from './types';
 
 interface MapViewProps {
+  customers: Customer[];
+  depots: Depot[];
+  routes: Route[];
   selectedRouteId: string | null;
   onSelectRoute: (routeId: string | null) => void;
   onSelectCustomer: (customerId: string) => void;
@@ -19,7 +22,7 @@ type PointFeature = {
 const isLocal = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
 const tileUrl = import.meta.env.VITE_VRP_TILE_URL || (isLocal ? 'https://tile.openstreetmap.org/{z}/{x}/{y}.png' : '/map-tiles/{z}/{x}/{y}.png');
 
-const routeFeature = (routeId: string) => {
+const routeFeature = (routes: Route[], routeId: string) => {
   const route = routes.find((item) => item.id === routeId)!;
   return {
     type: 'Feature' as const,
@@ -30,19 +33,19 @@ const routeFeature = (routeId: string) => {
 
 const featureCollection = (features: PointFeature[]) => ({ type: 'FeatureCollection' as const, features });
 
-const customerFeatures = (routeId: string | null = null) => featureCollection(
+const customerFeatures = (customers: Customer[], routes: Route[], routeId: string | null = null) => featureCollection(
   customers
     .filter((customer) => !routeId || customer.routeId === routeId)
     .map((customer, index) => {
-      const route = routes.find((item) => item.id === customer.routeId)!;
-      const icon = `customer-route-${route.id}-${customer.sequence}`;
+      const route = routes.find((item) => item.id === customer.routeId);
+      const icon = route ? `customer-route-${route.id}-${customer.sequence}` : 'customer-unassigned';
       return {
         type: 'Feature' as const,
         properties: {
           id: customer.id,
           name: customer.name,
-          routeId: route.id,
-          routeLabel: route.label,
+          routeId: route?.id || '',
+          routeLabel: route?.label || 'Unassigned',
           sequence: customer.sequence,
           timeWindow: customer.timeWindow,
           demand: customer.demand,
@@ -55,7 +58,7 @@ const customerFeatures = (routeId: string | null = null) => featureCollection(
     }),
 );
 
-const depotFeatures = featureCollection(depots.map((depot) => ({
+const depotFeatures = (depots: Depot[]) => featureCollection(depots.map((depot) => ({
   type: 'Feature' as const,
   properties: { id: depot.id, name: depot.name, window: depot.window, icon: 'depot-marker' },
   geometry: { type: 'Point' as const, coordinates: depot.coordinate },
@@ -128,9 +131,11 @@ function clusterImage(count: number): ImageData {
   return context.getImageData(0, 0, width, height);
 }
 
-function registerPointImages(map: MapLibreMap) {
+function registerPointImages(map: MapLibreMap, customers: Customer[], routes: Route[]) {
+  if (!map.hasImage('customer-unassigned')) map.addImage('customer-unassigned', markerImage('•', '#64748b'), { pixelRatio: 2 });
   customers.forEach((customer) => {
-    const route = routes.find((item) => item.id === customer.routeId)!;
+    const route = routes.find((item) => item.id === customer.routeId);
+    if (!route) return;
     const icon = `customer-route-${route.id}-${customer.sequence}`;
     if (!map.hasImage(icon)) map.addImage(icon, markerImage(String(customer.sequence), route.color), { pixelRatio: 2 });
   });
@@ -140,19 +145,19 @@ function registerPointImages(map: MapLibreMap) {
   map.addImage('depot-marker', markerImage('D', '#fbbf24', 'square'), { pixelRatio: 2 });
 }
 
-function scenarioBounds() {
+function scenarioBounds(depots: Depot[], customers: Customer[]) {
   const bounds = new maplibregl.LngLatBounds();
   depots.forEach((item) => bounds.extend(item.coordinate));
   customers.forEach((item) => bounds.extend(item.coordinate));
   return bounds;
 }
 
-function fitMap(map: MapLibreMap, routeId: string | null, animated: boolean) {
+function fitMap(map: MapLibreMap, depots: Depot[], customers: Customer[], routes: Route[], routeId: string | null, animated: boolean) {
   const bounds = new maplibregl.LngLatBounds();
   if (routeId) {
     routes.find((item) => item.id === routeId)?.coordinates.forEach((coordinate) => bounds.extend(coordinate));
   } else {
-    const allBounds = scenarioBounds();
+    const allBounds = scenarioBounds(depots, customers);
     bounds.extend(allBounds.getSouthWest());
     bounds.extend(allBounds.getNorthEast());
   }
@@ -199,7 +204,7 @@ function showPointPopup(map: MapLibreMap, popup: Popup, event: MapLayerMouseEven
     .addTo(map);
 }
 
-export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustomer, dark, fitRequest }: MapViewProps) {
+export default function MapView({ customers, depots, routes, selectedRouteId, onSelectRoute, onSelectCustomer, dark, fitRequest }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const selectedRouteRef = useRef(selectedRouteId);
@@ -242,10 +247,10 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
     const popup = new maplibregl.Popup({ offset: 20, closeButton: false, closeOnClick: false });
 
     map.on('load', () => {
-      registerPointImages(map);
+      registerPointImages(map, customers, routes);
       applyBasemapTheme(map, darkRef.current);
       routes.forEach((route) => {
-        map.addSource(`route-${route.id}`, { type: 'geojson', data: routeFeature(route.id) });
+        map.addSource(`route-${route.id}`, { type: 'geojson', data: routeFeature(routes, route.id) });
         map.addLayer({
           id: `route-shadow-${route.id}`, type: 'line', source: `route-${route.id}`,
           layout: { 'line-cap': 'round', 'line-join': 'round' },
@@ -261,7 +266,7 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
 
       map.addSource('customers-all', {
         type: 'geojson',
-        data: customerFeatures(),
+        data: customerFeatures(customers, routes),
         cluster: true,
         clusterRadius: 24,
         clusterMaxZoom: 8,
@@ -281,12 +286,12 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
         filter: ['!', ['has', 'point_count']],
         layout: { 'icon-image': ['get', 'iconAll'], 'icon-size': 1, 'icon-allow-overlap': true },
       });
-      map.addSource('customers-selected', { type: 'geojson', data: customerFeatures('__none__') });
+      map.addSource('customers-selected', { type: 'geojson', data: customerFeatures(customers, routes, '__none__') });
       map.addLayer({
         id: 'customer-points-selected', type: 'symbol', source: 'customers-selected',
         layout: { 'icon-image': ['get', 'iconRoute'], 'icon-size': 1.08, 'icon-allow-overlap': true, visibility: 'none' },
       });
-      map.addSource('depots', { type: 'geojson', data: depotFeatures });
+      map.addSource('depots', { type: 'geojson', data: depotFeatures(depots) });
       map.addLayer({
         id: 'depot-points', type: 'symbol', source: 'depots',
         layout: { 'icon-image': 'depot-marker', 'icon-size': 1.08, 'icon-allow-overlap': true },
@@ -306,7 +311,7 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
       map.on('click', 'customer-points', (event) => {
         const properties = event.features?.[0]?.properties as Record<string, string> | undefined;
         if (!properties) return;
-        onSelectRoute(properties.routeId);
+        if (properties.routeId) onSelectRoute(properties.routeId);
         onSelectCustomer(properties.id);
       });
       map.on('click', 'customer-points-selected', (event) => {
@@ -339,12 +344,12 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
 
       const initialRoute = selectedRouteRef.current;
       if (initialRoute) {
-        (map.getSource('customers-selected') as GeoJSONSource).setData(customerFeatures(initialRoute));
+        (map.getSource('customers-selected') as GeoJSONSource).setData(customerFeatures(customers, routes, initialRoute));
         map.setLayoutProperty('customer-clusters', 'visibility', 'none');
         map.setLayoutProperty('customer-points', 'visibility', 'none');
         map.setLayoutProperty('customer-points-selected', 'visibility', 'visible');
       }
-      fitMap(map, initialRoute, false);
+      fitMap(map, depots, customers, routes, initialRoute, false);
     });
 
     mapRef.current = map;
@@ -357,13 +362,13 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
       map.remove();
       mapRef.current = null;
     };
-  }, [onSelectCustomer, onSelectRoute]);
+  }, [customers, depots, onSelectCustomer, onSelectRoute, routes]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded() || !map.getSource('customers-selected')) return;
     const hasSelection = Boolean(selectedRouteId);
-    (map.getSource('customers-selected') as GeoJSONSource).setData(customerFeatures(selectedRouteId || '__none__'));
+    (map.getSource('customers-selected') as GeoJSONSource).setData(customerFeatures(customers, routes, selectedRouteId || '__none__'));
     map.setLayoutProperty('customer-clusters', 'visibility', hasSelection ? 'none' : 'visible');
     map.setLayoutProperty('customer-points', 'visibility', hasSelection ? 'none' : 'visible');
     map.setLayoutProperty('customer-points-selected', 'visibility', hasSelection ? 'visible' : 'none');
@@ -373,14 +378,14 @@ export default function MapView({ selectedRouteId, onSelectRoute, onSelectCustom
       map.setPaintProperty(`route-line-${route.id}`, 'line-width', selectedRouteId === route.id ? 6.5 : 4.5);
       map.setPaintProperty(`route-shadow-${route.id}`, 'line-opacity', selected ? 0.14 : 0.03);
     });
-    fitMap(map, selectedRouteId, true);
-  }, [selectedRouteId]);
+    fitMap(map, depots, customers, routes, selectedRouteId, true);
+  }, [customers, depots, routes, selectedRouteId]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
-    fitMap(map, selectedRouteRef.current, true);
-  }, [fitRequest]);
+    fitMap(map, depots, customers, routes, selectedRouteRef.current, true);
+  }, [customers, depots, fitRequest, routes]);
 
   useEffect(() => {
     const map = mapRef.current;
