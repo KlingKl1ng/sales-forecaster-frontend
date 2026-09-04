@@ -158,10 +158,12 @@ function fitMap(map: MapLibreMap, depots: Depot[], customers: Customer[], routes
     routes.find((item) => item.id === routeId)?.coordinates.forEach((coordinate) => bounds.extend(coordinate));
   } else {
     const allBounds = scenarioBounds(depots, customers);
+    if (allBounds.isEmpty()) return;
     bounds.extend(allBounds.getSouthWest());
     bounds.extend(allBounds.getNorthEast());
   }
   const compact = map.getContainer().clientWidth < 640;
+  if (bounds.isEmpty()) return;
   map.fitBounds(bounds, {
     padding: compact ? { top: 78, right: 42, bottom: 92, left: 42 } : { top: 78, right: 58, bottom: 82, left: 58 },
     duration: animated ? 600 : 0,

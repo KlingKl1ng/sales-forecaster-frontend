@@ -44,11 +44,11 @@ import {
   Zap,
 } from 'lucide-react';
 import { cancelJob, downloadJobExport, importScenarioFile, submitSolve, validateScenario, waitForJob } from './api';
-import { sampleScenario } from './sample-scenario';
 import type { Customer, DataKind, Depot, InspectorTab, Route, ValidationResponse, Vehicle, VehicleType, VrpScenario, VrpSolution, VrpViewData } from './types';
 import { buildViewData } from './view-model';
 import { SettingsModal } from './SettingsModal';
 import operartisLogo from '../../operartis-logo.svg';
+import operartisWatermark from '../../fulllogo_transparent_nobuffer.png';
 
 const MapView = lazy(() => import('./MapView'));
 
@@ -66,7 +66,7 @@ const createDataNav = (viewData: VrpViewData): DataNavItem[] => [
 ];
 
 type VrpRuntimeContextValue = {
-  scenario: VrpScenario;
+  scenario: VrpScenario | null;
   solution: VrpSolution | null;
   validation: ValidationResponse | null;
   viewData: VrpViewData;
@@ -76,8 +76,8 @@ const VrpRuntimeContext = createContext<VrpRuntimeContextValue | null>(null);
 
 function useVrpRuntime() {
   const value = useContext(VrpRuntimeContext);
-  if (!value) throw new Error('VRP runtime context is unavailable');
-  return value;
+  if (!value?.scenario) throw new Error('VRP scenario is unavailable');
+  return { ...value, scenario: value.scenario };
 }
 
 const inspectorTabs: Array<{ id: InspectorTab; label: string }> = [
@@ -229,7 +229,7 @@ function useLang() {
 function App() {
   const { theme, dark, setTheme } = useTheme();
   const { lang, setLang } = useLang();
-  const [scenario, setScenario] = useState<VrpScenario>(sampleScenario);
+  const [scenario, setScenario] = useState<VrpScenario | null>(null);
   const [solution, setSolution] = useState<VrpSolution | null>(null);
   const [validation, setValidation] = useState<ValidationResponse | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -238,7 +238,10 @@ function App() {
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>('summary');
   const [dataManager, setDataManager] = useState<DataKind | null>(null);
   const [entityDialog, setEntityDialog] = useState<DataKind | null>(null);
-  const [importOpen, setImportOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importedFilename, setImportedFilename] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
   const [timelineCollapsed, setTimelineCollapsed] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -251,7 +254,10 @@ function App() {
   const [mapFitRequest, setMapFitRequest] = useState(0);
   const optimizationAbortRef = useRef<AbortController | null>(null);
 
-  const viewData = useMemo(() => buildViewData(scenario, solution, validation), [scenario, solution, validation]);
+  const viewData = useMemo<VrpViewData>(() => scenario
+    ? buildViewData(scenario, solution, validation)
+    : { customers: [], depots: [], vehicleTypes: [], vehicles: [], routes: [], trips: [], validationItems: [] },
+  [scenario, solution, validation]);
   const dataNav = useMemo(() => createDataNav(viewData), [viewData]);
   const selectedRoute = viewData.routes.find((route) => route.id === selectedRouteId) || null;
   const selectedCustomer = viewData.customers.find((customer) => customer.id === selectedCustomerId) || null;
@@ -303,14 +309,29 @@ function App() {
     setInspectorTab(checked.valid ? 'summary' : 'validation');
     setOptimizationStage(checked.valid ? 'Scenario validated' : 'Input corrections required');
     setProgress(0);
-    setImportOpen(false);
     setToast(checked.valid
       ? `${checked.counts.customers || imported.customers.length} customers imported and validated`
       : `Import completed with ${checked.errors.length} blocking error${checked.errors.length === 1 ? '' : 's'}`);
   }, [prepareScenarioForRuntime]);
 
+  const handleFileSelection = async (file: File | undefined) => {
+    if (!file || importing || optimizing) return;
+    setImporting(true);
+    setImportError(null);
+    try {
+      const report = await importScenarioFile(file);
+      await handleImported(report);
+      setImportedFilename(file.name);
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : 'Scenario import failed');
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const runOptimization = async () => {
-    if (optimizing) return;
+    if (optimizing || importing || !scenario) return;
     const controller = new AbortController();
     optimizationAbortRef.current = controller;
     setOptimizing(true);
@@ -321,6 +342,7 @@ function App() {
     try {
       const runtimeScenario = prepareScenarioForRuntime(scenario);
       const report = await validateScenario(runtimeScenario);
+      if (controller.signal.aborted) return;
       setScenario(report.normalized_scenario);
       setValidation(report);
       if (!report.valid) {
@@ -331,6 +353,10 @@ function App() {
       setProgress(10);
       setOptimizationStage('Submitting optimization job');
       const accepted = await submitSolve(report.normalized_scenario);
+      if (controller.signal.aborted) {
+        void cancelJob(accepted.job_id).catch(() => undefined);
+        return;
+      }
       setActiveJobId(accepted.job_id);
       const result = await waitForJob(accepted.job_id, (job) => {
         const stageLabels: Record<string, string> = {
@@ -345,6 +371,7 @@ function App() {
         setOptimizationStage(stageLabels[job.status] || job.status.replaceAll('_', ' '));
         setProgress(job.progress);
       }, controller.signal);
+      if (controller.signal.aborted) return;
       setSolution(result);
       setCompletedJobId(accepted.job_id);
       setProgress(100);
@@ -354,13 +381,15 @@ function App() {
       setToast(`${result.verification.passed ? 'Verified' : 'Completed'} route plan generated · ${result.summary.customers_served} customers served`);
       window.OperartisApi?.broadcastDashboardDataChanged('vrp');
     } catch (error) {
-      if (!(error instanceof DOMException && error.name === 'AbortError')) {
+      if (!controller.signal.aborted && !(error instanceof DOMException && error.name === 'AbortError')) {
         setToast(error instanceof Error ? error.message : 'Optimization failed');
       }
     } finally {
-      optimizationAbortRef.current = null;
-      setActiveJobId(null);
-      setOptimizing(false);
+      if (optimizationAbortRef.current === controller) {
+        optimizationAbortRef.current = null;
+        setActiveJobId(null);
+        setOptimizing(false);
+      }
     }
   };
 
@@ -379,7 +408,7 @@ function App() {
     controller?.abort();
     optimizationAbortRef.current = null;
     setOptimizing(false);
-    setScenario(structuredClone(sampleScenario));
+    setScenario(null);
     setSolution(null);
     setValidation(null);
     setSelectedRouteId(null);
@@ -387,7 +416,9 @@ function App() {
     setInspectorTab('summary');
     setDataManager(null);
     setEntityDialog(null);
-    setImportOpen(false);
+    setImportedFilename(null);
+    setImportError(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
     setOptimizationStage('Ready to optimize');
     setProgress(0);
     setActiveJobId(null);
@@ -435,13 +466,28 @@ function App() {
 
             <div className="sidebar-scroll scroller">
               <div className="sidebar-import">
-                <span className="sidebar-section-label">Scenario file</span>
-                <button className="button button-quiet sidebar-import-button" type="button" onClick={() => { setImportOpen(true); setMobileSidebarOpen(false); }}>
-                  <Upload size={16} />
-                  Import
-                </button>
+                <span className="sidebar-section-label">Source data</span>
+                <input ref={fileInputRef} type="file" accept=".xlsx,.json" hidden onChange={(event) => void handleFileSelection(event.target.files?.[0])} />
+                <div className={`sidebar-file-card ${importedFilename ? validation?.valid ? 'is-ready' : 'needs-review' : ''}`} aria-busy={importing}>
+                  {importing ? <div className="sidebar-file-loading" role="status"><LoaderCircle size={32} className="spin" /><span>Validating file…</span></div> : importedFilename ? (
+                    <div className="sidebar-file-selected">
+                      <button className="sidebar-file-name" type="button" title={importedFilename} onClick={() => fileInputRef.current?.click()} disabled={optimizing}>{importedFilename}</button>
+                      <span className="sidebar-file-status">{validation?.valid ? 'Uploaded & validated' : 'Action required'}</span>
+                      <div className="sidebar-file-actions">
+                        <button type="button" title="Re-upload file" aria-label="Re-upload file" onClick={() => fileInputRef.current?.click()} disabled={optimizing}><Upload size={14} /></button>
+                        <button type="button" title="Review scenario data" aria-label="Review scenario data" onClick={() => setDataManager('customers')}><Table2 size={14} /></button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button className="sidebar-file-empty" type="button" onClick={() => fileInputRef.current?.click()} disabled={optimizing} aria-label="Import scenario file">
+                      <Upload size={32} /><span>Upload Data</span>
+                    </button>
+                  )}
+                </div>
+                {importError && <p className="sidebar-import-error" role="alert">{importError}</p>}
               </div>
 
+              {scenario && <>
               <div className="sidebar-heading">
                 <div>
                   <span className="eyebrow">Scenario data</span>
@@ -494,8 +540,9 @@ function App() {
                 <button type="button" onClick={() => setInspectorTab('validation')}>Review {warningCount} warning{warningCount === 1 ? '' : 's'} <ChevronRight size={14} /></button>
               </div>
 
+              </>}
               <div className="sidebar-reset">
-                <button type="button" className="sidebar-reset-button" onClick={handleReset}>
+                <button type="button" className="sidebar-reset-button" onClick={handleReset} disabled={importing}>
                   <Trash2 size={16} />
                   Reset
                 </button>
@@ -518,14 +565,14 @@ function App() {
               <button className="icon-button mobile-menu-button" type="button" onClick={() => setMobileSidebarOpen(true)} aria-label="Open scenario navigation">
                 <Menu size={19} />
               </button>
-              <button className="scenario-selector" type="button" aria-label="Choose scenario">
+              {scenario && <button className="scenario-selector" type="button" aria-label="Choose scenario">
                 <span className="scenario-status-dot" />
                 <span>
                   <small>Scenario</small>
                   <strong>{scenario.name} · {new Date(`${scenario.planning_date}T00:00:00`).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}</strong>
                 </span>
                 <ChevronDown size={15} />
-              </button>
+              </button>}
             </div>
 
             <div className="module-identity module-title">
@@ -533,23 +580,29 @@ function App() {
             </div>
 
             <div className="header-actions">
-              <button className="icon-button hide-compact" type="button" onClick={() => setToast('Scenario draft saved locally')} aria-label="Save scenario">
+              {scenario && <><button className="icon-button hide-compact" type="button" onClick={() => setToast('Scenario draft saved locally')} aria-label="Save scenario">
                 <Save size={17} />
               </button>
-              <button className="button button-primary" type="button" onClick={runOptimization} disabled={optimizing}>
+              <button className="button button-primary" type="button" onClick={runOptimization} disabled={optimizing || importing}>
                 {optimizing ? <LoaderCircle className="spin" size={17} /> : <Sparkles size={17} />}
                 <span>{optimizing ? 'Optimizing' : 'Optimize'}</span>
               </button>
+              </>}
               <OperartisAuthTopbarSlot />
             </div>
           </header>
 
-          <main className="planning-workspace">
+          <main className={`planning-workspace ${scenario ? '' : 'is-empty'}`}>
           <section className="map-workspace">
-            <Suspense fallback={<div className="map-loading"><LoaderCircle className="spin" size={22} /><span>Loading route map</span></div>}>
+            {scenario ? <Suspense fallback={<div className="map-loading"><LoaderCircle className="spin" size={22} /><span>Loading route map</span></div>}>
               <MapView customers={viewData.customers} depots={viewData.depots} routes={viewData.routes} selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} onSelectCustomer={handleSelectCustomer} dark={dark} fitRequest={mapFitRequest} />
-            </Suspense>
+            </Suspense> : (
+              <div className="vrp-empty-state" aria-hidden="true">
+                <img src={operartisWatermark} alt="" width="420" height="117" className="vrp-empty-watermark" />
+              </div>
+            )}
 
+            {scenario && <>
             <div className="map-toolbar map-toolbar-left glass-panel">
               <button className="toolbar-back" type="button" onClick={() => { setSelectedRouteId(null); setSelectedCustomerId(null); setMapFitRequest((value) => value + 1); }} aria-label="Show all routes"><ArrowLeft size={17} /></button>
               <span />
@@ -570,8 +623,10 @@ function App() {
               <span><i className="legend-cluster" /> Grouped stops</span>
               <span><i className="legend-route" /> Vehicle route</span>
             </div>
+            </>}
           </section>
 
+          {scenario && <>
           <aside className="route-inspector">
             <div className="inspector-header">
               <div>
@@ -616,6 +671,7 @@ function App() {
             </div>
             {!timelineCollapsed && <VehicleTimeline selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} />}
           </section>
+          </>}
           </main>
         </div>
       </div>
@@ -633,7 +689,6 @@ function App() {
         <DataManager kind={dataManager} onClose={() => setDataManager(null)} onAdd={() => setEntityDialog(dataManager)} onToast={setToast} />
       )}
       {entityDialog && <EntityDialog kind={entityDialog} onClose={() => setEntityDialog(null)} onSaved={(message) => { setEntityDialog(null); setToast(message); }} />}
-      {importOpen && <ImportDialog onClose={() => setImportOpen(false)} onImported={handleImported} />}
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} />
 
       {toast && (
