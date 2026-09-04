@@ -1,4 +1,4 @@
-import { Fragment, lazy, memo, Suspense, useCallback, useEffect, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from 'react';
+import { Fragment, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -25,6 +25,7 @@ import {
   MapPin,
   Menu,
   MoreHorizontal,
+  PencilLine,
   PackageCheck,
   Plus,
   Route as RouteIcon,
@@ -734,38 +735,292 @@ function VehicleTimeline({ selectedRouteId, onSelectRoute }: { selectedRouteId: 
   );
 }
 
+type TableRow = Record<string, string>;
+type ScenarioTables = Record<DataKind, TableRow[]>;
+
+function cloneScenarioTables(tables: ScenarioTables): ScenarioTables {
+  return {
+    depots: tables.depots.map((row) => ({ ...row })),
+    customers: tables.customers.map((row) => ({ ...row })),
+    vehicleTypes: tables.vehicleTypes.map((row) => ({ ...row })),
+    vehicles: tables.vehicles.map((row) => ({ ...row })),
+  };
+}
+
+function createScenarioTables(): ScenarioTables {
+  return {
+    depots: getDataRows('depots'),
+    customers: getDataRows('customers'),
+    vehicleTypes: getDataRows('vehicleTypes'),
+    vehicles: getDataRows('vehicles'),
+  };
+}
+
+let committedScenarioTables = createScenarioTables();
+
 function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClose: () => void; onAdd: () => void; onToast: (message: string) => void }) {
   const [activeKind, setActiveKind] = useState(kind);
   const [query, setQuery] = useState('');
+  const [tables, setTables] = useState(() => cloneScenarioTables(committedScenarioTables));
+  const [editingRow, setEditingRow] = useState<number | null>(null);
+  const [editingRowSnapshot, setEditingRowSnapshot] = useState<Record<string, string> | null>(null);
+  const [openMenuRow, setOpenMenuRow] = useState<number | null>(null);
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(() => new Set(committedScenarioTables[kind].map((_, index) => index)));
+  const [sortKey, setSortKey] = useState('ID');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const tableRef = useRef<HTMLTableElement>(null);
+  const selectAllRef = useRef<HTMLInputElement>(null);
   const title = dataNav.find((item) => item.kind === activeKind)!.label;
-  const rows = getDataRows(activeKind).filter((row) => Object.values(row).join(' ').toLowerCase().includes(query.toLowerCase()));
+  const rows = tables[activeKind];
+  const columns = Object.keys(rows[0] || {});
+  const activeSortKey = columns.includes(sortKey) ? sortKey : (columns[0] || '');
+  const visibleRows = useMemo(() => {
+    const filtered = rows
+      .map((row, index) => ({ row, index }))
+      .filter(({ row }) => Object.values(row).join(' ').toLowerCase().includes(query.toLowerCase()));
+    if (!activeSortKey) return filtered;
+    const direction = sortDir === 'asc' ? 1 : -1;
+    return [...filtered].sort((left, right) => {
+      const cmp = String(left.row[activeSortKey] ?? '').localeCompare(String(right.row[activeSortKey] ?? ''), undefined, { numeric: true, sensitivity: 'base' });
+      return cmp === 0 ? left.index - right.index : cmp * direction;
+    });
+  }, [rows, query, activeSortKey, sortDir]);
+  const blocking = rows.filter((row) => Object.values(row).some((value) => !String(value).trim())).length;
+  const dirty = JSON.stringify(tables) !== JSON.stringify(committedScenarioTables);
+  const visibleIndexes = visibleRows.map(({ index }) => index);
+  const selectedVisibleCount = visibleIndexes.filter((index) => selectedRows.has(index)).length;
+  const allVisibleSelected = visibleIndexes.length > 0 && selectedVisibleCount === visibleIndexes.length;
+  const someVisibleSelected = selectedVisibleCount > 0 && !allVisibleSelected;
+
+  useEffect(() => {
+    setEditingRow(null);
+    setEditingRowSnapshot(null);
+    setOpenMenuRow(null);
+    setSelectedRows(new Set(tables[activeKind].map((_, index) => index)));
+    setSortKey('ID');
+    setSortDir('asc');
+  }, [activeKind]);
+
+  useEffect(() => {
+    if (selectAllRef.current) selectAllRef.current.indeterminate = someVisibleSelected;
+  }, [someVisibleSelected]);
+
+  useEffect(() => {
+    if (openMenuRow === null) return undefined;
+    const closeMenu = (event: MouseEvent) => {
+      if (!(event.target as Element).closest('.data-row-menu')) setOpenMenuRow(null);
+    };
+    document.addEventListener('mousedown', closeMenu);
+    return () => document.removeEventListener('mousedown', closeMenu);
+  }, [openMenuRow]);
+
+  const toggleRowSelected = (rowIndex: number) => {
+    setSelectedRows((current) => {
+      const next = new Set(current);
+      if (next.has(rowIndex)) next.delete(rowIndex);
+      else next.add(rowIndex);
+      return next;
+    });
+  };
+
+  const handleSort = (column: string) => {
+    if (sortKey === column) setSortDir((current) => (current === 'asc' ? 'desc' : 'asc'));
+    else {
+      setSortKey(column);
+      setSortDir('asc');
+    }
+  };
+
+  const toggleAllVisible = () => {
+    setSelectedRows((current) => {
+      const next = new Set(current);
+      if (allVisibleSelected) visibleIndexes.forEach((index) => next.delete(index));
+      else visibleIndexes.forEach((index) => next.add(index));
+      return next;
+    });
+  };
+
+  const updateCell = (rowIndex: number, column: string, value: string) => {
+    setTables((current) => ({
+      ...current,
+      [activeKind]: current[activeKind].map((row, index) => (index === rowIndex ? { ...row, [column]: value } : row)),
+    }));
+  };
+
+  const startEditing = (rowIndex: number) => {
+    if (editingRow !== null && editingRow !== rowIndex && editingRowSnapshot) {
+      setTables((current) => ({
+        ...current,
+        [activeKind]: current[activeKind].map((row, index) => (index === editingRow ? editingRowSnapshot : row)),
+      }));
+    }
+    setEditingRowSnapshot({ ...tables[activeKind][rowIndex] });
+    setEditingRow(rowIndex);
+    setOpenMenuRow(null);
+    requestAnimationFrame(() => {
+      const input = tableRef.current?.querySelector<HTMLInputElement>(`input[data-row="${rowIndex}"]`);
+      input?.focus();
+      input?.select();
+    });
+  };
+
+  const applyRowEdit = (rowIndex: number) => {
+    const row = tables[activeKind][rowIndex];
+    if (Object.values(row).some((value) => !String(value).trim())) {
+      onToast('Complete all fields before applying this row');
+      return;
+    }
+    setEditingRow(null);
+    setEditingRowSnapshot(null);
+  };
+
+  const cancelRowEdit = (rowIndex: number) => {
+    if (editingRowSnapshot) {
+      setTables((current) => ({
+        ...current,
+        [activeKind]: current[activeKind].map((row, index) => (index === rowIndex ? editingRowSnapshot : row)),
+      }));
+    }
+    setEditingRow(null);
+    setEditingRowSnapshot(null);
+  };
+
+  const discardAndClose = () => {
+    setTables(cloneScenarioTables(committedScenarioTables));
+    setEditingRow(null);
+    setEditingRowSnapshot(null);
+    setOpenMenuRow(null);
+    onClose();
+  };
+
+  const applyAndClose = () => {
+    if (blocking) {
+      onToast(`${blocking} record${blocking === 1 ? '' : 's'} still need values before they can be applied`);
+      return;
+    }
+    committedScenarioTables = cloneScenarioTables(tables);
+    onToast(dirty ? `${title} changes applied` : `${title} is already up to date`);
+    onClose();
+  };
 
   return (
     <div className="modal-layer" role="presentation">
       <div className="data-manager" role="dialog" aria-modal="true" aria-label={`Manage ${title}`}>
         <header className="data-manager-header">
-          <div><span className="eyebrow">Scenario data</span><h2>Manage operational inputs</h2><p>Changes are validated before they enter the routing model.</p></div>
-          <button className="icon-button" type="button" onClick={onClose} aria-label="Close data manager"><X size={19} /></button>
+          <div><span className="eyebrow">Scenario data</span><h2>Manage operational inputs</h2><p>Use row actions to edit records. Apply saves them to this session.</p></div>
+          <button className="icon-button" type="button" onClick={discardAndClose} aria-label="Close data manager"><X size={19} /></button>
         </header>
         <div className="data-manager-tabs">
           {dataNav.map((item) => {
             const Icon = item.icon;
-            return <button key={item.kind} className={activeKind === item.kind ? 'is-active' : ''} type="button" onClick={() => setActiveKind(item.kind)}><Icon size={16} />{item.label}<span>{item.count}</span></button>;
+            return <button key={item.kind} className={activeKind === item.kind ? 'is-active' : ''} type="button" onClick={() => setActiveKind(item.kind)}><Icon size={18} />{item.label}<span>{item.count}</span></button>;
           })}
         </div>
         <div className="data-manager-toolbar">
-          <label><Search size={16} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${title.toLowerCase()}`} /></label>
-          <button className="button button-quiet" type="button" onClick={() => onToast(`${title} template downloaded`)}><Download size={15} /> Template</button>
-          <button className="button button-quiet" type="button" onClick={() => onToast(`${title} table validated`)}><ShieldCheck size={15} /> Validate</button>
-          <button className="button button-primary" type="button" onClick={onAdd}><Plus size={16} /> Add {singular(activeKind)}</button>
+          <label><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${title.toLowerCase()}`} /></label>
+          <button className="button button-quiet" type="button" onClick={() => onToast(`${title} template downloaded`)}><Download size={16} /> Template</button>
+          <button className="button button-quiet" type="button" onClick={() => onToast(blocking ? `${title} table has ${blocking} incomplete record${blocking === 1 ? '' : 's'}` : `${title} table validated`)}><ShieldCheck size={16} /> Validate</button>
+          <button className="button button-primary" type="button" onClick={onAdd}><Plus size={17} /> Add {singular(activeKind)}</button>
         </div>
         <div className="data-table-wrap scroller">
-          <table className="data-table">
-            <thead><tr>{Object.keys(rows[0] || {}).map((column) => <th key={column}>{column}</th>)}<th aria-label="Actions" /></tr></thead>
-            <tbody>{rows.map((row, rowIndex) => <tr key={`${activeKind}-${rowIndex}`}>{Object.values(row).map((value, index) => <td key={`${rowIndex}-${index}`}>{index === 0 ? <strong>{value}</strong> : value}</td>)}<td><button type="button" aria-label="Edit row"><MoreHorizontal size={16} /></button></td></tr>)}</tbody>
+          <table className="data-table" ref={tableRef}>
+            <thead>
+              <tr>
+                <th className="is-select">
+                  <input
+                    ref={selectAllRef}
+                    type="checkbox"
+                    className="fc-row-check"
+                    checked={allVisibleSelected}
+                    disabled={visibleIndexes.length === 0}
+                    onChange={toggleAllVisible}
+                    aria-label={`Select all ${title.toLowerCase()}`}
+                  />
+                </th>
+                {columns.map((column) => {
+                  const active = activeSortKey === column;
+                  return (
+                    <th key={column} aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
+                      <button type="button" className={`data-sort-header${active ? ' is-active' : ''}`} onClick={() => handleSort(column)}>
+                        <span>{column}</span>
+                        <span className="data-sort-icon" aria-hidden="true">{active ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}</span>
+                      </button>
+                    </th>
+                  );
+                })}
+                <th aria-label="Actions" />
+              </tr>
+            </thead>
+            <tbody>
+              {visibleRows.map(({ row, index }) => (
+                <tr key={`${activeKind}-${index}`} className={[editingRow === index ? 'is-editing' : undefined, selectedRows.has(index) ? 'is-selected' : undefined].filter(Boolean).join(' ') || undefined}>
+                  <td className="is-select">
+                    <input
+                      type="checkbox"
+                      className="fc-row-check"
+                      checked={selectedRows.has(index)}
+                      onChange={() => toggleRowSelected(index)}
+                      aria-label={`Select ${row.ID || `row ${index + 1}`}`}
+                    />
+                  </td>
+                  {columns.map((column, columnIndex) => (
+                    <td key={column} className={column === 'ID' ? 'is-id' : undefined}>
+                      {editingRow === index ? (
+                        <input
+                          data-row={columnIndex === 0 ? String(index) : undefined}
+                          value={row[column]}
+                          aria-label={`Edit ${column} for ${row.ID || `row ${index + 1}`}`}
+                          onChange={(event) => updateCell(index, column, event.target.value)}
+                        />
+                      ) : (
+                        <span className="data-cell-value">{row[column]}</span>
+                      )}
+                    </td>
+                  ))}
+                  <td>
+                    {editingRow === index ? (
+                      <div className="data-row-edit-actions">
+                        <button type="button" className="is-apply" onClick={() => applyRowEdit(index)} aria-label={`Apply changes for ${row.ID || `row ${index + 1}`}`}>
+                          <Check size={16} aria-hidden="true" />
+                        </button>
+                        <button type="button" className="is-cancel" onClick={() => cancelRowEdit(index)} aria-label={`Cancel editing for ${row.ID || `row ${index + 1}`}`}>
+                          <X size={16} aria-hidden="true" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="data-row-menu">
+                        <button
+                          type="button"
+                          onClick={() => setOpenMenuRow(openMenuRow === index ? null : index)}
+                          aria-label={`Actions for ${row.ID || `row ${index + 1}`}`}
+                          aria-haspopup="menu"
+                          aria-expanded={openMenuRow === index}
+                        >
+                          <MoreHorizontal size={16} />
+                        </button>
+                        {openMenuRow === index && (
+                          <div className="data-row-menu-panel" role="menu">
+                            <button type="button" role="menuitem" onClick={() => startEditing(index)}>
+                              <PencilLine size={16} aria-hidden="true" />
+                              Editing
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
-        <footer className="data-manager-footer"><span><CheckCircle2 size={15} /> {rows.length} valid records · 0 blocking errors</span><div><button className="button button-quiet" type="button" onClick={onClose}>Cancel</button><button className="button button-primary" type="button" onClick={() => { onToast(`${title} changes applied`); onClose(); }}><Save size={15} /> Apply changes</button></div></footer>
+        <footer className="data-manager-footer">
+          <span className={blocking ? 'is-blocked' : undefined}><CheckCircle2 size={16} /> {rows.length} record{rows.length === 1 ? '' : 's'} · {blocking} blocking error{blocking === 1 ? '' : 's'}{selectedRows.size ? ` · ${selectedRows.size} selected` : ''}{dirty ? ' · unsaved edits' : ''}</span>
+          <div>
+            <button className="button button-quiet" type="button" onClick={discardAndClose}>Cancel</button>
+            <button className="button button-primary" type="button" onClick={applyAndClose} disabled={blocking > 0}><Save size={16} /> Apply changes</button>
+          </div>
+        </footer>
       </div>
     </div>
   );
