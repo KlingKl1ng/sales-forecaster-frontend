@@ -531,6 +531,11 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .data-manager-toolbar input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 13px; }
 .data-manager-toolbar .button, .data-manager-footer .button { min-height: 42px; font-size: 13px; padding: 0 14px; }
 .data-table-wrap { overflow: auto; }
+.allowed-depot-select { min-width: 175px; max-width: 280px; padding: 9px 28px 9px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); font: inherit; }
+.allowed-depot-select:focus { outline: 2px solid var(--brand-gold); outline-offset: 2px; }
+.allowed-depot-select[aria-invalid="true"] { border-color: #ef4444; }
+.data-manager-footer:has(.allowed-depot-error) { flex-wrap: wrap; }
+.allowed-depot-error { flex-basis: 100%; max-height: 80px; overflow: auto; margin: 0 0 8px; color: #ef4444; font-size: 12px; }
 .data-table { width: 100%; min-width: 860px; border-collapse: collapse; }
 .data-table th, .data-table td { height: 52px; padding: 8px 12px 8px 16px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; white-space: nowrap; }
 .data-table th { position: sticky; z-index: 2; top: 0; background: var(--surface-muted); color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }

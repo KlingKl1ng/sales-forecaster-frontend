@@ -237,6 +237,8 @@ function App() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>('summary');
   const [dataManager, setDataManager] = useState<DataKind | null>(null);
+  const [enabledDepotIds, setEnabledDepotIds] = useState<string[] | null>(null);
+  const [allowedDepotChoices, setAllowedDepotChoices] = useState<Record<string, string> | null>(null);
   const [entityDialog, setEntityDialog] = useState<DataKind | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importing, setImporting] = useState(false);
@@ -259,6 +261,10 @@ function App() {
     : { customers: [], depots: [], vehicleTypes: [], vehicles: [], routes: [], trips: [], validationItems: [] },
   [scenario, solution, validation]);
   const dataNav = useMemo(() => createDataNav(viewData), [viewData]);
+  const mapDepots = useMemo(() => enabledDepotIds === null
+    ? viewData.depots
+    : viewData.depots.filter(depot => enabledDepotIds.includes(depot.id)),
+  [viewData.depots, enabledDepotIds]);
   const selectedRoute = viewData.routes.find((route) => route.id === selectedRouteId) || null;
   const selectedCustomer = viewData.customers.find((customer) => customer.id === selectedCustomerId) || null;
   const blockingErrors = validation?.errors.length || 0;
@@ -300,6 +306,8 @@ function App() {
       ? report
       : await validateScenario(imported);
     setScenario(checked.normalized_scenario);
+    setEnabledDepotIds(null);
+    setAllowedDepotChoices(null);
     setValidation(checked);
     setSolution(null);
     setCompletedJobId(null);
@@ -409,6 +417,8 @@ function App() {
     optimizationAbortRef.current = null;
     setOptimizing(false);
     setScenario(null);
+    setEnabledDepotIds(null);
+    setAllowedDepotChoices(null);
     setSolution(null);
     setValidation(null);
     setSelectedRouteId(null);
@@ -595,7 +605,7 @@ function App() {
           <main className={`planning-workspace ${scenario ? '' : 'is-empty'}`}>
           <section className="map-workspace">
             {scenario ? <Suspense fallback={<div className="map-loading"><LoaderCircle className="spin" size={22} /><span>Loading route map</span></div>}>
-              <MapView customers={viewData.customers} depots={viewData.depots} routes={viewData.routes} selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} onSelectCustomer={handleSelectCustomer} dark={dark} fitRequest={mapFitRequest} />
+              <MapView customers={viewData.customers} depots={mapDepots} routes={viewData.routes} selectedRouteId={selectedRouteId} onSelectRoute={handleSelectRoute} onSelectCustomer={handleSelectCustomer} dark={dark} fitRequest={mapFitRequest} />
             </Suspense> : (
               <div className="vrp-empty-state" aria-hidden="true">
                 <img src={operartisWatermark} alt="" width="420" height="117" className="vrp-empty-watermark" />
@@ -686,7 +696,29 @@ function App() {
       )}
 
       {dataManager && (
-        <DataManager kind={dataManager} onClose={() => setDataManager(null)} onAdd={() => setEntityDialog(dataManager)} onToast={setToast} />
+        <DataManager kind={dataManager} enabledDepotIds={enabledDepotIds} allowedDepotChoices={allowedDepotChoices}
+          onApplyDepots={async (selected, choices) => {
+            if (!scenario || optimizing) throw new Error('Wait for optimization to finish before changing depots.');
+            if (!selected.length) throw new Error('Select at least one depot.');
+            const customers = scenario.customers.map(customer => {
+              const choice = choices[customer.id];
+              const allowed = choice === 'Unassigned' ? selected : choice.split(',').map(id => id.trim());
+              if (!allowed.length || allowed.some(id => !selected.includes(id))) throw new Error(`${customer.id}: choose an available Allowed Depot or Unassigned.`);
+              return { ...customer, compatible_depot_ids: choice === 'Unassigned' && selected.length === scenario.depots.length ? null : allowed };
+            });
+            const report = await validateScenario(prepareScenarioForRuntime({ ...scenario, customers }));
+            if (!report.valid) throw new Error(report.errors.map(issue => `${issue.entity_id || 'Scenario'}: ${issue.message}`).join(' · '));
+            setScenario(report.normalized_scenario);
+            setValidation(report);
+            setEnabledDepotIds(selected);
+            setAllowedDepotChoices(choices);
+            setSolution(null);
+            setCompletedJobId(null);
+            setSelectedRouteId(null);
+            setSelectedCustomerId(null);
+            setInspectorTab('summary');
+            setToast('Allowed depots applied. Optimize again to calculate routes.');
+          }} onClose={() => setDataManager(null)} onAdd={() => setEntityDialog(dataManager)} onToast={setToast} />
       )}
       {entityDialog && <EntityDialog kind={entityDialog} onClose={() => setEntityDialog(null)} onSaved={(message) => { setEntityDialog(null); setToast(message); }} />}
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} />
@@ -1006,10 +1038,16 @@ function createScenarioTables(viewData: VrpViewData): ScenarioTables {
   };
 }
 
-function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClose: () => void; onAdd: () => void; onToast: (message: string) => void }) {
-  const { viewData } = useVrpRuntime();
+function DataManager({ kind, onClose, onAdd, onToast, enabledDepotIds, allowedDepotChoices, onApplyDepots }: { kind: DataKind; onClose: () => void; onAdd: () => void; onToast: (message: string) => void; enabledDepotIds: string[] | null; allowedDepotChoices: Record<string, string> | null; onApplyDepots: (selected: string[], choices: Record<string, string>) => Promise<void> }) {
+  const { viewData, scenario } = useVrpRuntime();
   const dataNav = useMemo(() => createDataNav(viewData), [viewData]);
-  const initialTables = useMemo(() => createScenarioTables(viewData), [viewData]);
+  const initialTables = useMemo(() => {
+    const result = createScenarioTables(viewData);
+    result.customers = result.customers.map(row => ({ ...row, 'Allowed Depot': allowedDepotChoices?.[row.ID] ?? scenario.customers.find(c => c.id === row.ID)?.compatible_depot_ids?.join(', ') ?? 'Unassigned' }));
+    return result;
+  }, [viewData, scenario, allowedDepotChoices]);
+  const [saving, setSaving] = useState(false);
+  const [applyError, setApplyError] = useState<string | null>(null);
   const [activeKind, setActiveKind] = useState(kind);
   const [query, setQuery] = useState('');
   const [committedTables, setCommittedTables] = useState(() => cloneScenarioTables(initialTables));
@@ -1017,7 +1055,22 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
   const [editingRow, setEditingRow] = useState<number | null>(null);
   const [editingRowSnapshot, setEditingRowSnapshot] = useState<Record<string, string> | null>(null);
   const [openMenuRow, setOpenMenuRow] = useState<number | null>(null);
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(() => new Set(initialTables[kind].map((_, index) => index)));
+  const [selections, setSelections] = useState<Record<DataKind, Set<number>>>(() => Object.fromEntries(
+    (Object.keys(initialTables) as DataKind[]).map(key => [key, new Set(initialTables[key].flatMap((row, index) => key !== 'depots' || !enabledDepotIds || enabledDepotIds.includes(row.ID) ? [index] : []))]),
+  ) as Record<DataKind, Set<number>>);
+  const selectedRows = selections[activeKind];
+  const selectionLabels: Record<DataKind, string> = { depots: 'depot', customers: 'customer', vehicleTypes: 'vehicle type', vehicles: 'physical vehicle' };
+  const setSelectedRows = (update: (current: Set<number>) => Set<number>) => {
+    const next = update(selectedRows);
+    if (next.size === 0) {
+      setApplyError(`At least one ${selectionLabels[activeKind]} must be selected.`);
+      return;
+    }
+    setApplyError(null);
+    setSelections(current => ({ ...current, [activeKind]: next }));
+  };
+  const availableDepots = tables.depots.filter((_, index) => selections.depots.has(index));
+  const isAvailableChoice = (choice: string) => choice === 'Unassigned' || choice.split(',').every(id => availableDepots.some(depot => depot.ID === id.trim()));
   const [sortKey, setSortKey] = useState('ID');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const tableRef = useRef<HTMLTableElement>(null);
@@ -1045,10 +1098,25 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
   const someVisibleSelected = selectedVisibleCount > 0 && !allVisibleSelected;
 
   useEffect(() => {
+    // Keep the draft values (not just the dropdown display) synchronized so Apply
+    // sends Unassigned after either individual or bulk depot deselection.
+    setTables(current => {
+      const availableIds = new Set(current.depots.filter((_, index) => selections.depots.has(index)).map(depot => depot.ID));
+      let changed = false;
+      const customers = current.customers.map(customer => {
+        const choice = customer['Allowed Depot'];
+        if (choice === 'Unassigned' || choice.split(',').every(id => availableIds.has(id.trim()))) return customer;
+        changed = true;
+        return { ...customer, 'Allowed Depot': 'Unassigned' };
+      });
+      return changed ? { ...current, customers } : current;
+    });
+  }, [selections.depots, tables.depots, tables.customers]);
+
+  useEffect(() => {
     setEditingRow(null);
     setEditingRowSnapshot(null);
     setOpenMenuRow(null);
-    setSelectedRows(new Set(tables[activeKind].map((_, index) => index)));
     setSortKey('ID');
     setSortDir('asc');
   }, [activeKind]);
@@ -1145,22 +1213,34 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
     onClose();
   };
 
-  const applyAndClose = () => {
+  const applyAndClose = async () => {
+    if (saving) return;
+    for (const key of Object.keys(selectionLabels) as DataKind[]) {
+      if (!tables[key].some((_, index) => selections[key].has(index))) {
+        setApplyError(`At least one ${selectionLabels[key]} must be selected.`);
+        return;
+      }
+    }
     if (blocking) {
       onToast(`${blocking} record${blocking === 1 ? '' : 's'} still need values before they can be applied`);
       return;
     }
-    setCommittedTables(cloneScenarioTables(tables));
-    onToast(dirty ? `${title} changes applied` : `${title} is already up to date`);
-    onClose();
+    setSaving(true);
+    setApplyError(null);
+    try {
+      await onApplyDepots(availableDepots.map(row => row.ID), Object.fromEntries(tables.customers.map(row => [row.ID, row['Allowed Depot']])));
+      onClose();
+    } catch (error) {
+      setApplyError(error instanceof Error ? error.message : 'Could not apply allowed depots.');
+    } finally { setSaving(false); }
   };
 
   return (
     <div className="modal-layer" role="presentation">
       <div className="data-manager" role="dialog" aria-modal="true" aria-label={`Manage ${title}`}>
         <header className="data-manager-header">
-          <div><span className="eyebrow">Scenario data</span><h2>Manage operational inputs</h2><p>Use row actions to edit records. Apply saves them to this session.</p></div>
-          <button className="icon-button" type="button" onClick={discardAndClose} aria-label="Close data manager"><X size={19} /></button>
+          <div><span className="eyebrow">Scenario data</span><h2>Manage operational inputs</h2><p>Select available depots, then choose each customer's Allowed Depot. Unassigned lets the solver choose among selected depots.</p></div>
+          <button className="icon-button" type="button" onClick={discardAndClose} disabled={saving} aria-label="Close data manager"><X size={19} /></button>
         </header>
         <div className="data-manager-tabs">
           {dataNav.map((item) => {
@@ -1184,7 +1264,7 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
                     type="checkbox"
                     className="fc-row-check"
                     checked={allVisibleSelected}
-                    disabled={visibleIndexes.length === 0}
+                    disabled={saving || visibleIndexes.length === 0}
                     onChange={toggleAllVisible}
                     aria-label={`Select all ${title.toLowerCase()}`}
                   />
@@ -1211,13 +1291,21 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
                       type="checkbox"
                       className="fc-row-check"
                       checked={selectedRows.has(index)}
+                      disabled={saving}
                       onChange={() => toggleRowSelected(index)}
                       aria-label={`Select ${row.ID || `row ${index + 1}`}`}
                     />
                   </td>
                   {columns.map((column, columnIndex) => (
                     <td key={column} className={column === 'ID' ? 'is-id' : undefined}>
-                      {editingRow === index ? (
+                      {editingRow === index && activeKind === 'customers' && column === 'Allowed Depot' ? (
+                        <select className="allowed-depot-select" value={isAvailableChoice(row[column]) ? row[column] : '__unavailable'} disabled={saving} aria-label={`Allowed Depot for ${row.ID}`} aria-invalid={!isAvailableChoice(row[column])} onChange={event => updateCell(index, column, event.target.value)}>
+                          {!isAvailableChoice(row[column]) && <option value="__unavailable" disabled>Choose an available depot</option>}
+                          <option value="Unassigned">Unassigned</option>
+                          {availableDepots.map(depot => <option key={depot.ID} value={depot.ID}>{depot.ID}</option>)}
+                          {row[column].includes(',') && isAvailableChoice(row[column]) && <option value={row[column]}>{row[column]} (imported restriction)</option>}
+                        </select>
+                      ) : editingRow === index ? (
                         <input
                           data-row={columnIndex === 0 ? String(index) : undefined}
                           value={row[column]}
@@ -1267,10 +1355,11 @@ function DataManager({ kind, onClose, onAdd, onToast }: { kind: DataKind; onClos
           </table>
         </div>
         <footer className="data-manager-footer">
+          {applyError && <p role="alert" className="allowed-depot-error">{applyError}</p>}
           <span className={blocking ? 'is-blocked' : undefined}><CheckCircle2 size={16} /> {rows.length} record{rows.length === 1 ? '' : 's'} · {blocking} blocking error{blocking === 1 ? '' : 's'}{selectedRows.size ? ` · ${selectedRows.size} selected` : ''}{dirty ? ' · unsaved edits' : ''}</span>
           <div>
-            <button className="button button-quiet" type="button" onClick={discardAndClose}>Cancel</button>
-            <button className="button button-primary" type="button" onClick={applyAndClose} disabled={blocking > 0}><Save size={16} /> Apply changes</button>
+            <button className="button button-quiet" type="button" onClick={discardAndClose} disabled={saving}>Cancel</button>
+            <button className="button button-primary" type="button" onClick={() => void applyAndClose()} disabled={saving || blocking > 0}><Save size={16} /> {saving ? 'Validating…' : 'Apply changes'}</button>
           </div>
         </footer>
       </div>
@@ -1330,7 +1419,7 @@ function singular(kind: DataKind) {
 
 function getDataRows(kind: DataKind, viewData: VrpViewData): Array<Record<string, string>> {
   if (kind === 'depots') return viewData.depots.map((item) => ({ ID: item.id, Name: item.name, 'Operating window': item.window, Reload: `${item.reloadMinutes} min`, Fleet: String(item.vehicles), Coordinates: `${item.coordinate[1].toFixed(4)}, ${item.coordinate[0].toFixed(4)}` }));
-  if (kind === 'customers') return viewData.customers.map((item) => ({ ID: item.id, Customer: item.name, Depot: item.depotId, Demand: String(item.demand), 'Time window': item.timeWindow, Service: `${item.serviceMinutes} min`, Route: item.routeId || 'Unassigned' }));
+  if (kind === 'customers') return viewData.customers.map((item) => ({ ID: item.id, Customer: item.name, 'Allowed Depot': 'Unassigned', Demand: String(item.demand), 'Time window': item.timeWindow, Service: `${item.serviceMinutes} min`, Route: item.routeId || 'Unassigned' }));
   if (kind === 'vehicleTypes') return viewData.vehicleTypes.map((item) => ({ ID: item.id, Type: item.name, Capacity: String(item.capacity), 'Fixed cost': String(item.fixedCost), 'Distance cost': String(item.distanceCost), Profile: item.profile }));
   return viewData.vehicles.map((item) => ({ ID: item.id, Plate: item.plate, Type: item.typeId, 'Home depot': item.depotId, Shift: item.shift, Trips: String(item.trips), Utilization: `${item.utilization}%` }));
 }
