@@ -352,6 +352,31 @@
             color: #94a3b8;
         }
 
+        .fc-model-picker-group + .fc-model-picker-group {
+            margin-top: 0.2rem;
+            padding-top: 0.2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .dark .fc-model-picker-group + .fc-model-picker-group {
+            border-top-color: #334155;
+        }
+
+        .fc-model-picker-group-label {
+            padding: 0.22rem 0.4rem 0.08rem;
+            font-size: 0.58rem;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .dark .fc-model-picker-group-label {
+            color: #64748b;
+        }
+
         /* Interface tab buttons — match dashboard .nav-btn / .nav-btn.active */
         .fc-iface-btn {
             display: flex;
@@ -1002,13 +1027,26 @@
                     model_profile: "Forecast Model",
                     model_basic_auto: "Basic Automatic",
                     model_advanced_auto: "Advanced Automatic",
-                    model_arima: "ARIMA",
+                    model_arima: "AutoARIMA",
                     model_mlp: "MLP",
+                    model_lstm: "LSTM",
+                    model_nhits: "NHITS",
+                    model_nbeats: "N-BEATS",
+                    model_neuralprophet: "NeuralPROPHET",
+                    model_autotbats: "AutoTBATS",
+                    model_automfles: "AutoMFLES",
+                    model_autoets: "AutoETS",
+                    model_autoces: "AutoCES",
+                    model_autotheta: "AutoTheta",
                     model_temporarily_disabled: "Temporarily disabled",
                     model_ses: "SES",
                     model_des: "DES",
                     model_tes: "TES",
-                    model_prophet: "Prophet",
+                    model_prophet: "PROPHET",
+                    model_group_basic: "Basic",
+                    model_group_advanced: "Advanced Statistical",
+                    model_group_neural: "Deep & Machine Learning",
+                    model_group_complex_multi_seasonal: "Complex Multi-Seasonal",
                     models_all: "All enabled models",
                     models_selected: "{count} selected",
                     models_select_all: "Select all",
@@ -1162,13 +1200,26 @@
                     model_profile: "Mô hình dự báo",
                     model_basic_auto: "Tự động cơ bản",
                     model_advanced_auto: "Tự động nâng cao",
-                    model_arima: "ARIMA",
+                    model_arima: "AutoARIMA",
                     model_mlp: "MLP",
+                    model_lstm: "LSTM",
+                    model_nhits: "NHITS",
+                    model_nbeats: "N-BEATS",
+                    model_neuralprophet: "NeuralPROPHET",
+                    model_autotbats: "AutoTBATS",
+                    model_automfles: "AutoMFLES",
+                    model_autoets: "AutoETS",
+                    model_autoces: "AutoCES",
+                    model_autotheta: "AutoTheta",
                     model_temporarily_disabled: "Tạm thời vô hiệu hóa",
                     model_ses: "SES",
                     model_des: "DES",
                     model_tes: "TES",
-                    model_prophet: "Prophet",
+                    model_prophet: "PROPHET",
+                    model_group_basic: "Cơ bản",
+                    model_group_advanced: "Thống kê nâng cao",
+                    model_group_neural: "Học máy & Học sâu",
+                    model_group_complex_multi_seasonal: "Đa mùa phức tạp",
                     models_all: "Tất cả mô hình khả dụng",
                     models_selected: "{count} đã chọn",
                     models_select_all: "Chọn tất cả",
@@ -1322,13 +1373,26 @@
                     model_profile: "Prognosemodell",
                     model_basic_auto: "Basis-Automatik",
                     model_advanced_auto: "Erweiterte Automatik",
-                    model_arima: "ARIMA",
+                    model_arima: "AutoARIMA",
                     model_mlp: "MLP",
+                    model_lstm: "LSTM",
+                    model_nhits: "NHITS",
+                    model_nbeats: "N-BEATS",
+                    model_neuralprophet: "NeuralPROPHET",
+                    model_autotbats: "AutoTBATS",
+                    model_automfles: "AutoMFLES",
+                    model_autoets: "AutoETS",
+                    model_autoces: "AutoCES",
+                    model_autotheta: "AutoTheta",
                     model_temporarily_disabled: "Vorübergehend deaktiviert",
                     model_ses: "SES",
                     model_des: "DES",
                     model_tes: "TES",
-                    model_prophet: "Prophet",
+                    model_prophet: "PROPHET",
+                    model_group_basic: "Basis",
+                    model_group_advanced: "Erweiterte Statistik",
+                    model_group_neural: "Deep & Machine Learning",
+                    model_group_complex_multi_seasonal: "Komplex mehrfach-saisonal",
                     models_all: "Alle aktiven Modelle",
                     models_selected: "{count} ausgewählt",
                     models_select_all: "Alle auswählen",
@@ -1513,12 +1577,27 @@
         };
         const FORECAST_CAPABILITY_PATH = '/forecast-capabilities';
         const SELECTABLE_FORECAST_MODELS = [
-            { value: 'ses', labelKey: 'sidebar.model_ses', advanced: false },
-            { value: 'des', labelKey: 'sidebar.model_des', advanced: false },
-            { value: 'tes', labelKey: 'sidebar.model_tes', advanced: false },
-            { value: 'prophet', labelKey: 'sidebar.model_prophet', advanced: false },
-            { value: 'arima', labelKey: 'sidebar.model_arima', advanced: true },
-            { value: 'mlp', labelKey: 'sidebar.model_mlp', advanced: true, disabled: true },
+            { value: 'ses', labelKey: 'sidebar.model_ses', group: 'basic', advanced: false },
+            { value: 'des', labelKey: 'sidebar.model_des', group: 'basic', advanced: false },
+            { value: 'tes', labelKey: 'sidebar.model_tes', group: 'basic', advanced: false },
+            { value: 'prophet', labelKey: 'sidebar.model_prophet', group: 'complex_multi_seasonal', advanced: false },
+            { value: 'arima', labelKey: 'sidebar.model_arima', group: 'advanced', advanced: true },
+            { value: 'autoets', labelKey: 'sidebar.model_autoets', group: 'advanced', advanced: true, disabled: true },
+            { value: 'autoces', labelKey: 'sidebar.model_autoces', group: 'advanced', advanced: true, disabled: true },
+            { value: 'autotheta', labelKey: 'sidebar.model_autotheta', group: 'advanced', advanced: true, disabled: true },
+            { value: 'mlp', labelKey: 'sidebar.model_mlp', group: 'neural', advanced: true, disabled: true },
+            { value: 'lstm', labelKey: 'sidebar.model_lstm', group: 'neural', advanced: true, disabled: true },
+            { value: 'nhits', labelKey: 'sidebar.model_nhits', group: 'neural', advanced: true, disabled: true },
+            { value: 'nbeats', labelKey: 'sidebar.model_nbeats', group: 'neural', advanced: true, disabled: true },
+            { value: 'neuralprophet', labelKey: 'sidebar.model_neuralprophet', group: 'neural', advanced: true, disabled: true },
+            { value: 'autotbats', labelKey: 'sidebar.model_autotbats', group: 'complex_multi_seasonal', advanced: true, disabled: true },
+            { value: 'automfles', labelKey: 'sidebar.model_automfles', group: 'complex_multi_seasonal', advanced: true, disabled: true },
+        ];
+        const FORECAST_MODEL_GROUPS = [
+            { id: 'basic', labelKey: 'sidebar.model_group_basic' },
+            { id: 'advanced', labelKey: 'sidebar.model_group_advanced' },
+            { id: 'complex_multi_seasonal', labelKey: 'sidebar.model_group_complex_multi_seasonal' },
+            { id: 'neural', labelKey: 'sidebar.model_group_neural' },
         ];
         const VALIDATION_METHOD_OPTIONS = [
             { value: 'simple', labelKey: 'sidebar.val_simple' },
@@ -1973,7 +2052,7 @@
                             onClick={() => inputRef.current?.focus()}
                             className="flex items-center w-full min-w-0 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus-within:border-brand-gold transition-colors overflow-hidden"
                         >
-                            <SearchIcon className="shrink-0 text-brand-gold w-4 h-4" />
+                            <SearchIcon className="shrink-0 text-slate-400 w-4 h-4" />
                             <input
                                 ref={inputRef}
                                 className="w-full min-w-0 ml-2 bg-transparent border-none outline-none font-sans font-medium text-xs text-slate-700 dark:text-white placeholder-slate-400"
@@ -4351,7 +4430,7 @@
                                     focusSearchOnExpand.current = true;
                                     setIsSidebarCollapsed(false);
                                 }}
-                                className="relative flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold transition-colors"
+                                className="relative flex items-center justify-center h-11 w-11 rounded-xl border transition-all border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold"
                                 title={t('dashboard.search_placeholder')}
                                 aria-label={t('dashboard.search_placeholder')}
                                 aria-expanded={false}
@@ -4491,24 +4570,33 @@
                                                         />
                                                         <span>{t('sidebar.models_select_all')}</span>
                                                     </label>
-                                                    {SELECTABLE_FORECAST_MODELS.map((option) => {
-                                                        const available = isForecastModelAvailable(option.value);
-                                                        const checked = selectedModels.includes(option.value);
+                                                    {FORECAST_MODEL_GROUPS.map((group) => {
+                                                        const groupOptions = SELECTABLE_FORECAST_MODELS.filter((option) => option.group === group.id);
+                                                        if (!groupOptions.length) return null;
                                                         return (
-                                                            <label
-                                                                key={option.value}
-                                                                className={`fc-model-picker-option${available ? '' : ' is-disabled'}`}
-                                                                title={option.disabled ? t('sidebar.model_temporarily_disabled') : (available ? undefined : t('sidebar.models_unavailable'))}
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    className="fc-row-check"
-                                                                    checked={checked}
-                                                                    disabled={!available || isRunning}
-                                                                    onChange={() => toggleSelectedModel(option.value, available)}
-                                                                />
-                                                                <span>{t(option.labelKey)}</span>
-                                                            </label>
+                                                            <div key={group.id} className="fc-model-picker-group" role="group" aria-label={t(group.labelKey)}>
+                                                                <div className="fc-model-picker-group-label">{t(group.labelKey)}</div>
+                                                                {groupOptions.map((option) => {
+                                                                    const available = isForecastModelAvailable(option.value);
+                                                                    const checked = selectedModels.includes(option.value);
+                                                                    return (
+                                                                        <label
+                                                                            key={option.value}
+                                                                            className={`fc-model-picker-option${available ? '' : ' is-disabled'}`}
+                                                                            title={option.disabled ? t('sidebar.model_temporarily_disabled') : (available ? undefined : t('sidebar.models_unavailable'))}
+                                                                        >
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                className="fc-row-check"
+                                                                                checked={checked}
+                                                                                disabled={!available || isRunning}
+                                                                                onChange={() => toggleSelectedModel(option.value, available)}
+                                                                            />
+                                                                            <span>{t(option.labelKey)}</span>
+                                                                        </label>
+                                                                    );
+                                                                })}
+                                                            </div>
                                                         );
                                                     })}
                                                 </div>
