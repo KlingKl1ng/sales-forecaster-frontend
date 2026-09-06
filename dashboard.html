@@ -45,6 +45,7 @@
             --sidebar-width: 256px;
             --sidebar-width-collapsed: 76px;
             --shell-header-height: 72px;
+            --sidebar-footer-height: 64px;
             --ease: cubic-bezier(.4, 0, .2, 1);
             --surface-sidebar: linear-gradient(180deg, rgba(2, 6, 23, .94), rgba(2, 6, 23, .88));
             --surface-topbar: rgba(2, 6, 23, .72);
@@ -134,7 +135,7 @@
         html:not(.dark) input,
         html:not(.dark) select,
         html:not(.dark) textarea {
-            background: var(--surface-input);
+            background-color: var(--surface-input);
             border-color: rgba(148, 163, 184, .35);
             color: var(--text);
         }
@@ -170,7 +171,7 @@
             width: 100%;
             border: 1px solid rgba(148, 163, 184, .22);
             border-radius: var(--radius);
-            background: var(--surface-input);
+            background-color: var(--surface-input);
             color: var(--text);
             outline: none;
             transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
@@ -178,6 +179,19 @@
         input, select {
             height: 42px;
             padding: 0 12px;
+        }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 36px;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px 14px;
+        }
+        html.dark select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
         }
         textarea {
             min-height: 96px;
@@ -1338,7 +1352,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
         #section-notifications.active {
             display: flex;
@@ -1352,6 +1365,9 @@
         }
         #section-notifications.active .filter-tabs {
             flex-shrink: 0;
+            align-self: flex-start;
+            width: fit-content;
+            max-width: 100%;
         }
         #section-notifications.active > .card {
             flex: 1 1 auto;
@@ -1457,6 +1473,13 @@
             padding: clamp(18px, 2.5vw, 28px);
             padding-bottom: calc(clamp(18px, 2.5vw, 28px) + env(safe-area-inset-bottom, 0px));
         }
+        .main.main-fill {
+            overflow-y: hidden;
+            padding-bottom: calc(var(--sidebar-footer-height) + env(safe-area-inset-bottom, 0px));
+        }
+        .shell.sidebar-collapsed .main.main-fill {
+            padding-bottom: calc(clamp(18px, 2.5vw, 28px) + env(safe-area-inset-bottom, 0px));
+        }
         .main::-webkit-scrollbar { width: 6px; }
         .main::-webkit-scrollbar-track { background: transparent; }
         .main::-webkit-scrollbar-thumb {
@@ -1464,6 +1487,66 @@
             border-radius: 999px;
         }
         html.dark .main::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, .55); }
+        .operartis-scroller,
+        .notification-list,
+        .split-table-body,
+        .table-wrap {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, .35) transparent;
+        }
+        .operartis-scroller::-webkit-scrollbar,
+        .notification-list::-webkit-scrollbar,
+        .split-table-body::-webkit-scrollbar,
+        .table-wrap::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .operartis-scroller::-webkit-scrollbar-track,
+        .notification-list::-webkit-scrollbar-track,
+        .split-table-body::-webkit-scrollbar-track,
+        .table-wrap::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .operartis-scroller::-webkit-scrollbar-thumb,
+        .notification-list::-webkit-scrollbar-thumb,
+        .split-table-body::-webkit-scrollbar-thumb,
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, .35);
+            border-radius: 999px;
+        }
+        .operartis-scroller::-webkit-scrollbar-thumb:hover,
+        .notification-list::-webkit-scrollbar-thumb:hover,
+        .split-table-body::-webkit-scrollbar-thumb:hover,
+        .table-wrap::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, .55);
+        }
+        html.dark .operartis-scroller,
+        html.dark .notification-list,
+        html.dark .split-table-body,
+        html.dark .table-wrap {
+            scrollbar-color: rgba(100, 116, 139, .55) transparent;
+        }
+        html.dark .operartis-scroller::-webkit-scrollbar-thumb,
+        html.dark .notification-list::-webkit-scrollbar-thumb,
+        html.dark .split-table-body::-webkit-scrollbar-thumb,
+        html.dark .table-wrap::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, .55);
+        }
+        html.dark .operartis-scroller::-webkit-scrollbar-thumb:hover,
+        html.dark .notification-list::-webkit-scrollbar-thumb:hover,
+        html.dark .split-table-body::-webkit-scrollbar-thumb:hover,
+        html.dark .table-wrap::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, .45);
+        }
+        @supports selector(::-webkit-scrollbar) {
+            .operartis-scroller,
+            .notification-list,
+            .split-table-body,
+            .table-wrap {
+                scrollbar-width: auto;
+                scrollbar-color: auto;
+            }
+        }
         .hero {
             display: flex;
             align-items: flex-end;
@@ -1523,6 +1606,30 @@
         .shortcut-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         .shortcut-list { grid-template-columns: 1fr; gap: 10px; }
         .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .api-key-create-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .api-key-create-grid .api-key-create-action-spacer {
+            visibility: hidden;
+            user-select: none;
+        }
+        .api-key-create-grid label > input,
+        .api-key-create-grid label > select,
+        .api-key-create-grid label > .password-wrap,
+        .api-key-create-grid .api-key-create-action > button[type="submit"] {
+            height: 42px;
+            min-height: 42px;
+            max-height: 42px;
+        }
+        .api-key-create-grid .password-wrap {
+            display: block;
+            width: 100%;
+        }
+        .api-key-create-grid .api-key-create-action > button[type="submit"] {
+            width: 100%;
+            padding: 0 12px;
+            font-size: 14px;
+        }
         .stack { display: grid; gap: 16px; }
         .card {
             border: 1px solid var(--line);
@@ -1754,15 +1861,36 @@
             line-height: 1.5;
         }
         .message {
+            position: fixed;
+            top: calc(88px + env(safe-area-inset-top, 0px));
+            right: max(20px, env(safe-area-inset-right, 0px));
+            z-index: 10000;
             display: none;
-            border-radius: var(--radius);
-            padding: 12px 14px;
+            align-items: center;
+            gap: 12px;
+            width: min(400px, calc(100vw - 32px));
+            box-sizing: border-box;
+            padding: 14px 12px 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--surface-elevated);
+            color: var(--text);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, .22);
             font-size: 13px;
-            margin-bottom: 16px;
             font-weight: 500;
+            line-height: 1.5;
         }
-        .message.error { display: block; color: var(--text-danger); background: rgba(239, 68, 68, .12); border: 1px solid rgba(248, 113, 113, .3); }
-        .message.success { display: block; color: var(--text-success); background: rgba(34, 197, 94, .12); border: 1px solid rgba(74, 222, 128, .3); }
+        .message.error, .message.success { display: flex; animation: toast-enter .18s ease-out; }
+        .message.error { border-left: 3px solid #ef4444; }
+        .message.success { border-left: 3px solid #10b981; }
+        .toast-icon { font-size: 18px; flex: none; }
+        .message.error .toast-icon { color: var(--text-danger); }
+        .message.success .toast-icon { color: var(--text-success); }
+        .toast-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+        .toast-close { flex: none; border: 0; background: transparent; color: var(--muted); cursor: pointer; width: 32px; height: 32px; border-radius: 8px; font-size: 20px; }
+        .toast-close:hover, .toast-close:focus-visible { color: var(--text); background: var(--panel-soft); }
+        @keyframes toast-enter { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) { .message.error, .message.success { animation: none; } }
         .kv-list { display: grid; gap: 0; }
         .kv-row {
             display: flex;
@@ -1848,6 +1976,9 @@
             min-width: 112px;
             height: 34px;
             font-size: 13px;
+            padding-right: 32px;
+            background-position: right 10px center;
+            background-size: 12px 12px;
         }
         .settings-options {
             display: grid;
@@ -2022,6 +2153,23 @@
         .download-btn:hover { background: rgba(16, 185, 129, .22); }
         .reports-grid {
             grid-template-columns: minmax(0, 1fr);
+        }
+        .reports-status-card .section-head {
+            align-items: center;
+            margin-bottom: 0;
+        }
+        .reports-status-card .status-board {
+            flex: 0 1 auto;
+            grid-template-columns: repeat(3, minmax(104px, 128px));
+            justify-content: flex-end;
+        }
+        .reports-status-card .status-stat {
+            min-height: 68px;
+            padding: 10px 12px;
+            gap: 8px;
+        }
+        .reports-status-card .status-stat-count {
+            font-size: clamp(20px, 2.5vw, 26px);
         }
         .artifact-list {
             display: none;
@@ -2230,7 +2378,7 @@
                 padding: calc(12px + env(safe-area-inset-top, 0px)) clamp(16px, 3vw, 28px) 12px;
             }
             .hero { flex-direction: column; align-items: flex-start; }
-            .form-grid, .metric-grid, .shortcut-grid, .admin-form-grid, .announcement-form { grid-template-columns: 1fr; }
+            .form-grid, .api-key-create-grid, .metric-grid, .shortcut-grid, .admin-form-grid, .announcement-form { grid-template-columns: 1fr; }
             .reports-downloads-card .split-table-wrap { display: none; }
             .artifact-list {
                 display: grid;
@@ -2244,10 +2392,13 @@
             }
             .reports-downloads-card .section-head,
             .reports-status-card .section-head {
-                margin-bottom: 12px;
+                margin-bottom: 0;
+                align-items: flex-start;
             }
-            .status-board {
+            .reports-status-card .status-board {
+                width: 100%;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                justify-content: stretch;
             }
             .status-stat {
                 min-height: 80px;
@@ -2522,7 +2673,7 @@
             </header>
 
             <main class="main">
-                <div id="message" class="message"></div>
+
 
                 <section id="section-overview" class="section active">
                     <div class="hero">
@@ -2679,7 +2830,7 @@
                                                 <th data-i18n="table.module">Module</th>
                                                 <th data-i18n="table.created">Created</th>
                                                 <th data-i18n="table.expires">Expires</th>
-                                                <th></th>
+                                                <th data-i18n="table.action">Action</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -2704,8 +2855,8 @@
                                     <h2 data-i18n="sections.reports.run_status">Run Status</h2>
                                     <p class="section-sub" data-i18n="sections.reports.run_status_sub">Distribution of your current job history.</p>
                                 </div>
+                                <div id="status-list" class="status-board"></div>
                             </div>
-                            <div id="status-list" class="status-board"></div>
                         </div>
                     </div>
                 </section>
@@ -2855,13 +3006,13 @@
                                         <p class="section-sub" data-i18n="sections.security.create_key_sub">The secret is shown once. Re-enter your password to create a key.</p>
                                     </div>
                                 </div>
-                                <div class="grid">
+                                <div class="grid api-key-create-grid">
                                     <label><span data-i18n="sections.security.key_name">Name</span>
                                         <input id="api-key-name" type="text" maxlength="80" autocomplete="off" data-i18n-placeholder="sections.security.key_name_placeholder" placeholder="Forecast API key">
                                     </label>
                                     <label><span data-i18n="sections.security.key_expiry">Expires</span>
                                         <select id="api-key-expiry">
-                                            <option value="" data-i18n="sections.security.expiry_never">Never</option>
+                                            <option value="" data-i18n="sections.security.expiry_never">Unlimited</option>
                                             <option value="30" data-i18n="sections.security.expiry_30">30 days</option>
                                             <option value="90" data-i18n="sections.security.expiry_90">90 days</option>
                                             <option value="365" data-i18n="sections.security.expiry_365">365 days</option>
@@ -2873,11 +3024,12 @@
                                             <button class="password-toggle" type="button" data-target="api-key-password" aria-label="Show password"></button>
                                         </span>
                                     </label>
+                                    <label class="api-key-create-action">
+                                        <span class="api-key-create-action-spacer" aria-hidden="true" data-i18n="sections.security.confirm_password_to_create">Current password</span>
+                                        <button id="create-api-key" class="button-link" type="submit" data-i18n="sections.security.create_key_button">Create API key</button>
+                                    </label>
                                 </div>
                                 <p id="api-key-limit-note" class="inline-note hidden" data-i18n="sections.security.max_keys_note">You already have 5 active keys. Revoke one to create another.</p>
-                                <div class="form-actions">
-                                    <button id="create-api-key" class="button-link" type="submit" data-i18n="sections.security.create_key_button">Create key</button>
-                                </div>
                             </form>
                         <div class="card" style="margin-top:16px">
                                 <div class="section-head">
@@ -3267,6 +3419,7 @@
         </div>
     </div>
 
+    <div id="message" class="message" role="status" aria-live="polite" aria-atomic="true"></div>
     <script>
         const app = document.getElementById('dashboard-app');
         const accessPanel = document.getElementById('access-panel');
@@ -3481,19 +3634,40 @@
         }
 
         function showMessage(text, type = 'success') {
-            if (messageHideTimer) {
-                clearTimeout(messageHideTimer);
-                messageHideTimer = null;
-            }
-            message.textContent = text || '';
-            message.className = text ? `message ${type}` : 'message';
-            if (text) {
-                messageHideTimer = setTimeout(() => {
-                    message.textContent = '';
-                    message.className = 'message';
-                    messageHideTimer = null;
-                }, 4500);
-            }
+            clearTimeout(messageHideTimer);
+            messageHideTimer = null;
+            message.replaceChildren();
+            message.className = 'message';
+            message.onmouseenter = message.onmouseleave = message.onfocusin = message.onfocusout = null;
+            if (!text) return;
+            const isError = type === 'error';
+            message.setAttribute('role', isError ? 'alert' : 'status');
+            message.setAttribute('aria-live', isError ? 'assertive' : 'polite');
+            const icon = document.createElement('span');
+            icon.className = 'toast-icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = isError ? '!' : '✓';
+            const content = document.createElement('span');
+            content.className = 'toast-text';
+            content.textContent = text;
+            const close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'toast-close';
+            close.setAttribute('aria-label', 'Dismiss notification');
+            close.textContent = '×';
+            close.onclick = () => showMessage('');
+            message.append(icon, content, close);
+            message.className = `message ${isError ? 'error' : 'success'}`;
+            const pause = () => clearTimeout(messageHideTimer);
+            const resume = () => {
+                pause();
+                if (!message.matches(':hover') && !message.contains(document.activeElement)) {
+                    messageHideTimer = setTimeout(() => showMessage(''), isError ? 8000 : 4500);
+                }
+            };
+            message.onmouseenter = message.onfocusin = pause;
+            message.onmouseleave = message.onfocusout = resume;
+            resume();
         }
 
         function clear(node) {
@@ -3591,6 +3765,95 @@
             const words = String(value || '').trim().split(/\s+/).filter(Boolean);
             if (words.length <= maxWords) return words.join(' ');
             return `${words.slice(0, maxWords).join(' ')}...`;
+        }
+
+        const SYSTEM_NOTIFICATION_TITLES = {
+            'Đăng nhập mới': 'login_success',
+            'New login': 'login_success',
+            'Neue Anmeldung': 'login_success',
+            'Yêu cầu đặt lại mật khẩu': 'password_reset_requested',
+            'Password reset requested': 'password_reset_requested',
+            'Passwort-Reset angefordert': 'password_reset_requested',
+            'Chào mừng đến với Operartis': 'invite_accepted',
+            'Welcome to Operartis': 'invite_accepted',
+            'Willkommen bei Operartis': 'invite_accepted',
+            'Lời mời đã được chấp nhận': 'invite_accepted_inviter',
+            'Invite accepted': 'invite_accepted_inviter',
+            'Einladung angenommen': 'invite_accepted_inviter',
+            'Quyền truy cập tài khoản đã được cập nhật': 'account_access_updated',
+            'Account access updated': 'account_access_updated',
+            'Kontozugriff aktualisiert': 'account_access_updated',
+            'Lần chạy mô-đun đã hoàn thành': 'job_completed',
+            'Module run completed': 'job_completed',
+            'Modullauf abgeschlossen': 'job_completed',
+            'Lần chạy mô-đun thất bại': 'job_failed',
+            'Module run failed': 'job_failed',
+            'Modullauf fehlgeschlagen': 'job_failed',
+        };
+        const PASSWORD_CHANGED_TITLES = new Set([
+            'Mật khẩu đã được thay đổi',
+            'Password changed',
+            'Passwort geändert',
+        ]);
+
+        function notificationEventKey(notification) {
+            const details = notification.details || {};
+            const event = String(details.event || '').trim();
+            if (event === 'admin_announcement') return null;
+            if (event === 'invite_accepted' && (details.accepted_user_id || details.email)) {
+                return 'invite_accepted_inviter';
+            }
+            if (event) return event;
+            const title = String(notification.title || '').trim();
+            if (SYSTEM_NOTIFICATION_TITLES[title]) return SYSTEM_NOTIFICATION_TITLES[title];
+            if (PASSWORD_CHANGED_TITLES.has(title)) {
+                const body = String(notification.body || '');
+                if (/đặt lại|reset successfully|zurückgesetzt/i.test(body)) return 'password_reset_completed';
+                return 'password_changed';
+            }
+            return null;
+        }
+
+        function notificationCategoryLabel(category) {
+            const key = 'notifications.category_' + String(category || 'system');
+            const translated = dt(key);
+            return translated !== key ? translated : String(category || '-');
+        }
+
+        function localizedNotification(notification) {
+            const details = notification.details || {};
+            const event = notificationEventKey(notification);
+            const fallback = {
+                title: notification.title || '-',
+                body: notification.body || '',
+                category: notificationCategoryLabel(notification.category),
+            };
+            if (!event) return fallback;
+            const emailMatch = String(notification.body || '').match(/([^\s]+@[^\s]+)/);
+            const vars = {
+                email: details.email || (emailMatch && emailMatch[1]) || '',
+                module: moduleLabel(details.module),
+                previous_role: roleLabel(details.previous_role),
+                role: roleLabel(details.role),
+                previous_status: statusLabel(details.previous_status),
+                status: statusLabel(details.status),
+            };
+            const titleKey = 'notifications.events.' + event + '.title';
+            let bodyKey = 'notifications.events.' + event + '.body';
+            if (event === 'account_access_updated') {
+                const roleChanged = details.previous_role && details.role && details.previous_role !== details.role;
+                const statusChanged = details.previous_status && details.status && details.previous_status !== details.status;
+                if (roleChanged && statusChanged) bodyKey = 'notifications.events.account_access_updated.body_role_and_status';
+                else if (roleChanged) bodyKey = 'notifications.events.account_access_updated.body_role';
+                else if (statusChanged) bodyKey = 'notifications.events.account_access_updated.body_status';
+            }
+            const title = dt(titleKey, vars);
+            const body = dt(bodyKey, vars);
+            return {
+                title: title !== titleKey ? title : fallback.title,
+                body: body !== bodyKey ? body : fallback.body,
+                category: fallback.category,
+            };
         }
 
         function readError(data, fallback) {
@@ -3792,7 +4055,7 @@
         }
 
         function profileCompletion() {
-            const fields = ['full_name', 'company_name', 'position_title', 'phone', 'locale', 'timezone', 'avatar_data_url'];
+            const fields = ['full_name', 'company_name', 'position_title', 'phone', 'timezone', 'avatar_data_url'];
             const completed = fields.filter(field => Boolean(state.user?.[field])).length;
             return Math.round((completed / fields.length) * 100);
         }
@@ -3928,13 +4191,14 @@
                 return;
             }
             state.notifications.forEach(notification => {
+                const copy = localizedNotification(notification);
                 const item = el('article', {
                     class: `notification-item ${notification.severity || 'info'} ${notification.read_at ? '' : 'unread'}`.trim(),
                 }, [
                     el('span', { class: 'notification-dot', 'aria-hidden': 'true' }),
                     el('div', {}, [
-                        el('p', { class: 'notification-title', text: notification.title }),
-                        notification.body ? el('p', { class: 'notification-body', text: previewWords(notification.body) }) : document.createTextNode(''),
+                        el('p', { class: 'notification-title', text: copy.title }),
+                        copy.body ? el('p', { class: 'notification-body', text: previewWords(copy.body) }) : document.createTextNode(''),
                         el('div', { class: 'notification-meta' }, [
                             el('span', { text: formatDate(notification.created_at) }),
                             el('div', { class: 'row-actions' }, [
@@ -4061,22 +4325,25 @@
                     el('td', { text: formatDate(job.updated_at || job.created_at) }),
                 ]),
             }));
-            const systemItems = systemNotifications().map(notification => ({
-                kind: 'system',
-                at: notification.created_at,
-                row: el('tr', { dataset: { notificationTarget: `notification:${notification.id}` } }, [
-                    el('td', { text: dt('sections.notifications.type_system') }),
-                    el('td', { text: notification.title || '-' }),
-                    el('td', {}, [notificationStatusBadge(notification.severity)]),
-                    el('td', {}, [
-                        el('div', { class: 'notification-detail' }, [
-                            el('strong', { text: notification.category || '-' }),
-                            el('span', { text: notification.body || '-' }),
+            const systemItems = systemNotifications().map(notification => {
+                const copy = localizedNotification(notification);
+                return {
+                    kind: 'system',
+                    at: notification.created_at,
+                    row: el('tr', { dataset: { notificationTarget: `notification:${notification.id}` } }, [
+                        el('td', { text: dt('sections.notifications.type_system') }),
+                        el('td', { text: copy.title }),
+                        el('td', {}, [notificationStatusBadge(notification.severity)]),
+                        el('td', {}, [
+                            el('div', { class: 'notification-detail' }, [
+                                el('strong', { text: copy.category }),
+                                el('span', { text: copy.body || '-' }),
+                            ]),
                         ]),
+                        el('td', { text: formatDate(notification.created_at) }),
                     ]),
-                    el('td', { text: formatDate(notification.created_at) }),
-                ]),
-            }));
+                };
+            });
             return moduleItems.concat(systemItems).sort((left, right) => {
                 const leftDate = parseBackendDate(left.at);
                 const rightDate = parseBackendDate(right.at);
@@ -4724,6 +4991,7 @@
             renderSummary();
             renderAccount();
             renderNotifications();
+            renderNotificationEvents();
             renderStatusList();
             renderJobs();
             renderArtifacts();
