@@ -1252,6 +1252,61 @@
             color: #111827;
             box-shadow: none;
         }
+        .table-wrap tr.is-revoked td {
+            opacity: 0.55;
+        }
+        .api-key-prefix,
+        .api-token-box {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .api-token-box {
+            margin: 12px 0 0;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--panel-soft);
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .dashboard-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .dashboard-modal.hidden {
+            display: none !important;
+        }
+        .dashboard-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, .55);
+        }
+        .dashboard-modal-card {
+            position: relative;
+            z-index: 1;
+            width: min(520px, 100%);
+            padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--panel);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, .28);
+        }
+        .dashboard-modal-card h2 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+        .dashboard-modal-card .section-sub {
+            margin: 0;
+        }
+        html.dark .dashboard-modal-backdrop {
+            background: rgba(2, 6, 23, .72);
+        }
         .notification-detail {
             display: grid;
             gap: 4px;
@@ -2543,9 +2598,15 @@
                         <div>
                             <div class="hero-eyebrow">Account Protection</div>
                             <h1>Security</h1>
-                            <p class="sub">Change your password and keep your member account protected.</p>
+                            <p class="sub">Change your password, manage Forecast API keys, and keep your member account protected.</p>
                         </div>
                     </div>
+                    <div id="security-filter-controls" class="filter-tabs" role="tablist" aria-label="Security sections" data-i18n-aria="sections.security.tablist_aria">
+                        <span id="security-filter-indicator" class="filter-tab-indicator" aria-hidden="true"></span>
+                        <button class="filter-tab active" type="button" data-security-panel="password" aria-pressed="true"><span class="filter-tab-label" data-i18n="sections.security.tab_password">Password</span></button>
+                        <button class="filter-tab" type="button" data-security-panel="api-keys" aria-pressed="false"><span class="filter-tab-label" data-i18n="sections.security.tab_api_keys">API keys</span></button>
+                    </div>
+                    <div id="security-password-panel">
                     <div class="grid two-col">
                         <form id="password-form" class="card">
                             <div class="section-head">
@@ -2586,6 +2647,87 @@
                                 </div>
                             </div>
                             <div id="access-info" class="kv-list"></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div id="security-api-panel" class="hidden">
+                        <div class="grid two-col">
+                            <form id="api-key-create-form" class="card">
+                                <div class="section-head">
+                                    <div>
+                                        <h2 data-i18n="sections.security.create_key">Create API key</h2>
+                                        <p class="section-sub" data-i18n="sections.security.create_key_sub">The secret is shown once. Re-enter your password to create a key.</p>
+                                    </div>
+                                </div>
+                                <div class="grid">
+                                    <label><span data-i18n="sections.security.key_name">Name</span>
+                                        <input id="api-key-name" type="text" maxlength="80" autocomplete="off" data-i18n-placeholder="sections.security.key_name_placeholder" placeholder="Forecast API key">
+                                    </label>
+                                    <label><span data-i18n="sections.security.key_expiry">Expires</span>
+                                        <select id="api-key-expiry">
+                                            <option value="" data-i18n="sections.security.expiry_never">Never</option>
+                                            <option value="30" data-i18n="sections.security.expiry_30">30 days</option>
+                                            <option value="90" data-i18n="sections.security.expiry_90">90 days</option>
+                                            <option value="365" data-i18n="sections.security.expiry_365">365 days</option>
+                                        </select>
+                                    </label>
+                                    <label><span data-i18n="sections.security.confirm_password_to_create">Current password</span>
+                                        <span class="password-wrap">
+                                            <input id="api-key-password" type="password" autocomplete="current-password" minlength="8" required>
+                                            <button class="password-toggle" type="button" data-target="api-key-password" aria-label="Show password"></button>
+                                        </span>
+                                    </label>
+                                </div>
+                                <p id="api-key-limit-note" class="inline-note hidden" data-i18n="sections.security.max_keys_note">You already have 5 active keys. Revoke one to create another.</p>
+                                <div class="form-actions">
+                                    <button id="create-api-key" class="button-link" type="submit" data-i18n="sections.security.create_key_button">Create key</button>
+                                </div>
+                            </form>
+                            <div class="card">
+                                <div class="section-head">
+                                    <div>
+                                        <h2 data-i18n="sections.security.api_keys">API keys</h2>
+                                        <p class="section-sub" data-i18n="sections.security.api_keys_sub">Only the prefix is stored after creation. Revoked keys stay listed.</p>
+                                    </div>
+                                </div>
+                                <div class="table-wrap">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th data-i18n="table.name">Name</th>
+                                                <th data-i18n="table.prefix">Prefix</th>
+                                                <th data-i18n="table.last_used">Last used</th>
+                                                <th data-i18n="table.expires">Expires</th>
+                                                <th data-i18n="table.status">Status</th>
+                                                <th data-i18n="table.actions">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="api-keys-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card" style="margin-top:16px">
+                            <div class="section-head">
+                                <div>
+                                    <h2 data-i18n="sections.security.recent_api_jobs">Recent API forecasts</h2>
+                                    <p class="section-sub" data-i18n="sections.security.recent_api_jobs_sub">Jobs started with one of your Forecast API keys. Polling a job is not listed separately.</p>
+                                </div>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th data-i18n="table.created">Created</th>
+                                            <th data-i18n="table.status">Status</th>
+                                            <th data-i18n="table.module">Module</th>
+                                            <th data-i18n="table.api_key">API key</th>
+                                            <th data-i18n="table.file">File</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="api-jobs-body"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -2827,6 +2969,7 @@
                                     <tr>
                                         <th data-i18n="table.module">Module</th>
                                         <th data-i18n="table.type">Type</th>
+                                        <th data-i18n="table.source">Source</th>
                                         <th data-i18n="table.user">User</th>
                                         <th data-i18n="table.status">Status</th>
                                         <th data-i18n="table.progress">Progress</th>
@@ -2869,6 +3012,19 @@
         </div>
     </div>
 
+    <div id="api-key-secret-modal" class="dashboard-modal hidden" role="dialog" aria-modal="true" aria-labelledby="api-key-secret-title">
+        <div class="dashboard-modal-backdrop" aria-hidden="true"></div>
+        <div class="dashboard-modal-card">
+            <h2 id="api-key-secret-title" data-i18n="sections.security.secret_title">Save this API key</h2>
+            <p class="section-sub" data-i18n="sections.security.secret_body">This secret is shown only once. Copy it now and store it in a secret manager. The dashboard will only show the prefix after you close this window.</p>
+            <div id="api-key-secret-value" class="api-token-box"></div>
+            <div class="form-actions">
+                <button id="copy-api-key-secret" class="button-secondary" type="button" data-i18n="sections.security.secret_copy">Copy</button>
+                <button id="close-api-key-secret" class="button-link" type="button" data-i18n="sections.security.secret_done">I have saved this key</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const app = document.getElementById('dashboard-app');
         const accessPanel = document.getElementById('access-panel');
@@ -2902,6 +3058,9 @@
         let notificationPollTimer = null;
         let dashboardRefreshInFlight = false;
         let notificationFilterIndicatorAnimated = false;
+        let securityFilterIndicatorAnimated = false;
+        let pendingApiKeySecret = '';
+        const MAX_ACTIVE_API_KEYS = 5;
         const DASHBOARD_BROADCAST_KEY = 'operartis_dashboard_data_changed';
         const NOTIFICATION_POLL_MS = 60000;
         const NOTIFICATION_PREVIEW_WORDS = 12;
@@ -2916,6 +3075,8 @@
             unreadNotifications: 0,
             notificationFilter: 'all',
             notificationFocus: null,
+            securityPanel: 'password',
+            apiKeys: [],
             adminOverview: null,
             adminUsers: [],
             adminInvites: [],
@@ -2930,7 +3091,7 @@
             notifications: ['Notifications', 'Review module runs and system events.'],
             reports: ['Reports', 'Download retained outputs before cleanup.'],
             profile: ['Profile', 'Manage your member information.'],
-            security: ['Security', 'Update your password and account access.'],
+            security: ['Security', 'Update your password, API keys, and account access.'],
             settings: ['Settings', 'Theme and language preferences.'],
             'admin-overview': ['Overview', 'Manage organization-level activity.'],
             'admin-users': ['Users', 'Manage roles and account status.'],
@@ -2962,6 +3123,10 @@
             if (!key) return '-';
             const translated = dt('admin_status.' + key);
             return translated !== 'admin_status.' + key ? translated : String(key).replace(/_/g, ' ');
+        }
+
+        function jobSourceLabel(source) {
+            return source === 'api' ? dt('sections.security.source_api') : dt('sections.security.source_app');
         }
         function auditEventLabel(key) {
             if (!key) return '-';
@@ -3266,6 +3431,7 @@
             topSubtitle.textContent = sectionCopy[section][1];
             window.location.hash = sectionHash(section);
             if (section === 'notifications') renderNotificationEvents();
+            if (section === 'security') requestAnimationFrame(updateSecurityFilterIndicator);
             setSidebarOpen(false);
         }
 
@@ -3279,12 +3445,13 @@
         async function loadDashboard(options = {}) {
             const silent = options.silent === true;
             if (!silent) showMessage('');
-            const [user, overview, jobs, artifacts, notifications] = await Promise.all([
+            const [user, overview, jobs, artifacts, notifications, apiKeys] = await Promise.all([
                 window.OperartisApi.me(),
                 api('/auth/dashboard/overview'),
                 api('/auth/dashboard/jobs'),
                 api('/auth/dashboard/artifacts'),
                 api('/auth/notifications'),
+                api('/auth/api-keys'),
             ]);
             state.user = user;
             state.overview = overview;
@@ -3292,6 +3459,7 @@
             state.artifacts = artifacts;
             state.notifications = notifications.notifications || [];
             state.unreadNotifications = notifications.unread_count || 0;
+            state.apiKeys = Array.isArray(apiKeys) ? apiKeys : [];
             if (canUseAdminDashboard(user.role)) {
                 await loadAdminDashboard(false);
             }
@@ -3679,9 +3847,9 @@
             });
         }
 
-        function updateNotificationFilterIndicator() {
-            const track = document.getElementById('notification-filter-controls');
-            const indicator = document.getElementById('notification-filter-indicator');
+        function updateFilterTabIndicator(trackId, indicatorId, animatedFlag) {
+            const track = document.getElementById(trackId);
+            const indicator = document.getElementById(indicatorId);
             if (!track || !indicator) return;
             const active = track.querySelector('.filter-tab.active');
             if (!active) {
@@ -3696,12 +3864,26 @@
             indicator.style.width = `${Math.round(activeRect.width)}px`;
             indicator.style.height = `${Math.round(activeRect.height)}px`;
             indicator.classList.add('is-ready');
-            if (!notificationFilterIndicatorAnimated) {
+            if (animatedFlag === 'notification' && !notificationFilterIndicatorAnimated) {
                 requestAnimationFrame(() => {
                     indicator.classList.add('is-animated');
                     notificationFilterIndicatorAnimated = true;
                 });
             }
+            if (animatedFlag === 'security' && !securityFilterIndicatorAnimated) {
+                requestAnimationFrame(() => {
+                    indicator.classList.add('is-animated');
+                    securityFilterIndicatorAnimated = true;
+                });
+            }
+        }
+
+        function updateNotificationFilterIndicator() {
+            updateFilterTabIndicator('notification-filter-controls', 'notification-filter-indicator', 'notification');
+        }
+
+        function updateSecurityFilterIndicator() {
+            updateFilterTabIndicator('security-filter-controls', 'security-filter-indicator', 'security');
         }
 
         function renderNotificationEvents() {
@@ -3933,17 +4115,118 @@
             });
         }
 
+        function setSecurityPanel(panel) {
+            state.securityPanel = panel === 'api-keys' ? 'api-keys' : 'password';
+            const passwordPanel = document.getElementById('security-password-panel');
+            const apiPanel = document.getElementById('security-api-panel');
+            passwordPanel?.classList.toggle('hidden', state.securityPanel !== 'password');
+            apiPanel?.classList.toggle('hidden', state.securityPanel !== 'api-keys');
+            document.querySelectorAll('[data-security-panel]').forEach(button => {
+                const active = button.dataset.securityPanel === state.securityPanel;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+            requestAnimationFrame(updateSecurityFilterIndicator);
+        }
+
+        function activeApiKeyCount() {
+            return (state.apiKeys || []).filter(key => !key.revoked_at).length;
+        }
+
+        function apiKeyStatus(key) {
+            if (key.revoked_at) return 'revoked';
+            if (key.expires_at && new Date(key.expires_at).getTime() <= Date.now()) return 'expired';
+            return 'active';
+        }
+
+        function apiKeyLabel(job) {
+            if (job.api_key_name && job.api_key_prefix) return `${job.api_key_name} (${job.api_key_prefix})`;
+            return job.api_key_name || job.api_key_prefix || '-';
+        }
+
+        function renderSecurityApi() {
+            setSecurityPanel(state.securityPanel);
+            const keysBody = document.getElementById('api-keys-body');
+            const jobsBody = document.getElementById('api-jobs-body');
+            const limitNote = document.getElementById('api-key-limit-note');
+                    const createButton = document.getElementById('create-api-key');
+            if (!keysBody || !jobsBody) return;
+            clear(keysBody);
+            clear(jobsBody);
+            const atLimit = activeApiKeyCount() >= MAX_ACTIVE_API_KEYS;
+            limitNote?.classList.toggle('hidden', !atLimit);
+            if (createButton) createButton.disabled = atLimit;
+            if (!state.apiKeys.length) {
+                keysBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: dt('empty.no_api_keys') })]));
+            } else {
+                state.apiKeys.forEach(key => {
+                    const revoked = Boolean(key.revoked_at);
+                    const actions = el('div', { class: 'row-actions' });
+                    if (!revoked) {
+                        actions.appendChild(el('button', {
+                            class: 'button-danger',
+                            type: 'button',
+                            dataset: { action: 'revoke-api-key', keyId: key.id, keyName: key.name || key.prefix || '' },
+                            text: dt('actions.revoke'),
+                        }));
+                    }
+                    keysBody.appendChild(el('tr', { class: revoked ? 'is-revoked' : '' }, [
+                        el('td', { text: key.name || '-' }),
+                        el('td', {}, [el('span', { class: 'api-key-prefix', text: key.prefix || '-' })]),
+                        el('td', { text: key.last_used_at ? formatDate(key.last_used_at) : dt('table.never') }),
+                        el('td', { text: key.expires_at ? formatDate(key.expires_at) : dt('sections.security.expiry_never') }),
+                        el('td', {}, [badge(apiKeyStatus(key))]),
+                        el('td', {}, [actions]),
+                    ]));
+                });
+            }
+            const apiJobs = (state.jobs || []).filter(job => job.source === 'api');
+            if (!apiJobs.length) {
+                jobsBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '5', text: dt('empty.no_api_jobs') })]));
+                return;
+            }
+            apiJobs.slice(0, 20).forEach(job => {
+                jobsBody.appendChild(el('tr', {}, [
+                    el('td', { text: formatDate(job.created_at) }),
+                    el('td', {}, [badge(job.status)]),
+                    el('td', { text: moduleLabel(job.module) }),
+                    el('td', { text: apiKeyLabel(job) }),
+                    el('td', { text: job.input_filename || '-' }),
+                ]));
+            });
+        }
+
+        function showApiKeySecretModal(token) {
+            pendingApiKeySecret = token || '';
+            const modal = document.getElementById('api-key-secret-modal');
+            const value = document.getElementById('api-key-secret-value');
+            if (value) value.textContent = pendingApiKeySecret;
+            modal?.classList.remove('hidden');
+            document.getElementById('copy-api-key-secret')?.focus();
+        }
+
+        function closeApiKeySecretModal() {
+            const modal = document.getElementById('api-key-secret-modal');
+            if (!modal || modal.classList.contains('hidden')) return false;
+            pendingApiKeySecret = '';
+            const value = document.getElementById('api-key-secret-value');
+            if (value) value.textContent = '';
+            modal.classList.add('hidden');
+            return true;
+        }
+
         function renderAdminJobs() {
             const tbody = document.getElementById('admin-jobs-body');
             clear(tbody);
             if (!state.adminJobs.length) {
-                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '8', text: dt('empty.no_jobs') })]));
+                tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '9', text: dt('empty.no_jobs') })]));
                 return;
             }
             state.adminJobs.forEach(job => {
                 tbody.appendChild(el('tr', {}, [
                     el('td', { text: moduleLabel(job.module) }),
                     el('td', { text: job.job_type || '-' }),
+                    el('td', { text: jobSourceLabel(job.source) }),
                     el('td', { text: job.user_email || '-' }),
                     el('td', {}, [badge(job.status)]),
                     el('td', { text: `${job.progress || 0}%` }),
@@ -4040,6 +4323,7 @@
             renderStatusList();
             renderJobs();
             renderArtifacts();
+            renderSecurityApi();
             renderAdminAll();
             fillProfileForm();
             renderSettings();
@@ -4072,6 +4356,7 @@
         sidebarBackdrop.addEventListener('click', () => setSidebarOpen(false));
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') {
+                if (closeApiKeySecretModal()) return;
                 setSidebarOpen(false);
                 setProfileMenuOpen(false);
                 setNotificationPanelOpen(false);
@@ -4145,6 +4430,20 @@
             track.querySelectorAll('.filter-tab').forEach(button => observer.observe(button));
             window.addEventListener('resize', updateNotificationFilterIndicator);
             requestAnimationFrame(updateNotificationFilterIndicator);
+        })();
+        document.getElementById('security-filter-controls')?.addEventListener('click', event => {
+            const button = event.target.closest('[data-security-panel]');
+            if (!button) return;
+            setSecurityPanel(button.dataset.securityPanel);
+        });
+        (function bindSecurityFilterIndicator() {
+            const track = document.getElementById('security-filter-controls');
+            if (!track) return;
+            const observer = new ResizeObserver(() => updateSecurityFilterIndicator());
+            observer.observe(track);
+            track.querySelectorAll('.filter-tab').forEach(button => observer.observe(button));
+            window.addEventListener('resize', updateSecurityFilterIndicator);
+            requestAnimationFrame(updateSecurityFilterIndicator);
         })();
         document.getElementById('theme-options').addEventListener('click', event => {
             const button = event.target.closest('[data-theme]');
@@ -4332,6 +4631,50 @@
                 button.disabled = false;
             }
         });
+        document.getElementById('api-key-create-form')?.addEventListener('submit', async event => {
+            event.preventDefault();
+            if (activeApiKeyCount() >= MAX_ACTIVE_API_KEYS) {
+                showMessage(dt('sections.security.max_keys_note'), 'error');
+                return;
+            }
+            const button = document.getElementById('create-api-key');
+            const name = document.getElementById('api-key-name').value.trim();
+            const expiry = document.getElementById('api-key-expiry').value;
+            const password = document.getElementById('api-key-password').value;
+            const payload = { name: name || undefined, password };
+            if (expiry) payload.expires_in_days = Number(expiry);
+            button.disabled = true;
+            try {
+                const created = await api('/auth/api-keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                event.target.reset();
+                state.apiKeys = await api('/auth/api-keys');
+                renderSecurityApi();
+                showApiKeySecretModal(created.token);
+                showMessage(dt('messages.api_key_created'), 'success');
+            } catch (error) {
+                showMessage(error.message || dt('messages.api_key_create_failed'), 'error');
+            } finally {
+                button.disabled = activeApiKeyCount() >= MAX_ACTIVE_API_KEYS;
+            }
+        });
+        document.getElementById('copy-api-key-secret')?.addEventListener('click', async () => {
+            if (!pendingApiKeySecret) return;
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(pendingApiKeySecret);
+                } else {
+                    throw new Error('clipboard unavailable');
+                }
+                showMessage(dt('messages.api_key_copied'), 'success');
+            } catch (error) {
+                showMessage(dt('messages.api_key_copy_failed'), 'error');
+            }
+        });
+        document.getElementById('close-api-key-secret')?.addEventListener('click', () => closeApiKeySecretModal());
         document.querySelectorAll('.password-toggle').forEach(button => {
             button.innerHTML = passwordIcon(false);
             button.addEventListener('click', () => {
@@ -4371,6 +4714,23 @@
             const actionButton = event.target.closest('[data-action]');
             if (!actionButton) return;
             event.preventDefault();
+            if (actionButton.dataset.action === 'revoke-api-key') {
+                const keyId = actionButton.dataset.keyId;
+                const keyName = actionButton.dataset.keyName || '';
+                if (!keyId) return;
+                if (!window.confirm(dt('sections.security.revoke_confirm', { name: keyName || keyId }))) return;
+                actionButton.disabled = true;
+                try {
+                    await api(`/auth/api-keys/${keyId}`, { method: 'DELETE' });
+                    state.apiKeys = await api('/auth/api-keys');
+                    renderSecurityApi();
+                    showMessage(dt('messages.api_key_revoked'), 'success');
+                } catch (error) {
+                    showMessage(error.message || dt('messages.api_key_revoke_failed'), 'error');
+                    actionButton.disabled = false;
+                }
+                return;
+            }
             if (!canUseAdminDashboard(state.user?.role)) return;
 
             if (actionButton.dataset.action === 'save-user') {
