@@ -2120,6 +2120,34 @@
             height: 88px;
             font-size: 27px;
         }
+        #admin-users-body tr.admin-user-row {
+            cursor: pointer;
+        }
+        #admin-users-body .admin-user-email-link {
+            display: block;
+            color: inherit;
+            text-decoration: none;
+        }
+        #admin-users-body .admin-user-email-link:hover strong {
+            text-decoration: underline;
+        }
+        .admin-user-detail-head {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+        }
+        .section-head .admin-user-detail-head {
+            margin-bottom: 0;
+        }
+        #admin-user-details .kv-row strong {
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+        .admin-user-detail-head h2 {
+            margin: 0 0 4px;
+            font-size: 20px;
+        }
         .avatar-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .form-actions {
             display: flex;
@@ -2905,7 +2933,6 @@
                                 <label><span data-i18n="sections.profile.phone">Phone</span><input id="profile-phone" name="phone" autocomplete="tel" maxlength="64"></label>
                                 <label><span data-i18n="sections.profile.language">Language</span>
                                     <select id="profile-locale" name="locale">
-                                        <option value="" data-i18n="sections.profile.browser_default">Browser default</option>
                                         <option value="en" data-i18n="sections.profile.lang_en">English</option>
                                         <option value="vi" data-i18n="sections.profile.lang_vi">Vietnamese</option>
                                         <option value="de" data-i18n="sections.profile.lang_de">German</option>
@@ -3241,6 +3268,29 @@
                     </div>
                 </section>
 
+                <section id="section-admin-user" class="section admin-only">
+                    <div class="hero">
+                        <div>
+                            <div class="hero-eyebrow">User Management</div>
+                            <h1>User details</h1>
+                            <p class="sub">Basic account information for management. Passwords are never shown.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="section-head">
+                            <div class="admin-user-detail-head">
+                                <div id="admin-user-avatar" class="avatar avatar-large"></div>
+                                <div>
+                                    <h2 id="admin-user-name">User</h2>
+                                    <p id="admin-user-email" class="section-sub"></p>
+                                </div>
+                            </div>
+                            <button class="button-ghost nav-jump" type="button" data-section="admin-users" data-i18n="sections.admin-users.back_to_users">Back to users</button>
+                        </div>
+                        <div id="admin-user-details" class="kv-list"></div>
+                    </div>
+                </section>
+
                 <section id="section-admin-invites" class="section admin-only">
                     <div class="hero">
                         <div>
@@ -3474,6 +3524,7 @@
             apiKeys: [],
             adminOverview: null,
             adminUsers: [],
+            adminUserId: null,
             adminInvites: [],
             adminJobs: [],
             adminAuditEvents: [],
@@ -3490,6 +3541,7 @@
             settings: ['Settings', 'Theme and language preferences.'],
             'admin-overview': ['Overview', 'Manage organization-level activity.'],
             'admin-users': ['Users', 'Manage roles and account status.'],
+            'admin-user': ['User details', 'Basic account information for management.'],
             'admin-invites': ['Invites', 'Create and revoke account invites.'],
             'admin-jobs': ['All Jobs', 'Monitor organization module runs.'],
             'admin-audit': ['Audit Log', 'Review recent security and admin events.'],
@@ -3728,9 +3780,12 @@
         }
 
         function renderAvatar(container, user, large = false) {
+            if (!container) return;
             clear(container);
             container.className = large ? 'avatar avatar-large' : 'avatar';
-            const avatar = state.avatarChanged ? state.avatarDraft : user?.avatar_data_url;
+            const avatar = (user && user.id === state.user?.id && state.avatarChanged)
+                ? state.avatarDraft
+                : user?.avatar_data_url;
             if (avatar) {
                 container.appendChild(el('img', { src: avatar, alt: '' }));
             } else {
@@ -3898,6 +3953,7 @@
             let filter = params.get('filter');
             const jobId = params.get('job');
             const notificationId = params.get('notification');
+            const userId = params.get('id');
             const focus = jobId
                 ? { kind: 'job', id: jobId, filter: 'module-runs' }
                 : notificationId
@@ -3908,6 +3964,7 @@
                 section: rawSection === 'activity' ? 'notifications' : rawSection,
                 filter: ['all', 'module-runs', 'system'].includes(filter) ? filter : null,
                 focus,
+                userId: rawSection === 'admin-user' ? userId : null,
             };
         }
 
@@ -3919,6 +3976,9 @@
                 }
                 return `notifications?${params.toString()}`;
             }
+            if (section === 'admin-user' && state.adminUserId) {
+                return `admin-user?id=${encodeURIComponent(state.adminUserId)}`;
+            }
             return section;
         }
 
@@ -3927,11 +3987,16 @@
             section = request.section;
             if (section === 'notifications') state.notificationFilter = request.filter || 'all';
             state.notificationFocus = section === 'notifications' ? request.focus : null;
+            if (section === 'admin-user') state.adminUserId = request.userId || state.adminUserId;
             if (!sectionCopy[section]) section = 'overview';
             if (isAdminSection(section) && state.user && !canUseAdminDashboard(state.user.role)) section = 'overview';
             state.activeSection = section;
             document.querySelectorAll('.section').forEach(item => item.classList.toggle('active', item.id === `section-${section}`));
-            document.querySelectorAll('.nav-btn').forEach(item => item.classList.toggle('active', item.dataset.section === section));
+            document.querySelectorAll('.nav-btn').forEach(item => {
+                const active = item.dataset.section === section
+                    || (section === 'admin-user' && item.dataset.section === 'admin-users');
+                item.classList.toggle('active', active);
+            });
             document.querySelector('.main')?.classList.toggle('main-fill', section === 'notifications' || section === 'admin-jobs' || section === 'admin-audit');
             topTitle.textContent = sectionCopy[section][0];
             topSubtitle.textContent = sectionCopy[section][1];
@@ -3946,6 +4011,7 @@
             if (section === 'admin-audit') {
                 requestAnimationFrame(() => requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-audit-table-wrap'))));
             }
+            if (section === 'admin-user') renderAdminUserDetail();
             if (section === 'security') requestAnimationFrame(updateSecurityFilterIndicator);
             setSidebarOpen(false);
         }
@@ -4033,7 +4099,14 @@
             const targetFilter = targetSection === 'notifications' ? (request.filter || 'all') : state.notificationFilter;
             const currentFocusKey = state.notificationFocus ? `${state.notificationFocus.kind}:${state.notificationFocus.id}` : '';
             const targetFocusKey = request.focus ? `${request.focus.kind}:${request.focus.id}` : '';
-            if (targetSection !== state.activeSection || targetFilter !== state.notificationFilter || currentFocusKey !== targetFocusKey) {
+            const targetUserId = targetSection === 'admin-user' ? (request.userId || '') : (state.adminUserId || '');
+            const currentUserId = state.adminUserId || '';
+            if (
+                targetSection !== state.activeSection
+                || targetFilter !== state.notificationFilter
+                || currentFocusKey !== targetFocusKey
+                || (targetSection === 'admin-user' && targetUserId !== currentUserId)
+            ) {
                 setSection(hash);
             }
         }
@@ -4054,8 +4127,105 @@
             if (shouldRender) renderAdminAll();
         }
 
+        function profileLocaleLabel(locale) {
+            if (locale === 'en' || locale === 'vi' || locale === 'de') return dt('sections.profile.lang_' + locale);
+            return dt('profile_summary.missing');
+        }
+
+        function genderLabel(gender) {
+            if (gender === 'female') return dt('sections.profile.gender_female');
+            if (gender === 'male') return dt('sections.profile.gender_male');
+            if (gender === 'non_binary') return dt('sections.profile.gender_non_binary');
+            if (gender === 'custom') return dt('sections.profile.gender_custom');
+            if (gender === 'prefer_not_to_say') return dt('sections.profile.gender_prefer_not');
+            return dt('profile_summary.missing');
+        }
+
+        function profileDisplayValue(value) {
+            return value ? String(value) : dt('profile_summary.missing');
+        }
+
+        function adminUserDetailUrl(userId) {
+            return `#admin-user?id=${encodeURIComponent(userId)}`;
+        }
+
+        function openAdminUserDetail(userId) {
+            if (!userId) return;
+            setSection(`admin-user?id=${encodeURIComponent(userId)}`);
+        }
+
+        function paintAdminUserDetail(user) {
+            const details = document.getElementById('admin-user-details');
+            const nameEl = document.getElementById('admin-user-name');
+            const emailEl = document.getElementById('admin-user-email');
+            const avatarEl = document.getElementById('admin-user-avatar');
+            if (!details || !nameEl || !emailEl) return;
+            nameEl.textContent = user.full_name || dt('sections.admin-users.no_profile_name');
+            emailEl.textContent = user.email || '';
+            renderAvatar(avatarEl, user, true);
+            const rows = [
+                [dt('sections.profile.full_name'), profileDisplayValue(user.full_name)],
+                [dt('table.email'), profileDisplayValue(user.email)],
+                [dt('sections.profile.company'), profileDisplayValue(user.company_name)],
+                [dt('sections.profile.position'), profileDisplayValue(user.position_title)],
+                [dt('sections.profile.gender'), genderLabel(user.gender)],
+                [dt('sections.profile.phone'), profileDisplayValue(user.phone)],
+                [dt('sections.profile.language'), user.locale ? profileLocaleLabel(user.locale) : dt('profile_summary.missing')],
+                [dt('sections.profile.timezone'), profileDisplayValue(user.timezone)],
+                [dt('table.role'), roleLabel(user.role)],
+                [dt('table.status'), statusLabel(user.status)],
+                [dt('sections.admin-users.primary_owner'), user.is_primary_owner ? dt('sections.admin-users.yes') : dt('sections.admin-users.no')],
+                [dt('table.created'), formatDate(user.created_at)],
+                [dt('table.last_login'), formatDate(user.last_login_at)],
+                [dt('sections.admin-users.profile_updated'), formatDate(user.profile_updated_at)],
+            ];
+            clear(details);
+            rows.forEach(([label, value]) => {
+                details.appendChild(el('div', { class: 'kv-row' }, [el('span', { text: label }), el('strong', { text: value })]));
+            });
+        }
+
+        async function renderAdminUserDetail() {
+            if (state.activeSection !== 'admin-user') return;
+            const details = document.getElementById('admin-user-details');
+            const nameEl = document.getElementById('admin-user-name');
+            const emailEl = document.getElementById('admin-user-email');
+            const avatarEl = document.getElementById('admin-user-avatar');
+            if (!details || !nameEl || !emailEl) return;
+            const userId = state.adminUserId;
+            let user = (state.adminUsers || []).find(item => item.id === userId);
+            if (user) paintAdminUserDetail(user);
+            if (!userId) {
+                nameEl.textContent = dt('sections.admin-users.detail_title');
+                emailEl.textContent = '';
+                renderAvatar(avatarEl, {}, true);
+                clear(details);
+                details.appendChild(el('div', { class: 'empty', text: dt('sections.admin-users.not_found') }));
+                return;
+            }
+            if (!state.user) return;
+            if (user?.adminDetailLoaded) return;
+            try {
+                user = await api(`/auth/admin/users/${userId}`);
+                user.adminDetailLoaded = true;
+                const index = (state.adminUsers || []).findIndex(item => item.id === user.id);
+                if (index >= 0) state.adminUsers[index] = { ...state.adminUsers[index], ...user };
+                else state.adminUsers = [...(state.adminUsers || []), user];
+                if (state.activeSection === 'admin-user' && state.adminUserId === userId) {
+                    paintAdminUserDetail(user);
+                }
+            } catch (error) {
+                if (user) return;
+                nameEl.textContent = dt('sections.admin-users.detail_title');
+                emailEl.textContent = '';
+                renderAvatar(avatarEl, {}, true);
+                clear(details);
+                details.appendChild(el('div', { class: 'empty', text: dt('sections.admin-users.not_found') }));
+            }
+        }
+
         function profileCompletion() {
-            const fields = ['full_name', 'company_name', 'position_title', 'phone', 'timezone', 'avatar_data_url'];
+            const fields = ['full_name', 'company_name', 'position_title', 'phone', 'locale', 'timezone', 'avatar_data_url'];
             const completed = fields.filter(field => Boolean(state.user?.[field])).length;
             return Math.round((completed / fields.length) * 100);
         }
@@ -4143,7 +4313,7 @@
                 [dt('profile_summary.name'), state.user?.full_name || dt('profile_summary.missing')],
                 [dt('profile_summary.company'), state.user?.company_name || dt('profile_summary.missing')],
                 [dt('profile_summary.position'), state.user?.position_title || dt('profile_summary.missing')],
-                [dt('profile_summary.language'), state.user?.locale || dt('profile_summary.browser_default')],
+                [dt('profile_summary.language'), profileLocaleLabel(state.user?.locale)],
             ];
             const summary = document.getElementById('profile-summary');
             clear(summary);
@@ -4705,10 +4875,19 @@
                 role.addEventListener('change', syncSaveButton);
                 status.addEventListener('change', syncSaveButton);
                 syncSaveButton();
-                tbody.appendChild(el('tr', {}, [
+                tbody.appendChild(el('tr', {
+                    class: 'admin-user-row',
+                    title: dt('sections.admin-users.open_details'),
+                    dataset: { userId: user.id },
+                }, [
                     el('td', {}, [
-                        el('strong', { text: user.email }),
-                        el('div', { class: 'metric-note', text: user.full_name || dt('sections.admin-users.no_profile_name') }),
+                        el('a', {
+                            class: 'admin-user-email-link',
+                            href: adminUserDetailUrl(user.id),
+                        }, [
+                            el('strong', { text: user.email }),
+                            el('div', { class: 'metric-note', text: user.full_name || dt('sections.admin-users.no_profile_name') }),
+                        ]),
                     ]),
                     el('td', {}, [role]),
                     el('td', {}, [status]),
@@ -4933,6 +5112,7 @@
             renderAdminStatusList('admin-job-statuses', state.adminOverview?.job_statuses || {});
             renderAdminInviteForm();
             renderAdminUsers();
+            renderAdminUserDetail();
             renderAdminInvites();
             renderAdminJobs();
             renderAdminAudit();
@@ -4945,7 +5125,9 @@
             document.getElementById('profile-position').value = user.position_title || '';
             document.getElementById('profile-gender').value = user.gender || '';
             document.getElementById('profile-phone').value = user.phone || '';
-            document.getElementById('profile-locale').value = user.locale || '';
+            const localeSelect = document.getElementById('profile-locale');
+            localeSelect.value = user.locale || '';
+            if (!localeSelect.value) localeSelect.selectedIndex = -1;
             document.getElementById('profile-timezone').value = user.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || '';
             state.avatarDraft = null;
             state.avatarChanged = false;
@@ -5084,6 +5266,13 @@
         profileDropdown.querySelector('a.index-account-menu-item')?.addEventListener('click', () => setProfileMenuOpen(false));
         document.querySelectorAll('.nav-btn, .nav-jump').forEach(button => {
             button.addEventListener('click', () => setSection(button.dataset.section));
+        });
+        document.getElementById('admin-users-body')?.addEventListener('click', event => {
+            if (event.target.closest('button, select, option, input, label')) return;
+            const row = event.target.closest('tr[data-user-id]');
+            if (!row?.dataset.userId) return;
+            event.preventDefault();
+            openAdminUserDetail(row.dataset.userId);
         });
         document.getElementById('notification-filter-controls')?.addEventListener('click', event => {
             const button = event.target.closest('[data-notification-filter]');
