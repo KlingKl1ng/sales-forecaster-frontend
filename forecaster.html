@@ -100,13 +100,73 @@
             flex: 1 1 0%;
             min-width: 0;
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             align-items: stretch;
         }
 
         .fc-kpi-metric {
             min-width: 0;
             overflow: hidden;
+        }
+
+        .fc-kpi-metric.fc-kpi-metric-select {
+            overflow: visible;
+        }
+
+        .fc-kpi-metric-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.15rem;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+            color: inherit;
+        }
+
+        .fc-kpi-metric-trigger:hover,
+        .fc-kpi-metric-trigger:focus-visible {
+            color: #d97706;
+        }
+
+        .dark .fc-kpi-metric-trigger:hover,
+        .dark .fc-kpi-metric-trigger:focus-visible {
+            color: #f59e0b;
+        }
+
+        .fc-kpi-metric-chevron {
+            width: 0.7rem;
+            height: 0.7rem;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+
+        .fc-kpi-metric-trigger[aria-expanded="true"] .fc-kpi-metric-chevron {
+            transform: rotate(180deg);
+        }
+
+        .fc-kpi-metric-menu {
+            position: absolute;
+            z-index: 70;
+            top: calc(100% + 0.2rem);
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 6.75rem;
+            padding: 0.3rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+        }
+
+        .dark .fc-kpi-metric-menu {
+            border-color: #334155;
+            background: #020617;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
         }
 
         .fc-kpi-search {
@@ -187,6 +247,112 @@
         }
 
         .dark .fc-sidebar-select-wrap > .fc-sidebar-select-chevron {
+            color: #94a3b8;
+        }
+
+        .fc-model-picker-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            padding-right: 1.75rem;
+        }
+
+        .fc-model-picker-trigger[aria-expanded="true"] + .fc-sidebar-select-chevron {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .fc-model-picker-menu {
+            position: absolute;
+            z-index: 40;
+            top: calc(100% + 0.3rem);
+            left: 0;
+            right: 0;
+            padding: 0.3rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+            max-height: 16.5rem;
+            overflow-y: auto;
+        }
+
+        .dark .fc-model-picker-menu {
+            border-color: #334155;
+            background: #020617;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+        }
+
+        .fc-model-picker-option {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            width: 100%;
+            padding: 0.32rem 0.4rem;
+            border-radius: 0.5rem;
+            font-size: 0.65rem;
+            line-height: 1rem;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .dark .fc-model-picker-option {
+            color: #e2e8f0;
+        }
+
+        .fc-model-picker-option:hover,
+        .fc-model-picker-option:focus-within {
+            background: #f8fafc;
+        }
+
+        .dark .fc-model-picker-option:hover,
+        .dark .fc-model-picker-option:focus-within {
+            background: #1e293b;
+        }
+
+        .fc-model-picker-option.is-disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        button.fc-model-picker-option {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .fc-model-picker-option.is-selected {
+            color: #d97706;
+            font-weight: 700;
+        }
+
+        .dark .fc-model-picker-option.is-selected {
+            color: #f59e0b;
+        }
+
+        .fc-model-picker-option input {
+            width: 0.8rem;
+            height: 0.8rem;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .fc-model-picker-select-all {
+            margin-bottom: 0.15rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+        }
+
+        .dark .fc-model-picker-select-all {
+            border-bottom-color: #334155;
             color: #94a3b8;
         }
 
@@ -686,7 +852,7 @@
         };
     </script>
     <link rel="stylesheet" href="./operartis-access-shell.css?v=20260622-access-mobile-full">
-    <script src="./operartis-api.js?v=20260622-auth-session-sync"></script>
+    <script src="./operartis-api.js?v=20260817-cloud-forecast"></script>
     <script src="./operartis-auth-ui.js?v=20260623-display-name"></script>
     <script src="./operartis-access-gate.js?v=20260622-access-mobile-full"></script>
     <script src="./vendor/react-17.0.2.production.min.js"></script>
@@ -739,11 +905,42 @@
                     edit_mapping: "Edit Mapping",
                     configuration: "Configuration",
                     action: "Action",
+                    model_profile: "Forecast Model",
+                    model_basic_auto: "Basic Automatic",
+                    model_advanced_auto: "Advanced Automatic",
+                    model_arima: "ARIMA",
+                    model_mlp: "MLP",
+                    model_temporarily_disabled: "Temporarily disabled",
+                    model_ses: "SES",
+                    model_des: "DES",
+                    model_tes: "TES",
+                    model_prophet: "Prophet",
+                    models_all: "All enabled models",
+                    models_selected: "{count} selected",
+                    models_select_all: "Select all",
+                    models_required: "Select at least one model.",
+                    availability_checking: "Checking forecasting model availability...",
+                    models_unavailable: "Advanced models are currently unavailable on the backend.",
                     val_method: "Validation Method",
+                    val_simple: "Simple Split (Fast)",
+                    val_walk_forward: "Walk-Forward (Adaptive)",
+                    val_rolling_window: "Rolling Window (Adaptive)",
+                    eval_metric: "Evaluation Metric",
+                    eval_rmse: "RMSE",
+                    eval_mae: "MAE",
+                    eval_mse: "MSE",
+                    eval_mape: "MAPE",
                     train_h: "Train Horizon",
                     test_h: "Test Horizon",
                     fc_h: "Forecast Horizon",
                     total_periods: "Total time periods",
+                    detected_frequency: "Detected frequency",
+                    history_too_long: "This {frequency} file has {count} periods; the maximum is {max}.",
+                    freq_hourly: "Hourly",
+                    freq_daily: "Daily",
+                    freq_weekly: "Weekly",
+                    freq_monthly: "Monthly",
+                    freq_quarterly: "Quarterly",
                     horizon_mismatch: "Train + Test must equal",
                     execute_btn: "Execute Forecast",
                     processing: "Processing...",
@@ -784,6 +981,26 @@
                     local: "LOCAL",
                     cloud: "CLOUD"
                 },
+                job: {
+                    execution_backend: "Execution",
+                    backend_local: "Local",
+                    backend_cloud: "Cloud",
+                    backend_pending: "Pending",
+                    progress: "Progress",
+                    cancel: "Cancel",
+                    canceling: "Canceling...",
+                    status_ready: "Ready",
+                    status_queued: "Queued",
+                    queue_position: "Queue position",
+                    status_processing: "Processing",
+                    status_completed: "Completed",
+                    status_failed: "Failed",
+                    status_canceled: "Canceled",
+                    status_cancel_requested: "Cancel requested",
+                    advanced_export_required: "Advanced forecasts must finish before they can be exported from persisted results.",
+                    max_skus: "A batch can contain at most 100 SKUs.",
+                    cancel_failed: "The forecast could not be canceled. Status polling has resumed."
+                },
                 dashboard: {
                     batch_overview: "Overview",
                     detailed_view: "Detailed View",
@@ -791,10 +1008,12 @@
                     total_skus_short: "SKUs",
                     total_vol: "Total Forecast Vol",
                     total_vol_short: "Forecast Vol",
-                    avg_mae: "Avg. Validation MAE",
+                    avg_mae: "Avg. MAE",
                     avg_mae_short: "MAE",
-                    avg_mse: "Avg. Validation MSE",
+                    avg_mse: "Avg. MSE",
                     avg_mse_short: "MSE",
+                    avg_eval: "Avg. {metric}",
+                    avg_eval_short: "{metric}",
                     search_placeholder: "Search",
                     no_results: "No Results Loaded",
                     running_algo: "Running Analytics Algorithms",
@@ -802,8 +1021,8 @@
                     table_status: "Status",
                     table_validation: "Validation",
                     table_best_model: "Best Model",
-                    table_mae: "MAE (Val)",
-                    table_mse: "MSE (Val)",
+                    table_mae: "MAE",
+                    table_mse: "MSE",
                     table_action: "Action",
                     table_select: "Select",
                     select_all: "Select all",
@@ -824,16 +1043,16 @@
                     select_required_ok: "OK",
                     view_details: "View Details",
                     best_model: "Model",
-                    val_mse: "Val. MSE"
+                    val_mse: "MSE"
                 },
                 charts: {
                     act_train: "Actual (Train)",
                     act_test: "Actual (Test)",
                     fitted: "Fitted (Train)",
-                    val_fc: "Validation Forecast",
-                    history: "History",
-                    final_fit: "Final Fit",
-                    future_fc: "Future Forecast"
+                    val_fc: "Forecast (Validation)",
+                    history: "Actual",
+                    final_fit: "Fit",
+                    future_fc: "Forecast"
                 }
             },
             vi: {
@@ -846,11 +1065,42 @@
                     edit_mapping: "Chỉnh sửa dữ liệu",
                     configuration: "Cấu hình",
                     action: "Hành động",
+                    model_profile: "Mô hình dự báo",
+                    model_basic_auto: "Tự động cơ bản",
+                    model_advanced_auto: "Tự động nâng cao",
+                    model_arima: "ARIMA",
+                    model_mlp: "MLP",
+                    model_temporarily_disabled: "Tạm thời vô hiệu hóa",
+                    model_ses: "SES",
+                    model_des: "DES",
+                    model_tes: "TES",
+                    model_prophet: "Prophet",
+                    models_all: "Tất cả mô hình khả dụng",
+                    models_selected: "{count} đã chọn",
+                    models_select_all: "Chọn tất cả",
+                    models_required: "Hãy chọn ít nhất một mô hình.",
+                    availability_checking: "Đang kiểm tra các mô hình dự báo...",
+                    models_unavailable: "Các mô hình nâng cao hiện không khả dụng trên máy chủ.",
                     val_method: "Phương pháp kiểm định",
+                    val_simple: "Tách đơn giản (Nhanh)",
+                    val_walk_forward: "Tịnh tiến (Thích ứng)",
+                    val_rolling_window: "Cửa sổ trượt (Thích ứng)",
+                    eval_metric: "Chỉ số đánh giá",
+                    eval_rmse: "RMSE",
+                    eval_mae: "MAE",
+                    eval_mse: "MSE",
+                    eval_mape: "MAPE",
                     train_h: "Chu kỳ H.luyện",
                     test_h: "Chu kỳ K.định",
                     fc_h: "Chu kỳ dự báo",
                     total_periods: "Tổng số chu kỳ",
+                    detected_frequency: "Tần suất phát hiện",
+                    history_too_long: "Tệp {frequency} này có {count} chu kỳ; tối đa là {max}.",
+                    freq_hourly: "Theo giờ",
+                    freq_daily: "Theo ngày",
+                    freq_weekly: "Theo tuần",
+                    freq_monthly: "Theo tháng",
+                    freq_quarterly: "Theo quý",
                     horizon_mismatch: "Huấn luyện + Thử nghiệm phải bằng",
                     execute_btn: "Chạy dự báo",
                     processing: "Đang xử lý...",
@@ -891,6 +1141,26 @@
                     local: "LOCAL",
                     cloud: "CLOUD"
                 },
+                job: {
+                    execution_backend: "Nơi thực thi",
+                    backend_local: "Cục bộ",
+                    backend_cloud: "Đám mây",
+                    backend_pending: "Đang chờ",
+                    progress: "Tiến độ",
+                    cancel: "Hủy",
+                    canceling: "Đang hủy...",
+                    status_ready: "Sẵn sàng",
+                    status_queued: "Đang xếp hàng",
+                    queue_position: "Vị trí chờ",
+                    status_processing: "Đang xử lý",
+                    status_completed: "Hoàn tất",
+                    status_failed: "Thất bại",
+                    status_canceled: "Đã hủy",
+                    status_cancel_requested: "Đã yêu cầu hủy",
+                    advanced_export_required: "Dự báo nâng cao phải hoàn tất trước khi xuất từ kết quả đã lưu.",
+                    max_skus: "Mỗi lô chỉ có thể chứa tối đa 100 SKU.",
+                    cancel_failed: "Không thể hủy dự báo. Việc kiểm tra trạng thái đã tiếp tục."
+                },
                 dashboard: {
                     batch_overview: "Tổng quan",
                     detailed_view: "Chi tiết",
@@ -898,10 +1168,12 @@
                     total_skus_short: "SKU",
                     total_vol: "Tổng lượng dự báo",
                     total_vol_short: "Tổng dự báo",
-                    avg_mae: "MAE trung bình (Val)",
+                    avg_mae: "MAE trung bình",
                     avg_mae_short: "MAE",
-                    avg_mse: "MSE trung bình (Val)",
+                    avg_mse: "MSE trung bình",
                     avg_mse_short: "MSE",
+                    avg_eval: "{metric} trung bình",
+                    avg_eval_short: "{metric}",
                     search_placeholder: "Tìm kiếm",
                     no_results: "Chưa có kết quả",
                     running_algo: "Đang chạy thuật toán phân tích",
@@ -909,8 +1181,8 @@
                     table_status: "Trạng thái",
                     table_validation: "Kiểm định",
                     table_best_model: "Mô hình tốt nhất",
-                    table_mae: "MAE (Val)",
-                    table_mse: "MSE (Val)",
+                    table_mae: "MAE",
+                    table_mse: "MSE",
                     table_action: "Hành động",
                     table_select: "Chọn",
                     select_all: "Chọn tất cả",
@@ -919,9 +1191,9 @@
                     table_not_run: "Chưa xử lý",
                     table_running: "Đang xử lý",
                     table_failed: "Thất bại",
-                    validation_simple: "Simple Split",
-                    validation_walk_forward: "Walk-Forward",
-                    validation_rolling_window: "Rolling Window",
+                    validation_simple: "Tách đơn giản",
+                    validation_walk_forward: "Tịnh tiến",
+                    validation_rolling_window: "Cửa sổ trượt",
                     sort_btn: "Sắp xếp",
                     sort_title: "Sắp xếp theo",
                     select_required: "Vui lòng chọn ít nhất một ID",
@@ -931,16 +1203,16 @@
                     select_required_ok: "OK",
                     view_details: "Xem chi tiết",
                     best_model: "Mô hình",
-                    val_mse: "MSE (Val)"
+                    val_mse: "MSE"
                 },
                 charts: {
-                    act_train: "Thực tế (Train)",
-                    act_test: "Thực tế (Test)",
-                    fitted: "Khớp (Train)",
-                    val_fc: "Dự báo thử nghiệm",
-                    history: "Lịch sử",
-                    final_fit: "Khớp cuối cùng",
-                    future_fc: "Dự báo tương lai"
+                    act_train: "Thực tế (Huấn luyện)",
+                    act_test: "Thực tế (Kiểm tra)",
+                    fitted: "Khớp (Huấn luyện)",
+                    val_fc: "Dự báo (Kiểm định)",
+                    history: "Thực tế",
+                    final_fit: "Khớp",
+                    future_fc: "Dự báo"
                 }
             },
             de: {
@@ -953,11 +1225,42 @@
                     edit_mapping: "Zuordnung bearbeiten",
                     configuration: "Konfiguration",
                     action: "Aktion",
+                    model_profile: "Prognosemodell",
+                    model_basic_auto: "Basis-Automatik",
+                    model_advanced_auto: "Erweiterte Automatik",
+                    model_arima: "ARIMA",
+                    model_mlp: "MLP",
+                    model_temporarily_disabled: "Vorübergehend deaktiviert",
+                    model_ses: "SES",
+                    model_des: "DES",
+                    model_tes: "TES",
+                    model_prophet: "Prophet",
+                    models_all: "Alle aktiven Modelle",
+                    models_selected: "{count} ausgewählt",
+                    models_select_all: "Alle auswählen",
+                    models_required: "Bitte mindestens ein Modell auswählen.",
+                    availability_checking: "Verfügbarkeit der Prognosemodelle wird geprüft...",
+                    models_unavailable: "Erweiterte Modelle sind derzeit auf dem Backend nicht verfügbar.",
                     val_method: "Validierungsmethode",
+                    val_simple: "Einfacher Split (Schnell)",
+                    val_walk_forward: "Walk-Forward (Adaptiv)",
+                    val_rolling_window: "Rolling Window (Adaptiv)",
+                    eval_metric: "Bewertungskennzahl",
+                    eval_rmse: "RMSE",
+                    eval_mae: "MAE",
+                    eval_mse: "MSE",
+                    eval_mape: "MAPE",
                     train_h: "Train-Horizont",
                     test_h: "Test-Horizont",
                     fc_h: "Prognose-Horizont",
                     total_periods: "Gesamtzeiträume",
+                    detected_frequency: "Erkannte Frequenz",
+                    history_too_long: "Diese {frequency}-Datei hat {count} Perioden; das Maximum ist {max}.",
+                    freq_hourly: "Stündlich",
+                    freq_daily: "Täglich",
+                    freq_weekly: "Wöchentlich",
+                    freq_monthly: "Monatlich",
+                    freq_quarterly: "Vierteljährlich",
                     horizon_mismatch: "Training + Test muss gleich sein",
                     execute_btn: "Prognose ausführen",
                     processing: "Verarbeitung...",
@@ -998,6 +1301,26 @@
                     local: "LOCAL",
                     cloud: "CLOUD"
                 },
+                job: {
+                    execution_backend: "Ausführung",
+                    backend_local: "Lokal",
+                    backend_cloud: "Cloud",
+                    backend_pending: "Ausstehend",
+                    progress: "Fortschritt",
+                    cancel: "Abbrechen",
+                    canceling: "Wird abgebrochen...",
+                    status_ready: "Bereit",
+                    status_queued: "In Warteschlange",
+                    queue_position: "Warteposition",
+                    status_processing: "In Verarbeitung",
+                    status_completed: "Abgeschlossen",
+                    status_failed: "Fehlgeschlagen",
+                    status_canceled: "Abgebrochen",
+                    status_cancel_requested: "Abbruch angefordert",
+                    advanced_export_required: "Erweiterte Prognosen müssen abgeschlossen sein, bevor persistierte Ergebnisse exportiert werden können.",
+                    max_skus: "Ein Batch darf höchstens 100 SKUs enthalten.",
+                    cancel_failed: "Die Prognose konnte nicht abgebrochen werden. Die Statusabfrage wurde fortgesetzt."
+                },
                 dashboard: {
                     batch_overview: "Batch-Übersicht",
                     detailed_view: "Detailansicht",
@@ -1005,10 +1328,12 @@
                     total_skus_short: "SKUs",
                     total_vol: "Gesamtprognosevolumen",
                     total_vol_short: "Prognose",
-                    avg_mae: "Ø Validierungs-MAE",
+                    avg_mae: "Ø MAE",
                     avg_mae_short: "MAE",
-                    avg_mse: "Ø Validierungs-MSE",
+                    avg_mse: "Ø MSE",
                     avg_mse_short: "MSE",
+                    avg_eval: "Ø {metric}",
+                    avg_eval_short: "{metric}",
                     search_placeholder: "SKU suchen...",
                     no_results: "Keine Ergebnisse geladen",
                     running_algo: "Analytik-Algorithmen laufen",
@@ -1016,8 +1341,8 @@
                     table_status: "Status",
                     table_validation: "Validierung",
                     table_best_model: "Bestes Modell",
-                    table_mae: "MAE (Val)",
-                    table_mse: "MSE (Val)",
+                    table_mae: "MAE",
+                    table_mse: "MSE",
                     table_action: "Aktion",
                     table_select: "Auswählen",
                     select_all: "Alle auswählen",
@@ -1038,16 +1363,16 @@
                     select_required_ok: "OK",
                     view_details: "Details ansehen",
                     best_model: "Modell",
-                    val_mse: "Val. MSE"
+                    val_mse: "MSE"
                 },
                 charts: {
                     act_train: "Ist (Training)",
                     act_test: "Ist (Test)",
                     fitted: "Angepasst (Training)",
-                    val_fc: "Validierungsprognose",
-                    history: "Verlauf",
-                    final_fit: "Endgültige Anpassung",
-                    future_fc: "Zukunftsprognose"
+                    val_fc: "Prognose (Validierung)",
+                    history: "Ist",
+                    final_fit: "Anpassung",
+                    future_fc: "Prognose"
                 }
             }
         };
@@ -1074,7 +1399,7 @@
         const CodeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>;
         const CopyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>;
         const LockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
-        const SettingsIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>;
+        const SettingsIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
         const ColumnsIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M9 3v18" /><path d="M15 3v18" /></svg>;
         const PaletteIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></svg>;
         const CheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>;
@@ -1091,6 +1416,226 @@
         const API_ENDPOINTS = {
             LOCAL: (window.OperartisApi && window.OperartisApi.getDefaultApiBase()) || window.location.origin || 'http://127.0.0.1:8000',
             PROD: window.OperartisApi ? window.OperartisApi.getDefaultApiBase() : 'https://api.operartis.io'
+        };
+        const FORECAST_CAPABILITY_PATH = '/forecast-capabilities';
+        const SELECTABLE_FORECAST_MODELS = [
+            { value: 'ses', labelKey: 'sidebar.model_ses', advanced: false },
+            { value: 'des', labelKey: 'sidebar.model_des', advanced: false },
+            { value: 'tes', labelKey: 'sidebar.model_tes', advanced: false },
+            { value: 'prophet', labelKey: 'sidebar.model_prophet', advanced: false },
+            { value: 'arima', labelKey: 'sidebar.model_arima', advanced: true },
+            { value: 'mlp', labelKey: 'sidebar.model_mlp', advanced: true, disabled: true },
+        ];
+        const VALIDATION_METHOD_OPTIONS = [
+            { value: 'simple', labelKey: 'sidebar.val_simple' },
+            { value: 'walk_forward', labelKey: 'sidebar.val_walk_forward' },
+            { value: 'rolling_window', labelKey: 'sidebar.val_rolling_window' },
+        ];
+        const EVALUATION_METRIC_OPTIONS = [
+            { value: 'rmse', labelKey: 'sidebar.eval_rmse' },
+            { value: 'mae', labelKey: 'sidebar.eval_mae' },
+            { value: 'mse', labelKey: 'sidebar.eval_mse' },
+            { value: 'mape', labelKey: 'sidebar.eval_mape' },
+        ];
+        const CONTEST_EVALUATION_METRIC_OPTIONS = EVALUATION_METRIC_OPTIONS.filter(
+            (option) => option.value === 'rmse' || option.value === 'mae'
+        );
+        const normalizeContestMetric = (code) => (
+            String(code || '').toLowerCase() === 'mae' ? 'mae' : 'rmse'
+        );
+        const EVALUATION_METRIC_FIELDS = {
+            rmse: 'rmse_validation',
+            mae: 'mae_validation',
+            mse: 'mse_validation',
+            mape: 'mape_validation',
+        };
+        const evaluationMetricField = (code) => (
+            EVALUATION_METRIC_FIELDS[String(code || '').toLowerCase()] || 'rmse_validation'
+        );
+        const evaluationMetricValue = (row, code) => {
+            if (!row) return null;
+            const field = evaluationMetricField(code);
+            const direct = row[field];
+            if (direct != null && direct !== '') {
+                const numeric = Number(direct);
+                return Number.isNaN(numeric) ? null : numeric;
+            }
+            if (String(code || '').toLowerCase() === 'rmse' && row.mse_validation != null) {
+                const mse = Number(row.mse_validation);
+                return Number.isNaN(mse) ? null : Math.sqrt(mse);
+            }
+            return null;
+        };
+        const SELECTABLE_MODEL_ORDER = SELECTABLE_FORECAST_MODELS.filter((option) => !option.disabled).map((option) => option.value);
+        const HEAVY_SELECTABLE_MODELS = new Set(['arima', 'mlp']);
+        const HEAVY_MODEL_TYPES = new Set(['advanced_auto', 'arima', 'mlp']);
+
+        const orderedSelectedModels = (selected) => (
+            SELECTABLE_MODEL_ORDER.filter((code) => (selected || []).includes(code))
+        );
+
+        const deriveModelType = (selected) => {
+            const codes = orderedSelectedModels(selected);
+            if (codes.length === 1) return codes[0];
+            return 'custom';
+        };
+
+        const selectionUsesHeavy = (selected) => (
+            (selected || []).some((code) => HEAVY_SELECTABLE_MODELS.has(String(code || '').toLowerCase()))
+        );
+
+        const isAdvancedModelType = (modelType, selected) => {
+            if (Array.isArray(selected) && selected.length) return selectionUsesHeavy(selected);
+            return HEAVY_MODEL_TYPES.has(String(modelType || '').toLowerCase());
+        };
+        const TERMINAL_JOB_STATUSES = new Set(['completed', 'failed', 'canceled']);
+
+        const normalizeJobStatus = (status) => {
+            const normalized = String(status || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+            if (normalized === 'cancelled') return 'canceled';
+            if (normalized === 'cancelling' || normalized === 'canceling') return 'cancel_requested';
+            if (normalized === 'running' || normalized === 'in_progress') return 'processing';
+            if (normalized === 'pending') return 'queued';
+            return normalized || 'queued';
+        };
+
+        const normalizeExecutionBackend = (backend) => {
+            const normalized = String(backend || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+            if (normalized.indexOf('cloud') !== -1 || normalized === 'remote') return 'cloud';
+            if (normalized.indexOf('local') !== -1 || normalized.indexOf('cx32') !== -1 || normalized.indexOf('hetzner') !== -1) return 'local';
+            return null;
+        };
+
+        const DEFAULT_FREQUENCY_PROFILES = {
+            hourly: { label: 'Hourly', max_history_columns: 720, max_train_horizon: 720, max_test_horizon: 48, max_forecast_horizon: 48, mlp_lag_window: 24, prophet_min_points: 336 },
+            daily: { label: 'Daily', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 14, prophet_min_points: 730 },
+            weekly: { label: 'Weekly', max_history_columns: 312, max_train_horizon: 312, max_test_horizon: 52, max_forecast_horizon: 52, mlp_lag_window: 52, prophet_min_points: 104 },
+            monthly: { label: 'Monthly', max_history_columns: 240, max_train_horizon: 240, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 12, prophet_min_points: 24 },
+            quarterly: { label: 'Quarterly', max_history_columns: 80, max_train_horizon: 80, max_test_horizon: 16, max_forecast_horizon: 16, mlp_lag_window: 4, prophet_min_points: 8 },
+        };
+
+        const parseFrequencyProfiles = (rawProfiles) => {
+            const profiles = {};
+            Object.keys(DEFAULT_FREQUENCY_PROFILES).forEach((name) => {
+                const fallback = DEFAULT_FREQUENCY_PROFILES[name];
+                const incoming = rawProfiles && typeof rawProfiles === 'object' ? rawProfiles[name] : null;
+                profiles[name] = incoming && typeof incoming === 'object'
+                    ? { ...fallback, ...incoming }
+                    : { ...fallback };
+            });
+            return profiles;
+        };
+
+        const FORECAST_MONTH_NAMES = {
+            january: 0, february: 1, march: 2, april: 3, june: 5, july: 6,
+            august: 7, september: 8, october: 9, november: 10, december: 11,
+            sept: 8, jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6,
+            aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+        };
+
+        const parseForecastHeaderDate = (header) => {
+            const text = String(header == null ? '' : header).trim();
+            if (!text) return NaN;
+            if (/(?:19|20)\d{2}/.test(text)) {
+                const parsed = Date.parse(text);
+                if (!Number.isNaN(parsed)) return parsed;
+            }
+            const lowered = text.toLowerCase();
+            const monthNames = Object.keys(FORECAST_MONTH_NAMES).sort((left, right) => right.length - left.length);
+            for (let index = 0; index < monthNames.length; index += 1) {
+                const monthName = monthNames[index];
+                if (!new RegExp(`(?:^|[^a-z])${monthName}(?:$|[^a-z])`).test(lowered)) continue;
+                const yearMatch = text.match(/\b(20\d{2}|19\d{2}|\d{2})\b/);
+                if (!yearMatch) return NaN;
+                let year = parseInt(yearMatch[1], 10);
+                if (yearMatch[1].length === 2) year = year < 70 ? 2000 + year : 1900 + year;
+                return Date.UTC(year, FORECAST_MONTH_NAMES[monthName], 1);
+            }
+            const parsed = Date.parse(text);
+            return Number.isNaN(parsed) ? NaN : parsed;
+        };
+
+        const inferFrequencyFromHeaders = (headers) => {
+            const dates = [];
+            (headers || []).forEach((header) => {
+                const parsed = parseForecastHeaderDate(header);
+                if (!Number.isNaN(parsed)) dates.push(parsed);
+            });
+            if (dates.length < 2) return 'monthly';
+            dates.sort((left, right) => left - right);
+            const diffs = [];
+            for (let index = 1; index < dates.length; index += 1) {
+                diffs.push((dates[index] - dates[index - 1]) / 1000);
+            }
+            diffs.sort((left, right) => left - right);
+            const median = diffs[Math.floor(diffs.length / 2)];
+            if (median >= 3400 && median <= 3800) return 'hourly';
+            if (median >= 86000 && median <= 87000) return 'daily';
+            if (median >= 600000 && median <= 610000) return 'weekly';
+            if (median >= 2400000 && median <= 2700000) return 'monthly';
+            if (median >= 7700000 && median <= 8000000) return 'quarterly';
+            return 'monthly';
+        };
+
+        const parseForecastCapabilities = (data) => {
+            const payload = data && typeof data === 'object' ? data : {};
+            const nested = payload.cloud_forecasting && typeof payload.cloud_forecasting === 'object'
+                ? payload.cloud_forecasting
+                : payload.forecasting && typeof payload.forecasting === 'object'
+                    ? payload.forecasting
+                    : payload;
+            const rawEnabled = [
+                nested.enabled,
+                nested.cloud_enabled,
+                payload.cloud_forecasting_enabled,
+                payload.forecast_cloud_enabled,
+                payload.cloud_enabled,
+            ].find((value) => typeof value === 'boolean' || typeof value === 'string');
+            const cloudEnabled = rawEnabled === true || String(rawEnabled).toLowerCase() === 'true';
+            const declaredModels = nested.available_model_types
+                || nested.available_models
+                || nested.advanced_models
+                || nested.models
+                || payload.available_model_types
+                || payload.available_models
+                || payload.advanced_models
+                || payload.models;
+            const supportedModels = Array.isArray(declaredModels)
+                ? declaredModels.map((item) => String(
+                    item && typeof item === 'object'
+                        ? (item.value || item.model_type || item.id || item.name || '')
+                        : item
+                ).toLowerCase()).filter(Boolean)
+                : declaredModels && typeof declaredModels === 'object'
+                    ? Object.keys(declaredModels).filter((model) => {
+                        const config = declaredModels[model];
+                        return !config || typeof config !== 'object' || config.available !== false;
+                    }).map((model) => model.toLowerCase())
+                    : [];
+            return {
+                cloudEnabled,
+                supportedModels,
+                frequencyProfiles: parseFrequencyProfiles(
+                    nested.frequency_profiles || payload.frequency_profiles
+                ),
+            };
+        };
+
+        const readResponseError = async (response, fallback) => {
+            try {
+                const data = await response.json();
+                const detail = data && (data.detail || data.message || data.error);
+                if (typeof detail === 'string' && detail.trim()) return detail;
+            } catch (_) { }
+            return fallback;
+        };
+
+        const getAdaptivePollDelay = ({ cloud, unchangedPolls, hadError }) => {
+            const baseDelay = cloud ? 2000 : 1000;
+            const maxDelay = cloud ? 15000 : 5000;
+            const exponent = Math.min(Math.max(unchangedPolls, 0), cloud ? 6 : 4);
+            const errorMultiplier = hadError ? 2 : 1;
+            return Math.min(maxDelay, Math.round(baseDelay * Math.pow(1.5, exponent) * errorMultiplier));
         };
 
         const getDeploymentEnvironment = () => {
@@ -1118,6 +1663,78 @@
             return null;
         };
 
+        const JobStatusBar = memo(({ status, executionBackend, completedCount, totalCount, queuePosition, canCancel, isCancelling, onCancel, t }) => {
+            if (!status) return null;
+            const normalizedStatus = normalizeJobStatus(status);
+            const safeCompleted = Number.isFinite(Number(completedCount)) ? Math.max(0, Number(completedCount)) : 0;
+            const safeTotal = Number.isFinite(Number(totalCount)) ? Math.max(0, Number(totalCount)) : 0;
+            const hasProgress = safeTotal > 0;
+            const progressPercent = hasProgress ? Math.min(100, Math.round((safeCompleted / safeTotal) * 100)) : 0;
+            const backendLabel = executionBackend === 'cloud'
+                ? t('job.backend_cloud')
+                : executionBackend === 'local'
+                    ? t('job.backend_local')
+                    : t('job.backend_pending');
+            const statusLabel = t(`job.status_${normalizedStatus}`);
+            const statusClass = normalizedStatus === 'failed'
+                ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40'
+                : normalizedStatus === 'completed'
+                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40'
+                    : normalizedStatus === 'canceled'
+                        ? 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
+                        : normalizedStatus === 'ready'
+                            ? 'text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
+                            : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40';
+
+            return (
+                <div
+                    className="flex items-center gap-3 h-10 px-3 sm:px-6 bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-800 text-[10px] sm:text-xs text-slate-600 dark:text-slate-300 overflow-hidden"
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="false"
+                >
+                    <div className="flex items-center gap-1.5 shrink-0 w-[8.75rem] sm:w-[9.5rem]">
+                        <span className="w-3.5 h-3.5 shrink-0 [&_svg]:w-full [&_svg]:h-full" aria-hidden="true"><ServerIcon /></span>
+                        <span className="font-semibold whitespace-nowrap">{t('job.execution_backend')}:</span>
+                        <strong className="truncate w-[3.25rem] sm:w-[3.75rem]">{backendLabel}</strong>
+                    </div>
+                    <span className={`inline-flex h-7 items-center justify-center rounded-full border px-2 font-bold whitespace-nowrap shrink-0 min-w-[7.75rem] sm:min-w-[9.5rem] leading-none ${statusClass}`}>
+                        {statusLabel}
+                    </span>
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="font-semibold whitespace-nowrap tabular-nums shrink-0 w-[6.75rem] sm:w-[7.5rem]">
+                            {normalizedStatus === 'queued' && queuePosition > 0
+                                ? `${t('job.queue_position')}: ${queuePosition}`
+                                : `${t('job.progress')}: ${hasProgress ? `${safeCompleted}/${safeTotal}` : '0/0'}`}
+                        </span>
+                        <div
+                            className="h-1.5 flex-1 min-w-0 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"
+                            role="progressbar"
+                            aria-label={t('job.progress')}
+                            aria-valuemin="0"
+                            aria-valuemax={hasProgress ? safeTotal : 0}
+                            aria-valuenow={hasProgress ? Math.min(safeCompleted, safeTotal) : 0}
+                        >
+                            <div className="h-full rounded-full bg-brand-gold transition-[width] duration-300" style={{ width: `${progressPercent}%` }}></div>
+                        </div>
+                    </div>
+                    <div className="w-[6.25rem] shrink-0 flex items-center justify-end">
+                        {canCancel ? (
+                            <button
+                                type="button"
+                                onClick={onCancel}
+                                disabled={isCancelling}
+                                className="inline-flex h-7 w-full items-center justify-center rounded-full border border-rose-200 dark:border-rose-900/50 px-2 font-bold leading-none text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:cursor-wait disabled:opacity-60 transition-colors"
+                                aria-label={isCancelling ? t('job.canceling') : t('job.cancel')}
+                            >
+                                {isCancelling ? t('job.canceling') : t('job.cancel')}
+                            </button>
+                        ) : null}
+                    </div>
+                </div>
+            );
+        });
+
         const MetricTile = memo(({ label, shortLabel, value, subValue, type, isDark, variant = 'default', highlight }) => {
             const colorClass = type === 'pos' ? 'text-emerald-600 dark:text-emerald-400' : type === 'neg' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-white';
             const bgClass = highlight ? 'bg-amber-50/50 dark:bg-amber-900/20' : variant === 'validation' ? 'bg-amber-50/30 dark:bg-amber-900/10' : 'bg-white/40 dark:bg-white/5';
@@ -1137,12 +1754,87 @@
             );
         });
 
+        const MetricSelectTile = memo(({ label, shortLabel, value, options, selected, onSelect, t }) => {
+            const [open, setOpen] = useState(false);
+            const wrapRef = useRef(null);
+            const mobileLabel = shortLabel || label;
+
+            useEffect(() => {
+                if (!open) return undefined;
+                const onPointer = (event) => {
+                    if (wrapRef.current && !wrapRef.current.contains(event.target)) {
+                        setOpen(false);
+                    }
+                };
+                const onKey = (event) => {
+                    if (event.key === 'Escape') setOpen(false);
+                };
+                document.addEventListener('mousedown', onPointer);
+                document.addEventListener('keydown', onKey);
+                return () => {
+                    document.removeEventListener('mousedown', onPointer);
+                    document.removeEventListener('keydown', onKey);
+                };
+            }, [open]);
+
+            return (
+                <div
+                    ref={wrapRef}
+                    className="fc-kpi-metric fc-kpi-metric-select relative flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 bg-white/40 dark:bg-white/5 backdrop-blur-md px-1 py-1.5 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
+                    title={label}
+                >
+                    <button
+                        type="button"
+                        className="fc-kpi-metric-trigger text-slate-500/80 dark:text-slate-400"
+                        aria-haspopup="listbox"
+                        aria-expanded={open}
+                        aria-label={t('sidebar.eval_metric')}
+                        onClick={() => setOpen((prev) => !prev)}
+                    >
+                        <span className="sm:hidden text-[7px] uppercase font-bold tracking-wide leading-[1.1] min-w-0 truncate">{mobileLabel}</span>
+                        <span className="hidden sm:block text-[9px] uppercase font-bold tracking-wider leading-[1.1] min-w-0 truncate">{label}</span>
+                        <svg className="fc-kpi-metric-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </button>
+                    <div className="flex items-baseline gap-1 justify-center min-w-0 max-w-full">
+                        <span className="text-xs sm:text-base md:text-lg font-bold font-mono leading-none truncate text-slate-700 dark:text-white drop-shadow-sm">{value}</span>
+                    </div>
+                    {open && (
+                        <div className="fc-kpi-metric-menu" role="listbox" aria-label={t('sidebar.eval_metric')}>
+                            {options.map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    role="option"
+                                    aria-selected={selected === option.value}
+                                    className={`fc-model-picker-option${selected === option.value ? ' is-selected' : ''}`}
+                                    onClick={() => {
+                                        onSelect(option.value);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    {t(option.labelKey)}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        });
+
         // Number formatter helper function
         const fmtNumber = (val, minFrac = 0, maxFrac = 0) => {
             if (val === null || val === undefined || val === '-') return '-';
             const num = Number(val);
             if (isNaN(num)) return val;
             return num.toLocaleString('en-US', { minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
+        };
+
+        const formatEvaluationValue = (value, code) => {
+            if (value === null || value === undefined || value === '-' || Number.isNaN(Number(value))) return '-';
+            if (String(code || '').toLowerCase() === 'mape') return `${fmtNumber(value, 1, 1)}%`;
+            return fmtNumber(value, 0, 0);
         };
 
         const ForecastingLoader = memo(({ t, validationMethod, testHorizon }) => {
@@ -1173,23 +1865,25 @@
             );
         });
 
-        const KPICards = memo(({ results, skuCount = 0, searchQuery, onSearchQueryChange, t }) => {
+        const KPICards = memo(({ results, skuCount = 0, searchQuery, onSearchQueryChange, evaluationMetric = 'rmse', onEvaluationMetricChange, t }) => {
             const hasData = results && results.length > 0;
+            const metricCode = evaluationMetric || 'rmse';
+            const metricLabel = t(`sidebar.eval_${metricCode}`);
+            const avgEvalLabel = t('dashboard.avg_eval').replace('{metric}', metricLabel);
+            const avgEvalShort = t('dashboard.avg_eval_short').replace('{metric}', metricLabel);
 
             // Memoize expensive calculations
-            const { totalSeries, avgMse, avgMae, totalForecastVolume } = useMemo(() => {
+            const { totalSeries, avgEval, totalForecastVolume } = useMemo(() => {
                 if (!hasData) {
                     return {
                         totalSeries: skuCount > 0 ? skuCount : '-',
-                        avgMse: '-',
-                        avgMae: '-',
+                        avgEval: '-',
                         totalForecastVolume: '-',
                     };
                 }
 
                 const total = results.length;
-                const mseSum = results.reduce((sum, r) => sum + (r.mse_validation || 0), 0);
-                const maeSum = results.reduce((sum, r) => sum + (r.mae_validation || 0), 0);
+                const evalSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, metricCode) || 0), 0);
                 const fcVolume = results.reduce((sum, r) => {
                     const fcSum = r.forecast_data ? r.forecast_data.reduce((s, d) => s + (d.future_forecast || 0), 0) : 0;
                     return sum + fcSum;
@@ -1197,11 +1891,10 @@
 
                 return {
                     totalSeries: skuCount > 0 ? skuCount : total,
-                    avgMse: mseSum / total,
-                    avgMae: maeSum / total,
+                    avgEval: evalSum / total,
                     totalForecastVolume: fcVolume
                 };
-            }, [results, hasData, skuCount]);
+            }, [results, hasData, skuCount, metricCode]);
 
             const [searchActive, setSearchActive] = useState(false);
             const inputRef = React.useRef(null);
@@ -1217,8 +1910,15 @@
                     <div className="fc-kpi-metrics min-h-12 sm:min-h-16">
                         <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} />
                         <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
-                        <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={fmtNumber(avgMae, 0, 0)} />
-                        <MetricTile label={t('dashboard.avg_mse')} shortLabel={t('dashboard.avg_mse_short')} value={fmtNumber(avgMse, 0, 0)} />
+                        <MetricSelectTile
+                            label={avgEvalLabel}
+                            shortLabel={avgEvalShort}
+                            value={formatEvaluationValue(avgEval, metricCode)}
+                            options={EVALUATION_METRIC_OPTIONS}
+                            selected={metricCode}
+                            onSelect={onEvaluationMetricChange}
+                            t={t}
+                        />
                     </div>
 
                     <div className="fc-kpi-search flex items-center justify-center sm:justify-end border-l border-white/20 dark:border-white/10 px-2 sm:px-4">
@@ -1426,8 +2126,10 @@
             );
         });
 
-        const BatchOverview = memo(({ results, onSelectSku, selectedSkus, onToggleSku, onToggleSelectAll, t }) => {
-            const formatMetric = (value) => (value == null || value === '' ? '-' : Number(value).toLocaleString());
+        const BatchOverview = memo(({ results, onSelectSku, selectedSkus, onToggleSku, onToggleSelectAll, evaluationMetric = 'rmse', t }) => {
+            const formatMetric = (value, code) => formatEvaluationValue(value, code);
+            const metricCode = evaluationMetric || 'rmse';
+            const metricLabel = t(`sidebar.eval_${metricCode}`);
             const selectAllDesktopRef = useRef(null);
             const selectAllMobileRef = useRef(null);
             const selectedSet = useMemo(() => new Set(selectedSkus), [selectedSkus]);
@@ -1442,9 +2144,8 @@
                 { key: 'status', label: t('dashboard.table_status') },
                 { key: 'validation', label: t('dashboard.table_validation') },
                 { key: 'model', label: t('dashboard.table_best_model') },
-                { key: 'mae', label: t('dashboard.table_mae') },
-                { key: 'mse', label: t('dashboard.table_mse') },
-            ]), [t]);
+                { key: 'eval', label: metricLabel },
+            ]), [t, metricLabel]);
 
             const activeSortLabel = useMemo(() => {
                 const match = sortOptions.find((opt) => opt.key === sortKey);
@@ -1488,10 +2189,9 @@
                         cmp = toStr(a.validation_method || '').localeCompare(toStr(b.validation_method || ''), undefined, { sensitivity: 'base' });
                     } else if (sortKey === 'model') {
                         cmp = toStr(a.best_ts_model || '').localeCompare(toStr(b.best_ts_model || ''), undefined, { sensitivity: 'base' });
-                    } else if (sortKey === 'mae' || sortKey === 'mse') {
-                        const field = sortKey === 'mae' ? 'mae_validation' : 'mse_validation';
-                        const av = toNum(a[field]);
-                        const bv = toNum(b[field]);
+                    } else if (sortKey === 'eval' || sortKey === 'mse') {
+                        const av = evaluationMetricValue(a, metricCode);
+                        const bv = evaluationMetricValue(b, metricCode);
                         if (av == null && bv == null) cmp = 0;
                         else if (av == null) cmp = 1;
                         else if (bv == null) cmp = -1;
@@ -1502,7 +2202,7 @@
                     }
                     return cmp * dir;
                 });
-            }, [results, sortKey, sortDir]);
+            }, [results, sortKey, sortDir, metricCode]);
 
             const SortHeader = ({ columnKey, label, align = 'left', thClassName = '' }) => {
                 const active = sortKey === columnKey;
@@ -1566,23 +2266,17 @@
                                 </div>
                                 <div className="min-w-0">
                                     <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
-                                    <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate">{r.best_ts_model || '-'}</p>
+                                    <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
-                                    <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mae_validation)}</span>
-                                </div>
-                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mse')}</span>
-                                    <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(r.mse_validation)}</span>
-                                </div>
+                            <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{metricLabel}</span>
+                                <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(evaluationMetricValue(r, metricCode), metricCode)}</span>
                             </div>
                         </button>
                     </div>
                 );
-            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
+            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t, metricCode, metricLabel]);
 
             const tableRows = useMemo(() => sortedResults.map((r, i) => {
                 const isReady = r.status === 'success';
@@ -1623,13 +2317,12 @@
                             <span className="block truncate" title={validationLabel}>{validationLabel}</span>
                         </td>
                         <td className="p-2 lg:p-3 w-24 lg:w-28 text-slate-600 dark:text-slate-300 uppercase text-center overflow-hidden">
-                            <span className="block truncate">{r.best_ts_model || '-'}</span>
+                            <span className="block truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</span>
                         </td>
-                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(r.mae_validation)}</td>
-                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(r.mse_validation)}</td>
+                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(evaluationMetricValue(r, metricCode), metricCode)}</td>
                     </tr>
                 );
-            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t]);
+            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t, metricCode]);
 
             return (
                 <div className="fc-overview-shell w-full h-full">
@@ -1732,8 +2425,7 @@
                                 <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[8.75rem]" />
                                 <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-28 lg:w-32" />
                                 <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-24 lg:w-28" />
-                                <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" thClassName="w-20 lg:w-24" />
-                                <SortHeader columnKey="mse" label={t('dashboard.table_mse')} align="right" thClassName="w-20 lg:w-24" />
+                                <SortHeader columnKey="eval" label={metricLabel} align="right" thClassName="w-20 lg:w-24" />
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -2285,24 +2977,20 @@
 
 
         const SettingsModal = ({ isOpen, onClose, theme, setTheme, lang, setLang, t }) => {
-            const [copied, setCopied] = useState(null);
             const [activeTab, setActiveTab] = useState("theme");
 
             useEffect(() => {
-                if (isOpen) {
-                    setActiveTab("theme");
-                    setCopied(null);
-                }
+                if (isOpen) setActiveTab("theme");
             }, [isOpen]);
 
             if (!isOpen) return null;
 
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm modal-backdrop transition-opacity" onClick={onClose}></div>
-                    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-xl shadow-2xl relative flex flex-col overflow-hidden animate-slide-up border border-white/20 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5">
+                    <div className="absolute inset-0 bg-black/60 modal-backdrop transition-opacity" onClick={onClose}></div>
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-xl shadow-2xl relative flex flex-col overflow-hidden animate-slide-up border border-slate-200 dark:border-slate-700">
                         {/* Header */}
-                        <div className="px-6 py-4 border-b border-white/20 dark:border-white/10 flex items-center justify-between bg-white/50 dark:bg-white/5 shrink-0">
+                        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/50 shrink-0">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-brand-gold/10 rounded-lg text-brand-gold">
                                     <SettingsIcon />
@@ -2318,9 +3006,9 @@
                         </div>
 
                         {/* Body Layout */}
-                        <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+                        <div className="flex flex-1 overflow-hidden">
                             {/* Sidebar Nav */}
-                            <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-white/20 dark:border-white/10 bg-slate-50/50 dark:bg-black/20 p-2 md:p-4 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 scroller">
+                            <div className="w-1/4 md:w-64 border-r border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 p-4 flex flex-col gap-2 overflow-y-auto">
                                 <button
                                     onClick={() => setActiveTab("theme")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'theme' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
@@ -2331,12 +3019,13 @@
                                     onClick={() => setActiveTab("lang")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'lang' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" x2="22" y1="12" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg> {t('settings.language')}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" x2="22" y1="12" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+                                    {t('settings.language')}
                                 </button>
                             </div>
 
                             {/* Content Area */}
-                            <div className="flex-1 overflow-y-auto scroller p-6 md:p-8 relative bg-transparent">
+                            <div className="flex-1 overflow-y-auto scroller p-6 md:p-8 relative bg-white dark:bg-slate-900">
                                 {activeTab === 'theme' && (
                                     <div className="space-y-6 animate-fade-in">
                                         <div>
@@ -2363,35 +3052,29 @@
                                     <div className="space-y-6 animate-fade-in">
                                         <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{t('settings.language')}</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <button onClick={() => setLang('en')} className={`p-4 rounded-lg border-2 flex items-center justify-between transition-all ${lang === 'en' ? 'border-brand-gold bg-brand-gold/5' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
+                                            <button onClick={() => setLang('en')} className={`p-4 rounded-lg border-2 flex items-center transition-all ${lang === 'en' ? 'border-brand-gold bg-brand-gold/5' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-2xl">🇺🇸</span>
                                                     <div className="text-left">
                                                         <div className={`font-bold ${lang === 'en' ? 'text-brand-dark dark:text-brand-gold' : 'text-slate-700 dark:text-slate-200'}`}>English</div>
-                                                        <div className="text-xs text-slate-500">US English</div>
                                                     </div>
                                                 </div>
-                                                {lang === 'en' && <div className="w-3 h-3 rounded-full bg-brand-gold"></div>}
                                             </button>
-                                            <button onClick={() => setLang('vi')} className={`p-4 rounded-lg border-2 flex items-center justify-between transition-all ${lang === 'vi' ? 'border-brand-gold bg-brand-gold/5' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
+                                            <button onClick={() => setLang('vi')} className={`p-4 rounded-lg border-2 flex items-center transition-all ${lang === 'vi' ? 'border-brand-gold bg-brand-gold/5' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-2xl">🇻🇳</span>
                                                     <div className="text-left">
                                                         <div className={`font-bold ${lang === 'vi' ? 'text-brand-dark dark:text-brand-gold' : 'text-slate-700 dark:text-slate-200'}`}>Tiếng Việt</div>
-                                                        <div className="text-xs text-slate-500">Vietnamese</div>
                                                     </div>
                                                 </div>
-                                                {lang === 'vi' && <div className="w-3 h-3 rounded-full bg-brand-gold"></div>}
                                             </button>
-                                            <button onClick={() => setLang('de')} className={`p-4 rounded-lg border-2 flex items-center justify-between transition-all ${lang === 'de' ? 'border-brand-gold bg-brand-gold/5' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
+                                            <button onClick={() => setLang('de')} className={`p-4 rounded-lg border-2 flex items-center transition-all ${lang === 'de' ? 'border-brand-gold bg-brand-gold/5' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-2xl">🇩🇪</span>
                                                     <div className="text-left">
                                                         <div className={`font-bold ${lang === 'de' ? 'text-brand-dark dark:text-brand-gold' : 'text-slate-700 dark:text-slate-200'}`}>Deutsch</div>
-                                                        <div className="text-xs text-slate-500">German</div>
                                                     </div>
                                                 </div>
-                                                {lang === 'de' && <div className="w-3 h-3 rounded-full bg-brand-gold"></div>}
                                             </button>
                                         </div>
                                     </div>
@@ -2422,9 +3105,18 @@
             const [startColIdx, setStartColIdx] = useState(-1);
             const [endColIdx, setEndColIdx] = useState(-1);
 
+            const [selectedModels, setSelectedModels] = useState(() => [...SELECTABLE_MODEL_ORDER]);
+            const [modelPickerOpen, setModelPickerOpen] = useState(false);
+            const [validationPickerOpen, setValidationPickerOpen] = useState(false);
+            const [metricPickerOpen, setMetricPickerOpen] = useState(false);
+            const modelPickerRef = useRef(null);
+            const validationPickerRef = useRef(null);
+            const metricPickerRef = useRef(null);
             const [trainHorizon, setTrainHorizon] = useState("24");
             const [testHorizon, setTestHorizon] = useState("6");
             const [validationMethod, setValidationMethod] = useState("simple");
+            const [evaluationMetric, setEvaluationMetric] = useState("rmse");
+            const [displayMetric, setDisplayMetric] = useState("rmse");
             const [forecastSteps, setForecastSteps] = useState("6");
             const [totalTimeSeries, setTotalTimeSeries] = useState(0);
 
@@ -2433,9 +3125,15 @@
 
             // Job State
             const [jobId, setJobId] = useState(null);
+            const [completedJobIds, setCompletedJobIds] = useState([]);
             const [isPolling, setIsPolling] = useState(false);
             const [batchResults, setBatchResults] = useState(null);
             const [jobStatus, setJobStatus] = useState(null);
+            const [jobModelType, setJobModelType] = useState(null);
+            const [jobSelectedModels, setJobSelectedModels] = useState(null);
+            const [executionBackend, setExecutionBackend] = useState(null);
+            const [jobProgress, setJobProgress] = useState({ completed: 0, total: 0, queuePosition: 0 });
+            const [isCancelling, setIsCancelling] = useState(false);
             const [error, setError] = useState(null);
             const [isExporting, setIsExporting] = useState(false);
             // Invalidates in-flight polls when a newer run starts (avoids toggling isPolling off).
@@ -2483,6 +3181,14 @@
             // API State
             const [apiUrl, setApiUrl] = useState(API_ENDPOINTS.PROD);
             const [connectionStatus, setConnectionStatus] = useState('checking');
+            const [forecastCapabilities, setForecastCapabilities] = useState({
+                status: 'loading',
+                cloudEnabled: false,
+                supportedModels: [],
+                frequencyProfiles: parseFrequencyProfiles(),
+            });
+            const [inferredFrequency, setInferredFrequency] = useState('monthly');
+            const [capabilityRefreshToken, setCapabilityRefreshToken] = useState(0);
             const deploymentEnvironment = getDeploymentEnvironment();
             const environmentBadge = getEnvironmentBadgeConfig(deploymentEnvironment);
             const BASE_URL = apiUrl;
@@ -2524,6 +3230,76 @@
                 checkConnection();
             }, [deploymentEnvironment]);
 
+            useEffect(() => {
+                const refreshCapabilities = () => setCapabilityRefreshToken((current) => current + 1);
+                window.addEventListener('operartis:authenticated', refreshCapabilities);
+                return () => window.removeEventListener('operartis:authenticated', refreshCapabilities);
+            }, []);
+
+            useEffect(() => {
+                let disposed = false;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const loadForecastCapabilities = async () => {
+                    setForecastCapabilities({
+                        status: 'loading',
+                        cloudEnabled: false,
+                        supportedModels: [],
+                        frequencyProfiles: parseFrequencyProfiles(),
+                    });
+                    try {
+                        const response = await fetch(`${BASE_URL}${FORECAST_CAPABILITY_PATH}`, {
+                            method: 'GET',
+                            signal: controller.signal,
+                        });
+                        if (!response.ok) throw new Error(`Capability request failed (${response.status})`);
+                        const parsed = parseForecastCapabilities(await response.json());
+                        if (disposed) return;
+                        setForecastCapabilities({ status: 'ready', ...parsed });
+                        const heavyAvailable = parsed.supportedModels.length > 0
+                            ? parsed.supportedModels.some((model) => HEAVY_SELECTABLE_MODELS.has(model) || model === 'advanced_auto')
+                            : parsed.cloudEnabled === true;
+                        setSelectedModels((current) => {
+                            const next = orderedSelectedModels(current).filter((code) => (
+                                !HEAVY_SELECTABLE_MODELS.has(code) || heavyAvailable
+                            ));
+                            return next.length ? next : SELECTABLE_MODEL_ORDER.filter((code) => (
+                                !HEAVY_SELECTABLE_MODELS.has(code) || heavyAvailable
+                            ));
+                        });
+                    } catch (capabilityError) {
+                        if (disposed) return;
+                        setForecastCapabilities({
+                            status: 'unavailable',
+                            cloudEnabled: false,
+                            supportedModels: [],
+                            frequencyProfiles: parseFrequencyProfiles(),
+                        });
+                        setSelectedModels((current) => {
+                            const next = orderedSelectedModels(current).filter((code) => (
+                                !HEAVY_SELECTABLE_MODELS.has(code)
+                            ));
+                            return next.length ? next : SELECTABLE_MODEL_ORDER.filter((code) => (
+                                !HEAVY_SELECTABLE_MODELS.has(code)
+                            ));
+                        });
+                        if (capabilityError.name !== 'AbortError') {
+                            console.warn('Cloud forecasting capabilities unavailable:', capabilityError);
+                        }
+                    } finally {
+                        clearTimeout(timeoutId);
+                    }
+                };
+
+                loadForecastCapabilities();
+                return () => {
+                    disposed = true;
+                    clearTimeout(timeoutId);
+                    controller.abort();
+                };
+            }, [BASE_URL, capabilityRefreshToken]);
+
             // Toggle mobile scroll behavior based on results presence - DISABLE for fixed view
             // useEffect(() => {
             //     if (batchResults && batchResults.length > 0) {
@@ -2544,6 +3320,40 @@
                 return () => window.removeEventListener('operartis:lang-change', handler);
             }, []);
             useEffect(() => { window.persistOperartisLang(lang); }, [lang]);
+            useEffect(() => {
+                if (!modelPickerOpen && !validationPickerOpen && !metricPickerOpen) return undefined;
+                const onPointer = (event) => {
+                    if (modelPickerRef.current && !modelPickerRef.current.contains(event.target)) {
+                        setModelPickerOpen(false);
+                    }
+                    if (validationPickerRef.current && !validationPickerRef.current.contains(event.target)) {
+                        setValidationPickerOpen(false);
+                    }
+                    if (metricPickerRef.current && !metricPickerRef.current.contains(event.target)) {
+                        setMetricPickerOpen(false);
+                    }
+                };
+                const onKey = (event) => {
+                    if (event.key === 'Escape') {
+                        setModelPickerOpen(false);
+                        setValidationPickerOpen(false);
+                        setMetricPickerOpen(false);
+                    }
+                };
+                document.addEventListener('mousedown', onPointer);
+                document.addEventListener('keydown', onKey);
+                return () => {
+                    document.removeEventListener('mousedown', onPointer);
+                    document.removeEventListener('keydown', onKey);
+                };
+            }, [modelPickerOpen, validationPickerOpen, metricPickerOpen]);
+            useEffect(() => {
+                if (isPolling || runningSkus.length > 0 || isCancelling) {
+                    setModelPickerOpen(false);
+                    setValidationPickerOpen(false);
+                    setMetricPickerOpen(false);
+                }
+            }, [isPolling, runningSkus, isCancelling]);
 
             const t = (key) => {
                 const keys = key.split('.');
@@ -2559,20 +3369,79 @@
                 return fallback || key;
             };
 
+            const isForecastModelAvailable = (candidate) => {
+                if (SELECTABLE_FORECAST_MODELS.find((option) => option.value === candidate)?.disabled) return false;
+                if (!isAdvancedModelType(candidate)) return true;
+                if (forecastCapabilities.status !== 'ready') return false;
+                const value = String(candidate || '').toLowerCase();
+                if (forecastCapabilities.supportedModels.length > 0) {
+                    return forecastCapabilities.supportedModels.includes(value)
+                        || forecastCapabilities.supportedModels.includes('advanced_auto');
+                }
+                return forecastCapabilities.cloudEnabled === true;
+            };
+            const hasAvailableAdvancedModels = SELECTABLE_FORECAST_MODELS.some(
+                (option) => option.advanced && isForecastModelAvailable(option.value)
+            );
+            const modelType = deriveModelType(selectedModels);
+            const frequencyProfiles = forecastCapabilities.frequencyProfiles || parseFrequencyProfiles();
+            const activeFrequencyProfile = frequencyProfiles[inferredFrequency] || frequencyProfiles.monthly;
+            const maxTrainHorizon = Number(activeFrequencyProfile.max_train_horizon) || 240;
+            const maxTestHorizon = Number(activeFrequencyProfile.max_test_horizon) || 60;
+            const maxForecastHorizon = Number(activeFrequencyProfile.max_forecast_horizon) || 60;
+            const maxHistoryColumns = Number(activeFrequencyProfile.max_history_columns) || 240;
+            const historyTooLong = totalTimeSeries > 0 && totalTimeSeries > maxHistoryColumns;
+
             // --- POLLING (merge partial results as each SKU completes) ---
             useEffect(() => {
-                let cancelled = false;
-                let interval;
+                let disposed = false;
+                let timeoutId = null;
+                let activeController = null;
                 if (isPolling && jobId) {
                     const polledJobId = jobId;
                     const generation = runGenerationRef.current;
-                    const pollOnce = async () => {
-                        try {
-                            const res = await fetch(`${BASE_URL}/batch_status/${polledJobId}`);
-                            const data = await res.json();
-                            if (cancelled || generation !== runGenerationRef.current) return;
+                    let unchangedPolls = 0;
+                    let lastCompleted = -1;
+                    let lastStatus = '';
+                    let pollBackend = executionBackend || (
+                        isAdvancedModelType(jobModelType, jobSelectedModels) && forecastCapabilities.cloudEnabled
+                            ? 'cloud'
+                            : 'local'
+                    );
 
-                            setJobStatus(data.status);
+                    const scheduleNextPoll = (hadError) => {
+                        if (disposed || generation !== runGenerationRef.current) return;
+                        const delay = getAdaptivePollDelay({
+                            cloud: pollBackend === 'cloud',
+                            unchangedPolls,
+                            hadError,
+                        });
+                        timeoutId = setTimeout(pollOnce, delay);
+                    };
+
+                    const pollOnce = async () => {
+                        let shouldContinue = true;
+                        let hadError = false;
+                        activeController = new AbortController();
+                        try {
+                            const res = await fetch(`${BASE_URL}/batch_status/${encodeURIComponent(polledJobId)}`, {
+                                method: 'GET',
+                                signal: activeController.signal,
+                            });
+                            if (!res.ok) {
+                                throw new Error(await readResponseError(res, `Status request failed (${res.status})`));
+                            }
+                            const data = await res.json();
+                            if (disposed || generation !== runGenerationRef.current) {
+                                shouldContinue = false;
+                                return;
+                            }
+
+                            const responseBackend = normalizeExecutionBackend(data.execution_backend || data.backend);
+                            if (responseBackend) {
+                                pollBackend = responseBackend;
+                                setExecutionBackend(responseBackend);
+                            }
 
                             const incoming = data.result?.results || [];
                             if (incoming.length > 0) {
@@ -2585,48 +3454,86 @@
                                 setRunningSkus((prev) => prev.filter((sku) => !done.has(String(sku))));
                             }
 
-                            const totalCount = data.total_count != null ? Number(data.total_count) : 0;
-                            const completedCount = data.completed_count != null
-                                ? Number(data.completed_count)
-                                : incoming.length;
-                            const allSkusFinished = totalCount > 0 && completedCount >= totalCount;
-                            const jobFinished = data.status === 'completed' || data.status === 'failed' || allSkusFinished;
+                            const parsedTotal = data.total_count != null ? Number(data.total_count) : null;
+                            const parsedCompleted = data.completed_count != null ? Number(data.completed_count) : incoming.length;
+                            const totalCount = Number.isFinite(parsedTotal) && parsedTotal >= 0 ? parsedTotal : 0;
+                            const completedCount = Number.isFinite(parsedCompleted) && parsedCompleted >= 0 ? parsedCompleted : incoming.length;
+                            setJobProgress((previous) => ({
+                                queuePosition: Math.max(0, Number(data.queue_position) || 0),
+                                completed: Math.max(previous.completed, completedCount),
+                                total: totalCount > 0 ? totalCount : previous.total,
+                            }));
 
-                            if (jobFinished) {
+                            const responseStatus = normalizeJobStatus(data.status);
+                            const effectiveStatus = responseStatus;
+                            setJobStatus(effectiveStatus);
+
+                            const progressChanged = completedCount > lastCompleted || effectiveStatus !== lastStatus;
+                            unchangedPolls = progressChanged ? 0 : unchangedPolls + 1;
+                            lastCompleted = Math.max(lastCompleted, completedCount);
+                            lastStatus = effectiveStatus;
+
+                            if (TERMINAL_JOB_STATUSES.has(effectiveStatus)) {
+                                shouldContinue = false;
                                 setIsPolling(false);
                                 setRunningSkus([]);
-                                if (data.status === 'failed') {
-                                    setError("Job Failed: " + data.error);
-                                } else {
+                                if (effectiveStatus === 'failed') {
+                                    setError(data.error || "Job failed");
+                                } else if (effectiveStatus === 'completed') {
+                                    setCompletedJobIds((previous) => (
+                                        previous.includes(polledJobId)
+                                            ? previous
+                                            : [...previous, polledJobId]
+                                    ));
                                     window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-completed');
+                                } else {
+                                    window.OperartisApi?.broadcastDashboardDataChanged?.('forecaster-canceled');
                                 }
                             }
                         } catch (e) {
-                            if (!cancelled && generation === runGenerationRef.current) console.error(e);
+                            if (disposed || generation !== runGenerationRef.current || e.name === 'AbortError') {
+                                shouldContinue = false;
+                                return;
+                            }
+                            hadError = true;
+                            unchangedPolls += 1;
+                            console.error('Forecast status polling failed:', e);
+                        } finally {
+                            activeController = null;
+                            if (shouldContinue) scheduleNextPoll(hadError);
                         }
                     };
                     pollOnce();
-                    interval = setInterval(pollOnce, 1000);
                 }
                 return () => {
-                    cancelled = true;
-                    clearInterval(interval);
+                    disposed = true;
+                    clearTimeout(timeoutId);
+                    if (activeController) activeController.abort();
                 };
-            }, [isPolling, jobId, BASE_URL]);
+            }, [isPolling, jobId, BASE_URL, jobModelType, jobSelectedModels]);
 
             // --- HANDLERS ---
             const handleFileChange = (e) => {
                 const f = e.target.files[0];
                 if (!f) return;
                 try {
-                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.xls'] });
+                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.csv'] });
                 } catch (err) {
                     setError(err.message);
                     e.target.value = null;
                     return;
                 }
+                ++runGenerationRef.current;
                 setFile(f);
                 setError(null);
+                setJobId(null);
+                setCompletedJobIds([]);
+                setIsPolling(false);
+                setJobStatus(null);
+                setJobModelType(null);
+                setExecutionBackend(null);
+                setJobProgress({ completed: 0, total: 0, queuePosition: 0 });
+                setIsCancelling(false);
                 setAvailableCols([]);
                 setSheetRows([]);
                 setMappedSkus([]);
@@ -2641,6 +3548,7 @@
                 setSkuColIdx(-1);
                 setStartColIdx(-1);
                 setEndColIdx(-1);
+                setInferredFrequency("monthly");
                 setActiveTab("overview");
                 const reader = new FileReader();
                 reader.onload = (evt) => {
@@ -2652,10 +3560,16 @@
                         const rawHeaders = rawRows[0] || [];
 
                         // Convert headers - handle Date objects and other types
+                        const formatHeaderDate = (value) => {
+                            const pad = (part) => String(part).padStart(2, '0');
+                            const hasTime = value.getHours() || value.getMinutes() || value.getSeconds();
+                            const datePart = `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+                            if (!hasTime) return datePart;
+                            return `${datePart} ${pad(value.getHours())}:${pad(value.getMinutes())}:${pad(value.getSeconds())}`;
+                        };
                         const normalizeCell = (h) => {
                             if (h instanceof Date) {
-                                // Format Date as YYYY-MM-DD
-                                return h.toISOString().split('T')[0];
+                                return formatHeaderDate(h);
                             } else if (typeof h === 'number') {
                                 // Could be Excel serial date number - try to convert
                                 // Excel serial date: days since 1900-01-01
@@ -2663,7 +3577,7 @@
                                 const possibleDate = new Date(excelEpoch.getTime() + h * 24 * 60 * 60 * 1000);
                                 // Check if it's a reasonable date (between 1990 and 2100)
                                 if (possibleDate.getFullYear() >= 1990 && possibleDate.getFullYear() <= 2100) {
-                                    return possibleDate.toISOString().split('T')[0];
+                                    return formatHeaderDate(possibleDate);
                                 }
                                 return String(h);
                             }
@@ -2724,21 +3638,64 @@
                 setActiveTab("overview");
                 setCurrentSku(null);
                 setBatchResults(null);
+                ++runGenerationRef.current;
+                setJobId(null);
+                setCompletedJobIds([]);
+                setIsPolling(false);
+                setJobStatus(null);
+                setJobModelType(null);
+                setExecutionBackend(null);
+                setJobProgress({ completed: 0, total: 0, queuePosition: 0 });
+                setIsCancelling(false);
 
                 // Calculate total time series from column range
                 const total = endIdx - startIdx + 1;
+                const dateHeaders = startIdx >= 0 && endIdx >= startIdx
+                    ? availableCols.slice(startIdx, endIdx + 1)
+                    : [];
+                const frequency = inferFrequencyFromHeaders(dateHeaders);
+                const profile = (forecastCapabilities.frequencyProfiles || parseFrequencyProfiles())[frequency]
+                    || DEFAULT_FREQUENCY_PROFILES.monthly;
+                setInferredFrequency(frequency);
                 setTotalTimeSeries(total);
 
                 // Set initial values: Test = 6, Train = Total - 6, Forecast = Test
-                const initialTest = Math.min(6, Math.floor(total / 2));
-                const initialTrain = total - initialTest;
+                const initialTest = Math.min(
+                    6,
+                    Math.floor(total / 2),
+                    Number(profile.max_test_horizon) || 6
+                );
+                const initialTrain = Math.min(
+                    Math.max(4, total - initialTest),
+                    Number(profile.max_train_horizon) || total
+                );
                 setTestHorizon(initialTest.toString());
                 setTrainHorizon(initialTrain.toString());
-                setForecastSteps(initialTest.toString());
+                setForecastSteps(Math.min(initialTest, Number(profile.max_forecast_horizon) || initialTest).toString());
             };
 
             const startBatchForSkus = async (skusToRun) => {
                 if (!skusToRun.length) return;
+                if (historyTooLong) {
+                    setAlertMessage(
+                        t('sidebar.history_too_long')
+                            .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
+                            .replace('{count}', String(totalTimeSeries))
+                            .replace('{max}', String(maxHistoryColumns))
+                    );
+                    return;
+                }
+                const selectedModelType = deriveModelType(selectedModels);
+                if (!selectedModels.length) {
+                    setAlertMessage(t('sidebar.models_required'));
+                    return;
+                }
+                if (selectionUsesHeavy(selectedModels) && selectedModels.some((code) => (
+                    HEAVY_SELECTABLE_MODELS.has(code) && !isForecastModelAvailable(code)
+                ))) {
+                    setAlertMessage(t('sidebar.models_unavailable'));
+                    return;
+                }
 
                 const rerunSet = new Set(skusToRun.map(String));
                 // Bump generation so any in-flight poll from a prior job is ignored.
@@ -2761,12 +3718,22 @@
 
                 setError(null);
                 setJobStatus("queued");
+                setJobModelType(selectedModelType);
+                setJobSelectedModels([...selectedModels]);
+                setExecutionBackend(
+                    selectionUsesHeavy(selectedModels) && forecastCapabilities.cloudEnabled
+                        ? 'cloud'
+                        : 'local'
+                );
+                setJobProgress({ completed: 0, total: skusToRun.length, queuePosition: 0 });
+                setIsCancelling(false);
                 setRunningSkus(skusToRun);
                 setSkuValidationMethods((prev) => {
                     const next = { ...prev };
                     for (const sku of skusToRun) next[String(sku)] = validationMethod;
                     return next;
                 });
+                setDisplayMetric(normalizeContestMetric(evaluationMetric));
 
                 console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus, skusToRun });
 
@@ -2776,8 +3743,10 @@
                 fd.append('start_col_idx', startColIdx);
                 fd.append('end_col_idx', endColIdx);
                 fd.append('data_format', 'horizontal');
-                fd.append('model_type', 'auto');
+                fd.append('model_type', selectedModelType);
+                fd.append('selected_models', JSON.stringify(orderedSelectedModels(selectedModels)));
                 fd.append('validation_method', validationMethod);
+                fd.append('evaluation_metric', normalizeContestMetric(evaluationMetric));
                 fd.append('train_horizon', parseInt(trainHorizon) || 24);
                 fd.append('test_horizon', parseInt(testHorizon) || 6);
                 fd.append('forecast_steps', parseInt(forecastSteps) || 6);
@@ -2787,23 +3756,38 @@
                     const res = await fetch(`${BASE_URL}/batch_init`, { method: 'POST', body: fd });
                     if (generation !== runGenerationRef.current) return;
                     if (!res.ok) {
-                        let message = "Failed to start job";
-                        try {
-                            const errBody = await res.json();
-                            message = errBody.detail || errBody.message || message;
-                        } catch (_) {}
+                        const message = await readResponseError(res, "Failed to start job");
                         setIsPolling(false);
                         setRunningSkus([]);
                         throw new Error(typeof message === 'string' ? message : "Failed to start job");
                     }
                     const data = await res.json();
                     if (generation !== runGenerationRef.current) return;
+                    if (!data.job_id) throw new Error("Forecast job ID was not returned");
                     setJobId(data.job_id);
+                    setJobStatus(normalizeJobStatus(data.status || 'queued'));
+                    setExecutionBackend(
+                        normalizeExecutionBackend(data.execution_backend || data.backend)
+                        || (
+                            selectionUsesHeavy(selectedModels) && forecastCapabilities.cloudEnabled
+                                ? 'cloud'
+                                : 'local'
+                        )
+                    );
+                    setJobProgress((previous) => ({
+                                queuePosition: Math.max(0, Number(data.queue_position) || 0),
+                        completed: Number.isFinite(Number(data.completed_count)) ? Number(data.completed_count) : previous.completed,
+                        total: Number.isFinite(Number(data.total_count)) && Number(data.total_count) > 0
+                            ? Number(data.total_count)
+                            : previous.total,
+                    }));
                 } catch (e) {
                     if (generation !== runGenerationRef.current) return;
                     setIsPolling(false);
                     setRunningSkus([]);
+                    setJobStatus('failed');
                     setError(e.message);
+                    setAlertMessage(e.message);
                 }
             };
 
@@ -2812,6 +3796,19 @@
                 if (skuColIdx < 0 || startColIdx < 0 || endColIdx < 0) { setError("Invalid column mapping. Please re-map columns."); return; }
                 if (!selectedSkus.length) {
                     setAlertMessage(t('dashboard.select_required'));
+                    return;
+                }
+                if (selectedSkus.length > 100) {
+                    setAlertMessage(t('job.max_skus'));
+                    return;
+                }
+                if (historyTooLong) {
+                    setAlertMessage(
+                        t('sidebar.history_too_long')
+                            .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
+                            .replace('{count}', String(totalTimeSeries))
+                            .replace('{max}', String(maxHistoryColumns))
+                    );
                     return;
                 }
 
@@ -2830,9 +3827,77 @@
                 await startBatchForSkus(selectedSkus);
             };
 
+            const handleCancelJob = async () => {
+                if (!jobId || isCancelling || TERMINAL_JOB_STATUSES.has(normalizeJobStatus(jobStatus))) return;
+                const cancelJobId = jobId;
+                const previousStatus = jobStatus;
+                const previousRunningSkus = [...runningSkus];
+                const generation = ++runGenerationRef.current;
+
+                setIsCancelling(true);
+                setIsPolling(false);
+                setJobStatus('cancel_requested');
+                setRunningSkus([]);
+
+                try {
+                    const response = await fetch(`${BASE_URL}/batch_cancel/${encodeURIComponent(cancelJobId)}`, {
+                        method: 'POST',
+                    });
+                    if (!response.ok) {
+                        throw new Error(await readResponseError(response, t('job.cancel_failed')));
+                    }
+                    const data = await response.json().catch(() => ({}));
+                    if (generation !== runGenerationRef.current) return;
+
+                    const canceledStatus = normalizeJobStatus(data.status || 'canceled');
+                    const responseBackend = normalizeExecutionBackend(data.execution_backend || data.backend);
+                    if (responseBackend) setExecutionBackend(responseBackend);
+                    setJobStatus(canceledStatus);
+                    setJobProgress((previous) => ({
+                                queuePosition: Math.max(0, Number(data.queue_position) || 0),
+                        completed: Number.isFinite(Number(data.completed_count))
+                            ? Math.max(previous.completed, Number(data.completed_count))
+                            : previous.completed,
+                        total: Number.isFinite(Number(data.total_count)) && Number(data.total_count) > 0
+                            ? Number(data.total_count)
+                            : previous.total,
+                    }));
+
+                    if (TERMINAL_JOB_STATUSES.has(canceledStatus)) {
+                        setIsPolling(false);
+                        setRunningSkus([]);
+                    } else {
+                        setIsPolling(true);
+                    }
+                } catch (cancelError) {
+                    if (generation !== runGenerationRef.current) return;
+                    setError(cancelError.message);
+                    setAlertMessage(t('job.cancel_failed'));
+                    setJobStatus(previousStatus || 'processing');
+                    setRunningSkus(previousRunningSkus);
+                    setIsPolling(true);
+                } finally {
+                    if (generation === runGenerationRef.current) setIsCancelling(false);
+                }
+            };
+
             const handleExport = async () => {
                 if (!file || !skuCol || !startCol || !endCol) { setError("Please load and map data first."); return; }
                 if (isExporting) return;
+                const exportSelected = jobId && jobSelectedModels && jobSelectedModels.length
+                    ? jobSelectedModels
+                    : selectedModels;
+                const exportModelType = jobId && jobModelType ? jobModelType : modelType;
+                const advancedExport = isAdvancedModelType(exportModelType, exportSelected);
+                if (advancedExport && (
+                    normalizeJobStatus(jobStatus) !== 'completed'
+                    || completedJobIds.length === 0
+                    || !batchResults
+                    || batchResults.length === 0
+                )) {
+                    setAlertMessage(t('job.advanced_export_required'));
+                    return;
+                }
                 setIsExporting(true);
 
                 // Use fast export if cached results are available
@@ -2846,11 +3911,12 @@
                     fd.append('end_col_idx', endColIdx);
                     fd.append('data_format', 'horizontal');
                     fd.append('cached_results', JSON.stringify(batchResults));
-                    fd.append('job_id', jobId);
+                    fd.append('job_id', jobId || '');
+                    fd.append('job_ids', JSON.stringify(completedJobIds));
 
                     try {
                         const res = await fetch(`${BASE_URL}/export-fast`, { method: 'POST', body: fd });
-                        if (!res.ok) throw new Error("Export failed");
+                        if (!res.ok) throw new Error(await readResponseError(res, "Export failed"));
                         const inputBaseName = file.name.replace(/\.[^/.]+$/, "");
                         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
                         let filename = `Operartis_Forecast_${inputBaseName}_${timestamp}.xlsx`;
@@ -2867,11 +3933,18 @@
                     } catch (e) { setError(e.message); }
                     finally { setIsExporting(false); }
                 } else {
-                    // Fallback to slow export if no cached results
+                    // Basic/local-only fallback. Advanced profiles must use persisted /export-fast results.
+                    if (advancedExport) {
+                        setIsExporting(false);
+                        setAlertMessage(t('job.advanced_export_required'));
+                        return;
+                    }
                     const fd = new FormData();
                     fd.append('file', file);
-                    fd.append('model_type', 'auto');
+                    fd.append('model_type', exportModelType);
+                    fd.append('selected_models', JSON.stringify(exportSelected));
                     fd.append('validation_method', validationMethod);
+                    fd.append('evaluation_metric', normalizeContestMetric(evaluationMetric));
                     fd.append('train_horizon', parseInt(trainHorizon) || 24);
                     fd.append('test_horizon', parseInt(testHorizon) || 6);
                     fd.append('forecast_steps', parseInt(forecastSteps) || 6);
@@ -2882,7 +3955,7 @@
 
                     try {
                         const res = await fetch(`${BASE_URL}/export`, { method: 'POST', body: fd });
-                        if (!res.ok) throw new Error("Export failed");
+                        if (!res.ok) throw new Error(await readResponseError(res, "Export failed"));
                         const inputBaseName = file.name.replace(/\.[^/.]+$/, "");
                         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
                         let filename = `Operartis_Forecast_${inputBaseName}_${timestamp}.xlsx`;
@@ -2902,10 +3975,17 @@
             };
 
             const handleReset = () => {
-                setFile(null); setBatchResults(null); setJobId(null); setIsPolling(false); setError(null);
+                ++runGenerationRef.current;
+                setFile(null); setBatchResults(null); setJobId(null); setCompletedJobIds([]); setIsPolling(false); setError(null);
+                setJobStatus(null); setJobModelType(null); setJobSelectedModels(null); setExecutionBackend(null);
+                setModelPickerOpen(false);
+                setValidationPickerOpen(false);
+                setMetricPickerOpen(false);
+                setJobProgress({ completed: 0, total: 0, queuePosition: 0 }); setIsCancelling(false);
                 setSkuCol(""); setStartCol(""); setEndCol("");
                 setSkuColIdx(-1); setStartColIdx(-1); setEndColIdx(-1);
                 setTotalTimeSeries(0); setAvailableCols([]);
+                setInferredFrequency('monthly');
                 setSheetRows([]); setMappedSkus([]); setItemTabs([]);
                 setSelectedSkus([]);
                 setRunningSkus([]);
@@ -2913,6 +3993,7 @@
                 setOverviewSearchQuery("");
                 setActiveTab("overview");
                 setSkuValidationMethods({});
+                setDisplayMetric(evaluationMetric);
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
 
@@ -2983,7 +4064,43 @@
             const mappingReady = mappedSkus.length > 0;
             const isDetailTab = activeTab !== 'overview' && !!skuData;
             // Keep Run button in sync with Overview row status (not only the poll flag).
-            const isRunning = isPolling || runningSkus.length > 0;
+            const isRunning = isPolling || runningSkus.length > 0 || isCancelling;
+            const normalizedJobStatus = jobStatus ? normalizeJobStatus(jobStatus) : null;
+            const canCancelJob = !!jobId
+                && !!normalizedJobStatus
+                && !TERMINAL_JOB_STATUSES.has(normalizedJobStatus)
+                && normalizedJobStatus !== 'cancel_requested';
+            const availableSelectableCodes = SELECTABLE_FORECAST_MODELS
+                .filter((option) => isForecastModelAvailable(option.value))
+                .map((option) => option.value);
+            const allAvailableSelected = availableSelectableCodes.length > 0
+                && availableSelectableCodes.every((code) => selectedModels.includes(code));
+            const modelPickerSummary = (() => {
+                const selected = orderedSelectedModels(selectedModels);
+                if (!selected.length) return t('sidebar.models_required');
+                if (allAvailableSelected) return t('sidebar.models_all');
+                if (selected.length <= 4) {
+                    return selected.map((code) => {
+                        const option = SELECTABLE_FORECAST_MODELS.find((item) => item.value === code);
+                        return option ? t(option.labelKey) : code.toUpperCase();
+                    }).join(', ');
+                }
+                return t('sidebar.models_selected').replace('{count}', String(selected.length));
+            })();
+            const toggleSelectedModel = (code, available) => {
+                if (!available || isRunning) return;
+                setSelectedModels((current) => {
+                    if (current.includes(code)) {
+                        if (current.length <= 1) return current;
+                        return orderedSelectedModels(current.filter((item) => item !== code));
+                    }
+                    return orderedSelectedModels(current.concat(code));
+                });
+            };
+            const toggleSelectAllModels = () => {
+                if (isRunning || !availableSelectableCodes.length) return;
+                setSelectedModels(availableSelectableCodes);
+            };
 
             const openDetailedView = () => {
                 if (!interfaceReady || !batchResults?.length) return;
@@ -3008,6 +4125,8 @@
                             best_ts_model: null,
                             mae_validation: null,
                             mse_validation: null,
+                            rmse_validation: null,
+                            mape_validation: null,
                         };
                     }
                     if (result) {
@@ -3024,6 +4143,8 @@
                         best_ts_model: null,
                         mae_validation: null,
                         mse_validation: null,
+                        rmse_validation: null,
+                        mape_validation: null,
                     };
                 });
             }, [mappedSkus, batchResults, runningSkus, skuValidationMethods]);
@@ -3082,7 +4203,7 @@
 
                     {/* SIDEBAR */}
                     <div className={`fc-sidebar-shell ${isFullScreen ? 'hidden' : ''} fixed lg:relative inset-y-0 left-0 z-50 w-64 ${isSidebarCollapsed ? 'lg:w-[76px]' : 'lg:w-64'} transform transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileChange} />
+                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.csv" onChange={handleFileChange} />
                         <button
                             onClick={() => setIsSidebarCollapsed(prev => !prev)}
                             className="fc-sidebar-toggle hidden lg:flex items-center justify-center h-6 w-6 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold shadow-md transition-colors"
@@ -3105,7 +4226,8 @@
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className={`relative flex items-center justify-center h-11 w-11 rounded-xl border transition-all ${file ? (skuCol && startCol && endCol ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500' : 'border-brand-gold/40 bg-amber-500/10 text-brand-gold') : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
+                                disabled={isRunning}
+                                className={`relative flex items-center justify-center h-11 w-11 rounded-xl border transition-all disabled:cursor-not-allowed disabled:opacity-60 ${file ? (skuCol && startCol && endCol ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500' : 'border-brand-gold/40 bg-amber-500/10 text-brand-gold') : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
                                 title={file ? file.name : t('sidebar.upload_label')}
                             >
                                 <UploadIcon width="18" height="18" />
@@ -3114,7 +4236,8 @@
                             {file && (
                                 <button
                                     onClick={() => setIsMappingModalOpen(true)}
-                                    className="flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold transition-all"
+                                    disabled={isRunning}
+                                    className="flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                     title={t('sidebar.edit_mapping')}
                                 >
                                     <ColumnsIcon width="18" height="18" />
@@ -3123,7 +4246,7 @@
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
                                 onClick={handleExecute}
-                                disabled={!file || isRunning}
+                                disabled={!file || isRunning || historyTooLong}
                                 className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${isRunning ? 'bg-amber-50 dark:bg-amber-950/40 text-brand-gold cursor-not-allowed' : !file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
                                 title={isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
                             >
@@ -3139,7 +4262,8 @@
                             </button>
                             <button
                                 onClick={handleReset}
-                                className="mt-auto flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20 transition-all box-border"
+                                disabled={isRunning}
+                                className="mt-auto flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20 transition-all box-border disabled:cursor-not-allowed disabled:opacity-60"
                                 title={t('sidebar.reset_btn')}
                             >
                                 <TrashIcon />
@@ -3152,23 +4276,25 @@
                             {/* 1. Source Data */}
                             <div>
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
-                                <div className={`relative border border-dashed rounded-lg px-3 py-6 text-center transition-colors group ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
-                                    <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : ""}>
+                                <div className={`relative border border-dashed rounded-lg px-3 py-6 text-center transition-colors group min-w-0 overflow-hidden ${file ? (skuCol && startCol && endCol ? 'border-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/10' : 'border-brand-gold bg-amber-50/10') : 'border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'}`}>
+                                    <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : "min-w-0 w-full"}>
                                         {file ? (
-                                            <div className="flex flex-col items-center gap-1">
-                                                <div onClick={() => fileInputRef.current?.click()} className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 cursor-pointer hover:underline mb-1">{file.name}</div>
+                                            <div className="flex flex-col items-center gap-1 min-w-0 w-full max-w-full">
+                                                <div onClick={() => !isRunning && fileInputRef.current?.click()} title={file.name} className={`text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 mb-1 w-full min-w-0 max-w-full ${isRunning ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:underline'}`}>{file.name}</div>
                                                 <div className="text-[10px] text-emerald-500 font-bold uppercase">{skuCol && startCol && endCol ? t('sidebar.uploaded_mapped') : t('sidebar.action_required')}</div>
                                                 <div className="flex gap-2 mt-2 justify-center">
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
+                                                        disabled={isRunning}
+                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                                         title={t('sidebar.reupload_file')}
                                                     >
                                                         <UploadIcon width="14" height="14" />
                                                     </button>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); setIsMappingModalOpen(true); }}
-                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all"
+                                                        disabled={isRunning}
+                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                                         title={t('sidebar.edit_mapping')}
                                                     >
                                                         <ColumnsIcon width="14" height="14" />
@@ -3190,20 +4316,159 @@
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-2">{t('sidebar.configuration')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
                                 <form className="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800" onSubmit={(e) => e.preventDefault()}>
                                     <div>
-                                        <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.val_method')}</label>
-                                        <div className="fc-sidebar-select-wrap">
-                                            <select
-                                                value={validationMethod}
-                                                onChange={(e) => setValidationMethod(e.target.value)}
-                                                className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
+                                        <label htmlFor="forecast-model-profile" className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">
+                                            {t('sidebar.model_profile')}
+                                        </label>
+                                        <div className="fc-sidebar-select-wrap" ref={modelPickerRef}>
+                                            <button
+                                                type="button"
+                                                id="forecast-model-profile"
+                                                aria-haspopup="listbox"
+                                                aria-expanded={modelPickerOpen}
+                                                aria-describedby={forecastCapabilities.status === 'loading' || !hasAvailableAdvancedModels ? 'forecast-model-availability' : undefined}
+                                                disabled={isRunning}
+                                                onClick={() => {
+                                                    setValidationPickerOpen(false);
+                                                    setMetricPickerOpen(false);
+                                                    setModelPickerOpen((open) => !open);
+                                                }}
+                                                className="fc-sidebar-control fc-model-picker-trigger w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                                             >
-                                                <option value="simple">Simple Split (Fast)</option>
-                                                <option value="walk_forward">Walk-Forward (Adaptive)</option>
-                                                <option value="rolling_window">Rolling Window (Adaptive)</option>
-                                            </select>
+                                                <span className="min-w-0 truncate">{modelPickerSummary}</span>
+                                            </button>
                                             <svg className="fc-sidebar-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
+                                            {modelPickerOpen && (
+                                                <div className="fc-model-picker-menu" role="listbox" aria-multiselectable="true" aria-labelledby="forecast-model-profile">
+                                                    <label className="fc-model-picker-option fc-model-picker-select-all">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="fc-row-check"
+                                                            checked={allAvailableSelected}
+                                                            disabled={isRunning || !availableSelectableCodes.length}
+                                                            onChange={toggleSelectAllModels}
+                                                        />
+                                                        <span>{t('sidebar.models_select_all')}</span>
+                                                    </label>
+                                                    {SELECTABLE_FORECAST_MODELS.map((option) => {
+                                                        const available = isForecastModelAvailable(option.value);
+                                                        const checked = selectedModels.includes(option.value);
+                                                        return (
+                                                            <label
+                                                                key={option.value}
+                                                                className={`fc-model-picker-option${available ? '' : ' is-disabled'}`}
+                                                                title={option.disabled ? t('sidebar.model_temporarily_disabled') : (available ? undefined : t('sidebar.models_unavailable'))}
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="fc-row-check"
+                                                                    checked={checked}
+                                                                    disabled={!available || isRunning}
+                                                                    onChange={() => toggleSelectedModel(option.value, available)}
+                                                                />
+                                                                <span>{t(option.labelKey)}</span>
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                        {(forecastCapabilities.status === 'loading' || !hasAvailableAdvancedModels) && (
+                                            <p id="forecast-model-availability" className="mt-1.5 text-[9px] leading-3 text-slate-500 dark:text-slate-400">
+                                                {forecastCapabilities.status === 'loading'
+                                                    ? t('sidebar.availability_checking')
+                                                    : t('sidebar.models_unavailable')}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label htmlFor="forecast-validation-method" className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.val_method')}</label>
+                                        <div className="fc-sidebar-select-wrap" ref={validationPickerRef}>
+                                            <button
+                                                type="button"
+                                                id="forecast-validation-method"
+                                                aria-haspopup="listbox"
+                                                aria-expanded={validationPickerOpen}
+                                                onClick={() => {
+                                                    setModelPickerOpen(false);
+                                                    setMetricPickerOpen(false);
+                                                    setValidationPickerOpen((open) => !open);
+                                                }}
+                                                className="fc-sidebar-control fc-model-picker-trigger w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors"
+                                            >
+                                                <span className="min-w-0 truncate">
+                                                    {t((VALIDATION_METHOD_OPTIONS.find((option) => option.value === validationMethod) || VALIDATION_METHOD_OPTIONS[0]).labelKey)}
+                                                </span>
+                                            </button>
+                                            <svg className="fc-sidebar-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9" />
+                                            </svg>
+                                            {validationPickerOpen && (
+                                                <div className="fc-model-picker-menu" role="listbox" aria-labelledby="forecast-validation-method">
+                                                    {VALIDATION_METHOD_OPTIONS.map((option) => (
+                                                        <button
+                                                            key={option.value}
+                                                            type="button"
+                                                            role="option"
+                                                            aria-selected={validationMethod === option.value}
+                                                            className={`fc-model-picker-option${validationMethod === option.value ? ' is-selected' : ''}`}
+                                                            onClick={() => {
+                                                                setValidationMethod(option.value);
+                                                                setValidationPickerOpen(false);
+                                                            }}
+                                                        >
+                                                            {t(option.labelKey)}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="forecast-evaluation-metric" className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.eval_metric')}</label>
+                                        <div className="fc-sidebar-select-wrap" ref={metricPickerRef}>
+                                            <button
+                                                type="button"
+                                                id="forecast-evaluation-metric"
+                                                aria-haspopup="listbox"
+                                                aria-expanded={metricPickerOpen}
+                                                onClick={() => {
+                                                    setModelPickerOpen(false);
+                                                    setValidationPickerOpen(false);
+                                                    setMetricPickerOpen((open) => !open);
+                                                }}
+                                                className="fc-sidebar-control fc-model-picker-trigger w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors"
+                                            >
+                                                <span className="min-w-0 truncate">
+                                                    {t((CONTEST_EVALUATION_METRIC_OPTIONS.find((option) => option.value === normalizeContestMetric(evaluationMetric)) || CONTEST_EVALUATION_METRIC_OPTIONS[0]).labelKey)}
+                                                </span>
+                                            </button>
+                                            <svg className="fc-sidebar-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9" />
+                                            </svg>
+                                            {metricPickerOpen && (
+                                                <div className="fc-model-picker-menu" role="listbox" aria-labelledby="forecast-evaluation-metric">
+                                                    {CONTEST_EVALUATION_METRIC_OPTIONS.map((option) => (
+                                                        <button
+                                                            key={option.value}
+                                                            type="button"
+                                                            role="option"
+                                                            aria-selected={normalizeContestMetric(evaluationMetric) === option.value}
+                                                            className={`fc-model-picker-option${normalizeContestMetric(evaluationMetric) === option.value ? ' is-selected' : ''}`}
+                                                            onClick={() => {
+                                                                setEvaluationMetric(option.value);
+                                                                if (!(batchResults && batchResults.length)) {
+                                                                    setDisplayMetric(option.value);
+                                                                }
+                                                                setMetricPickerOpen(false);
+                                                            }}
+                                                        >
+                                                            {t(option.labelKey)}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
@@ -3213,7 +4478,9 @@
                                                 type="number"
                                                 value={trainHorizon}
                                                 onChange={(e) => setTrainHorizon(e.target.value)}
-                                                onBlur={() => setTrainHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
+                                                onBlur={() => setTrainHorizon(prev => Math.min(maxTrainHorizon, Math.max(4, parseInt(prev) || 4)).toString())}
+                                                min="4"
+                                                max={maxTrainHorizon}
                                                 className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
@@ -3229,17 +4496,28 @@
                                                         setTrainHorizon((totalTimeSeries - newTest).toString());
                                                     }
                                                 }}
-                                                onBlur={() => setTestHorizon(prev => Math.max(1, parseInt(prev) || 1).toString())}
+                                                onBlur={() => setTestHorizon(prev => Math.min(maxTestHorizon, Math.max(1, parseInt(prev) || 1)).toString())}
                                                 min="1"
+                                                max={maxTestHorizon}
                                                 className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                     </div>
                                     {totalTimeSeries > 0 && (
-                                        <div className={`text-[9px] ${horizonMismatch ? 'text-red-500' : 'text-slate-400'}`}>
-                                            {horizonMismatch
+                                        <div className={`text-[9px] leading-4 ${horizonMismatch || historyTooLong ? 'text-red-500' : 'text-slate-400'}`}>
+                                            {historyTooLong
+                                                ? `⚠️ ${t('sidebar.history_too_long')
+                                                    .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
+                                                    .replace('{count}', String(totalTimeSeries))
+                                                    .replace('{max}', String(maxHistoryColumns))}`
+                                                : horizonMismatch
                                                 ? `⚠️ ${t('sidebar.horizon_mismatch')} ${totalTimeSeries}`
-                                                : `${t('sidebar.total_periods')}: ${totalTimeSeries}`
+                                                : (
+                                                    <>
+                                                        <div>{t('sidebar.total_periods')}: {totalTimeSeries}</div>
+                                                        <div>{t('sidebar.detected_frequency')}: {t(`sidebar.freq_${inferredFrequency}`)}</div>
+                                                    </>
+                                                )
                                             }
                                         </div>
                                     )}
@@ -3249,8 +4527,9 @@
                                             type="number"
                                             value={forecastSteps}
                                             onChange={(e) => setForecastSteps(e.target.value)}
-                                            onBlur={() => setForecastSteps(prev => Math.max(1, parseInt(prev) || 1).toString())}
+                                            onBlur={() => setForecastSteps(prev => Math.min(maxForecastHorizon, Math.max(1, parseInt(prev) || 1)).toString())}
                                             min="1"
+                                            max={maxForecastHorizon}
                                             className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
@@ -3264,7 +4543,7 @@
                                     <button
                                         type="button"
                                         onClick={handleExecute}
-                                        disabled={!file || isRunning}
+                                        disabled={!file || isRunning || historyTooLong}
                                         className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isRunning ? 'bg-amber-50 dark:bg-amber-950/40 text-brand-gold cursor-not-allowed' : !file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
                                     >
                                         {isRunning ? <RunningSpinnerIcon size={14} /> : <PlayIcon />}
@@ -3285,7 +4564,7 @@
                             {/* Reset Button Area - Inside Body, Pushed to Bottom */}
                             <div className="pt-4 pb-1 !mt-auto">
                                 <div className="p-2">
-                                    <button type="button" onClick={handleReset} className="w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20"><TrashIcon width="16" height="16" /> {t('sidebar.reset_btn')}</button>
+                                    <button type="button" onClick={handleReset} disabled={isRunning} className="w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 text-slate-400 hover:text-red-500 border border-transparent hover:border-red-200 dark:hover:border-red-900/30 hover:bg-red-50/50 dark:hover:bg-red-950/20 disabled:cursor-not-allowed disabled:opacity-60"><TrashIcon width="16" height="16" /> {t('sidebar.reset_btn')}</button>
                                 </div>
                             </div>
                         </div>
@@ -3322,10 +4601,24 @@
                                 </div>
                             </header>
 
+                            {mappingReady && (
+                            <JobStatusBar
+                                status={jobStatus || 'ready'}
+                                executionBackend={executionBackend || 'local'}
+                                completedCount={jobStatus ? jobProgress.completed : 0}
+                                queuePosition={jobProgress.queuePosition}
+                                totalCount={jobProgress.total > 0 ? jobProgress.total : (selectedSkus.length || mappedSkus.length)}
+                                canCancel={canCancelJob}
+                                isCancelling={isCancelling}
+                                onCancel={handleCancelJob}
+                                t={t}
+                            />
+                            )}
+
                             {/* KPI BAR — with Overview tab after mapping confirm */}
                             {mappingReady && (
-                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-hidden relative">
-                                <KPICards results={batchResults} skuCount={mappedSkus.length} searchQuery={overviewSearchQuery} onSearchQueryChange={handleOverviewSearchChange} t={t} />
+                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-visible relative">
+                                <KPICards results={batchResults} skuCount={mappedSkus.length} searchQuery={overviewSearchQuery} onSearchQueryChange={handleOverviewSearchChange} evaluationMetric={displayMetric} onEvaluationMetricChange={setDisplayMetric} t={t} />
                             </div>
                             )}
                         </div>
@@ -3374,6 +4667,7 @@
                                                     selectedSkus={selectedSkus}
                                                     onToggleSku={handleToggleSkuSelection}
                                                     onToggleSelectAll={handleToggleSelectAll}
+                                                    evaluationMetric={displayMetric}
                                                     t={t}
                                                 />
                                             )}
@@ -3399,11 +4693,11 @@
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
-                                                                    <span className="text-[10px] lg:text-xs font-bold text-brand-gold">{skuData.best_ts_model.toUpperCase()}</span>
+                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{skuData.best_ts_model.toUpperCase()}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
-                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.val_mse')}</span>
-                                                                    <span className="text-[10px] lg:text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{fmtNumber(skuData.mse_validation, 0, 0)}</span>
+                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t(`sidebar.eval_${displayMetric}`)}</span>
+                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{formatEvaluationValue(evaluationMetricValue(skuData, displayMetric), displayMetric)}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
