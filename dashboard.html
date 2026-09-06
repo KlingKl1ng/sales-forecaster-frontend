@@ -4056,7 +4056,7 @@
         }
 
         function profileCompletion() {
-            const fields = ['full_name', 'company_name', 'position_title', 'phone', 'locale', 'timezone', 'avatar_data_url'];
+            const fields = ['full_name', 'company_name', 'position_title', 'phone', 'timezone', 'avatar_data_url'];
             const completed = fields.filter(field => Boolean(state.user?.[field])).length;
             return Math.round((completed / fields.length) * 100);
         }
