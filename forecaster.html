@@ -1583,8 +1583,8 @@
             { value: 'prophet', labelKey: 'sidebar.model_prophet', group: 'complex_multi_seasonal', advanced: false },
             { value: 'arima', labelKey: 'sidebar.model_arima', group: 'advanced', advanced: true },
             { value: 'autoets', labelKey: 'sidebar.model_autoets', group: 'advanced', advanced: true, disabled: true },
-            { value: 'autoces', labelKey: 'sidebar.model_autoces', group: 'advanced', advanced: true, disabled: true },
-            { value: 'autotheta', labelKey: 'sidebar.model_autotheta', group: 'advanced', advanced: true, disabled: true },
+            { value: 'autoces', labelKey: 'sidebar.model_autoces', group: 'advanced', advanced: true },
+            { value: 'autotheta', labelKey: 'sidebar.model_autotheta', group: 'advanced', advanced: true },
             { value: 'mlp', labelKey: 'sidebar.model_mlp', group: 'neural', advanced: true, disabled: true },
             { value: 'lstm', labelKey: 'sidebar.model_lstm', group: 'neural', advanced: true, disabled: true },
             { value: 'nhits', labelKey: 'sidebar.model_nhits', group: 'neural', advanced: true, disabled: true },
@@ -1640,8 +1640,8 @@
             return null;
         };
         const SELECTABLE_MODEL_ORDER = SELECTABLE_FORECAST_MODELS.filter((option) => !option.disabled).map((option) => option.value);
-        const HEAVY_SELECTABLE_MODELS = new Set(['arima', 'mlp']);
-        const HEAVY_MODEL_TYPES = new Set(['advanced_auto', 'arima', 'mlp']);
+        const HEAVY_SELECTABLE_MODELS = new Set(['arima', 'autoces', 'autotheta', 'mlp']);
+        const HEAVY_MODEL_TYPES = new Set(['advanced_auto', 'arima', 'autoces', 'autotheta', 'mlp']);
 
         const orderedSelectedModels = (selected) => (
             SELECTABLE_MODEL_ORDER.filter((code) => (selected || []).includes(code))
