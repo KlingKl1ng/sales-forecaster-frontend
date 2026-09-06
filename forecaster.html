@@ -4559,7 +4559,7 @@
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
                                             {modelPickerOpen && (
-                                                <div className="fc-model-picker-menu" role="listbox" aria-multiselectable="true" aria-labelledby="forecast-model-profile">
+                                                <div className="fc-model-picker-menu scroller" role="listbox" aria-multiselectable="true" aria-labelledby="forecast-model-profile">
                                                     <label className="fc-model-picker-option fc-model-picker-select-all">
                                                         <input
                                                             type="checkbox"
@@ -4633,7 +4633,7 @@
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
                                             {validationPickerOpen && (
-                                                <div className="fc-model-picker-menu" role="listbox" aria-labelledby="forecast-validation-method">
+                                                <div className="fc-model-picker-menu scroller" role="listbox" aria-labelledby="forecast-validation-method">
                                                     {VALIDATION_METHOD_OPTIONS.map((option) => (
                                                         <button
                                                             key={option.value}
@@ -4676,7 +4676,7 @@
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
                                             {metricPickerOpen && (
-                                                <div className="fc-model-picker-menu" role="listbox" aria-labelledby="forecast-evaluation-metric">
+                                                <div className="fc-model-picker-menu scroller" role="listbox" aria-labelledby="forecast-evaluation-metric">
                                                     {CONTEST_EVALUATION_METRIC_OPTIONS.map((option) => (
                                                         <button
                                                             key={option.value}
