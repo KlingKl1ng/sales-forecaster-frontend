@@ -1255,6 +1255,9 @@
         .table-wrap tr.is-revoked td {
             opacity: 0.55;
         }
+        .api-key-owner-col {
+            white-space: nowrap;
+        }
         .api-key-prefix,
         .api-token-box {
             font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -1322,10 +1325,114 @@
         }
         #section-notifications.single-filter th:first-child,
         #section-notifications.single-filter td:first-child {
-            display: none;
+            visibility: collapse;
+            padding: 0;
+            border: 0;
+            font-size: 0;
+            line-height: 0;
         }
         #section-notifications tr.notification-focus-row {
             animation: notification-row-focus 2.8s ease-out;
+        }
+        .main.main-fill {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        #section-notifications.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        #section-notifications.active .hero {
+            flex-shrink: 0;
+            margin-bottom: 16px;
+        }
+        #section-notifications.active .filter-tabs {
+            flex-shrink: 0;
+        }
+        #section-notifications.active > .card {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        #section-notifications.active > .card > .notifications-table-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        #section-notifications.active .notifications-table-wrap .split-table-body {
+            max-height: none;
+        }
+        #section-admin-jobs.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        .main.main-fill #section-admin-jobs.active {
+            display: flex !important;
+        }
+        #section-admin-jobs.active .hero {
+            flex-shrink: 0;
+        }
+        #section-admin-jobs.active > .card {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        #section-admin-jobs.active .admin-jobs-table-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        #section-admin-jobs.active .admin-jobs-table-wrap .split-table-body {
+            max-height: none;
+        }
+        .admin-jobs-table-wrap .split-table { min-width: 1080px; }
+        .admin-jobs-table-wrap .admin-jobs-col-user,
+        .admin-jobs-table-wrap .admin-jobs-col-file,
+        .admin-jobs-table-wrap td:nth-child(4),
+        .admin-jobs-table-wrap td:nth-child(7) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #section-admin-audit.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        .main.main-fill #section-admin-audit.active {
+            display: flex !important;
+        }
+        #section-admin-audit.active .hero {
+            flex-shrink: 0;
+        }
+        #section-admin-audit.active > .card {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        #section-admin-audit.active .admin-audit-table-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        #section-admin-audit.active .admin-audit-table-wrap .split-table-body {
+            max-height: none;
+        }
+        .admin-audit-table-wrap .split-table { min-width: 720px; }
+        .admin-audit-table-wrap .admin-audit-col-user,
+        .admin-audit-table-wrap .admin-audit-col-details,
+        .admin-audit-table-wrap td:nth-child(2),
+        .admin-audit-table-wrap td:nth-child(3) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         @keyframes notification-row-focus {
             0%, 45% {
@@ -2012,8 +2119,53 @@
             letter-spacing: -.02em;
             text-align: center;
         }
-        .reports-table-wrap table {
-            min-width: 640px;
+        .split-table-wrap {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .split-table-head {
+            flex: 0 0 auto;
+            overflow: hidden;
+            border-bottom: 1px solid var(--line-strong);
+            background: var(--surface-inset-strong);
+        }
+        .split-table-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: min(52vh, 520px);
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .split-table-wrap .split-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+        .reports-table-wrap .split-table { min-width: 640px; }
+        .reports-table-wrap .reports-col-file { width: 34%; }
+        .reports-table-wrap .reports-col-module { width: 11%; }
+        .reports-table-wrap .reports-col-created { width: 22%; }
+        .reports-table-wrap .reports-col-expires { width: 21%; }
+        .reports-table-wrap .reports-col-actions { width: 12%; }
+        .notifications-table-wrap .split-table { min-width: 640px; }
+        .notifications-table-wrap .notification-detail span {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #section-notifications.single-filter .notifications-col-type {
+            width: 0 !important;
+        }
+        .split-table-head th {
+            position: static;
+            background: transparent;
+            box-shadow: none;
+            border-bottom: 0;
+        }
+        .split-table-body tbody tr:last-child td {
+            border-bottom: 0;
         }
         .password-wrap { position: relative; }
         .password-wrap input { padding-right: 46px; }
@@ -2079,8 +2231,13 @@
             }
             .hero { flex-direction: column; align-items: flex-start; }
             .form-grid, .metric-grid, .shortcut-grid, .admin-form-grid, .announcement-form { grid-template-columns: 1fr; }
-            .reports-downloads-card .reports-table-wrap { display: none; }
-            .artifact-list { display: grid; }
+            .reports-downloads-card .split-table-wrap { display: none; }
+            .artifact-list {
+                display: grid;
+                max-height: min(52vh, 560px);
+                overflow: auto;
+                padding-right: 2px;
+            }
             .reports-downloads-card,
             .reports-status-card {
                 padding: 14px;
@@ -2452,19 +2609,39 @@
                         <button class="filter-tab" type="button" data-notification-filter="system" aria-pressed="false"><span class="filter-tab-label" data-i18n="sections.notifications.filter_system">System</span></button>
                     </div>
                     <div class="card">
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th data-i18n="table.type">Type</th>
-                                        <th data-i18n="table.event">Event</th>
-                                        <th data-i18n="table.status">Status</th>
-                                        <th data-i18n="table.details">Details</th>
-                                        <th data-i18n="table.updated">Updated</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="notification-events-body"></tbody>
-                            </table>
+                        <div class="table-wrap split-table-wrap notifications-table-wrap">
+                            <div class="split-table-head">
+                                <table class="split-table">
+                                    <colgroup>
+                                        <col class="notifications-col-type">
+                                        <col class="notifications-col-event">
+                                        <col class="notifications-col-status">
+                                        <col class="notifications-col-details">
+                                        <col class="notifications-col-updated">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th data-i18n="table.type">Type</th>
+                                            <th data-i18n="table.event">Event</th>
+                                            <th data-i18n="table.status">Status</th>
+                                            <th data-i18n="table.details">Details</th>
+                                            <th data-i18n="table.updated">Updated</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="split-table-body">
+                                <table class="split-table">
+                                    <colgroup>
+                                        <col class="notifications-col-type">
+                                        <col class="notifications-col-event">
+                                        <col class="notifications-col-status">
+                                        <col class="notifications-col-details">
+                                        <col class="notifications-col-updated">
+                                    </colgroup>
+                                    <tbody id="notification-events-body"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -2486,19 +2663,39 @@
                                 </div>
                             </div>
                             <div id="artifacts-list" class="artifact-list" aria-live="polite"></div>
-                            <div class="table-wrap reports-table-wrap">
-                                <table class="reports-table">
-                                    <thead>
-                                        <tr>
-                                            <th data-i18n="table.file">File</th>
-                                            <th data-i18n="table.module">Module</th>
-                                            <th data-i18n="table.created">Created</th>
-                                            <th data-i18n="table.expires">Expires</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="artifacts-body"></tbody>
-                                </table>
+                            <div class="table-wrap split-table-wrap reports-table-wrap">
+                                <div class="split-table-head">
+                                    <table class="split-table">
+                                        <colgroup>
+                                            <col class="reports-col-file">
+                                            <col class="reports-col-module">
+                                            <col class="reports-col-created">
+                                            <col class="reports-col-expires">
+                                            <col class="reports-col-actions">
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th data-i18n="table.file">File</th>
+                                                <th data-i18n="table.module">Module</th>
+                                                <th data-i18n="table.created">Created</th>
+                                                <th data-i18n="table.expires">Expires</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="split-table-body">
+                                    <table class="split-table">
+                                        <colgroup>
+                                            <col class="reports-col-file">
+                                            <col class="reports-col-module">
+                                            <col class="reports-col-created">
+                                            <col class="reports-col-expires">
+                                            <col class="reports-col-actions">
+                                        </colgroup>
+                                        <tbody id="artifacts-body"></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <div class="card reports-status-card">
@@ -2651,7 +2848,6 @@
                     </div>
                     </div>
                     <div id="security-api-panel" class="hidden">
-                        <div class="grid two-col">
                             <form id="api-key-create-form" class="card">
                                 <div class="section-head">
                                     <div>
@@ -2683,7 +2879,7 @@
                                     <button id="create-api-key" class="button-link" type="submit" data-i18n="sections.security.create_key_button">Create key</button>
                                 </div>
                             </form>
-                            <div class="card">
+                        <div class="card" style="margin-top:16px">
                                 <div class="section-head">
                                     <div>
                                         <h2 data-i18n="sections.security.api_keys">API keys</h2>
@@ -2695,6 +2891,7 @@
                                         <thead>
                                             <tr>
                                                 <th data-i18n="table.name">Name</th>
+                                                <th class="api-key-owner-col hidden" data-i18n="table.owner">Owner</th>
                                                 <th data-i18n="table.prefix">Prefix</th>
                                                 <th data-i18n="table.last_used">Last used</th>
                                                 <th data-i18n="table.expires">Expires</th>
@@ -2706,7 +2903,6 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
                         <div class="card" style="margin-top:16px">
                             <div class="section-head">
                                 <div>
@@ -2963,23 +3159,51 @@
                         </div>
                     </div>
                     <div class="card">
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th data-i18n="table.module">Module</th>
-                                        <th data-i18n="table.type">Type</th>
-                                        <th data-i18n="table.source">Source</th>
-                                        <th data-i18n="table.user">User</th>
-                                        <th data-i18n="table.status">Status</th>
-                                        <th data-i18n="table.progress">Progress</th>
-                                        <th data-i18n="table.file">File</th>
-                                        <th data-i18n="table.created">Created</th>
-                                        <th data-i18n="table.expires">Expires</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-jobs-body"></tbody>
-                            </table>
+                        <div class="table-wrap split-table-wrap admin-jobs-table-wrap">
+                            <div class="split-table-head">
+                                <table class="split-table">
+                                    <colgroup>
+                                        <col class="admin-jobs-col-module">
+                                        <col class="admin-jobs-col-type">
+                                        <col class="admin-jobs-col-source">
+                                        <col class="admin-jobs-col-user">
+                                        <col class="admin-jobs-col-status">
+                                        <col class="admin-jobs-col-progress">
+                                        <col class="admin-jobs-col-file">
+                                        <col class="admin-jobs-col-created">
+                                        <col class="admin-jobs-col-expires">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th data-i18n="table.module">Module</th>
+                                            <th data-i18n="table.type">Type</th>
+                                            <th data-i18n="table.source">Source</th>
+                                            <th data-i18n="table.user">User</th>
+                                            <th data-i18n="table.status">Status</th>
+                                            <th data-i18n="table.progress">Progress</th>
+                                            <th data-i18n="table.file">File</th>
+                                            <th data-i18n="table.created">Created</th>
+                                            <th data-i18n="table.expires">Expires</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="split-table-body">
+                                <table class="split-table">
+                                    <colgroup>
+                                        <col class="admin-jobs-col-module">
+                                        <col class="admin-jobs-col-type">
+                                        <col class="admin-jobs-col-source">
+                                        <col class="admin-jobs-col-user">
+                                        <col class="admin-jobs-col-status">
+                                        <col class="admin-jobs-col-progress">
+                                        <col class="admin-jobs-col-file">
+                                        <col class="admin-jobs-col-created">
+                                        <col class="admin-jobs-col-expires">
+                                    </colgroup>
+                                    <tbody id="admin-jobs-body"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -2993,18 +3217,36 @@
                         </div>
                     </div>
                     <div class="card">
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th data-i18n="table.event">Event</th>
-                                        <th data-i18n="table.user">User</th>
-                                        <th data-i18n="table.details">Details</th>
-                                        <th data-i18n="table.created">Created</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-audit-body"></tbody>
-                            </table>
+                        <div class="table-wrap split-table-wrap admin-audit-table-wrap">
+                            <div class="split-table-head">
+                                <table class="split-table">
+                                    <colgroup>
+                                        <col class="admin-audit-col-event">
+                                        <col class="admin-audit-col-user">
+                                        <col class="admin-audit-col-details">
+                                        <col class="admin-audit-col-created">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th data-i18n="table.event">Event</th>
+                                            <th data-i18n="table.user">User</th>
+                                            <th data-i18n="table.details">Details</th>
+                                            <th data-i18n="table.created">Created</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="split-table-body">
+                                <table class="split-table">
+                                    <colgroup>
+                                        <col class="admin-audit-col-event">
+                                        <col class="admin-audit-col-user">
+                                        <col class="admin-audit-col-details">
+                                        <col class="admin-audit-col-created">
+                                    </colgroup>
+                                    <tbody id="admin-audit-body"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -3427,10 +3669,20 @@
             state.activeSection = section;
             document.querySelectorAll('.section').forEach(item => item.classList.toggle('active', item.id === `section-${section}`));
             document.querySelectorAll('.nav-btn').forEach(item => item.classList.toggle('active', item.dataset.section === section));
+            document.querySelector('.main')?.classList.toggle('main-fill', section === 'notifications' || section === 'admin-jobs' || section === 'admin-audit');
             topTitle.textContent = sectionCopy[section][0];
             topSubtitle.textContent = sectionCopy[section][1];
             window.location.hash = sectionHash(section);
-            if (section === 'notifications') renderNotificationEvents();
+            if (section === 'notifications') {
+                renderNotificationEvents();
+                requestAnimationFrame(() => requestAnimationFrame(syncSplitTableLayout));
+            }
+            if (section === 'admin-jobs') {
+                requestAnimationFrame(() => requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-jobs-table-wrap'))));
+            }
+            if (section === 'admin-audit') {
+                requestAnimationFrame(() => requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-audit-table-wrap'))));
+            }
             if (section === 'security') requestAnimationFrame(updateSecurityFilterIndicator);
             setSidebarOpen(false);
         }
@@ -3908,12 +4160,18 @@
                         text: dt('empty.no_notifications_for_filter', { filter: notificationFilterLabel(state.notificationFilter) }),
                     }),
                 ]));
-                requestAnimationFrame(updateNotificationFilterIndicator);
+                requestAnimationFrame(() => {
+                    updateNotificationFilterIndicator();
+                    syncSplitTableLayout(document.querySelector('.notifications-table-wrap'));
+                });
                 return;
             }
             items.forEach(item => tbody.appendChild(item.row));
             focusNotificationRow(tbody);
-            requestAnimationFrame(updateNotificationFilterIndicator);
+            requestAnimationFrame(() => {
+                updateNotificationFilterIndicator();
+                syncSplitTableLayout(document.querySelector('.notifications-table-wrap'));
+            });
         }
 
         function renderJobs() {
@@ -3929,6 +4187,132 @@
             renderNotificationEvents();
         }
 
+        function syncNotificationsTableColumns(wrap) {
+            const tableWrap = wrap || document.querySelector('.notifications-table-wrap');
+            if (!tableWrap || tableWrap.offsetParent === null) return;
+            const body = tableWrap.querySelector('.split-table-body');
+            if (!body) return;
+            const bodyWidth = body.clientWidth;
+            if (bodyWidth <= 0) return;
+            const hideType = document.getElementById('section-notifications')?.classList.contains('single-filter');
+            const spec = hideType
+                ? [
+                    ['type', 0],
+                    ['event', 0.14],
+                    ['status', 0.11],
+                    ['details', 0.52],
+                    ['updated', 0.23],
+                ]
+                : [
+                    ['type', 0.10],
+                    ['event', 0.13],
+                    ['status', 0.10],
+                    ['details', 0.49],
+                    ['updated', 0.18],
+                ];
+            let assigned = 0;
+            const widths = spec.map(([, ratio], index) => {
+                if (index === spec.length - 1) return Math.max(0, bodyWidth - assigned);
+                const px = ratio === 0 ? 0 : Math.floor(bodyWidth * ratio);
+                assigned += px;
+                return px;
+            });
+            tableWrap.querySelectorAll('colgroup').forEach((colgroup) => {
+                spec.forEach(([key], index) => {
+                    const col = colgroup.querySelector(`.notifications-col-${key}`);
+                    if (col) col.style.width = `${widths[index]}px`;
+                });
+            });
+        }
+
+        function syncAdminJobsTableColumns(wrap) {
+            const tableWrap = wrap || document.querySelector('.admin-jobs-table-wrap');
+            if (!tableWrap || tableWrap.offsetParent === null) return;
+            const body = tableWrap.querySelector('.split-table-body');
+            if (!body) return;
+            const bodyWidth = body.clientWidth;
+            if (bodyWidth <= 0) return;
+            const spec = [
+                ['module', 0.10],
+                ['type', 0.11],
+                ['source', 0.08],
+                ['user', 0.15],
+                ['status', 0.09],
+                ['progress', 0.07],
+                ['file', 0.22],
+                ['created', 0.09],
+                ['expires', 0.09],
+            ];
+            let assigned = 0;
+            const widths = spec.map(([, ratio], index) => {
+                if (index === spec.length - 1) return Math.max(0, bodyWidth - assigned);
+                const px = Math.floor(bodyWidth * ratio);
+                assigned += px;
+                return px;
+            });
+            tableWrap.querySelectorAll('colgroup').forEach((colgroup) => {
+                spec.forEach(([key], index) => {
+                    const col = colgroup.querySelector(`.admin-jobs-col-${key}`);
+                    if (col) col.style.width = `${widths[index]}px`;
+                });
+            });
+        }
+
+        function syncAdminAuditTableColumns(wrap) {
+            const tableWrap = wrap || document.querySelector('.admin-audit-table-wrap');
+            if (!tableWrap || tableWrap.offsetParent === null) return;
+            const body = tableWrap.querySelector('.split-table-body');
+            if (!body) return;
+            const bodyWidth = body.clientWidth;
+            if (bodyWidth <= 0) return;
+            const spec = [
+                ['event', 0.16],
+                ['user', 0.18],
+                ['details', 0.46],
+                ['created', 0.20],
+            ];
+            let assigned = 0;
+            const widths = spec.map(([, ratio], index) => {
+                if (index === spec.length - 1) return Math.max(0, bodyWidth - assigned);
+                const px = Math.floor(bodyWidth * ratio);
+                assigned += px;
+                return px;
+            });
+            tableWrap.querySelectorAll('colgroup').forEach((colgroup) => {
+                spec.forEach(([key], index) => {
+                    const col = colgroup.querySelector(`.admin-audit-col-${key}`);
+                    if (col) col.style.width = `${widths[index]}px`;
+                });
+            });
+        }
+
+        function syncSplitTableLayout(wrap) {
+            const wraps = wrap ? [wrap] : Array.from(document.querySelectorAll('.split-table-wrap'));
+            wraps.forEach((tableWrap) => {
+                const head = tableWrap.querySelector('.split-table-head');
+                const body = tableWrap.querySelector('.split-table-body');
+                if (!head || !body || tableWrap.offsetParent === null) return;
+                if (tableWrap.classList.contains('notifications-table-wrap')) {
+                    syncNotificationsTableColumns(tableWrap);
+                }
+                if (tableWrap.classList.contains('admin-jobs-table-wrap')) {
+                    syncAdminJobsTableColumns(tableWrap);
+                }
+                if (tableWrap.classList.contains('admin-audit-table-wrap')) {
+                    syncAdminAuditTableColumns(tableWrap);
+                }
+                const scrollbar = body.offsetWidth - body.clientWidth;
+                head.style.paddingRight = `${Math.max(0, scrollbar)}px`;
+                if (!body.dataset.scrollSync) {
+                    body.dataset.scrollSync = '1';
+                    body.addEventListener('scroll', () => {
+                        head.scrollLeft = body.scrollLeft;
+                    }, { passive: true });
+                }
+                head.scrollLeft = body.scrollLeft;
+            });
+        }
+
         function renderArtifacts() {
             const tbody = document.getElementById('artifacts-body');
             const list = document.getElementById('artifacts-list');
@@ -3938,6 +4322,7 @@
                 const emptyText = dt('empty.no_retained_downloads');
                 tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '5', text: emptyText })]));
                 list.appendChild(el('div', { class: 'empty artifact-list-empty', text: emptyText }));
+                requestAnimationFrame(syncSplitTableLayout);
                 return;
             }
             state.artifacts.forEach(artifact => {
@@ -3969,6 +4354,7 @@
                     el('button', { class: 'download-btn', type: 'button', dataset: { artifactId: artifact.id }, text: dt('actions.download') }),
                 ]));
             });
+            requestAnimationFrame(syncSplitTableLayout);
         }
 
         function renderAdminMetrics() {
@@ -4156,8 +4542,12 @@
             const atLimit = activeApiKeyCount() >= MAX_ACTIVE_API_KEYS;
             limitNote?.classList.toggle('hidden', !atLimit);
             if (createButton) createButton.disabled = atLimit;
+            const showOwner = isPrivilegedRole(state.user?.role);
+            document.querySelectorAll('.api-key-owner-col').forEach(node => {
+                node.classList.toggle('hidden', !showOwner);
+            });
             if (!state.apiKeys.length) {
-                keysBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '6', text: dt('empty.no_api_keys') })]));
+                keysBody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: String(showOwner ? 7 : 6), text: dt('empty.no_api_keys') })]));
             } else {
                 state.apiKeys.forEach(key => {
                     const revoked = Boolean(key.revoked_at);
@@ -4170,14 +4560,24 @@
                             text: dt('actions.revoke'),
                         }));
                     }
-                    keysBody.appendChild(el('tr', { class: revoked ? 'is-revoked' : '' }, [
+                    const cells = [
                         el('td', { text: key.name || '-' }),
+                    ];
+                    if (showOwner) {
+                        cells.push(el('td', {
+                            class: 'api-key-owner-col',
+                            text: key.user_email || '-',
+                            title: key.user_email || '',
+                        }));
+                    }
+                    cells.push(
                         el('td', {}, [el('span', { class: 'api-key-prefix', text: key.prefix || '-' })]),
                         el('td', { text: key.last_used_at ? formatDate(key.last_used_at) : dt('table.never') }),
                         el('td', { text: key.expires_at ? formatDate(key.expires_at) : dt('sections.security.expiry_never') }),
                         el('td', {}, [badge(apiKeyStatus(key))]),
                         el('td', {}, [actions]),
-                    ]));
+                    );
+                    keysBody.appendChild(el('tr', { class: revoked ? 'is-revoked' : '' }, cells));
                 });
             }
             const apiJobs = (state.jobs || []).filter(job => job.source === 'api');
@@ -4220,6 +4620,7 @@
             clear(tbody);
             if (!state.adminJobs.length) {
                 tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '9', text: dt('empty.no_jobs') })]));
+                requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-jobs-table-wrap')));
                 return;
             }
             state.adminJobs.forEach(job => {
@@ -4235,6 +4636,7 @@
                     el('td', { text: formatDate(job.expires_at) }),
                 ]));
             });
+            requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-jobs-table-wrap')));
         }
 
         function renderAdminAudit() {
@@ -4242,6 +4644,7 @@
             clear(tbody);
             if (!state.adminAuditEvents.length) {
                 tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '4', text: dt('empty.no_audit_events') })]));
+                requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-audit-table-wrap')));
                 return;
             }
             state.adminAuditEvents.forEach(event => {
@@ -4252,6 +4655,7 @@
                     el('td', { text: formatDate(event.created_at) }),
                 ]));
             });
+            requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-audit-table-wrap')));
         }
 
         function renderAdminAll() {
@@ -4367,6 +4771,7 @@
             applySidebarCollapsedUi();
             setProfileMenuOpen(false);
             setNotificationPanelOpen(false);
+            syncSplitTableLayout();
         });
         userProfile.addEventListener('click', () => {
             setProfileMenuOpen(!profileMenu.classList.contains('open'));
