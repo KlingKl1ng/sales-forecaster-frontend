@@ -459,9 +459,69 @@
             }
         }
 
+        .fc-status-active {
+            color: #92400e;
+            background: #fff7e6;
+            border-color: #f3d9a4;
+        }
+
+        .dark .fc-status-active {
+            color: #fbbf24;
+            background: #252a32;
+            border-color: #51452d;
+        }
+
         .scroller {
             -webkit-overflow-scrolling: touch;
+        }
+
+        .scroller,
+        .fc-overview-scroll,
+        .fc-overview-header {
             scrollbar-width: thin;
+            scrollbar-color: #94a3b8 transparent;
+        }
+
+        .dark .scroller,
+        .dark .fc-overview-scroll,
+        .dark .fc-overview-header {
+            scrollbar-color: #475569 transparent;
+        }
+
+        /* Chromium/WebKit: use our rounded thumb, not the OS scrollbar skin.
+           Firefox uses the standard thin scrollbar and colors above. */
+        @supports selector(::-webkit-scrollbar) {
+            .scroller,
+            .fc-overview-scroll,
+            .fc-overview-header,
+            .dark .scroller,
+            .dark .fc-overview-scroll,
+            .dark .fc-overview-header {
+                scrollbar-width: auto;
+                scrollbar-color: auto;
+            }
+
+            .scroller::-webkit-scrollbar,
+            .fc-overview-scroll::-webkit-scrollbar,
+            .fc-overview-header::-webkit-scrollbar {
+                width: 3px;
+                height: 3px;
+            }
+
+            .scroller::-webkit-scrollbar-thumb,
+            .fc-overview-scroll::-webkit-scrollbar-thumb {
+                border-radius: 999px;
+            }
+
+            .scroller::-webkit-scrollbar-thumb:hover,
+            .fc-overview-scroll::-webkit-scrollbar-thumb:hover {
+                background: #64748b;
+            }
+
+            .scroller::-webkit-scrollbar-corner,
+            .fc-overview-scroll::-webkit-scrollbar-corner {
+                background: transparent;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -699,12 +759,24 @@
             display: none;
             width: 100%;
             table-layout: fixed;
+            /* Separate cells keep row borders and selection paint local. */
+            border-collapse: separate;
+            border-spacing: 0;
             text-align: left;
             font-size: 0.75rem;
         }
 
+        /* Keep selection paint inside each cell in the scrolling body. */
+        .fc-overview-table .fc-selection-cell.is-selected {
+            box-shadow: inset 3px 0 0 #f59e0b;
+        }
+
         .fc-overview-shell {
             background: transparent;
+        }
+
+        .fc-overview-header {
+            display: none;
         }
 
         .fc-overview-scroll {
@@ -721,12 +793,28 @@
                 display: table !important;
             }
 
+            .fc-overview-header {
+                display: block;
+                flex: none;
+                overflow: hidden;
+                scrollbar-gutter: stable;
+            }
+
+            .fc-overview-scroll {
+                flex: 1;
+                min-height: 0;
+                height: auto;
+                scrollbar-gutter: stable;
+            }
+
             .fc-overview-shell {
+                display: flex;
+                flex-direction: column;
                 border: 1px solid rgb(226, 232, 240);
                 border-radius: 0.5rem;
                 background: rgb(255, 255, 255);
                 box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-                /* Clip sticky header / row fills to the rounded frame. */
+                /* The body clips scrolling rows independently of the fixed header. */
                 overflow: hidden;
             }
 
@@ -747,12 +835,22 @@
                 background: rgb(15, 23, 42);
             }
 
-            .fc-overview-table thead th:first-child {
-                border-top-left-radius: 0.5rem;
+            /* Header and body are separate elements; no sticky overlay needed. */
+            .fc-overview-table thead th {
+                border-radius: 0;
+                border-bottom: 1px solid rgb(241, 245, 249);
             }
 
-            .fc-overview-table thead th:last-child {
-                border-top-right-radius: 0.5rem;
+            .dark .fc-overview-table thead th {
+                border-bottom-color: rgb(30, 41, 59);
+            }
+
+            .fc-overview-table tbody tr + tr td {
+                border-top: 1px solid rgb(241, 245, 249);
+            }
+
+            .dark .fc-overview-table tbody tr + tr td {
+                border-top-color: rgb(30, 41, 59);
             }
         }
 
@@ -1640,7 +1738,7 @@
 
         const getDeploymentEnvironment = () => {
             const host = window.location.hostname;
-            if (host === 'localhost' || host === '127.0.0.1' || host === '::1' || window.location.protocol === 'file:') return 'local';
+            if (host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]' || window.location.protocol === 'file:') return 'local';
             if (host.indexOf('staging') !== -1) return 'staging';
             return 'production';
         };
@@ -1663,18 +1761,17 @@
             return null;
         };
 
-        const JobStatusBar = memo(({ status, executionBackend, completedCount, totalCount, queuePosition, canCancel, isCancelling, onCancel, t }) => {
+        const JobStatusBar = memo(({ status, deploymentEnvironment, completedCount, totalCount, queuePosition, canCancel, isCancelling, onCancel, t }) => {
             if (!status) return null;
             const normalizedStatus = normalizeJobStatus(status);
             const safeCompleted = Number.isFinite(Number(completedCount)) ? Math.max(0, Number(completedCount)) : 0;
             const safeTotal = Number.isFinite(Number(totalCount)) ? Math.max(0, Number(totalCount)) : 0;
             const hasProgress = safeTotal > 0;
             const progressPercent = hasProgress ? Math.min(100, Math.round((safeCompleted / safeTotal) * 100)) : 0;
-            const backendLabel = executionBackend === 'cloud'
-                ? t('job.backend_cloud')
-                : executionBackend === 'local'
-                    ? t('job.backend_local')
-                    : t('job.backend_pending');
+            // This label describes the deployment, not the API's in-process runner.
+            const backendLabel = deploymentEnvironment === 'local'
+                ? t('job.backend_local')
+                : t('job.backend_cloud');
             const statusLabel = t(`job.status_${normalizedStatus}`);
             const statusClass = normalizedStatus === 'failed'
                 ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40'
@@ -1684,7 +1781,7 @@
                         ? 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
                         : normalizedStatus === 'ready'
                             ? 'text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
-                            : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40';
+                            : 'fc-status-active';
 
             return (
                 <div
@@ -1968,7 +2065,7 @@
             }
             if (status === 'running') {
                 return (
-                    <span className={`${base} bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300`}>
+                    <span className={`${base} fc-status-active`}>
                         <RunningSpinnerIcon size={10} />
                         {t('dashboard.table_running')}
                     </span>
@@ -2298,7 +2395,7 @@
                         className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isReady ? 'cursor-pointer' : ''} ${isChecked ? 'bg-slate-100 dark:bg-slate-800/60' : ''}`}
                     >
                         <td
-                            className={`p-3 w-12 text-center border-l-[3px] ${isChecked ? 'border-brand-gold' : 'border-transparent'}`}
+                            className={`fc-selection-cell p-3 w-12 text-center ${isChecked ? 'is-selected' : ''}`}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <input
@@ -2326,6 +2423,38 @@
 
             return (
                 <div className="fc-overview-shell w-full h-full">
+                    <div className="fc-overview-header">
+                    <table className="fc-overview-table" aria-label="Forecast table controls">
+                        <colgroup>
+                            <col style={{ width: '5%' }} />
+                            <col style={{ width: '33%' }} />
+                            <col style={{ width: '15%' }} />
+                            <col style={{ width: '16%' }} />
+                            <col style={{ width: '17%' }} />
+                            <col style={{ width: '14%' }} />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th className="p-2 lg:p-3 w-12 text-center font-bold text-slate-500 dark:text-slate-400 uppercase">
+                                    <input
+                                        type="checkbox"
+                                        className="fc-row-check"
+                                        checked={allSelected}
+                                        ref={selectAllDesktopRef}
+                                        onChange={onToggleSelectAll}
+                                        title={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
+                                        aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
+                                    />
+                                </th>
+                                <SortHeader columnKey="sku" label={t('dashboard.table_sku')} thClassName="w-[28%]" />
+                                <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[8.75rem]" />
+                                <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-28 lg:w-32" />
+                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-24 lg:w-28" />
+                                <SortHeader columnKey="eval" label={metricLabel} align="right" thClassName="w-20 lg:w-24" />
+                            </tr>
+                        </thead>
+                    </table>
+                    </div>
                     <div className="fc-overview-scroll">
                     {/* Card/single-column view through tablet widths (incl. iPad portrait). */}
                     <div className="fc-overview-cards">
@@ -2407,28 +2536,16 @@
                         )}
                         {mobileCards}
                     </div>
-                    <table className="fc-overview-table">
-                        <thead className="sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
-                            <tr>
-                                <th className="p-2 lg:p-3 w-12 text-center font-bold text-slate-500 dark:text-slate-400 uppercase border-l-[3px] border-transparent">
-                                    <input
-                                        type="checkbox"
-                                        className="fc-row-check"
-                                        checked={allSelected}
-                                        ref={selectAllDesktopRef}
-                                        onChange={onToggleSelectAll}
-                                        title={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
-                                        aria-label={allSelected ? t('dashboard.unselect_all') : t('dashboard.select_all')}
-                                    />
-                                </th>
-                                <SortHeader columnKey="sku" label={t('dashboard.table_sku')} thClassName="w-[28%]" />
-                                <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[8.75rem]" />
-                                <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-28 lg:w-32" />
-                                <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-24 lg:w-28" />
-                                <SortHeader columnKey="eval" label={metricLabel} align="right" thClassName="w-20 lg:w-24" />
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    <table className="fc-overview-table" aria-label="Forecast results">
+                        <colgroup>
+                            <col style={{ width: '5%' }} />
+                            <col style={{ width: '33%' }} />
+                            <col style={{ width: '15%' }} />
+                            <col style={{ width: '16%' }} />
+                            <col style={{ width: '17%' }} />
+                            <col style={{ width: '14%' }} />
+                        </colgroup>
+                        <tbody>
                             {tableRows}
                         </tbody>
                     </table>
@@ -4604,7 +4721,7 @@
                             {mappingReady && (
                             <JobStatusBar
                                 status={jobStatus || 'ready'}
-                                executionBackend={executionBackend || 'local'}
+                                deploymentEnvironment={deploymentEnvironment}
                                 completedCount={jobStatus ? jobProgress.completed : 0}
                                 queuePosition={jobProgress.queuePosition}
                                 totalCount={jobProgress.total > 0 ? jobProgress.total : (selectedSkus.length || mappedSkus.length)}
