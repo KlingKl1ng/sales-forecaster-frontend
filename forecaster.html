@@ -222,6 +222,33 @@
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
         }
 
+        .fc-model-catalog-picker {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .fc-model-picker-options {
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .fc-model-picker-more {
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+            padding: 0.5rem 0.4rem 0.25rem;
+            border-top: 1px solid #e2e8f0;
+            color: #b45309;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .dark .fc-model-picker-more {
+            border-color: #334155;
+            color: #fbbf24;
+        }
+
         .fc-model-picker-option {
             display: flex;
             align-items: center;
@@ -303,14 +330,29 @@
         }
 
         .fc-model-picker-group-label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
             padding: 0.22rem 0.4rem 0.08rem;
             font-size: 0.58rem;
             font-weight: 700;
-            line-height: 1;
+            line-height: 1.3;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: #94a3b8;
             pointer-events: none;
+        }
+
+        .fc-model-picker-group-icon {
+            flex: 0 0 0.75rem;
+            width: 0.75rem;
+            height: 0.75rem;
+        }
+
+        .fc-model-picker-group-icon svg {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
 
         .dark .fc-model-picker-group-label {
@@ -434,6 +476,59 @@
 
         .scroller {
             -webkit-overflow-scrolling: touch;
+        }
+
+        .fc-detail-scroll {
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior-y: contain;
+        }
+
+        .fc-detail-scroll:focus-visible {
+            outline: 2px solid #f59e0b;
+            outline-offset: -2px;
+        }
+
+        .fc-detail-charts {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-rows: repeat(2, minmax(0, 1fr));
+            flex: 1 0 640px;
+            min-height: 640px;
+            max-height: min(680px, calc(100vh - 240px));
+            max-height: min(680px, calc(100dvh - 240px));
+        }
+
+        .fc-detail-chart {
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .fc-validation-table,
+        .fc-validation-table > thead,
+        .fc-validation-table > tbody {
+            display: block;
+        }
+
+        .fc-validation-table > thead,
+        .fc-validation-table > tbody {
+            /* Reserve the same gutter so header and body columns stay aligned. */
+            scrollbar-gutter: stable;
+        }
+
+        .fc-validation-table > thead {
+            overflow: hidden;
+        }
+
+        .fc-validation-table > tbody {
+            max-height: 124px;
+            overflow-y: auto;
+            overscroll-behavior-y: contain;
+        }
+
+        .fc-validation-table tr {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
         }
 
         .scroller,
@@ -1039,6 +1134,17 @@
                 settings: {
                     title: "Settings",
                     subtitle: "Configure application preferences.",
+                    models: "Models",
+                    close: "Close settings",
+                    more_models: "More Models",
+                    models_description: "Choose which models appear in the Forecast Model dropdown. Use the dropdown checkboxes to select models for a forecast.",
+                    show_in_dropdown: "Show in dropdown",
+                    models_available: "Available",
+                    models_unavailable: "Unavailable",
+                    models_checking: "Checking availability…",
+                    models_empty: "No models in your dropdown. Add models in Settings.",
+                    models_all_listed: "All listed models",
+                    models_running: "Model preferences can be changed when the current forecast finishes.",
                     theme_mode: "Theme Mode",
                     language: "Language",
                     about_us: "About Us",
@@ -1140,7 +1246,9 @@
                     val_fc: "Forecast (Validation)",
                     history: "Actual",
                     final_fit: "Fit",
-                    future_fc: "Forecast"
+                    future_fc: "Forecast",
+                    forecast_values: "Forecast values",
+                    period: "Period"
                 }
             },
             vi: {
@@ -1228,6 +1336,17 @@
                 settings: {
                     title: "Cài đặt",
                     subtitle: "Cấu hình tùy chọn ứng dụng.",
+                    models: "Mô hình",
+                    close: "Đóng cài đặt",
+                    more_models: "Thêm mô hình",
+                    models_description: "Chọn các mô hình xuất hiện trong danh sách Mô hình dự báo. Dùng ô chọn trong danh sách để chọn mô hình cho lần dự báo.",
+                    show_in_dropdown: "Hiển thị trong danh sách",
+                    models_available: "Khả dụng",
+                    models_unavailable: "Chưa khả dụng",
+                    models_checking: "Đang kiểm tra…",
+                    models_empty: "Danh sách chưa có mô hình. Thêm mô hình trong Cài đặt.",
+                    models_all_listed: "Tất cả mô hình trong danh sách",
+                    models_running: "Có thể thay đổi tùy chọn mô hình sau khi lần dự báo hiện tại hoàn tất.",
                     theme_mode: "Giao diện",
                     language: "Ngôn ngữ",
                     about_us: "Về chúng tôi",
@@ -1329,7 +1448,9 @@
                     val_fc: "Dự báo (Kiểm định)",
                     history: "Thực tế",
                     final_fit: "Khớp",
-                    future_fc: "Dự báo"
+                    future_fc: "Dự báo",
+                    forecast_values: "Giá trị dự báo",
+                    period: "Kỳ"
                 }
             },
             de: {
@@ -1417,6 +1538,17 @@
                 settings: {
                     title: "Einstellungen",
                     subtitle: "Anwendungspräferenzen konfigurieren.",
+                    models: "Modelle",
+                    close: "Einstellungen schließen",
+                    more_models: "Weitere Modelle",
+                    models_description: "Wählen Sie die Modelle für das Dropdown Prognosemodell aus. Mit den Kontrollkästchen im Dropdown wählen Sie Modelle für eine Prognose.",
+                    show_in_dropdown: "Im Dropdown anzeigen",
+                    models_available: "Verfügbar",
+                    models_unavailable: "Nicht verfügbar",
+                    models_checking: "Verfügbarkeit wird geprüft…",
+                    models_empty: "Keine Modelle im Dropdown. Fügen Sie Modelle in den Einstellungen hinzu.",
+                    models_all_listed: "Alle aufgelisteten Modelle",
+                    models_running: "Modelleinstellungen können nach Abschluss der aktuellen Prognose geändert werden.",
                     theme_mode: "Design-Modus",
                     language: "Sprache",
                     about_us: "Über uns",
@@ -1518,7 +1650,9 @@
                     val_fc: "Prognose (Validierung)",
                     history: "Ist",
                     final_fit: "Anpassung",
-                    future_fc: "Prognose"
+                    future_fc: "Prognose",
+                    forecast_values: "Prognosewerte",
+                    period: "Zeitraum"
                 }
             }
         };
@@ -1551,8 +1685,11 @@
         const CheckIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>;
         const ServerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>;
         const ChartLineIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>;
+        const StatisticsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 5V3H4l8 9-8 9h16v-2" /></svg>;
+        const SeasonalWavesIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 8c3-8 7 8 10 0s7 8 10 0M2 16c3-8 7 8 10 0s7 8 10 0" /></svg>;
+        const NeuralNetworkIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 5 4 7-4 7m12-14-4 7 4 7M6 5h12M6 19h12" /><circle cx="4" cy="4" r="2" /><circle cx="20" cy="4" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="4" cy="20" r="2" /><circle cx="20" cy="20" r="2" /></svg>;
         const LayoutDashboardIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></svg>;
-        const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>;
+        const LayersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3 10 5-10 5L2 8Z" /><path d="m2 12 10 5 10-5M2 16l10 5 10-5" /></svg>;
         const ListIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>;
         const EyeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>;
         const SearchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>;
@@ -1582,10 +1719,10 @@
             { value: 'automfles', labelKey: 'sidebar.model_automfles', group: 'complex_multi_seasonal', advanced: true, disabled: true },
         ];
         const FORECAST_MODEL_GROUPS = [
-            { id: 'basic', labelKey: 'sidebar.model_group_basic' },
-            { id: 'advanced', labelKey: 'sidebar.model_group_advanced' },
-            { id: 'complex_multi_seasonal', labelKey: 'sidebar.model_group_complex_multi_seasonal' },
-            { id: 'neural', labelKey: 'sidebar.model_group_neural' },
+            { id: 'basic', labelKey: 'sidebar.model_group_basic', Icon: ChartLineIcon },
+            { id: 'advanced', labelKey: 'sidebar.model_group_advanced', Icon: StatisticsIcon },
+            { id: 'complex_multi_seasonal', labelKey: 'sidebar.model_group_complex_multi_seasonal', Icon: SeasonalWavesIcon },
+            { id: 'neural', labelKey: 'sidebar.model_group_neural', Icon: NeuralNetworkIcon },
         ];
         const VALIDATION_METHOD_OPTIONS = [
             { value: 'simple', labelKey: 'sidebar.val_simple' },
@@ -1626,15 +1763,29 @@
             const direct = row[field];
             if (direct != null && direct !== '') {
                 const numeric = Number(direct);
-                return Number.isNaN(numeric) ? null : numeric;
+                return Number.isFinite(numeric) ? numeric : null;
             }
             if (String(code || '').toLowerCase() === 'rmse' && row.mse_validation != null) {
                 const mse = Number(row.mse_validation);
-                return Number.isNaN(mse) ? null : Math.sqrt(mse);
+                return Number.isFinite(mse) && mse >= 0 ? Math.sqrt(mse) : null;
             }
             return null;
         };
+        const averageEvaluationMetric = (rows, code) => {
+            const values = rows.map(row => evaluationMetricValue(row, code)).filter(Number.isFinite);
+            return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+        };
         const SELECTABLE_MODEL_ORDER = SELECTABLE_FORECAST_MODELS.filter((option) => !option.disabled).map((option) => option.value);
+        const VISIBLE_FORECAST_MODELS_KEY = 'fc-visible-forecast-models-v1';
+        const readVisibleForecastModels = () => {
+            const allModels = SELECTABLE_FORECAST_MODELS.map((option) => option.value);
+            try {
+                const saved = JSON.parse(localStorage.getItem(VISIBLE_FORECAST_MODELS_KEY));
+                return Array.isArray(saved) ? allModels.filter((code) => saved.includes(code)) : allModels;
+            } catch (_) {
+                return allModels;
+            }
+        };
         const HEAVY_SELECTABLE_MODELS = new Set(['arima', 'autoces', 'autotheta', 'mlp']);
         const HEAVY_MODEL_TYPES = new Set(['advanced_auto', 'arima', 'autoces', 'autotheta', 'mlp']);
 
@@ -1656,6 +1807,17 @@
             if (Array.isArray(selected) && selected.length) return selectionUsesHeavy(selected);
             return HEAVY_MODEL_TYPES.has(String(modelType || '').toLowerCase());
         };
+        const forecastModelAvailable = (candidate, capabilities) => {
+            const option = SELECTABLE_FORECAST_MODELS.find((model) => model.value === candidate);
+            if (!option || option.disabled) return false;
+            if (!option.advanced) return true;
+            if (capabilities.status !== 'ready') return false;
+            if (capabilities.supportedModels.length > 0) {
+                return capabilities.supportedModels.includes(candidate)
+                    || capabilities.supportedModels.includes('advanced_auto');
+            }
+            return capabilities.cloudEnabled === true;
+        };
         const TERMINAL_JOB_STATUSES = new Set(['completed', 'failed', 'canceled']);
 
         const normalizeJobStatus = (status) => {
@@ -1676,7 +1838,7 @@
 
         const DEFAULT_FREQUENCY_PROFILES = {
             hourly: { label: 'Hourly', max_history_columns: 720, max_train_horizon: 720, max_test_horizon: 48, max_forecast_horizon: 48, mlp_lag_window: 24, prophet_min_points: 336 },
-            daily: { label: 'Daily', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 14, prophet_min_points: 730 },
+            daily: { label: 'Daily', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 14, prophet_min_points: 14 },
             weekly: { label: 'Weekly', max_history_columns: 312, max_train_horizon: 312, max_test_horizon: 52, max_forecast_horizon: 52, mlp_lag_window: 52, prophet_min_points: 104 },
             monthly: { label: 'Monthly', max_history_columns: 240, max_train_horizon: 240, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 12, prophet_min_points: 24 },
             quarterly: { label: 'Quarterly', max_history_columns: 80, max_train_horizon: 80, max_test_horizon: 16, max_forecast_horizon: 16, mlp_lag_window: 4, prophet_min_points: 8 },
@@ -1991,6 +2153,61 @@
             );
         });
 
+        const ForecastValuesTable = memo(({ data, t }) => {
+            const sectionRef = useRef(null);
+            const scrollRef = useRef(null);
+            const forecasts = (data || []).filter(point => point.date && point.future_forecast != null);
+            const hasForecasts = forecasts.length > 0;
+
+            useEffect(() => {
+                const section = sectionRef.current;
+                const scroller = scrollRef.current;
+                if (!section || !scroller) return;
+                const handleWheel = (event) => {
+                    if (event.ctrlKey || event.metaKey) return;
+                    const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+                    if (maxScroll <= 1) return;
+                    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+                    if (!delta) return;
+                    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? scroller.clientWidth : 1;
+                    // Consume the wheel even at either end so the surrounding
+                    // detail panel does not jump vertically while browsing values.
+                    event.preventDefault();
+                    event.stopPropagation();
+                    scroller.scrollLeft = Math.max(0, Math.min(maxScroll, scroller.scrollLeft + delta * unit));
+                };
+                section.addEventListener('wheel', handleWheel, { passive: false });
+                return () => section.removeEventListener('wheel', handleWheel);
+            }, [hasForecasts]);
+
+            if (!hasForecasts) return null;
+            return (
+                <section ref={sectionRef} className="fc-forecast-values shrink-0 min-w-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300" aria-label={t('charts.forecast_values')}>
+                    <h3 className="mb-2 font-semibold">{t('charts.forecast_values')}</h3>
+                    <div ref={scrollRef} className="scroller overflow-x-auto rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500" tabIndex={0} role="region" aria-label={t('charts.forecast_values')}>
+                        <table className="w-full border-separate border-spacing-0 text-right tabular-nums whitespace-nowrap" aria-label={t('charts.forecast_values')}>
+                            <thead>
+                                <tr>
+                                    <th scope="col" className="sticky left-0 z-10 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 text-left font-semibold">{t('charts.period')}</th>
+                                    {forecasts.map(point => (
+                                        <th scope="col" key={point.date} className="min-w-[7.5rem] bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 font-semibold">{point.date.replace('T', ' ')}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" className="sticky left-0 z-10 bg-white dark:bg-slate-900 px-3 py-2 text-left font-semibold">{t('charts.future_fc')}</th>
+                                    {forecasts.map(point => (
+                                        <td key={point.date} className="px-3 py-2">{fmtNumber(point.future_forecast, 0, 6)}</td>
+                                    ))}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            );
+        });
+
         const KPICards = memo(({ results, skuCount = 0, t }) => {
             const hasData = results && results.length > 0;
 
@@ -2006,9 +2223,6 @@
                 }
 
                 const total = results.length;
-                const mapeSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, 'mape') || 0), 0);
-                const rmseSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, 'rmse') || 0), 0);
-                const maeSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, 'mae') || 0), 0);
                 const fcVolume = results.reduce((sum, r) => {
                     const fcSum = r.forecast_data ? r.forecast_data.reduce((s, d) => s + (d.future_forecast || 0), 0) : 0;
                     return sum + fcSum;
@@ -2016,9 +2230,9 @@
 
                 return {
                     totalSeries: skuCount > 0 ? skuCount : total,
-                    avgMape: mapeSum / total,
-                    avgRmse: rmseSum / total,
-                    avgMae: maeSum / total,
+                    avgMape: averageEvaluationMetric(results, 'mape'),
+                    avgRmse: averageEvaluationMetric(results, 'rmse'),
+                    avgMae: averageEvaluationMetric(results, 'mae'),
                     totalForecastVolume: fcVolume
                 };
             }, [results, hasData, skuCount]);
@@ -2579,38 +2793,56 @@
                 setZoomDomain({ start: 0, end: dataLength - 1 });
             }, [dataLength]);
 
-            const handleWheel = (e) => {
-                e.preventDefault();
-                const rect = containerRef.current?.getBoundingClientRect();
-                const cursorRatio = rect ? Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)) : 0.5;
-                const delta = e.deltaY || e.deltaX;
-                const wantZoomIn = delta < 0;
+            useEffect(() => {
+                const el = containerRef.current;
+                if (!el) return;
 
-                setZoomDomain((prev) => {
-                    const last = Math.max(0, dataLength - 1);
-                    const minRange = Math.min(last, Math.max(5, Math.floor(dataLength * 0.05)));
-                    let start = Math.max(0, Math.min(prev.start, last));
-                    let end = Math.max(start, Math.min(prev.end, last));
-                    const range = end - start;
-                    const zoomFactor = 0.1;
+                const handleWheel = (e) => {
+                    // Use the rendered plot bounds so legends, axes and margins
+                    // keep normal scrolling, including after a resize or zoom.
+                    const rect = el.querySelector('.recharts-cartesian-grid')?.getBoundingClientRect();
+                    if (!rect || rect.width <= 0 || rect.height <= 0 ||
+                        e.clientX < rect.left || e.clientX > rect.right ||
+                        e.clientY < rect.top || e.clientY > rect.bottom) return;
 
-                    if (wantZoomIn && range > minRange) {
-                        const reduction = Math.max(1, Math.floor(range * zoomFactor));
-                        const leftReduction = Math.floor(reduction * cursorRatio);
-                        const rightReduction = reduction - leftReduction;
-                        start = Math.min(start + leftReduction, end - minRange);
-                        end = Math.max(end - rightReduction, start + minRange);
-                    } else if (!wantZoomIn && range < last) {
-                        const expansion = Math.max(1, Math.floor(range * zoomFactor));
-                        const leftExpansion = Math.floor(expansion * cursorRatio);
-                        const rightExpansion = expansion - leftExpansion;
-                        start = Math.max(0, start - leftExpansion);
-                        end = Math.min(last, end + rightExpansion);
-                    }
-                    if (end < start) end = start;
-                    return { start, end };
-                });
-            };
+                    // A native, non-passive listener can cancel scrolling. Keep
+                    // consuming the wheel at the zoom limits so the panel stays put.
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const delta = e.deltaY || e.deltaX;
+                    if (!delta) return;
+                    const cursorRatio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+                    const wantZoomIn = delta < 0;
+
+                    setZoomDomain((prev) => {
+                        const last = Math.max(0, dataLength - 1);
+                        const minRange = Math.min(last, Math.max(5, Math.floor(dataLength * 0.05)));
+                        let start = Math.max(0, Math.min(prev.start, last));
+                        let end = Math.max(start, Math.min(prev.end, last));
+                        const range = end - start;
+                        const zoomFactor = 0.1;
+
+                        if (wantZoomIn && range > minRange) {
+                            const reduction = Math.max(1, Math.floor(range * zoomFactor));
+                            const leftReduction = Math.floor(reduction * cursorRatio);
+                            const rightReduction = reduction - leftReduction;
+                            start = Math.min(start + leftReduction, end - minRange);
+                            end = Math.max(end - rightReduction, start + minRange);
+                        } else if (!wantZoomIn && range < last) {
+                            const expansion = Math.max(1, Math.floor(range * zoomFactor));
+                            const leftExpansion = Math.floor(expansion * cursorRatio);
+                            const rightExpansion = expansion - leftExpansion;
+                            start = Math.max(0, start - leftExpansion);
+                            end = Math.min(last, end + rightExpansion);
+                        }
+                        if (end < start) end = start;
+                        return { start, end };
+                    });
+                };
+
+                el.addEventListener('wheel', handleWheel, { passive: false });
+                return () => el.removeEventListener('wheel', handleWheel);
+            }, [dataLength]);
 
             const handleMouseDown = (e) => {
                 if (e.button === 0) { // Left click only
@@ -2776,7 +3008,6 @@
                 zoomDomain,
                 containerRef,
                 handlers: {
-                    onWheel: handleWheel,
                     onMouseDown: handleMouseDown,
                     onMouseMove: handleMouseMove,
                     onMouseUp: handleMouseUp,
@@ -2805,7 +3036,7 @@
                     style={{ touchAction: 'none' }}
                 >
                     <div
-                        className="absolute top-14 right-2 z-10 flex items-center gap-1"
+                        className="absolute top-2 right-2 z-10 flex items-center gap-1"
                         onMouseDown={(e) => e.stopPropagation()}
                         onPointerDown={(e) => e.stopPropagation()}
                         onDoubleClick={(e) => e.stopPropagation()}
@@ -2881,7 +3112,7 @@
                     style={{ touchAction: 'none' }}
                 >
                     <div
-                        className="absolute top-14 right-2 z-10 flex items-center gap-1"
+                        className="absolute top-2 right-2 z-10 flex items-center gap-1"
                         onMouseDown={(e) => e.stopPropagation()}
                         onPointerDown={(e) => e.stopPropagation()}
                         onDoubleClick={(e) => e.stopPropagation()}
@@ -3105,19 +3336,43 @@
         };
 
 
-        const SettingsModal = ({ isOpen, onClose, theme, setTheme, lang, setLang, t }) => {
-            const [activeTab, setActiveTab] = useState("theme");
-
+        const SettingsModal = ({ isOpen, onClose, activeTab, setActiveTab, theme, setTheme, lang, setLang, t, visibleModels, onToggleVisibleModel, isModelAvailable, capabilitiesStatus, isRunning }) => {
+            const dialogRef = useRef(null);
             useEffect(() => {
-                if (isOpen) setActiveTab("theme");
+                if (!isOpen) return;
+                const previousFocus = document.activeElement;
+                const dialog = dialogRef.current;
+                dialog.querySelector('[data-settings-tab][aria-pressed="true"]')?.focus();
+                const handleKeyDown = (event) => {
+                    if (event.key === 'Escape') {
+                        event.preventDefault();
+                        onClose();
+                    } else if (event.key === 'Tab') {
+                        const controls = dialog.querySelectorAll('button:not(:disabled), input:not(:disabled), [tabindex="0"]');
+                        const first = controls[0];
+                        const last = controls[controls.length - 1];
+                        if (event.shiftKey && document.activeElement === first) {
+                            event.preventDefault();
+                            last?.focus();
+                        } else if (!event.shiftKey && document.activeElement === last) {
+                            event.preventDefault();
+                            first?.focus();
+                        }
+                    }
+                };
+                dialog.addEventListener('keydown', handleKeyDown);
+                return () => {
+                    dialog.removeEventListener('keydown', handleKeyDown);
+                    if (previousFocus?.isConnected && previousFocus !== document.body) previousFocus.focus();
+                    else document.getElementById('forecast-model-profile')?.focus();
+                };
             }, [isOpen]);
-
             if (!isOpen) return null;
 
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 modal-backdrop transition-opacity" onClick={onClose}></div>
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-xl shadow-2xl relative flex flex-col overflow-hidden animate-slide-up border border-slate-200 dark:border-slate-700">
+                    <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="forecast-settings-title" className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-xl shadow-2xl relative flex flex-col overflow-hidden animate-slide-up border border-slate-200 dark:border-slate-700">
                         {/* Header */}
                         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/50 shrink-0">
                             <div className="flex items-center gap-3">
@@ -3125,11 +3380,11 @@
                                     <SettingsIcon />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('settings.title')}</h2>
+                                    <h2 id="forecast-settings-title" className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('settings.title')}</h2>
                                     <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.subtitle')}</p>
                                 </div>
                             </div>
-                            <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
+                            <button type="button" onClick={onClose} aria-label={t('settings.close')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
                                 <XIcon />
                             </button>
                         </div>
@@ -3139,22 +3394,79 @@
                             {/* Sidebar Nav */}
                             <div className="w-1/4 md:w-64 border-r border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 p-4 flex flex-col gap-2 overflow-y-auto">
                                 <button
+                                    data-settings-tab="theme"
+                                    aria-pressed={activeTab === 'theme'}
                                     onClick={() => setActiveTab("theme")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'theme' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
                                     <PaletteIcon /> {t('settings.theme_mode')}
                                 </button>
                                 <button
+                                    data-settings-tab="lang"
+                                    aria-pressed={activeTab === 'lang'}
                                     onClick={() => setActiveTab("lang")}
                                     className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'lang' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" x2="22" y1="12" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
                                     {t('settings.language')}
                                 </button>
+                                <button
+                                    type="button"
+                                    data-settings-tab="models"
+                                    onClick={() => setActiveTab('models')}
+                                    aria-pressed={activeTab === 'models'}
+                                    className={`text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-3 transition-colors ${activeTab === 'models' ? 'bg-brand-gold text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                >
+                                    <span className="shrink-0" aria-hidden="true"><LayersIcon /></span>
+                                    {t('settings.models')}
+                                </button>
                             </div>
 
                             {/* Content Area */}
-                            <div className="flex-1 overflow-y-auto scroller p-6 md:p-8 relative bg-white dark:bg-slate-900">
+                            <div className="flex-1 min-w-0 overflow-y-auto scroller p-6 md:p-8 relative bg-white dark:bg-slate-900">
+                                {activeTab === 'models' && (
+                                    <div className="space-y-5 animate-fade-in">
+                                        <div>
+                                            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('settings.models')}</h3>
+                                            <p className="mt-2 text-sm leading-5 text-slate-500 dark:text-slate-400">{t('settings.models_description')}</p>
+                                            {isRunning && <p className="mt-2 text-sm text-amber-700 dark:text-amber-400" role="status">{t('settings.models_running')}</p>}
+                                        </div>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                                            {FORECAST_MODEL_GROUPS.map((group) => (
+                                                <section key={group.id} aria-label={t(group.labelKey)} className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                                                    <h4 className="flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-slate-800/60 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                        <span className="shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true"><group.Icon /></span>
+                                                        {t(group.labelKey)}
+                                                    </h4>
+                                                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                                                        {SELECTABLE_FORECAST_MODELS.filter((option) => option.group === group.id).map((option) => {
+                                                            const visible = visibleModels.includes(option.value);
+                                                            const available = isModelAvailable(option.value);
+                                                            const checking = !option.disabled && option.advanced && capabilitiesStatus === 'loading';
+                                                            const toggleDisabled = isRunning || !available;
+                                                            return (
+                                                                <label key={option.value} className={`flex items-center justify-between gap-3 px-4 py-3 ${toggleDisabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30'}`}>
+                                                                    <span className="min-w-0">
+                                                                        <span className="block text-sm font-semibold text-slate-700 dark:text-slate-200">{t(option.labelKey)}</span>
+                                                                        <span className={`block mt-0.5 text-xs ${available ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`} title={option.disabled ? t('sidebar.model_temporarily_disabled') : undefined}>
+                                                                            {t(checking ? 'settings.models_checking' : available ? 'settings.models_available' : 'settings.models_unavailable')}
+                                                                        </span>
+                                                                    </span>
+                                                                    <span className={`relative shrink-0 flex items-center ${toggleDisabled ? 'opacity-50' : ''}`}>
+                                                                        <input type="checkbox" role="switch" className="peer sr-only" checked={visible} disabled={toggleDisabled} onChange={() => onToggleVisibleModel(option.value)} aria-label={`${t(option.labelKey)}: ${t('settings.show_in_dropdown')}`} />
+                                                                        <span aria-hidden="true" className={`block h-5 w-9 rounded-full transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-amber-500 peer-focus-visible:ring-offset-2 dark:peer-focus-visible:ring-offset-slate-900 ${visible && !toggleDisabled ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-600'}`}>
+                                                                            <span className={`block h-4 w-4 mt-0.5 rounded-full bg-white shadow-sm transition-transform ${visible ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
+                                                                        </span>
+                                                                    </span>
+                                                                </label>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </section>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                                 {activeTab === 'theme' && (
                                     <div className="space-y-6 animate-fade-in">
                                         <div>
@@ -3234,7 +3546,13 @@
             const [startColIdx, setStartColIdx] = useState(-1);
             const [endColIdx, setEndColIdx] = useState(-1);
 
-            const [selectedModels, setSelectedModels] = useState(() => [...SELECTABLE_MODEL_ORDER]);
+            const [visibleModels, setVisibleModels] = useState(readVisibleForecastModels);
+            const [selectedModels, setSelectedModels] = useState(() => orderedSelectedModels(visibleModels));
+            useEffect(() => {
+                try {
+                    localStorage.setItem(VISIBLE_FORECAST_MODELS_KEY, JSON.stringify(visibleModels));
+                } catch (_) { }
+            }, [visibleModels]);
             const [modelPickerOpen, setModelPickerOpen] = useState(false);
             const [validationPickerOpen, setValidationPickerOpen] = useState(false);
             const [metricPickerOpen, setMetricPickerOpen] = useState(false);
@@ -3294,6 +3612,7 @@
             const [activeTab, setActiveTab] = useState("overview"); // overview | sku id
             const [overviewSearchQuery, setOverviewSearchQuery] = useState("");
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+            const [settingsTab, setSettingsTab] = useState('theme');
             const [isMappingModalOpen, setIsMappingModalOpen] = useState(false);
             const [theme, setTheme] = useOperartisTheme();
             const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
@@ -3305,7 +3624,10 @@
             }, []);
 
             useEffect(() => {
-                const openSettings = () => setIsSettingsOpen(true);
+                const openSettings = () => {
+                    setSettingsTab('theme');
+                    setIsSettingsOpen(true);
+                };
                 window.addEventListener('operartis:open-settings', openSettings);
                 return () => window.removeEventListener('operartis:open-settings', openSettings);
             }, []);
@@ -3403,17 +3725,9 @@
                         const parsed = parseForecastCapabilities(await response.json());
                         if (disposed) return;
                         setForecastCapabilities({ status: 'ready', ...parsed });
-                        const heavyAvailable = parsed.supportedModels.length > 0
-                            ? parsed.supportedModels.some((model) => HEAVY_SELECTABLE_MODELS.has(model) || model === 'advanced_auto')
-                            : parsed.cloudEnabled === true;
-                        setSelectedModels((current) => {
-                            const next = orderedSelectedModels(current).filter((code) => (
-                                !HEAVY_SELECTABLE_MODELS.has(code) || heavyAvailable
-                            ));
-                            return next.length ? next : SELECTABLE_MODEL_ORDER.filter((code) => (
-                                !HEAVY_SELECTABLE_MODELS.has(code) || heavyAvailable
-                            ));
-                        });
+                        setSelectedModels((current) => current.filter((code) => (
+                            forecastModelAvailable(code, { status: 'ready', ...parsed })
+                        )));
                     } catch (capabilityError) {
                         if (disposed) return;
                         setForecastCapabilities({
@@ -3422,14 +3736,9 @@
                             supportedModels: [],
                             frequencyProfiles: parseFrequencyProfiles(),
                         });
-                        setSelectedModels((current) => {
-                            const next = orderedSelectedModels(current).filter((code) => (
-                                !HEAVY_SELECTABLE_MODELS.has(code)
-                            ));
-                            return next.length ? next : SELECTABLE_MODEL_ORDER.filter((code) => (
-                                !HEAVY_SELECTABLE_MODELS.has(code)
-                            ));
-                        });
+                        setSelectedModels((current) => current.filter((code) => (
+                            forecastModelAvailable(code, { status: 'unavailable' })
+                        )));
                         if (capabilityError.name !== 'AbortError') {
                             console.warn('Cloud forecasting capabilities unavailable:', capabilityError);
                         }
@@ -3520,17 +3829,7 @@
                 return fallback || key;
             };
 
-            const isForecastModelAvailable = (candidate) => {
-                if (SELECTABLE_FORECAST_MODELS.find((option) => option.value === candidate)?.disabled) return false;
-                if (!isAdvancedModelType(candidate)) return true;
-                if (forecastCapabilities.status !== 'ready') return false;
-                const value = String(candidate || '').toLowerCase();
-                if (forecastCapabilities.supportedModels.length > 0) {
-                    return forecastCapabilities.supportedModels.includes(value)
-                        || forecastCapabilities.supportedModels.includes('advanced_auto');
-                }
-                return forecastCapabilities.cloudEnabled === true;
-            };
+            const isForecastModelAvailable = (candidate) => forecastModelAvailable(candidate, forecastCapabilities);
             const hasAvailableAdvancedModels = SELECTABLE_FORECAST_MODELS.some(
                 (option) => option.advanced && isForecastModelAvailable(option.value)
             );
@@ -4225,7 +4524,8 @@
                 && !!normalizedJobStatus
                 && !TERMINAL_JOB_STATUSES.has(normalizedJobStatus)
                 && normalizedJobStatus !== 'cancel_requested';
-            const availableSelectableCodes = SELECTABLE_FORECAST_MODELS
+            const visibleModelOptions = SELECTABLE_FORECAST_MODELS.filter((option) => visibleModels.includes(option.value));
+            const availableSelectableCodes = visibleModelOptions
                 .filter((option) => isForecastModelAvailable(option.value))
                 .map((option) => option.value);
             const allAvailableSelected = availableSelectableCodes.length > 0
@@ -4233,7 +4533,7 @@
             const modelPickerSummary = (() => {
                 const selected = orderedSelectedModels(selectedModels);
                 if (!selected.length) return t('sidebar.models_required');
-                if (allAvailableSelected) return t('sidebar.models_all');
+                if (allAvailableSelected) return t(visibleModels.length === SELECTABLE_FORECAST_MODELS.length ? 'sidebar.models_all' : 'settings.models_all_listed');
                 if (selected.length <= 4) {
                     return selected.map((code) => {
                         const option = SELECTABLE_FORECAST_MODELS.find((item) => item.value === code);
@@ -4243,7 +4543,7 @@
                 return t('sidebar.models_selected').replace('{count}', String(selected.length));
             })();
             const toggleSelectedModel = (code, available) => {
-                if (!available || isRunning) return;
+                if (!available || isRunning || !visibleModels.includes(code)) return;
                 setSelectedModels((current) => {
                     if (current.includes(code)) {
                         if (current.length <= 1) return current;
@@ -4255,6 +4555,17 @@
             const toggleSelectAllModels = () => {
                 if (isRunning || !availableSelectableCodes.length) return;
                 setSelectedModels(availableSelectableCodes);
+            };
+            const toggleVisibleModel = (code) => {
+                if (isRunning || !isForecastModelAvailable(code)) return;
+                const removing = visibleModels.includes(code);
+                setVisibleModels((current) => removing ? current.filter((item) => item !== code) : [...current, code]);
+                if (removing) setSelectedModels((current) => current.filter((item) => item !== code));
+            };
+            const openModelSettings = () => {
+                setModelPickerOpen(false);
+                setSettingsTab('models');
+                setIsSettingsOpen(true);
             };
 
             const openDetailedView = () => {
@@ -4530,7 +4841,8 @@
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
                                             {modelPickerOpen && (
-                                                <div className="fc-model-picker-menu scroller" role="listbox" aria-multiselectable="true" aria-labelledby="forecast-model-profile">
+                                                <div className="fc-model-picker-menu fc-model-catalog-picker">
+                                                    <div className="fc-model-picker-options scroller" role="listbox" aria-multiselectable="true" aria-labelledby="forecast-model-profile">
                                                     <label className="fc-model-picker-option fc-model-picker-select-all">
                                                         <input
                                                             type="checkbox"
@@ -4542,11 +4854,14 @@
                                                         <span>{t('sidebar.models_select_all')}</span>
                                                     </label>
                                                     {FORECAST_MODEL_GROUPS.map((group) => {
-                                                        const groupOptions = SELECTABLE_FORECAST_MODELS.filter((option) => option.group === group.id);
+                                                        const groupOptions = visibleModelOptions.filter((option) => option.group === group.id);
                                                         if (!groupOptions.length) return null;
                                                         return (
                                                             <div key={group.id} className="fc-model-picker-group" role="group" aria-label={t(group.labelKey)}>
-                                                                <div className="fc-model-picker-group-label">{t(group.labelKey)}</div>
+                                                                <div className="fc-model-picker-group-label">
+                                                                    <span className="fc-model-picker-group-icon" aria-hidden="true"><group.Icon /></span>
+                                                                    <span>{t(group.labelKey)}</span>
+                                                                </div>
                                                                 {groupOptions.map((option) => {
                                                                     const available = isForecastModelAvailable(option.value);
                                                                     const checked = selectedModels.includes(option.value);
@@ -4570,6 +4885,11 @@
                                                             </div>
                                                         );
                                                     })}
+                                                    {!visibleModelOptions.length && <p className="px-2 py-3 text-xs text-slate-500 dark:text-slate-400">{t('settings.models_empty')}</p>}
+                                                    </div>
+                                                    <button type="button" onClick={openModelSettings} className="fc-model-picker-more hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500" aria-haspopup="dialog">
+                                                        {t('settings.more_models')}
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>
@@ -4921,8 +5241,8 @@
                                                 />
                                             )}
                                             {isDetailTab && skuData && (
-                                                <div className="h-full w-full overflow-hidden max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm pt-4 px-3 pb-3 sm:pt-5 lg:p-4 lg:pt-5 mobile-compact-p relative flex flex-col min-h-0" key={layoutKey}>
-                                                    <div className="flex flex-col h-full gap-2 mobile-landscape-chart-row mobile-compact-gap min-h-0">
+                                                <div className="fc-detail-scroll scroller h-full w-full max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm pt-4 px-3 pb-3 sm:pt-5 lg:p-4 lg:pt-5 mobile-compact-p relative min-h-0" key={layoutKey} role="region" aria-label={skuData.sku} tabIndex={0}>
+                                                    <div className="flex flex-col min-h-full gap-4">
                                                         {/* Dedicated toolbar — keeps SKU + metrics off the chart legend */}
                                                         <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-w-0 px-0.5">
                                                             <div className="flex items-center gap-0.5 lg:gap-1 min-w-0 max-w-full sm:max-w-[55%] bg-slate-100/80 dark:bg-white/5 pl-0.5 pr-1.5 py-0.5 lg:pl-1 lg:pr-3 lg:py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-sm">
@@ -4959,27 +5279,32 @@
                                                             </div>
                                                         </div>
                                                         {skuData.validation_summary && (
-                                                            <details className="shrink-0 text-[10px] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1">
-                                                                <summary className="cursor-pointer" title={t('sidebar.validation_details')}>
+                                                            <section className="shrink-0 text-[13px] leading-5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg p-3" aria-label={t('sidebar.validation_details')}>
+                                                                <p className="font-semibold">
                                                                     {t('sidebar.validation_counts').replace('{count}', skuData.validation_summary.evaluations).replace('{horizon}', skuData.validation_summary.forecast_horizon).replace('{pairs}', skuData.validation_summary.scored_pairs)}
-                                                                </summary>
-                                                                <div className="max-h-32 overflow-auto mt-1 space-y-1">
-                                                                    <p>{t('sidebar.validation_chart')}</p>
-                                                                    <p>{t('sidebar.validation_coverage').replace('{dates}', skuData.validation_summary.unique_test_dates).replace('{periods}', skuData.validation_summary.validation_period)}</p>
+                                                                </p>
+                                                                <div className="mt-2 space-y-2">
                                                                     {skuData.validation_summary.scheme === 'fixed_horizon' && skuData.validation_summary.evaluations < skuData.validation_summary.max_evaluations && <p>{t('sidebar.validation_limited').replace('{max}', skuData.validation_summary.max_evaluations)}</p>}
                                                                     <p>{t('sidebar.validation_final')}: {skuData.final_training_periods}</p>
-                                                                    <table className="w-full text-right">
-                                                                        <thead><tr><th className="text-left">{t('sidebar.validation_lead')}</th><th>RMSE</th><th>MAE</th><th>MAPE</th></tr></thead>
-                                                                        <tbody>{(skuData.validation_summary.metrics_by_lead || []).map(metric => <tr key={metric.lead}><td className="text-left">{metric.lead}</td><td>{fmtNumber(metric.rmse, 1, 1)}</td><td>{fmtNumber(metric.mae, 1, 1)}</td><td>{formatEvaluationValue(metric.mape, 'mape')}</td></tr>)}</tbody>
+                                                                    <table role="table" aria-label={t('sidebar.validation_details')} className="fc-validation-table w-full border-separate border-spacing-0 text-right tabular-nums [&_td]:px-3 [&_td]:py-1">
+                                                                        <thead role="rowgroup" className="scroller rounded-t-md bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 [&_th]:px-3 [&_th]:py-2 [&_th]:font-semibold">
+                                                                            <tr role="row"><th role="columnheader" scope="col" className="text-left">{t('sidebar.validation_lead')}</th><th role="columnheader" scope="col">RMSE</th><th role="columnheader" scope="col">MAE</th><th role="columnheader" scope="col">MAPE</th></tr>
+                                                                        </thead>
+                                                                        <tbody role="rowgroup" tabIndex={0} aria-label={t('sidebar.validation_details')} className="fc-validation-table-scroll scroller rounded-b-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
+                                                                            {(skuData.validation_summary.metrics_by_lead || []).map(metric => <tr role="row" key={metric.lead}><td role="cell" className="text-left">{metric.lead}</td><td role="cell">{fmtNumber(metric.rmse, 1, 1)}</td><td role="cell">{fmtNumber(metric.mae, 1, 1)}</td><td role="cell">{formatEvaluationValue(metric.mape, 'mape')}</td></tr>)}
+                                                                        </tbody>
                                                                     </table>
                                                                 </div>
-                                                            </details>
+                                                            </section>
                                                         )}
-                                                        <div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative mobile-landscape-chart-sep min-h-0">
-                                                            <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
-                                                        </div>
-                                                        <div className="flex-1 relative min-h-0">
-                                                            <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
+                                                        <ForecastValuesTable data={skuData.forecast_data} t={t} />
+                                                        <div className="fc-detail-charts min-w-0 gap-4 border border-slate-200 dark:border-slate-700 rounded-lg p-2">
+                                                            <div className="fc-detail-chart border-b border-dashed border-slate-200 dark:border-slate-700 relative">
+                                                                <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
+                                                            </div>
+                                                            <div className="fc-detail-chart relative">
+                                                                <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -4994,7 +5319,7 @@
                     {/* FULL SCREEN */}
 
 
-                    <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} baseUrl={BASE_URL} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} t={t} />
+                    <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} activeTab={settingsTab} setActiveTab={setSettingsTab} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} t={t} visibleModels={visibleModels} onToggleVisibleModel={toggleVisibleModel} isModelAvailable={isForecastModelAvailable} capabilitiesStatus={forecastCapabilities.status} isRunning={isRunning} />
                 </div>
             );
         };

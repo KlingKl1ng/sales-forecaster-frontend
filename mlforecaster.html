@@ -310,7 +310,7 @@
                 },
                 kpi: {
                     totalVol: "Total Forecast Volume",
-                    avgHealth: "Avg Model Health (R²)",
+                    avgHealth: "Avg Validation R²",
                     alerts: "Critical Alerts (Low R²)",
                     skus: "SKUs",
                     currentVol: "Current Volume",
@@ -349,7 +349,7 @@
                     bestTs: "Best TS Model",
                     bestCausal: "Best Causal Model",
                     valMse: "Validation MSE",
-                    r2: "R² Score",
+                    r2: "Validation R²",
                     action: "Action",
                     date: "Date"
                 },
@@ -417,7 +417,7 @@
                 },
                 kpi: {
                     totalVol: "Tổng lượng dự báo",
-                    avgHealth: "Độ chính xác trung bình (R²)",
+                    avgHealth: "R² kiểm định trung bình",
                     alerts: "Cảnh báo (R² thấp)",
                     skus: "Mã hàng",
                     currentVol: "Số lượng hiện tại",
@@ -456,7 +456,7 @@
                     bestTs: "Mô hình chuỗi thời gian",
                     bestCausal: "Mô hình nhân quả",
                     valMse: "Sai số MSE",
-                    r2: "Điểm R²",
+                    r2: "R² kiểm định",
                     action: "Hành động",
                     date: "Ngày"
                 },
@@ -524,7 +524,7 @@
                 },
                 kpi: {
                     totalVol: "Gesamtprognosevolumen",
-                    avgHealth: "Mittlere Modellgüte (R²)",
+                    avgHealth: "Mittleres Validierungs-R²",
                     alerts: "Kritische Warnungen (Niedriger R²)",
                     skus: "SKUs",
                     currentVol: "Aktuelles Volumen",
@@ -563,7 +563,7 @@
                     bestTs: "Bestes ZReihe-Modell",
                     bestCausal: "Bestes Kausalmodell",
                     valMse: "Validierungs-MSE",
-                    r2: "R²-Wert",
+                    r2: "Validierungs-R²",
                     action: "Aktion",
                     date: "Datum"
                 },
@@ -669,8 +669,9 @@
             const stats = useMemo(() => {
                 if (!results || !results.length) return null;
                 const totalVol = results.reduce((acc, r) => acc + r.forecast_data.reduce((sum, d) => sum + (d.future_forecast || 0), 0), 0);
-                const avgR2 = results.reduce((acc, r) => acc + (r.r2_score || 0), 0) / results.length;
-                const lowConf = results.filter(r => (r.r2_score || 0) < 0.6).length;
+                const scores = results.map(r => r.r2_score).filter(Number.isFinite);
+                const avgR2 = scores.length ? scores.reduce((sum, value) => sum + value, 0) / scores.length : null;
+                const lowConf = scores.filter(value => value < 0.6).length;
                 return { totalVol, avgR2, lowConf };
             }, [results]);
 
@@ -685,7 +686,7 @@
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
                         <div className="text-xs text-slate-500 uppercase font-bold">{t('kpi.avgHealth')}</div>
                         <div className={`text-2xl font-black mt-1 ${stats.avgR2 > 0.7 ? 'text-emerald-500' : stats.avgR2 > 0.4 ? 'text-amber-500' : 'text-rose-500'}`}>
-                            {(stats.avgR2 * 100).toFixed(1)}%
+                            {stats.avgR2 == null ? '-' : stats.avgR2.toFixed(3)}
                         </div>
                     </div>
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -771,7 +772,7 @@
                     <div className="flex-none w-44 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-sm min-h-[80px] gap-1">
                         <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide text-center w-full">{t('table.r2')}</div>
                         <div className={`text-lg font-black leading-none ${data.r2_score > 0.7 ? 'text-emerald-500' : data.r2_score > 0.4 ? 'text-amber-500' : 'text-rose-500'}`}>
-                            {(data.r2_score || 0).toFixed(3)}
+                            {Number.isFinite(data.r2_score) ? data.r2_score.toFixed(3) : '-'}
                         </div>
                     </div>
                 </div>
@@ -1663,7 +1664,7 @@
                 fd.append('train_horizon', Math.max(1, trainHorizon));
                 fd.append('test_horizon', Math.max(1, testHorizon));
                 fd.append('forecast_steps', Math.max(1, forecastHorizon));
-                fd.append('model_type', 'tes');
+                fd.append('model_type', 'auto');
 
                 fetch(`${apiUrl}/synthesis/init`, { method: 'POST', body: fd })
                     .then(res => res.json())
