@@ -100,73 +100,13 @@
             flex: 1 1 0%;
             min-width: 0;
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             align-items: stretch;
         }
 
         .fc-kpi-metric {
             min-width: 0;
             overflow: hidden;
-        }
-
-        .fc-kpi-metric.fc-kpi-metric-select {
-            overflow: visible;
-        }
-
-        .fc-kpi-metric-trigger {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.15rem;
-            max-width: 100%;
-            margin: 0;
-            padding: 0;
-            border: 0;
-            background: transparent;
-            cursor: pointer;
-            font: inherit;
-            color: inherit;
-        }
-
-        .fc-kpi-metric-trigger:hover,
-        .fc-kpi-metric-trigger:focus-visible {
-            color: #d97706;
-        }
-
-        .dark .fc-kpi-metric-trigger:hover,
-        .dark .fc-kpi-metric-trigger:focus-visible {
-            color: #f59e0b;
-        }
-
-        .fc-kpi-metric-chevron {
-            width: 0.7rem;
-            height: 0.7rem;
-            flex-shrink: 0;
-            opacity: 0.7;
-        }
-
-        .fc-kpi-metric-trigger[aria-expanded="true"] .fc-kpi-metric-chevron {
-            transform: rotate(180deg);
-        }
-
-        .fc-kpi-metric-menu {
-            position: absolute;
-            z-index: 70;
-            top: calc(100% + 0.2rem);
-            left: 50%;
-            transform: translateX(-50%);
-            min-width: 6.75rem;
-            padding: 0.3rem;
-            border-radius: 0.75rem;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
-        }
-
-        .dark .fc-kpi-metric-menu {
-            border-color: #334155;
-            background: #020617;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
         }
 
         .fc-module-header {
@@ -1063,8 +1003,8 @@
                     eval_mse: "MSE",
                     eval_mape: "MAPE",
                     value_domain: "Forecast values",
-                    value_domain_nonnegative: "Non-negative (clip at zero)",
-                    value_domain_signed: "Signed (allow negatives)",
+                    value_domain_nonnegative: "Non-negative",
+                    value_domain_signed: "Allow negatives",
                     train_h: "Train Horizon",
                     test_h: "Test Horizon",
                     fc_h: "Forecast Horizon",
@@ -1139,25 +1079,28 @@
                 dashboard: {
                     batch_overview: "Overview",
                     detailed_view: "Detailed View",
-                    total_skus: "Total SKUs",
-                    total_skus_short: "SKUs",
+                    total_skus: "TOTAL IDs",
+                    total_skus_short: "IDs",
                     total_vol: "Total Forecast Vol",
                     total_vol_short: "Forecast Vol",
                     avg_mae: "Avg. MAE",
                     avg_mae_short: "MAE",
-                    avg_mse: "Avg. MSE",
-                    avg_mse_short: "MSE",
+                    avg_rmse: "Avg. RMSE",
+                    avg_rmse_short: "RMSE",
+                    avg_mape: "Avg. MAPE",
+                    avg_mape_short: "MAPE",
                     avg_eval: "Avg. {metric}",
                     avg_eval_short: "{metric}",
                     search_placeholder: "Search",
                     no_results: "No Results Loaded",
                     running_algo: "Running Analytics Algorithms",
-                    table_sku: "SKU",
+                    table_sku: "ID",
                     table_status: "Status",
                     table_validation: "Validation",
                     table_best_model: "Best Model",
                     table_mae: "MAE",
-                    table_mse: "MSE",
+                    table_rmse: "RMSE",
+                    table_mape: "MAPE",
                     table_action: "Action",
                     table_select: "Select",
                     select_all: "Select all",
@@ -1239,8 +1182,8 @@
                     eval_mse: "MSE",
                     eval_mape: "MAPE",
                     value_domain: "Giá trị dự báo",
-                    value_domain_nonnegative: "Không âm (cắt tại 0)",
-                    value_domain_signed: "Có dấu (cho phép âm)",
+                    value_domain_nonnegative: "Không âm",
+                    value_domain_signed: "Cho phép âm",
                     train_h: "Chu kỳ H.luyện",
                     test_h: "Chu kỳ K.định",
                     fc_h: "Chu kỳ dự báo",
@@ -1315,25 +1258,28 @@
                 dashboard: {
                     batch_overview: "Tổng quan",
                     detailed_view: "Chi tiết",
-                    total_skus: "Tổng SKU",
-                    total_skus_short: "SKU",
+                    total_skus: "Tổng ID",
+                    total_skus_short: "ID",
                     total_vol: "Tổng lượng dự báo",
                     total_vol_short: "Tổng dự báo",
                     avg_mae: "MAE trung bình",
                     avg_mae_short: "MAE",
-                    avg_mse: "MSE trung bình",
-                    avg_mse_short: "MSE",
+                    avg_rmse: "RMSE trung bình",
+                    avg_rmse_short: "RMSE",
+                    avg_mape: "MAPE trung bình",
+                    avg_mape_short: "MAPE",
                     avg_eval: "{metric} trung bình",
                     avg_eval_short: "{metric}",
                     search_placeholder: "Tìm kiếm",
                     no_results: "Chưa có kết quả",
                     running_algo: "Đang chạy thuật toán phân tích",
-                    table_sku: "Mã hàng (SKU)",
+                    table_sku: "ID",
                     table_status: "Trạng thái",
                     table_validation: "Kiểm định",
                     table_best_model: "Mô hình tốt nhất",
                     table_mae: "MAE",
-                    table_mse: "MSE",
+                    table_rmse: "RMSE",
+                    table_mape: "MAPE",
                     table_action: "Hành động",
                     table_select: "Chọn",
                     select_all: "Chọn tất cả",
@@ -1415,8 +1361,8 @@
                     eval_mse: "MSE",
                     eval_mape: "MAPE",
                     value_domain: "Prognosewerte",
-                    value_domain_nonnegative: "Nichtnegativ (bei 0 begrenzen)",
-                    value_domain_signed: "Vorzeichenbehaftet (negative Werte erlaubt)",
+                    value_domain_nonnegative: "Nichtnegativ",
+                    value_domain_signed: "Negative Werte erlaubt",
                     train_h: "Train-Horizont",
                     test_h: "Test-Horizont",
                     fc_h: "Prognose-Horizont",
@@ -1491,25 +1437,28 @@
                 dashboard: {
                     batch_overview: "Batch-Übersicht",
                     detailed_view: "Detailansicht",
-                    total_skus: "SKUs gesamt",
-                    total_skus_short: "SKUs",
+                    total_skus: "IDs gesamt",
+                    total_skus_short: "IDs",
                     total_vol: "Gesamtprognosevolumen",
                     total_vol_short: "Prognose",
                     avg_mae: "Ø MAE",
                     avg_mae_short: "MAE",
-                    avg_mse: "Ø MSE",
-                    avg_mse_short: "MSE",
+                    avg_rmse: "Ø RMSE",
+                    avg_rmse_short: "RMSE",
+                    avg_mape: "Ø MAPE",
+                    avg_mape_short: "MAPE",
                     avg_eval: "Ø {metric}",
                     avg_eval_short: "{metric}",
                     search_placeholder: "SKU suchen...",
                     no_results: "Keine Ergebnisse geladen",
                     running_algo: "Analytik-Algorithmen laufen",
-                    table_sku: "SKU",
+                    table_sku: "ID",
                     table_status: "Status",
                     table_validation: "Validierung",
                     table_best_model: "Bestes Modell",
                     table_mae: "MAE",
-                    table_mse: "MSE",
+                    table_rmse: "RMSE",
+                    table_mape: "MAPE",
                     table_action: "Aktion",
                     table_select: "Auswählen",
                     select_all: "Alle auswählen",
@@ -1852,17 +1801,13 @@
             return null;
         };
 
-        const JobStatusBar = memo(({ status, deploymentEnvironment, completedCount, totalCount, queuePosition, canCancel, isCancelling, onCancel, t }) => {
+        const JobStatusBar = memo(({ status, completedCount, totalCount, queuePosition, canCancel, isCancelling, onCancel, t }) => {
             if (!status) return null;
             const normalizedStatus = normalizeJobStatus(status);
             const safeCompleted = Number.isFinite(Number(completedCount)) ? Math.max(0, Number(completedCount)) : 0;
             const safeTotal = Number.isFinite(Number(totalCount)) ? Math.max(0, Number(totalCount)) : 0;
             const hasProgress = safeTotal > 0;
             const progressPercent = hasProgress ? Math.min(100, Math.round((safeCompleted / safeTotal) * 100)) : 0;
-            // This label describes the deployment, not the API's in-process runner.
-            const backendLabel = deploymentEnvironment === 'local'
-                ? t('job.backend_local')
-                : t('job.backend_cloud');
             const statusLabel = t(`job.status_${normalizedStatus}`);
             const statusClass = normalizedStatus === 'failed'
                 ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40'
@@ -1881,11 +1826,6 @@
                     aria-live="polite"
                     aria-atomic="false"
                 >
-                    <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="w-3.5 h-3.5 shrink-0 [&_svg]:w-full [&_svg]:h-full" aria-hidden="true"><ServerIcon /></span>
-                        <span className="font-semibold whitespace-nowrap">{t('job.execution_backend')}:</span>
-                        <strong className="whitespace-nowrap">{backendLabel}</strong>
-                    </div>
                     <span className={`inline-flex h-7 items-center justify-center rounded-full border px-2 font-bold whitespace-nowrap shrink-0 min-w-[7.75rem] sm:min-w-[9.5rem] leading-none ${statusClass}`}>
                         {statusLabel}
                     </span>
@@ -1923,90 +1863,25 @@
             );
         });
 
-        const MetricTile = memo(({ label, shortLabel, value, subValue, type, isDark, variant = 'default', highlight }) => {
-            const colorClass = type === 'pos' ? 'text-emerald-600 dark:text-emerald-400' : type === 'neg' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-white';
-            const bgClass = highlight ? 'bg-amber-50/50 dark:bg-amber-900/20' : variant === 'validation' ? 'bg-amber-50/30 dark:bg-amber-900/10' : 'bg-white/40 dark:bg-white/5';
+        const MetricTile = memo(({ label, shortLabel, value, subValue, type, isDark, variant = 'default', highlight, preserveLabelCase = false }) => {
+            const colorClass = highlight
+                ? 'text-amber-600 dark:text-amber-400'
+                : type === 'pos' ? 'text-emerald-600 dark:text-emerald-400' : type === 'neg' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-white';
+            const bgClass = highlight ? 'bg-amber-50/70 dark:bg-amber-900/30' : variant === 'validation' ? 'bg-amber-50/30 dark:bg-amber-900/10' : 'bg-white/40 dark:bg-white/5';
+            const labelClass = highlight ? 'text-amber-700/80 dark:text-amber-400/80' : 'text-slate-500/80 dark:text-slate-400';
+            const caseClass = preserveLabelCase ? '' : 'uppercase';
             const mobileLabel = shortLabel || label;
             return (
                 <div
                     className={`fc-kpi-metric flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 ${bgClass} backdrop-blur-md px-1 py-1.5 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
                     title={label}
                 >
-                    <span className="sm:hidden text-[7px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wide mb-0.5 text-center leading-[1.1] w-full min-w-0 truncate px-0.5">{mobileLabel}</span>
-                    <span className="hidden sm:block text-[9px] uppercase font-bold text-slate-500/80 dark:text-slate-400 tracking-wider mb-0.5 text-center leading-[1.1] w-full min-w-0 truncate px-0.5">{label}</span>
+                    <span className={`sm:hidden text-[9px] ${caseClass} font-bold ${labelClass} tracking-wide mb-0.5 text-center leading-[1.15] w-full min-w-0 truncate px-0.5`}>{mobileLabel}</span>
+                    <span className={`hidden sm:block text-[11px] md:text-xs ${caseClass} font-bold ${labelClass} tracking-wide mb-0.5 text-center leading-[1.15] w-full min-w-0 truncate px-0.5`}>{label}</span>
                     <div className="flex items-baseline gap-1 justify-center min-w-0 max-w-full">
                         <span className={`text-xs sm:text-base md:text-lg font-bold font-mono leading-none truncate ${colorClass} drop-shadow-sm`}>{value}</span>
                         {subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500 shrink-0">{subValue}</span>}
                     </div>
-                </div>
-            );
-        });
-
-        const MetricSelectTile = memo(({ label, shortLabel, value, options, selected, onSelect, t }) => {
-            const [open, setOpen] = useState(false);
-            const wrapRef = useRef(null);
-            const mobileLabel = shortLabel || label;
-
-            useEffect(() => {
-                if (!open) return undefined;
-                const onPointer = (event) => {
-                    if (wrapRef.current && !wrapRef.current.contains(event.target)) {
-                        setOpen(false);
-                    }
-                };
-                const onKey = (event) => {
-                    if (event.key === 'Escape') setOpen(false);
-                };
-                document.addEventListener('mousedown', onPointer);
-                document.addEventListener('keydown', onKey);
-                return () => {
-                    document.removeEventListener('mousedown', onPointer);
-                    document.removeEventListener('keydown', onKey);
-                };
-            }, [open]);
-
-            return (
-                <div
-                    ref={wrapRef}
-                    className="fc-kpi-metric fc-kpi-metric-select relative flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 bg-white/40 dark:bg-white/5 backdrop-blur-md px-1 py-1.5 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
-                    title={label}
-                >
-                    <button
-                        type="button"
-                        className="fc-kpi-metric-trigger text-slate-500/80 dark:text-slate-400"
-                        aria-haspopup="listbox"
-                        aria-expanded={open}
-                        aria-label={t('sidebar.eval_metric')}
-                        onClick={() => setOpen((prev) => !prev)}
-                    >
-                        <span className="sm:hidden text-[7px] uppercase font-bold tracking-wide leading-[1.1] min-w-0 truncate">{mobileLabel}</span>
-                        <span className="hidden sm:block text-[9px] uppercase font-bold tracking-wider leading-[1.1] min-w-0 truncate">{label}</span>
-                        <svg className="fc-kpi-metric-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                    </button>
-                    <div className="flex items-baseline gap-1 justify-center min-w-0 max-w-full">
-                        <span className="text-xs sm:text-base md:text-lg font-bold font-mono leading-none truncate text-slate-700 dark:text-white drop-shadow-sm">{value}</span>
-                    </div>
-                    {open && (
-                        <div className="fc-kpi-metric-menu" role="listbox" aria-label={t('sidebar.eval_metric')}>
-                            {options.map((option) => (
-                                <button
-                                    key={option.value}
-                                    type="button"
-                                    role="option"
-                                    aria-selected={selected === option.value}
-                                    className={`fc-model-picker-option${selected === option.value ? ' is-selected' : ''}`}
-                                    onClick={() => {
-                                        onSelect(option.value);
-                                        setOpen(false);
-                                    }}
-                                >
-                                    {t(option.labelKey)}
-                                </button>
-                            ))}
-                        </div>
-                    )}
                 </div>
             );
         });
@@ -2024,6 +1899,14 @@
             if (String(code || '').toLowerCase() === 'mape') return `${fmtNumber(value, 1, 1)}%`;
             return fmtNumber(value, 0, 0);
         };
+        const rowContestMetric = (row, fallback = 'rmse') => (
+            normalizeContestMetric(row && row.evaluation_metric ? row.evaluation_metric : fallback)
+        );
+        const contestValueClass = (isContest) => (
+            isContest
+                ? 'text-amber-600 dark:text-amber-400'
+                : 'dark:text-slate-300'
+        );
 
         const ForecastingLoader = memo(({ t, validationMethod, testHorizon }) => {
             // Calculate adaptive stride info for display
@@ -2083,25 +1966,24 @@
             );
         });
 
-        const KPICards = memo(({ results, skuCount = 0, evaluationMetric = 'rmse', onEvaluationMetricChange, t }) => {
+        const KPICards = memo(({ results, skuCount = 0, t }) => {
             const hasData = results && results.length > 0;
-            const metricCode = evaluationMetric || 'rmse';
-            const metricLabel = t(`sidebar.eval_${metricCode}`);
-            const avgEvalLabel = t('dashboard.avg_eval').replace('{metric}', metricLabel);
-            const avgEvalShort = t('dashboard.avg_eval_short').replace('{metric}', metricLabel);
 
-            // Memoize expensive calculations
-            const { totalSeries, avgEval, totalForecastVolume } = useMemo(() => {
+            const { totalSeries, avgMape, avgRmse, avgMae, totalForecastVolume } = useMemo(() => {
                 if (!hasData) {
                     return {
                         totalSeries: skuCount > 0 ? skuCount : '-',
-                        avgEval: '-',
+                        avgMape: '-',
+                        avgRmse: '-',
+                        avgMae: '-',
                         totalForecastVolume: '-',
                     };
                 }
 
                 const total = results.length;
-                const evalSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, metricCode) || 0), 0);
+                const mapeSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, 'mape') || 0), 0);
+                const rmseSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, 'rmse') || 0), 0);
+                const maeSum = results.reduce((sum, r) => sum + (evaluationMetricValue(r, 'mae') || 0), 0);
                 const fcVolume = results.reduce((sum, r) => {
                     const fcSum = r.forecast_data ? r.forecast_data.reduce((s, d) => s + (d.future_forecast || 0), 0) : 0;
                     return sum + fcSum;
@@ -2109,28 +1991,22 @@
 
                 return {
                     totalSeries: skuCount > 0 ? skuCount : total,
-                    avgEval: evalSum / total,
+                    avgMape: mapeSum / total,
+                    avgRmse: rmseSum / total,
+                    avgMae: maeSum / total,
                     totalForecastVolume: fcVolume
                 };
-            }, [results, hasData, skuCount, metricCode]);
+            }, [results, hasData, skuCount]);
 
             return (
                 <div className="fc-kpi-bar min-h-12 sm:min-h-16">
                     <div className="fc-kpi-metrics min-h-12 sm:min-h-16">
-                        <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} />
+                        <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} preserveLabelCase />
                         <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
-                        <MetricSelectTile
-                            label={avgEvalLabel}
-                            shortLabel={avgEvalShort}
-                            value={formatEvaluationValue(avgEval, metricCode)}
-                            options={CONTEST_EVALUATION_METRIC_OPTIONS}
-                            selected={metricCode}
-                            onSelect={onEvaluationMetricChange}
-                            t={t}
-                        />
+                        <MetricTile label={t('dashboard.avg_mape')} shortLabel={t('dashboard.avg_mape_short')} value={formatEvaluationValue(avgMape, 'mape')} />
+                        <MetricTile label={t('dashboard.avg_rmse')} shortLabel={t('dashboard.avg_rmse_short')} value={formatEvaluationValue(avgRmse, 'rmse')} />
+                        <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={formatEvaluationValue(avgMae, 'mae')} />
                     </div>
-
-
                 </div>
             );
         });
@@ -2317,8 +2193,7 @@
 
         const BatchOverview = memo(({ results, onSelectSku, selectedSkus, onToggleSku, onToggleSelectAll, evaluationMetric = 'rmse', t }) => {
             const formatMetric = (value, code) => formatEvaluationValue(value, code);
-            const metricCode = evaluationMetric || 'rmse';
-            const metricLabel = t(`sidebar.eval_${metricCode}`);
+            const contestCode = normalizeContestMetric(evaluationMetric);
             const selectAllDesktopRef = useRef(null);
             const selectAllMobileRef = useRef(null);
             const selectedSet = useMemo(() => new Set(selectedSkus), [selectedSkus]);
@@ -2333,8 +2208,10 @@
                 { key: 'status', label: t('dashboard.table_status') },
                 { key: 'validation', label: t('dashboard.table_validation') },
                 { key: 'model', label: t('dashboard.table_best_model') },
-                { key: 'eval', label: metricLabel },
-            ]), [t, metricLabel]);
+                { key: 'mape', label: t('dashboard.table_mape') },
+                { key: 'rmse', label: t('dashboard.table_rmse') },
+                { key: 'mae', label: t('dashboard.table_mae') },
+            ]), [t]);
 
             const activeSortLabel = useMemo(() => {
                 const match = sortOptions.find((opt) => opt.key === sortKey);
@@ -2378,9 +2255,9 @@
                         cmp = toStr(a.validation_method || '').localeCompare(toStr(b.validation_method || ''), undefined, { sensitivity: 'base' });
                     } else if (sortKey === 'model') {
                         cmp = toStr(a.best_ts_model || '').localeCompare(toStr(b.best_ts_model || ''), undefined, { sensitivity: 'base' });
-                    } else if (sortKey === 'eval' || sortKey === 'mse') {
-                        const av = evaluationMetricValue(a, metricCode);
-                        const bv = evaluationMetricValue(b, metricCode);
+                    } else if (sortKey === 'mape' || sortKey === 'rmse' || sortKey === 'mae') {
+                        const av = evaluationMetricValue(a, sortKey);
+                        const bv = evaluationMetricValue(b, sortKey);
                         if (av == null && bv == null) cmp = 0;
                         else if (av == null) cmp = 1;
                         else if (bv == null) cmp = -1;
@@ -2391,7 +2268,7 @@
                     }
                     return cmp * dir;
                 });
-            }, [results, sortKey, sortDir, metricCode]);
+            }, [results, sortKey, sortDir]);
 
             const SortHeader = ({ columnKey, label, align = 'left', thClassName = '' }) => {
                 const active = sortKey === columnKey;
@@ -2458,14 +2335,24 @@
                                     <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</p>
                                 </div>
                             </div>
-                            <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
-                                <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{metricLabel}</span>
-                                <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(evaluationMetricValue(r, metricCode), metricCode)}</span>
+                            <div className="grid grid-cols-3 gap-2">
+                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mape')}</span>
+                                    <span className="mt-0.5 block font-mono font-bold text-sm text-slate-700 dark:text-slate-200">{formatMetric(evaluationMetricValue(r, 'mape'), 'mape')}</span>
+                                </div>
+                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_rmse')}</span>
+                                    <span className={`mt-0.5 block font-mono font-bold text-sm ${rowContestMetric(r, contestCode) === 'rmse' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-200'}`}>{formatMetric(evaluationMetricValue(r, 'rmse'), 'rmse')}</span>
+                                </div>
+                                <div className="rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 px-2.5 py-2">
+                                    <span className="block text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_mae')}</span>
+                                    <span className={`mt-0.5 block font-mono font-bold text-sm ${rowContestMetric(r, contestCode) === 'mae' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-200'}`}>{formatMetric(evaluationMetricValue(r, 'mae'), 'mae')}</span>
+                                </div>
                             </div>
                         </button>
                     </div>
                 );
-            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t, metricCode, metricLabel]);
+            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t, contestCode]);
 
             const tableRows = useMemo(() => sortedResults.map((r, i) => {
                 const isReady = r.status === 'success';
@@ -2508,10 +2395,12 @@
                         <td className="p-2 lg:p-3 w-24 lg:w-28 text-slate-600 dark:text-slate-300 uppercase text-center overflow-hidden">
                             <span className="block truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</span>
                         </td>
-                        <td className="p-2 lg:p-3 w-20 lg:w-24 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(evaluationMetricValue(r, metricCode), metricCode)}</td>
+                        <td className="p-2 lg:p-3 w-16 lg:w-20 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(evaluationMetricValue(r, 'mape'), 'mape')}</td>
+                        <td className={`p-2 lg:p-3 w-16 lg:w-20 text-right font-mono overflow-hidden ${contestValueClass(rowContestMetric(r, contestCode) === 'rmse')}`}>{formatMetric(evaluationMetricValue(r, 'rmse'), 'rmse')}</td>
+                        <td className={`p-2 lg:p-3 w-16 lg:w-20 text-right font-mono overflow-hidden ${contestValueClass(rowContestMetric(r, contestCode) === 'mae')}`}>{formatMetric(evaluationMetricValue(r, 'mae'), 'mae')}</td>
                     </tr>
                 );
-            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t, metricCode]);
+            }), [sortedResults, onSelectSku, onToggleSku, selectedSet, t, contestCode]);
 
             return (
                 <div className="fc-overview-shell w-full h-full">
@@ -2519,11 +2408,13 @@
                     <table className="fc-overview-table" aria-label="Forecast table controls">
                         <colgroup>
                             <col style={{ width: '5%' }} />
-                            <col style={{ width: '33%' }} />
-                            <col style={{ width: '15%' }} />
-                            <col style={{ width: '16%' }} />
-                            <col style={{ width: '17%' }} />
-                            <col style={{ width: '14%' }} />
+                            <col style={{ width: '24%' }} />
+                            <col style={{ width: '13%' }} />
+                            <col style={{ width: '13%' }} />
+                            <col style={{ width: '13%' }} />
+                            <col style={{ width: '10%' }} />
+                            <col style={{ width: '11%' }} />
+                            <col style={{ width: '11%' }} />
                         </colgroup>
                         <thead>
                             <tr>
@@ -2542,7 +2433,9 @@
                                 <SortHeader columnKey="status" label={t('dashboard.table_status')} align="center" thClassName="w-[8.75rem]" />
                                 <SortHeader columnKey="validation" label={t('dashboard.table_validation')} align="center" thClassName="w-28 lg:w-32" />
                                 <SortHeader columnKey="model" label={t('dashboard.table_best_model')} align="center" thClassName="w-24 lg:w-28" />
-                                <SortHeader columnKey="eval" label={metricLabel} align="right" thClassName="w-20 lg:w-24" />
+                                <SortHeader columnKey="mape" label={t('dashboard.table_mape')} align="right" thClassName="w-16 lg:w-20" />
+                                <SortHeader columnKey="rmse" label={t('dashboard.table_rmse')} align="right" thClassName="w-16 lg:w-20" />
+                                <SortHeader columnKey="mae" label={t('dashboard.table_mae')} align="right" thClassName="w-16 lg:w-20" />
                             </tr>
                         </thead>
                     </table>
@@ -2631,11 +2524,13 @@
                     <table className="fc-overview-table" aria-label="Forecast results">
                         <colgroup>
                             <col style={{ width: '5%' }} />
-                            <col style={{ width: '33%' }} />
-                            <col style={{ width: '15%' }} />
-                            <col style={{ width: '16%' }} />
-                            <col style={{ width: '17%' }} />
-                            <col style={{ width: '14%' }} />
+                            <col style={{ width: '24%' }} />
+                            <col style={{ width: '13%' }} />
+                            <col style={{ width: '13%' }} />
+                            <col style={{ width: '13%' }} />
+                            <col style={{ width: '10%' }} />
+                            <col style={{ width: '11%' }} />
+                            <col style={{ width: '11%' }} />
                         </colgroup>
                         <tbody>
                             {tableRows}
@@ -3327,7 +3222,7 @@
             const [testHorizon, setTestHorizon] = useState("6");
             const [validationMethod, setValidationMethod] = useState("simple");
             const [evaluationMetric, setEvaluationMetric] = useState("rmse");
-            const [displayMetric, setDisplayMetric] = useState("rmse");
+            const contestMetric = normalizeContestMetric(evaluationMetric);
             const [valueDomain, setValueDomain] = useState("nonnegative");
             const [forecastSteps, setForecastSteps] = useState("6");
             const [totalTimeSeries, setTotalTimeSeries] = useState(0);
@@ -3350,6 +3245,7 @@
             const [isExporting, setIsExporting] = useState(false);
             // Invalidates in-flight polls when a newer run starts (avoids toggling isPolling off).
             const runGenerationRef = useRef(0);
+            const skuContestHighlightRef = useRef({});
 
             // UI State
             const [currentSku, setCurrentSku] = useState(null);
@@ -3958,8 +3854,6 @@
                     for (const sku of skusToRun) next[String(sku)] = validationMethod;
                     return next;
                 });
-                setDisplayMetric(normalizeContestMetric(evaluationMetric));
-
                 console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus, skusToRun });
 
                 const fd = new FormData();
@@ -4221,7 +4115,6 @@
                 setOverviewSearchQuery("");
                 setActiveTab("overview");
                 setSkuValidationMethods({});
-                setDisplayMetric(evaluationMetric);
                 if (fileInputRef.current) fileInputRef.current.value = "";
             };
 
@@ -4338,12 +4231,26 @@
             };
 
             const overviewRows = useMemo(() => {
-                if (!mappedSkus.length) return [];
+                if (!mappedSkus.length) {
+                    skuContestHighlightRef.current = {};
+                    return [];
+                }
                 const resultMap = new Map((batchResults || []).map((r) => [String(r.sku), r]));
                 const runningSet = new Set(runningSkus.map(String));
+                const selectedSet = new Set(selectedSkus.map(String));
+                const previousHighlight = skuContestHighlightRef.current;
+                const nextHighlight = {};
+                mappedSkus.forEach((sku) => {
+                    const key = String(sku);
+                    nextHighlight[key] = selectedSet.has(key)
+                        ? contestMetric
+                        : (previousHighlight[key] || contestMetric);
+                });
+                skuContestHighlightRef.current = nextHighlight;
                 return mappedSkus.map((sku) => {
                     const result = resultMap.get(sku);
                     const trackedMethod = skuValidationMethods[String(sku)] || null;
+                    const rowMetric = nextHighlight[String(sku)];
                     // While a SKU is re-running, never show stale metrics from a previous run.
                     if (runningSet.has(String(sku))) {
                         return {
@@ -4355,6 +4262,7 @@
                             mse_validation: null,
                             rmse_validation: null,
                             mape_validation: null,
+                            evaluation_metric: rowMetric,
                         };
                     }
                     if (result) {
@@ -4373,9 +4281,10 @@
                         mse_validation: null,
                         rmse_validation: null,
                         mape_validation: null,
+                        evaluation_metric: rowMetric,
                     };
                 });
-            }, [mappedSkus, batchResults, runningSkus, skuValidationMethods]);
+            }, [mappedSkus, batchResults, runningSkus, skuValidationMethods, contestMetric, selectedSkus]);
 
             const handleOverviewSearchChange = useCallback((value) => {
                 setOverviewSearchQuery(value);
@@ -4716,9 +4625,6 @@
                                                             className={`fc-model-picker-option${normalizeContestMetric(evaluationMetric) === option.value ? ' is-selected' : ''}`}
                                                             onClick={() => {
                                                                 setEvaluationMetric(option.value);
-                                                                if (!(batchResults && batchResults.length)) {
-                                                                    setDisplayMetric(option.value);
-                                                                }
                                                                 setMetricPickerOpen(false);
                                                             }}
                                                         >
@@ -4907,7 +4813,6 @@
                             {mappingReady && (
                             <JobStatusBar
                                 status={jobStatus || 'ready'}
-                                deploymentEnvironment={deploymentEnvironment}
                                 completedCount={jobStatus ? jobProgress.completed : 0}
                                 queuePosition={jobProgress.queuePosition}
                                 totalCount={jobProgress.total > 0 ? jobProgress.total : (selectedSkus.length || mappedSkus.length)}
@@ -4921,7 +4826,7 @@
                             {/* KPI BAR — with Overview tab after mapping confirm */}
                             {mappingReady && (
                             <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-visible relative">
-                                <KPICards results={batchResults} skuCount={mappedSkus.length} evaluationMetric={displayMetric} onEvaluationMetricChange={setDisplayMetric} t={t} />
+                                <KPICards results={batchResults} skuCount={mappedSkus.length} t={t} />
                             </div>
                             )}
                         </div>
@@ -4970,7 +4875,7 @@
                                                     selectedSkus={selectedSkus}
                                                     onToggleSku={handleToggleSkuSelection}
                                                     onToggleSelectAll={handleToggleSelectAll}
-                                                    evaluationMetric={displayMetric}
+                                                    evaluationMetric={contestMetric}
                                                     t={t}
                                                 />
                                             )}
@@ -4999,8 +4904,16 @@
                                                                     <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{skuData.best_ts_model.toUpperCase()}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
-                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t(`sidebar.eval_${displayMetric}`)}</span>
-                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{formatEvaluationValue(evaluationMetricValue(skuData, displayMetric), displayMetric)}</span>
+                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.table_mape')}</span>
+                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{formatEvaluationValue(evaluationMetricValue(skuData, 'mape'), 'mape')}</span>
+                                                                </div>
+                                                                <div className="flex flex-col items-center text-center">
+                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.table_rmse')}</span>
+                                                                    <span className={`text-[10px] lg:text-xs font-bold ${rowContestMetric(skuData, contestMetric) === 'rmse' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'rmse'), 'rmse')}</span>
+                                                                </div>
+                                                                <div className="flex flex-col items-center text-center">
+                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.table_mae')}</span>
+                                                                    <span className={`text-[10px] lg:text-xs font-bold ${rowContestMetric(skuData, contestMetric) === 'mae' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'mae'), 'mae')}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
