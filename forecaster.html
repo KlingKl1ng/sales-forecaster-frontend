@@ -994,9 +994,19 @@
                     availability_checking: "Checking forecasting model availability...",
                     models_unavailable: "Advanced models are currently unavailable on the backend.",
                     val_method: "Validation Method",
-                    val_simple: "Simple Split (Fast)",
-                    val_walk_forward: "Walk-Forward (Adaptive)",
-                    val_rolling_window: "Rolling Window (Adaptive)",
+                    val_simple: "Simple Split",
+                    val_walk_forward: "Expanding Window",
+                    validation_plan: "{count} evaluations × {horizon} periods ahead. Up to {max} dates, spread across the validation period.",
+                    validation_short: "Validation period must be at least the forecast horizon.",
+                    validation_limited: "Limited history: fewer than {max} evaluations are available.",
+                    validation_simple: "One forecast over the entire test period. Fastest option.",
+                    validation_details: "Validation details",
+                    validation_counts: "{count} evaluations · {horizon} periods ahead · {pairs} scored forecasts",
+                    validation_chart: "Scores include every evaluation and lead time. The chart shows the latest forecast for each date; fitted values are retrospective, not validation predictions.",
+                    validation_lead: "Periods ahead",
+                    validation_final: "Final training periods",
+                    validation_coverage: "{dates} of {periods} test dates scored. Overlapping evaluations are not independent samples.",
+                    val_rolling_window: "Rolling Window",
                     eval_metric: "Evaluation Metric",
                     eval_rmse: "RMSE",
                     eval_mae: "MAE",
@@ -1110,7 +1120,7 @@
                     table_running: "Processing",
                     table_failed: "Failed",
                     validation_simple: "Simple Split",
-                    validation_walk_forward: "Walk-Forward",
+                    validation_walk_forward: "Expanding Window",
                     validation_rolling_window: "Rolling Window",
                     sort_btn: "Sorting",
                     sort_title: "Sort by",
@@ -1173,9 +1183,19 @@
                     availability_checking: "Đang kiểm tra các mô hình dự báo...",
                     models_unavailable: "Các mô hình nâng cao hiện không khả dụng trên máy chủ.",
                     val_method: "Phương pháp kiểm định",
-                    val_simple: "Tách đơn giản (Nhanh)",
-                    val_walk_forward: "Tịnh tiến (Thích ứng)",
-                    val_rolling_window: "Cửa sổ trượt (Thích ứng)",
+                    val_simple: "Tách đơn giản",
+                    val_walk_forward: "Cửa sổ mở rộng",
+                    validation_plan: "{count} lần kiểm định × {horizon} kỳ phía trước. Tối đa {max} mốc, phân bố trong giai đoạn kiểm định.",
+                    validation_short: "Giai đoạn kiểm định phải dài ít nhất bằng chu kỳ dự báo.",
+                    validation_limited: "Dữ liệu hạn chế: có ít hơn {max} lần kiểm định.",
+                    validation_simple: "Một lần dự báo cho toàn bộ giai đoạn kiểm định. Nhanh nhất.",
+                    validation_details: "Chi tiết kiểm định",
+                    validation_counts: "{count} lần kiểm định · {horizon} kỳ phía trước · {pairs} dự báo được chấm điểm",
+                    validation_chart: "Điểm số dùng mọi lần kiểm định và kỳ dự báo. Biểu đồ dùng dự báo mới nhất tại mỗi ngày; giá trị khớp là hồi cứu, không phải dự báo kiểm định.",
+                    validation_lead: "Số kỳ phía trước",
+                    validation_final: "Số kỳ huấn luyện cuối",
+                    validation_coverage: "Chấm điểm {dates}/{periods} ngày kiểm định. Các lần kiểm định chồng lấn không phải mẫu độc lập.",
+                    val_rolling_window: "Cửa sổ trượt",
                     eval_metric: "Chỉ số đánh giá",
                     eval_rmse: "RMSE",
                     eval_mae: "MAE",
@@ -1289,7 +1309,7 @@
                     table_running: "Đang xử lý",
                     table_failed: "Thất bại",
                     validation_simple: "Tách đơn giản",
-                    validation_walk_forward: "Tịnh tiến",
+                    validation_walk_forward: "Cửa sổ mở rộng",
                     validation_rolling_window: "Cửa sổ trượt",
                     sort_btn: "Sắp xếp",
                     sort_title: "Sắp xếp theo",
@@ -1352,9 +1372,19 @@
                     availability_checking: "Verfügbarkeit der Prognosemodelle wird geprüft...",
                     models_unavailable: "Erweiterte Modelle sind derzeit auf dem Backend nicht verfügbar.",
                     val_method: "Validierungsmethode",
-                    val_simple: "Einfacher Split (Schnell)",
-                    val_walk_forward: "Walk-Forward (Adaptiv)",
-                    val_rolling_window: "Rolling Window (Adaptiv)",
+                    val_simple: "Einfacher Split",
+                    val_walk_forward: "Erweiterndes Fenster",
+                    validation_plan: "{count} Auswertungen × {horizon} Perioden voraus. Bis zu {max} über den Testzeitraum verteilte Startpunkte.",
+                    validation_short: "Der Testzeitraum muss mindestens so lang wie der Prognosehorizont sein.",
+                    validation_limited: "Begrenzte Historie: weniger als {max} Auswertungen möglich.",
+                    validation_simple: "Eine Prognose über den gesamten Testzeitraum. Schnellste Option.",
+                    validation_details: "Validierungsdetails",
+                    validation_counts: "{count} Auswertungen · {horizon} Perioden voraus · {pairs} bewertete Prognosen",
+                    validation_chart: "Die Kennzahlen berücksichtigen alle Auswertungen und Vorlaufzeiten. Das Diagramm zeigt die neueste Prognose je Datum; angepasste Werte sind rückblickend, keine Testprognosen.",
+                    validation_lead: "Perioden voraus",
+                    validation_final: "Perioden im finalen Training",
+                    validation_coverage: "{dates} von {periods} Testdaten bewertet. Überlappende Auswertungen sind keine unabhängigen Stichproben.",
+                    val_rolling_window: "Rolling Window",
                     eval_metric: "Bewertungskennzahl",
                     eval_rmse: "RMSE",
                     eval_mae: "MAE",
@@ -1468,7 +1498,7 @@
                     table_running: "Verarbeitung",
                     table_failed: "Fehlgeschlagen",
                     validation_simple: "Einfacher Split",
-                    validation_walk_forward: "Walk-Forward",
+                    validation_walk_forward: "Erweiterndes Fenster",
                     validation_rolling_window: "Rolling Window",
                     sort_btn: "Sortieren",
                     sort_title: "Sortieren nach",
@@ -1753,6 +1783,7 @@
             return {
                 cloudEnabled,
                 supportedModels,
+                maxValidationEvaluations: Number((nested.validation_policy || payload.validation_policy || {}).max_evaluations) || 5,
                 frequencyProfiles: parseFrequencyProfiles(
                     nested.frequency_profiles || payload.frequency_profiles
                 ),
@@ -1909,12 +1940,6 @@
         );
 
         const ForecastingLoader = memo(({ t, validationMethod, testHorizon }) => {
-            // Calculate adaptive stride info for display
-            const testH = parseInt(testHorizon) || 6;
-            const isAdaptive = (validationMethod === 'walk_forward' || validationMethod === 'rolling_window') && testH > 12;
-            const stride = isAdaptive ? Math.floor(testH / 12) : 1;
-            const numFolds = isAdaptive ? Math.min(12 + (testH % 12 > 0 ? 1 : 0), 13) : testH;
-
             return (
                 <div className="h-full flex flex-col items-center justify-center gap-6 animate-fade-in">
                     <div className="relative">
@@ -1949,7 +1974,7 @@
                         <form
                             onSubmit={onSearchSubmit}
                             onClick={() => inputRef.current?.focus()}
-                            className="flex items-center w-full min-w-0 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus-within:border-brand-gold transition-colors overflow-hidden"
+                            className="flex items-center w-full min-w-0 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus-within:border-brand-gold dark:focus-within:border-brand-gold transition-colors overflow-hidden"
                         >
                             <SearchIcon className="shrink-0 text-slate-400 w-4 h-4" />
                             <input
@@ -3229,6 +3254,9 @@
 
             // Computed: Check if train + test equals total
             const horizonMismatch = totalTimeSeries > 0 && (parseInt(trainHorizon) || 0) + (parseInt(testHorizon) || 0) !== totalTimeSeries;
+            const adaptiveValidation = validationMethod !== 'simple';
+            const validationHorizonTooShort = adaptiveValidation && Number(testHorizon) < Number(forecastSteps);
+
 
             // Job State
             const [jobId, setJobId] = useState(null);
@@ -3303,6 +3331,8 @@
                 supportedModels: [],
                 frequencyProfiles: parseFrequencyProfiles(),
             });
+            const maxValidationEvaluations = forecastCapabilities.maxValidationEvaluations || 5;
+            const validationEvaluations = adaptiveValidation ? Math.max(0, Math.min(maxValidationEvaluations, Number(testHorizon) - Number(forecastSteps) + 1)) : 1;
             const [inferredFrequency, setInferredFrequency] = useState('monthly');
             const [capabilityRefreshToken, setCapabilityRefreshToken] = useState(0);
             const deploymentEnvironment = getDeploymentEnvironment();
@@ -3797,6 +3827,10 @@
 
             const startBatchForSkus = async (skusToRun) => {
                 if (!skusToRun.length) return;
+                if (validationHorizonTooShort) {
+                    setAlertMessage(t('sidebar.validation_short'));
+                    return;
+                }
                 if (historyTooLong) {
                     setAlertMessage(
                         t('sidebar.history_too_long')
@@ -4398,7 +4432,7 @@
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
                                 onClick={handleExecute}
-                                disabled={!file || isRunning || historyTooLong}
+                                disabled={!file || isRunning || historyTooLong || validationHorizonTooShort}
                                 className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${isRunning ? 'fc-status-active cursor-not-allowed' : !file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
                                 title={isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
                             >
@@ -4741,6 +4775,13 @@
                                             className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
+                                    <div aria-live="polite" className={`text-[10px] leading-relaxed ${validationHorizonTooShort ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                                        {validationHorizonTooShort ? t('sidebar.validation_short') : adaptiveValidation ? (
+                                            <>{t('sidebar.validation_plan').replace('{count}', validationEvaluations).replace('{horizon}', forecastSteps).replace('{max}', maxValidationEvaluations)}
+                                                {validationEvaluations < maxValidationEvaluations && <div className="mt-1">{t('sidebar.validation_limited').replace('{max}', maxValidationEvaluations)}</div>}
+                                            </>
+                                        ) : t('sidebar.validation_simple')}
+                                    </div>
                                 </form>
                             </div>
 
@@ -4751,7 +4792,7 @@
                                     <button
                                         type="button"
                                         onClick={handleExecute}
-                                        disabled={!file || isRunning || historyTooLong}
+                                        disabled={!file || isRunning || historyTooLong || validationHorizonTooShort}
                                         className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isRunning ? 'fc-status-active cursor-not-allowed' : !file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
                                     >
                                         {isRunning ? <RunningSpinnerIcon size={14} /> : <PlayIcon />}
@@ -4917,6 +4958,23 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        {skuData.validation_summary && (
+                                                            <details className="shrink-0 text-[10px] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1">
+                                                                <summary className="cursor-pointer" title={t('sidebar.validation_details')}>
+                                                                    {t('sidebar.validation_counts').replace('{count}', skuData.validation_summary.evaluations).replace('{horizon}', skuData.validation_summary.forecast_horizon).replace('{pairs}', skuData.validation_summary.scored_pairs)}
+                                                                </summary>
+                                                                <div className="max-h-32 overflow-auto mt-1 space-y-1">
+                                                                    <p>{t('sidebar.validation_chart')}</p>
+                                                                    <p>{t('sidebar.validation_coverage').replace('{dates}', skuData.validation_summary.unique_test_dates).replace('{periods}', skuData.validation_summary.validation_period)}</p>
+                                                                    {skuData.validation_summary.scheme === 'fixed_horizon' && skuData.validation_summary.evaluations < skuData.validation_summary.max_evaluations && <p>{t('sidebar.validation_limited').replace('{max}', skuData.validation_summary.max_evaluations)}</p>}
+                                                                    <p>{t('sidebar.validation_final')}: {skuData.final_training_periods}</p>
+                                                                    <table className="w-full text-right">
+                                                                        <thead><tr><th className="text-left">{t('sidebar.validation_lead')}</th><th>RMSE</th><th>MAE</th><th>MAPE</th></tr></thead>
+                                                                        <tbody>{(skuData.validation_summary.metrics_by_lead || []).map(metric => <tr key={metric.lead}><td className="text-left">{metric.lead}</td><td>{fmtNumber(metric.rmse, 1, 1)}</td><td>{fmtNumber(metric.mae, 1, 1)}</td><td>{formatEvaluationValue(metric.mape, 'mape')}</td></tr>)}</tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </details>
+                                                        )}
                                                         <div className="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700 relative mobile-landscape-chart-sep min-h-0">
                                                             <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
                                                         </div>
