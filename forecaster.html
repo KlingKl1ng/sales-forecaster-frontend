@@ -1093,7 +1093,19 @@
                     val_walk_forward: "Expanding Window",
                     validation_plan: "{count} evaluations × {horizon} periods ahead. Up to {max} dates, spread across the validation period.",
                     validation_short: "Validation period must be at least the forecast horizon.",
-                    validation_limited: "Limited history: fewer than {max} evaluations are available.",
+                    validation_limited: "This split allows fewer than {max} evaluations.",
+                    validation_single: "One evaluation: equivalent to Simple Split validation.",
+                    validation_auto: "Automatic split: keeps at least {train} training periods for eligible selected models.",
+                    validation_manual: "Manual split. Your train and test horizons are kept when the forecast horizon changes.",
+                    validation_recommend: "Use recommended split",
+                    model_substitution: "Model substituted",
+                    models_requested: "Requested models",
+                    model_used: "Model used",
+                    model_initial: "First choice",
+                    model_reason: "Reason",
+                    model_variant: "TES seasonality",
+                    seasonal_add: "Additive",
+                    seasonal_mul: "Multiplicative",
                     validation_simple: "One forecast over the entire test period. Fastest option.",
                     validation_details: "Validation details",
                     validation_counts: "{count} evaluations · {horizon} periods ahead · {pairs} scored forecasts",
@@ -1298,7 +1310,19 @@
                     val_walk_forward: "Cửa sổ mở rộng",
                     validation_plan: "{count} lần kiểm định × {horizon} kỳ phía trước. Tối đa {max} mốc, phân bố trong giai đoạn kiểm định.",
                     validation_short: "Giai đoạn kiểm định phải dài ít nhất bằng chu kỳ dự báo.",
-                    validation_limited: "Dữ liệu hạn chế: có ít hơn {max} lần kiểm định.",
+                    validation_limited: "Cách chia này cho phép ít hơn {max} lần kiểm định.",
+                    validation_single: "Một lần kiểm định: tương đương kiểm định Tách đơn giản.",
+                    validation_auto: "Chia tự động: giữ ít nhất {train} kỳ huấn luyện cho các mô hình đã chọn đủ điều kiện.",
+                    validation_manual: "Chia thủ công. Giữ chu kỳ huấn luyện và kiểm định khi thay đổi chu kỳ dự báo.",
+                    validation_recommend: "Dùng cách chia đề xuất",
+                    model_substitution: "Đã thay thế mô hình",
+                    models_requested: "Mô hình yêu cầu",
+                    model_used: "Mô hình sử dụng",
+                    model_initial: "Lựa chọn ban đầu",
+                    model_reason: "Lý do",
+                    model_variant: "Tính mùa vụ TES",
+                    seasonal_add: "Cộng",
+                    seasonal_mul: "Nhân",
                     validation_simple: "Một lần dự báo cho toàn bộ giai đoạn kiểm định. Nhanh nhất.",
                     validation_details: "Chi tiết kiểm định",
                     validation_counts: "{count} lần kiểm định · {horizon} kỳ phía trước · {pairs} dự báo được chấm điểm",
@@ -1503,7 +1527,19 @@
                     val_walk_forward: "Erweiterndes Fenster",
                     validation_plan: "{count} Auswertungen × {horizon} Perioden voraus. Bis zu {max} über den Testzeitraum verteilte Startpunkte.",
                     validation_short: "Der Testzeitraum muss mindestens so lang wie der Prognosehorizont sein.",
-                    validation_limited: "Begrenzte Historie: weniger als {max} Auswertungen möglich.",
+                    validation_limited: "Diese Aufteilung ermöglicht weniger als {max} Auswertungen.",
+                    validation_single: "Eine Auswertung: entspricht der Validierung mit einfacher Aufteilung.",
+                    validation_auto: "Automatische Aufteilung: mindestens {train} Trainingsperioden für geeignete ausgewählte Modelle.",
+                    validation_manual: "Manuelle Aufteilung. Trainings- und Testhorizont bleiben bei Änderungen des Prognosehorizonts erhalten.",
+                    validation_recommend: "Empfohlene Aufteilung verwenden",
+                    model_substitution: "Modell ersetzt",
+                    models_requested: "Angeforderte Modelle",
+                    model_used: "Verwendetes Modell",
+                    model_initial: "Erste Wahl",
+                    model_reason: "Grund",
+                    model_variant: "TES-Saisonalität",
+                    seasonal_add: "Additiv",
+                    seasonal_mul: "Multiplikativ",
                     validation_simple: "Eine Prognose über den gesamten Testzeitraum. Schnellste Option.",
                     validation_details: "Validierungsdetails",
                     validation_counts: "{count} Auswertungen · {horizon} Perioden voraus · {pairs} bewertete Prognosen",
@@ -1846,13 +1882,13 @@
         };
 
         const DEFAULT_FREQUENCY_PROFILES = {
-            hourly: { label: 'Hourly', max_history_columns: 720, max_train_horizon: 720, max_test_horizon: 48, max_forecast_horizon: 48, mlp_lag_window: 24, prophet_min_points: 336 },
-            daily: { label: 'Daily', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 14, prophet_min_points: 14 },
-            business_daily: { label: 'Business daily (Mon-Fri)', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 10, prophet_min_points: 10 },
-            yearly: { label: 'Yearly', max_history_columns: 100, max_train_horizon: 100, max_test_horizon: 20, max_forecast_horizon: 20, mlp_lag_window: 4, prophet_min_points: 8 },
-            weekly: { label: 'Weekly', max_history_columns: 312, max_train_horizon: 312, max_test_horizon: 52, max_forecast_horizon: 52, mlp_lag_window: 52, prophet_min_points: 104 },
-            monthly: { label: 'Monthly', max_history_columns: 240, max_train_horizon: 240, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 12, prophet_min_points: 24 },
-            quarterly: { label: 'Quarterly', max_history_columns: 80, max_train_horizon: 80, max_test_horizon: 16, max_forecast_horizon: 16, mlp_lag_window: 4, prophet_min_points: 8 },
+            hourly: { seasonal_period: 24, label: 'Hourly', max_history_columns: 720, max_train_horizon: 720, max_test_horizon: 48, max_forecast_horizon: 48, mlp_lag_window: 24, prophet_min_points: 336 },
+            daily: { seasonal_period: 7, label: 'Daily', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 14, prophet_min_points: 14 },
+            business_daily: { seasonal_period: 5, label: 'Business daily (Mon-Fri)', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 10, prophet_min_points: 10 },
+            yearly: { seasonal_period: 1, label: 'Yearly', max_history_columns: 100, max_train_horizon: 100, max_test_horizon: 20, max_forecast_horizon: 20, mlp_lag_window: 4, prophet_min_points: 8 },
+            weekly: { seasonal_period: 52, label: 'Weekly', max_history_columns: 312, max_train_horizon: 312, max_test_horizon: 52, max_forecast_horizon: 52, mlp_lag_window: 52, prophet_min_points: 104 },
+            monthly: { seasonal_period: 12, label: 'Monthly', max_history_columns: 240, max_train_horizon: 240, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 12, prophet_min_points: 24 },
+            quarterly: { seasonal_period: 4, label: 'Quarterly', max_history_columns: 80, max_train_horizon: 80, max_test_horizon: 16, max_forecast_horizon: 16, mlp_lag_window: 4, prophet_min_points: 8 },
         };
 
         const parseFrequencyProfiles = (rawProfiles) => {
@@ -1865,6 +1901,28 @@
                     : { ...fallback };
             });
             return profiles;
+        };
+
+        // Keep these training floors aligned with forecasting/models in the backend.
+        // Do not sacrifice an eligible selected model just to add more evaluations.
+        const recommendValidationSplit = ({ total, horizon, models, profile, maxEvaluations = 5 }) => {
+            if (!profile || !Number.isInteger(total) || !Number.isInteger(horizon)
+                || horizon < 1 || total < horizon + 4
+                || horizon > profile.max_forecast_horizon || total > profile.max_history_columns) return null;
+            const floors = {
+                ses: 4, des: 4,
+                tes: profile.seasonal_period > 1 ? 2 * profile.seasonal_period : 4,
+                prophet: profile.prophet_min_points,
+                arima: 16, autoces: 8, autotheta: 8,
+            };
+            const eligibleFloors = (models || []).map(model => floors[model])
+                .filter(minimum => Number.isFinite(minimum) && minimum <= total - horizon);
+            const minimumTrain = Math.max(4, ...eligibleFloors);
+            const target = Math.max(1, Math.floor(maxEvaluations));
+            const test = Math.min(horizon + target - 1, total - minimumTrain, profile.max_test_horizon);
+            const train = total - test;
+            if (test < horizon || train > profile.max_train_horizon) return null;
+            return { train, test, minimumTrain, evaluations: Math.min(target, test - horizon + 1) };
         };
 
         const FORECAST_MONTH_NAMES = {
@@ -2178,6 +2236,23 @@
                     </div>
             );
         });
+
+        const ModelSelectionNotice = ({ data, t }) => {
+            const requested = (data.requested_models?.length ? data.requested_models : [data.requested_model]).filter(Boolean).join(', ');
+            const seasonal = data.model_configuration?.seasonal;
+            if (!data.fallback_reason && !seasonal) return null;
+            return <section aria-label={t(data.fallback_reason ? 'sidebar.model_substitution' : 'sidebar.model_variant')}
+                className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-xs leading-5 text-slate-600 dark:text-slate-300">
+                {data.fallback_reason && <>
+                    <p className="font-semibold text-amber-700 dark:text-amber-400">{t('sidebar.model_substitution')}</p>
+                    <p>{t('sidebar.models_requested')}: <span className="uppercase">{requested || '—'}</span></p>
+                    {data.initially_selected_model && <p>{t('sidebar.model_initial')}: <span className="uppercase">{data.initially_selected_model}</span></p>}
+                    <p>{t('sidebar.model_used')}: <span className="uppercase font-semibold">{data.best_ts_model}</span></p>
+                    <p className="break-words">{t('sidebar.model_reason')}: {data.fallback_reason}</p>
+                </>}
+                {seasonal && <p>{t('sidebar.model_variant')}: {t(`sidebar.seasonal_${seasonal}`)}</p>}
+            </section>;
+        };
 
         const ForecastValuesTable = memo(({ data, t }) => {
             const sectionRef = useRef(null);
@@ -2597,7 +2672,7 @@
                                 </div>
                                 <div className="min-w-0">
                                     <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{t('dashboard.table_best_model')}</span>
-                                    <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</p>
+                                    <p className="mt-0.5 text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</p>{r.fallback_reason && <span className="block text-[10px] font-semibold text-amber-700 dark:text-amber-400">{t('sidebar.model_substitution')}</span>}
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
@@ -2658,7 +2733,7 @@
                             <span className="block truncate" title={validationLabel}>{validationLabel}</span>
                         </td>
                         <td className="p-2 lg:p-3 w-24 lg:w-28 text-slate-600 dark:text-slate-300 uppercase text-center overflow-hidden">
-                            <span className="block truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</span>
+                            <span className="block truncate" title={r.fallback_reason || r.best_ts_model || ''}>{r.best_ts_model || '-'}</span>{r.fallback_reason && <span className="block text-[10px] font-semibold text-amber-700 dark:text-amber-400">{t('sidebar.model_substitution')}</span>}
                         </td>
                         <td className="p-2 lg:p-3 w-16 lg:w-20 text-right font-mono dark:text-slate-300 overflow-hidden">{formatMetric(evaluationMetricValue(r, 'mape'), 'mape')}</td>
                         <td className={`p-2 lg:p-3 w-16 lg:w-20 text-right font-mono overflow-hidden ${contestValueClass(rowContestMetric(r, contestCode) === 'rmse')}`}>{formatMetric(evaluationMetricValue(r, 'rmse'), 'rmse')}</td>
@@ -3590,6 +3665,7 @@
             const [trainHorizon, setTrainHorizon] = useState("24");
             const [testHorizon, setTestHorizon] = useState("6");
             const [validationMethod, setValidationMethod] = useState("simple");
+            const [automaticValidationSplit, setAutomaticValidationSplit] = useState(true);
             const [evaluationMetric, setEvaluationMetric] = useState("rmse");
             const contestMetric = normalizeContestMetric(evaluationMetric);
             const [valueDomain, setValueDomain] = useState("nonnegative");
@@ -3869,6 +3945,21 @@
             const maxHistoryColumns = Number(activeFrequencyProfile.max_history_columns) || 240;
             const historyTooLong = totalTimeSeries > 0 && totalTimeSeries > maxHistoryColumns;
 
+            const recommendedValidationSplit = recommendValidationSplit({
+                total: totalTimeSeries,
+                horizon: Number(forecastSteps),
+                models: selectedModels.filter(isForecastModelAvailable),
+                profile: frequencyProfiles[inferredFrequency],
+                maxEvaluations: maxValidationEvaluations,
+            });
+            const recommendedTrain = recommendedValidationSplit?.train;
+            const recommendedTest = recommendedValidationSplit?.test;
+            useEffect(() => {
+                if (!adaptiveValidation || !automaticValidationSplit || recommendedTest == null) return;
+                setTrainHorizon(String(recommendedTrain));
+                setTestHorizon(String(recommendedTest));
+            }, [adaptiveValidation, automaticValidationSplit, recommendedTrain, recommendedTest]);
+
             // --- POLLING (merge partial results as each SKU completes) ---
             useEffect(() => {
                 let disposed = false;
@@ -4120,9 +4211,16 @@
                     Math.max(4, total - initialTest),
                     Number(profile.max_train_horizon) || total
                 );
-                setTestHorizon(initialTest.toString());
-                setTrainHorizon(initialTrain.toString());
-                setForecastSteps(Math.min(initialTest, Number(profile.max_forecast_horizon) || initialTest).toString());
+                const initialForecast = Math.min(initialTest, Number(profile.max_forecast_horizon) || initialTest);
+                const initialSplit = adaptiveValidation ? recommendValidationSplit({
+                    total, horizon: initialForecast, profile,
+                    models: selectedModels.filter(isForecastModelAvailable),
+                    maxEvaluations: maxValidationEvaluations,
+                }) : null;
+                setAutomaticValidationSplit(true);
+                setTestHorizon(String(initialSplit?.test ?? initialTest));
+                setTrainHorizon(String(initialSplit?.train ?? initialTrain));
+                setForecastSteps(String(initialForecast));
             };
 
             const startBatchForSkus = async (skusToRun) => {
@@ -4943,6 +5041,7 @@
                                                             aria-selected={validationMethod === option.value}
                                                             className={`fc-model-picker-option${validationMethod === option.value ? ' is-selected' : ''}`}
                                                             onClick={() => {
+                                                                if (!adaptiveValidation && option.value !== 'simple') setAutomaticValidationSplit(true);
                                                                 setValidationMethod(option.value);
                                                                 setValidationPickerOpen(false);
                                                             }}
@@ -5044,30 +5143,46 @@
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="min-w-0 flex flex-col">
-                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase leading-4 whitespace-nowrap overflow-hidden text-ellipsis" title={t('sidebar.train_h')}>{t('sidebar.train_h')}</label>
+                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase leading-4 whitespace-nowrap overflow-hidden text-ellipsis" htmlFor="forecast-train-horizon" title={t('sidebar.train_h')}>{t('sidebar.train_h')}</label>
                                             <input
                                                 type="number"
+                                                id="forecast-train-horizon"
                                                 value={trainHorizon}
-                                                onChange={(e) => setTrainHorizon(e.target.value)}
-                                                onBlur={() => setTrainHorizon(prev => Math.min(maxTrainHorizon, Math.max(4, parseInt(prev) || 4)).toString())}
+                                                onChange={(e) => {
+                                                    setAutomaticValidationSplit(false);
+                                                    setTrainHorizon(e.target.value);
+                                                    const train = Number(e.target.value);
+                                                    if (Number.isInteger(train) && train >= 4 && train < totalTimeSeries) setTestHorizon(String(totalTimeSeries - train));
+                                                }}
+                                                onBlur={() => {
+                                                    const train = Math.min(maxTrainHorizon, totalTimeSeries > 4 ? totalTimeSeries - 1 : maxTrainHorizon, Math.max(4, totalTimeSeries - maxTestHorizon, parseInt(trainHorizon) || 4));
+                                                    setTrainHorizon(String(train));
+                                                    if (totalTimeSeries > train) setTestHorizon(String(totalTimeSeries - train));
+                                                }}
                                                 min="4"
                                                 max={maxTrainHorizon}
                                                 className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                         <div className="min-w-0 flex flex-col">
-                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase leading-4 whitespace-nowrap overflow-hidden text-ellipsis" title={t('sidebar.test_h')}>{t('sidebar.test_h')}</label>
+                                            <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase leading-4 whitespace-nowrap overflow-hidden text-ellipsis" htmlFor="forecast-test-horizon" title={t('sidebar.test_h')}>{t('sidebar.test_h')}</label>
                                             <input
                                                 type="number"
+                                                id="forecast-test-horizon"
                                                 value={testHorizon}
                                                 onChange={(e) => {
+                                                    setAutomaticValidationSplit(false);
                                                     const newTest = parseInt(e.target.value) || 0;
                                                     setTestHorizon(e.target.value);
                                                     if (totalTimeSeries > 0 && newTest > 0 && newTest < totalTimeSeries) {
                                                         setTrainHorizon((totalTimeSeries - newTest).toString());
                                                     }
                                                 }}
-                                                onBlur={() => setTestHorizon(prev => Math.min(maxTestHorizon, Math.max(1, parseInt(prev) || 1)).toString())}
+                                                onBlur={() => {
+                                                    const test = Math.min(maxTestHorizon, totalTimeSeries > 4 ? totalTimeSeries - 4 : maxTestHorizon, Math.max(1, totalTimeSeries - maxTrainHorizon, parseInt(testHorizon) || 1));
+                                                    setTestHorizon(String(test));
+                                                    if (totalTimeSeries > test) setTrainHorizon(String(totalTimeSeries - test));
+                                                }}
                                                 min="1"
                                                 max={maxTestHorizon}
                                                 className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
@@ -5095,9 +5210,10 @@
                                         </div>
                                     )}
                                     <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                                        <label className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.fc_h')}</label>
+                                        <label htmlFor="forecast-future-horizon" className="text-xxs text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">{t('sidebar.fc_h')}</label>
                                         <input
                                             type="number"
+                                            id="forecast-future-horizon"
                                             value={forecastSteps}
                                             onChange={(e) => setForecastSteps(e.target.value)}
                                             onBlur={() => setForecastSteps(prev => Math.min(maxForecastHorizon, Math.max(1, parseInt(prev) || 1)).toString())}
@@ -5109,9 +5225,17 @@
                                     <div aria-live="polite" className={`text-[10px] leading-relaxed ${validationHorizonTooShort ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`}>
                                         {validationHorizonTooShort ? t('sidebar.validation_short') : adaptiveValidation ? (
                                             <>{t('sidebar.validation_plan').replace('{count}', validationEvaluations).replace('{horizon}', forecastSteps).replace('{max}', maxValidationEvaluations)}
+                                                {validationEvaluations === 1 && <div className="mt-1">{t('sidebar.validation_single')}</div>}
+                                                {automaticValidationSplit && recommendedValidationSplit && <div className="mt-1">{t('sidebar.validation_auto').replace('{train}', recommendedValidationSplit.minimumTrain)}</div>}
                                                 {validationEvaluations < maxValidationEvaluations && <div className="mt-1">{t('sidebar.validation_limited').replace('{max}', maxValidationEvaluations)}</div>}
                                             </>
                                         ) : t('sidebar.validation_simple')}
+                                        {adaptiveValidation && !automaticValidationSplit && <div className="mt-1">{t('sidebar.validation_manual')}</div>}
+                                        {adaptiveValidation && !automaticValidationSplit && recommendedValidationSplit && <button
+                                            type="button"
+                                            className="mt-1 text-brand-gold underline underline-offset-2 hover:text-amber-600"
+                                            onClick={() => setAutomaticValidationSplit(true)}
+                                        >{t('sidebar.validation_recommend')}</button>}
                                     </div>
                                 </form>
                             </div>
@@ -5289,6 +5413,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <ModelSelectionNotice data={skuData} t={t} />
                                                         {skuData.validation_summary && (
                                                             <section className="shrink-0 text-[13px] leading-5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg p-3" aria-label={t('sidebar.validation_details')}>
                                                                 <p className="font-semibold">
