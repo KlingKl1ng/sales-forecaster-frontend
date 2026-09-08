@@ -2812,23 +2812,6 @@
             const control = 'w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500';
             const tickColor = isDark ? '#cbd5e1' : '#64748b';
             return <section className="flex flex-col gap-4 min-w-0 text-slate-700 dark:text-slate-200" aria-label={t('sidebar.detail_replay')}>
-                <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
-                    <button type="button" className={control} aria-label={t(playing ? 'sidebar.replay_pause' : 'sidebar.replay_play')} title={t(playing ? 'sidebar.replay_pause' : 'sidebar.replay_play')} onClick={() => {
-                        if (!playing && index === replay.folds.length - 1 && phase === 2) { setIndex(0); setPhase(0); }
-                        setPlaying(!playing);
-                    }}><ReplayControlIcon kind={playing ? 'pause' : 'play'} /></button>
-                    <button type="button" className={control} aria-label={t('sidebar.replay_reset')} title={t('sidebar.replay_reset')} disabled={index === 0 && phase === 0 && !playing} onClick={() => { setPlaying(false); setIndex(0); setPhase(0); }}><ReplayControlIcon kind="reset" /></button>
-                    <button type="button" className={control} aria-label={t('sidebar.replay_previous')} title={t('sidebar.replay_previous')} disabled={index === 0} onClick={() => selectFold(index - 1)}><ReplayControlIcon kind="previous" /></button>
-                    <button type="button" className={control} aria-label={t('sidebar.replay_next')} title={t('sidebar.replay_next')} disabled={index === replay.folds.length - 1} onClick={() => selectFold(index + 1)}><ReplayControlIcon kind="next" /></button>
-                    <label className="flex items-center gap-3 text-xs flex-1 min-w-[180px] text-slate-500 dark:text-slate-400">
-                        <span className="shrink-0 whitespace-nowrap">{t('sidebar.replay_evaluation')}</span>
-                        <span className="fc-replay-slider-wrap">
-                            {replay.folds.length > 1 && <span className="fc-replay-slider-ticks" aria-hidden="true">{replay.folds.map((_, tick) => <span key={tick} className={tick === index ? 'is-current' : undefined} />)}</span>}
-                            <input type="range" min="0" max={replay.folds.length - 1} step="1" value={index} disabled={replay.folds.length === 1} onChange={event => selectFold(Number(event.target.value))} aria-label={t('sidebar.replay_evaluation')} aria-valuetext={`${index + 1} / ${replay.folds.length}`} className="fc-replay-slider" style={{ '--fc-replay-progress': `${replay.folds.length <= 1 ? 0 : (index / (replay.folds.length - 1)) * 100}%` }} />
-                        </span>
-                    </label>
-                    <label className="flex items-center gap-2 text-xs" title={t('sidebar.replay_speed')}><ReplayControlIcon kind="speed" /><select aria-label={t('sidebar.replay_speed')} value={speed} onChange={event => setSpeed(Number(event.target.value))} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5">{[0.5, 1, 2].map(value => <option key={value} value={value}>{value}×</option>)}</select></label>
-                </div>
                 <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 min-w-0 fc-replay-chart-panel">
                     <div className="fc-replay-chart-header">
                         <div className="fc-replay-chart-header-start text-left">
@@ -2872,6 +2855,23 @@
                         <h4 className="text-xs font-semibold mb-3">{t(`sidebar.replay_${scope}`)}</h4>
                         <dl className="fc-replay-metrics-values grid grid-cols-3 gap-2">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric)}</dd></div>)}</dl>
                     </section>)}
+                </div>
+                <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+                    <button type="button" className={control} aria-label={t(playing ? 'sidebar.replay_pause' : 'sidebar.replay_play')} title={t(playing ? 'sidebar.replay_pause' : 'sidebar.replay_play')} onClick={() => {
+                        if (!playing && index === replay.folds.length - 1 && phase === 2) { setIndex(0); setPhase(0); }
+                        setPlaying(!playing);
+                    }}><ReplayControlIcon kind={playing ? 'pause' : 'play'} /></button>
+                    <button type="button" className={control} aria-label={t('sidebar.replay_reset')} title={t('sidebar.replay_reset')} disabled={index === 0 && phase === 0 && !playing} onClick={() => { setPlaying(false); setIndex(0); setPhase(0); }}><ReplayControlIcon kind="reset" /></button>
+                    <button type="button" className={control} aria-label={t('sidebar.replay_previous')} title={t('sidebar.replay_previous')} disabled={index === 0} onClick={() => selectFold(index - 1)}><ReplayControlIcon kind="previous" /></button>
+                    <button type="button" className={control} aria-label={t('sidebar.replay_next')} title={t('sidebar.replay_next')} disabled={index === replay.folds.length - 1} onClick={() => selectFold(index + 1)}><ReplayControlIcon kind="next" /></button>
+                    <label className="flex items-center gap-3 text-xs flex-1 min-w-[180px] text-slate-500 dark:text-slate-400">
+                        <span className="shrink-0 whitespace-nowrap">{t('sidebar.replay_evaluation')}</span>
+                        <span className="fc-replay-slider-wrap">
+                            {replay.folds.length > 1 && <span className="fc-replay-slider-ticks" aria-hidden="true">{replay.folds.map((_, tick) => <span key={tick} className={tick === index ? 'is-current' : undefined} />)}</span>}
+                            <input type="range" min="0" max={replay.folds.length - 1} step="1" value={index} disabled={replay.folds.length === 1} onChange={event => selectFold(Number(event.target.value))} aria-label={t('sidebar.replay_evaluation')} aria-valuetext={`${index + 1} / ${replay.folds.length}`} className="fc-replay-slider" style={{ '--fc-replay-progress': `${replay.folds.length <= 1 ? 0 : (index / (replay.folds.length - 1)) * 100}%` }} />
+                        </span>
+                    </label>
+                    <label className="flex items-center gap-2 text-xs" title={t('sidebar.replay_speed')}><ReplayControlIcon kind="speed" /><select aria-label={t('sidebar.replay_speed')} value={speed} onChange={event => setSpeed(Number(event.target.value))} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5">{[0.5, 1, 2].map(value => <option key={value} value={value}>{value}×</option>)}</select></label>
                 </div>
             </section>;
         };
