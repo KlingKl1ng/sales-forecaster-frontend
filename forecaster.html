@@ -552,9 +552,32 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: center;
             gap: 0.25rem 1rem;
             font-size: 0.75rem;
             line-height: 1rem;
+        }
+        .fc-replay-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        .fc-replay-legend-line {
+            display: inline-block;
+            width: 1.25rem;
+            height: 0;
+            border-top: 2px solid transparent;
+            flex-shrink: 0;
+        }
+        .fc-replay-legend-line.is-train { border-top-color: #64748b; }
+        .fc-replay-legend-line.is-forecast {
+            border-top-color: #f59e0b;
+            border-top-style: dashed;
+        }
+        .fc-replay-legend-line.is-test { border-top-color: #10b981; }
+        .fc-replay-legend-line.is-fitted {
+            border-top-color: #94a3b8;
+            border-top-style: dashed;
         }
         @container replay-chart (min-width: 720px) {
             .fc-replay-chart-header {
@@ -1510,7 +1533,7 @@
                 charts: {
                     act_train: "Actual (Train)",
                     act_test: "Actual (Test)",
-                    fitted: "Fitted (Train)",
+                    fitted: "Fit (Train)",
                     val_fc: "Forecast (Validation)",
                     history: "Actual",
                     final_fit: "Fit",
@@ -2818,7 +2841,9 @@
                                 <p><span className="font-semibold">{t('sidebar.replay_targets')}: </span>{history[fold.end + 1].date} → {history[targetEnd].date} ({fold.points.length})</p>
                             </div>
                             <div className="fc-replay-chart-header-legend" aria-hidden="true">
-                                <span className="text-slate-500 dark:text-slate-400">● {t('charts.act_train')}</span><span className="text-amber-600 dark:text-amber-400">┄ {t('charts.val_fc')}</span><span className="text-emerald-600 dark:text-emerald-400">● {t('charts.act_test')}</span>
+                                <span className="fc-replay-legend-item text-slate-500 dark:text-slate-400"><span className="fc-replay-legend-line is-train" aria-hidden="true" />{t('charts.act_train')}</span>
+                                <span className="fc-replay-legend-item text-amber-600 dark:text-amber-400"><span className="fc-replay-legend-line is-forecast" aria-hidden="true" />{t('charts.val_fc')}</span>
+                                <span className="fc-replay-legend-item text-emerald-600 dark:text-emerald-400"><span className="fc-replay-legend-line is-test" aria-hidden="true" />{t('charts.act_test')}</span>
                             </div>
                         </div>
                         <div className="fc-replay-chart-header-end">
@@ -3886,6 +3911,36 @@
             };
         };
 
+        const CHART_LEGEND_LINES = {
+            actual_train: { line: 'is-train', text: 'text-slate-500 dark:text-slate-400' },
+            actual_test: { line: 'is-test', text: 'text-emerald-600 dark:text-emerald-400' },
+            fitted: { line: 'is-fitted', text: 'text-slate-400 dark:text-slate-500' },
+            val_forecast: { line: 'is-forecast', text: 'text-amber-600 dark:text-amber-400' },
+            actual_history: { line: 'is-train', text: 'text-slate-500 dark:text-slate-400' },
+            final_fit: { line: 'is-fitted', text: 'text-slate-400 dark:text-slate-500' },
+            future_forecast: { line: 'is-forecast', text: 'text-amber-600 dark:text-amber-400' },
+        };
+
+        const ChartLineLegend = ({ payload }) => {
+            if (!payload?.length) return null;
+            return (
+                <ul className="fc-replay-chart-header-legend recharts-default-legend" style={{ margin: 0, padding: '2px 0 0', width: '100%', textAlign: 'center' }}>
+                    {payload.map(entry => {
+                        const key = entry.dataKey;
+                        const style = CHART_LEGEND_LINES[key] || { line: '', text: 'text-slate-500 dark:text-slate-400' };
+                        return (
+                            <li key={`${entry.value}-${key || entry.color}`} className="recharts-legend-item" style={{ display: 'inline-block', marginRight: 10 }}>
+                                <span className={`fc-replay-legend-item ${style.text}`}>
+                                    <span className={`fc-replay-legend-line ${style.line}`.trim()} aria-hidden="true" />
+                                    {entry.value}
+                                </span>
+                            </li>
+                        );
+                    })}
+                </ul>
+            );
+        };
+
         const BacktestChart = ({ data, syncId, isDark, t }) => {
             if (!data) return null;
 
@@ -3951,7 +4006,7 @@
                             <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={10} minTickGap={36} interval="preserveStartEnd" padding={{ left: 8, right: 8 }} />
                             <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
                             <Tooltip contentStyle={{ backgroundColor: isDark ? "#0f172a" : "#fff", borderColor: isDark ? "#334155" : "#e2e8f0", fontSize: '12px', color: isDark ? '#fff' : '#000' }} />
-                            <Legend verticalAlign="top" height={36} wrapperStyle={{ color: isDark ? '#cbd5e1' : '#64748b' }} />
+                            <Legend verticalAlign="top" height={36} content={(props) => <ChartLineLegend {...props} />} wrapperStyle={{ width: '100%' }} />
                             <Area type="linear" dataKey="actual_train" name={t('charts.act_train')} stroke="#64748b" fill="url(#gd_bt_actual_train)" strokeWidth={2} isAnimationActive={false} />
                             <Area type="linear" dataKey="actual_test" name={t('charts.act_test')} stroke="#10b981" fill="url(#gd_bt_actual_test)" strokeWidth={2} isAnimationActive={false} />
                             <Area type="linear" dataKey="fitted" name={t('charts.fitted')} stroke="#94a3b8" fill="url(#gd_bt_fitted)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
@@ -4024,7 +4079,7 @@
                             <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={10} minTickGap={36} interval="preserveStartEnd" padding={{ left: 8, right: 8 }} />
                             <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
                             <Tooltip contentStyle={{ backgroundColor: isDark ? "#0f172a" : "#fff", borderColor: isDark ? "#334155" : "#e2e8f0", fontSize: '12px', color: isDark ? '#fff' : '#000' }} />
-                            <Legend verticalAlign="top" height={36} wrapperStyle={{ color: isDark ? '#cbd5e1' : '#64748b' }} />
+                            <Legend verticalAlign="top" height={36} content={(props) => <ChartLineLegend {...props} />} wrapperStyle={{ width: '100%' }} />
                             <Area type="linear" dataKey="actual_history" name={t('charts.history')} stroke="#64748b" fill="url(#gd_fc_history)" strokeWidth={2} isAnimationActive={false} />
                             <Area type="linear" dataKey="final_fit" name={t('charts.final_fit')} stroke="#94a3b8" fill="url(#gd_fc_final_fit)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
                             <Area type="linear" dataKey="future_forecast" name={t('charts.future_fc')} stroke="#f59e0b" fill="url(#gd_fc_future)" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
