@@ -502,6 +502,96 @@
         @media (max-width: 639px) {
             .fc-replay-chart { height: 300px; }
         }
+        .fc-replay-chart-panel {
+            container-type: inline-size;
+            container-name: replay-chart;
+        }
+        .fc-replay-chart-header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-areas:
+                "start end"
+                "center center";
+            gap: 0.5rem 1rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .fc-replay-chart-header-start {
+            grid-area: start;
+            min-width: 0;
+        }
+        .fc-replay-chart-header-end {
+            grid-area: end;
+            justify-self: end;
+            align-self: start;
+            min-width: 0;
+        }
+        .fc-replay-chart-header-center {
+            grid-area: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            text-align: center;
+            min-width: 0;
+            width: max-content;
+            max-width: 100%;
+            margin-inline: auto;
+        }
+        .fc-replay-chart-header-windows {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem 1.5rem;
+            font-size: 0.75rem;
+            line-height: 1rem;
+        }
+        .fc-replay-chart-header-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem 1rem;
+            font-size: 0.75rem;
+            line-height: 1rem;
+        }
+        @container replay-chart (min-width: 720px) {
+            .fc-replay-chart-header {
+                grid-template-columns: 1fr auto 1fr;
+                grid-template-areas: "start center end";
+                align-items: center;
+                min-height: 2.5rem;
+            }
+            .fc-replay-chart-header-start { justify-self: start; }
+            .fc-replay-chart-header-center {
+                justify-self: center;
+                margin-inline: 0;
+            }
+            .fc-replay-chart-header-end {
+                justify-self: end;
+                align-self: center;
+            }
+        }
+        .fc-replay-metrics {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.75rem;
+        }
+        @media (min-width: 640px) {
+            .fc-replay-metrics {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        .fc-replay-metrics-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 4.5rem;
+        }
+        .fc-replay-metrics-values dd {
+            font-variant-numeric: tabular-nums;
+            min-height: 1.25rem;
+        }
         .fc-replay-slider-wrap {
             position: relative;
             display: flex;
@@ -2699,11 +2789,6 @@
             const control = 'w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500';
             const tickColor = isDark ? '#cbd5e1' : '#64748b';
             return <section className="flex flex-col gap-4 min-w-0 text-slate-700 dark:text-slate-200" aria-label={t('sidebar.detail_replay')}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div><h3 className="text-sm font-semibold">{t('sidebar.replay_evaluation')} {index + 1} / {replay.folds.length}</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('sidebar.replay_saved')} · {data.best_ts_model?.toUpperCase()}</p></div>
-                    <span role="status" className="text-xs font-semibold rounded-full px-3 py-1 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400">{stage}</span>
-                </div>
                 <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                     <button type="button" className={control} aria-label={t(playing ? 'sidebar.replay_pause' : 'sidebar.replay_play')} title={t(playing ? 'sidebar.replay_pause' : 'sidebar.replay_play')} onClick={() => {
                         if (!playing && index === replay.folds.length - 1 && phase === 2) { setIndex(0); setPhase(0); }
@@ -2721,13 +2806,24 @@
                     </label>
                     <label className="flex items-center gap-2 text-xs" title={t('sidebar.replay_speed')}><ReplayControlIcon kind="speed" /><select aria-label={t('sidebar.replay_speed')} value={speed} onChange={event => setSpeed(Number(event.target.value))} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5">{[0.5, 1, 2].map(value => <option key={value} value={value}>{value}×</option>)}</select></label>
                 </div>
-                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 min-w-0">
-                    <div className="grid sm:grid-cols-2 gap-2 text-xs mb-3">
-                        <p><span className="font-semibold">{t('sidebar.replay_training')}: </span>{history[fold.start].date} → {history[fold.end].date} ({fold.end - fold.start + 1})</p>
-                        <p><span className="font-semibold">{t('sidebar.replay_targets')}: </span>{history[fold.end + 1].date} → {history[targetEnd].date} ({fold.points.length})</p>
-                    </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mb-2" aria-hidden="true">
-                        <span className="text-slate-500 dark:text-slate-400">● {t('charts.act_train')}</span><span className="text-amber-600 dark:text-amber-400">┄ {t('charts.val_fc')}</span><span className="text-emerald-600 dark:text-emerald-400">● {t('charts.act_test')}</span>
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 min-w-0 fc-replay-chart-panel">
+                    <div className="fc-replay-chart-header">
+                        <div className="fc-replay-chart-header-start text-left">
+                            <h3 className="text-sm font-semibold">{t('sidebar.replay_evaluation')} {index + 1} / {replay.folds.length}</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('sidebar.replay_saved')} · {data.best_ts_model?.toUpperCase()}</p>
+                        </div>
+                        <div className="fc-replay-chart-header-center">
+                            <div className="fc-replay-chart-header-windows">
+                                <p><span className="font-semibold">{t('sidebar.replay_training')}: </span>{history[fold.start].date} → {history[fold.end].date} ({fold.end - fold.start + 1})</p>
+                                <p><span className="font-semibold">{t('sidebar.replay_targets')}: </span>{history[fold.end + 1].date} → {history[targetEnd].date} ({fold.points.length})</p>
+                            </div>
+                            <div className="fc-replay-chart-header-legend" aria-hidden="true">
+                                <span className="text-slate-500 dark:text-slate-400">● {t('charts.act_train')}</span><span className="text-amber-600 dark:text-amber-400">┄ {t('charts.val_fc')}</span><span className="text-emerald-600 dark:text-emerald-400">● {t('charts.act_test')}</span>
+                            </div>
+                        </div>
+                        <div className="fc-replay-chart-header-end">
+                            <span role="status" className="text-xs font-semibold rounded-full px-3 py-1 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 shrink-0">{stage}</span>
+                        </div>
                     </div>
                     <div className="fc-replay-chart w-full" aria-label={`${t('sidebar.replay_evaluation')} ${index + 1}: ${stage}`}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -2746,11 +2842,10 @@
                         </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-3">
-                    {['current', 'overall'].map(scope => <section key={scope} aria-label={t(`sidebar.replay_${scope}`)} className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+                <div className="fc-replay-metrics">
+                    {['current', 'overall'].map(scope => <section key={scope} aria-label={t(`sidebar.replay_${scope}`)} className="fc-replay-metrics-card rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                         <h4 className="text-xs font-semibold mb-3">{t(`sidebar.replay_${scope}`)}</h4>
-                        <dl className="grid grid-cols-3 gap-2">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric)}</dd></div>)}</dl>
-                        {scope === 'current' && phase < 2 && <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t('sidebar.replay_scores_pending')}</p>}
+                        <dl className="fc-replay-metrics-values grid grid-cols-3 gap-2">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric)}</dd></div>)}</dl>
                     </section>)}
                 </div>
             </section>;
