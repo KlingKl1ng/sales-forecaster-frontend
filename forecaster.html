@@ -876,9 +876,11 @@
                 gap: 0.5rem;
             }
             .fc-detail-toolbar {
-                display: grid !important;
-                grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
-                align-items: center;
+                display: flex !important;
+                flex-direction: column;
+                flex-wrap: nowrap !important;
+                align-items: stretch;
+                justify-content: flex-start !important;
                 gap: 0.4rem !important;
                 padding-bottom: 0.4rem;
                 position: relative;
@@ -890,11 +892,11 @@
                 order: 1;
                 position: relative;
                 z-index: 2;
-                flex: none !important;
-                width: auto !important;
+                flex: 0 0 auto !important;
+                width: 100% !important;
                 min-width: 0;
-                max-width: none;
-                justify-content: flex-start !important;
+                max-width: none !important;
+                justify-content: center !important;
                 flex-wrap: nowrap !important;
                 overflow-x: auto;
                 overflow-y: hidden;
@@ -906,13 +908,12 @@
             }
             .fc-detail-toolbar .fc-detail-view-tabs::-webkit-scrollbar { display: none; }
             .fc-detail-toolbar .fc-detail-view-tabs > button {
-                padding: 0.28rem 0.4rem !important;
-                font-size: 0.65rem !important;
-                line-height: 1.1;
+                padding: 0.28rem 0.5rem !important;
+                font-size: 0.7rem !important;
+                line-height: 1.2;
                 flex: 0 0 auto;
                 min-width: max-content;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                overflow: visible;
                 white-space: nowrap;
                 cursor: pointer;
                 touch-action: manipulation;
@@ -928,20 +929,31 @@
                 order: 2;
                 position: relative;
                 z-index: 1;
-                margin-left: 0 !important;
-                flex: none;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                flex: 0 0 auto;
+                width: 100% !important;
                 min-width: 0;
-                max-width: 50%;
+                max-width: none !important;
+                justify-content: center !important;
                 overflow-x: auto;
                 flex-wrap: nowrap;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
-                gap: 0.35rem;
-                padding: 0.2rem 0.4rem !important;
+                gap: 0.5rem;
+                padding: 0.25rem 0.5rem !important;
                 pointer-events: auto;
             }
             .fc-detail-toolbar .fc-detail-metrics::-webkit-scrollbar { display: none; }
-            .fc-detail-toolbar .fc-detail-metrics > div { flex-shrink: 0; }
+            .fc-detail-toolbar .fc-detail-metrics > div {
+                flex-shrink: 0;
+                max-width: none !important;
+            }
+            .fc-detail-toolbar .fc-detail-metrics .truncate {
+                overflow: visible;
+                text-overflow: clip;
+                max-width: none;
+            }
             .fc-replay-root { gap: 0.65rem; }
             .fc-replay-chart { height: 200px; }
             .fc-replay-chart-header {
@@ -1022,44 +1034,58 @@
         }
 
         .fc-validation-table,
-        .fc-validation-table > thead,
-        .fc-validation-table > tbody,
-        .fc-evaluation-table,
-        .fc-evaluation-table > thead,
-        .fc-evaluation-table > tbody {
-            display: block;
-            width: 100%;
-        }
-
-        .fc-validation-table tr {
-            display: grid;
-            width: 100%;
-            grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
-        }
-
-        .fc-evaluation-table tr {
-            display: grid;
-            width: 100%;
-            align-items: center;
-            grid-template-columns:
-                minmax(0, 0.7fr)
-                minmax(0, 1.1fr)
-                minmax(0, 1.8fr)
-                repeat(3, minmax(0, 0.7fr));
-        }
-
-        .fc-forecast-values-table {
+        .fc-evaluation-table {
             width: 100%;
             table-layout: fixed;
         }
+
+        .fc-validation-table th,
+        .fc-validation-table td,
+        .fc-evaluation-table th,
+        .fc-evaluation-table td {
+            white-space: nowrap;
+        }
+
+        .fc-evaluation-table thead th:nth-child(1) { width: 14%; }
+        .fc-evaluation-table thead th:nth-child(2) { width: 18%; }
+        .fc-evaluation-table thead th:nth-child(3) { width: 36%; }
+        .fc-evaluation-table thead th:nth-child(4),
+        .fc-evaluation-table thead th:nth-child(5),
+        .fc-evaluation-table thead th:nth-child(6) { width: 10.67%; }
+
+        .fc-validation-table thead th:nth-child(1) { width: 40%; }
+        .fc-validation-table thead th:nth-child(2),
+        .fc-validation-table thead th:nth-child(3),
+        .fc-validation-table thead th:nth-child(4) { width: 20%; }
+
+        .fc-forecast-values-table {
+            width: 100%;
+            min-width: 100%;
+            table-layout: auto;
+        }
         .fc-forecast-values-table th,
         .fc-forecast-values-table td {
-            overflow-wrap: anywhere;
+            white-space: nowrap;
+            overflow-wrap: normal;
+            word-break: normal;
         }
         .fc-forecast-values-table th:first-child,
         .fc-forecast-values-table th[scope="row"] {
             width: 5.75rem;
             white-space: nowrap;
+        }
+        @media (min-width: 769px) {
+            .fc-forecast-values-table { table-layout: fixed; }
+        }
+        @media (max-width: 768px) {
+            .fc-evaluation-table,
+            .fc-validation-table {
+                table-layout: auto;
+                width: max-content;
+                min-width: 100%;
+            }
+            .fc-forecast-values-table th:not(:first-child),
+            .fc-forecast-values-table td { min-width: 6.25rem; }
         }
 
         .scroller,
@@ -3269,8 +3295,8 @@
                                     <th scope="row" className="text-left font-normal"><button type="button" onClick={() => onReplayEvaluation(index)} aria-label={`${t('sidebar.replay_evaluation')} ${index + 1}: ${t('sidebar.validation_open_replay')}`} title={t('sidebar.validation_open_replay')} className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-400 underline underline-offset-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
                                         {index + 1}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
                                     </button></th>
-                                    <td className="text-left">{replay.history[fold.end].date}</td>
-                                    <td className="text-left">{replay.history[fold.end + 1].date} → {replay.history[fold.end + fold.points.length].date}</td>
+                                    <td className="text-left whitespace-nowrap">{replay.history[fold.end].date}</td>
+                                    <td className="text-left whitespace-nowrap">{replay.history[fold.end + 1].date} → {replay.history[fold.end + fold.points.length].date}</td>
                                     <td>{fmtNumber(fold.metrics.rmse, 1, 1)}</td><td>{fmtNumber(fold.metrics.mae, 1, 1)}</td><td>{formatEvaluationValue(fold.metrics.mape, 'mape')}</td>
                                 </tr>)}</tbody>
                             </table>
