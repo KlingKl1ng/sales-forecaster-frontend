@@ -664,6 +664,17 @@
             flex-direction: column;
             min-height: 4.5rem;
         }
+        .fc-replay-metrics-values {
+            display: grid;
+            width: 100%;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.5rem;
+            align-items: start;
+        }
+        .fc-replay-metrics-values > div {
+            min-width: 0;
+            text-align: center;
+        }
         .fc-replay-metrics-values dd {
             font-variant-numeric: tabular-nums;
             min-height: 1.25rem;
@@ -3199,7 +3210,6 @@
                     <div className="fc-replay-chart-header">
                         <div className="fc-replay-chart-header-start text-left">
                             <h3 className="text-[13px] font-semibold">{t('sidebar.replay_evaluation')} {index + 1} / {replay.folds.length}</h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('sidebar.replay_saved')} · {data.best_ts_model?.toUpperCase()}</p>
                         </div>
                         <div className="fc-replay-chart-header-center">
                             <div className="fc-replay-chart-header-windows">
@@ -3236,7 +3246,7 @@
                 <div className="fc-replay-metrics">
                     {['current', 'overall'].map(scope => <section key={scope} aria-label={t(`sidebar.replay_${scope}`)} className="fc-replay-metrics-card rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                         <h4 className="text-[13px] font-semibold mb-3">{t(`sidebar.replay_${scope}`)}</h4>
-                        <dl className="fc-replay-metrics-values grid grid-cols-3 gap-2">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric)}</dd></div>)}</dl>
+                        <dl className="fc-replay-metrics-values">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric)}</dd></div>)}</dl>
                     </section>)}
                 </div>
                 <div className="fc-replay-controls flex flex-wrap items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
