@@ -823,45 +823,69 @@
                 gap: 0.5rem;
             }
             .fc-detail-toolbar {
-                flex-wrap: nowrap !important;
-                justify-content: flex-start !important;
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
                 align-items: center;
-                gap: 0.35rem !important;
+                gap: 0.4rem !important;
                 padding-bottom: 0.4rem;
+                position: relative;
+                z-index: 3;
             }
             .fc-detail-toolbar .fc-detail-view-tabs,
             .fc-detail-toolbar[data-inline-tabs="false"] .fc-detail-view-tabs,
             .fc-detail-toolbar[data-inline-tabs="true"] .fc-detail-view-tabs {
                 order: 1;
-                flex: 1 1 0% !important;
+                position: relative;
+                z-index: 2;
+                flex: none !important;
                 width: auto !important;
                 min-width: 0;
+                max-width: none;
                 justify-content: flex-start !important;
-                flex-wrap: nowrap;
-                overflow: hidden;
+                flex-wrap: nowrap !important;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
                 gap: 0.15rem;
+                touch-action: pan-x;
+                pointer-events: auto;
             }
+            .fc-detail-toolbar .fc-detail-view-tabs::-webkit-scrollbar { display: none; }
             .fc-detail-toolbar .fc-detail-view-tabs > button {
                 padding: 0.28rem 0.4rem !important;
                 font-size: 0.65rem !important;
                 line-height: 1.1;
-                flex: 0 1 auto;
-                min-width: 0;
+                flex: 0 0 auto;
+                min-width: max-content;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                cursor: pointer;
+                touch-action: manipulation;
+                pointer-events: auto;
+                position: relative;
+                z-index: 1;
+                -webkit-user-select: none;
+                user-select: none;
             }
             .fc-detail-toolbar .fc-detail-metrics,
             .fc-detail-toolbar[data-inline-tabs="false"] .fc-detail-metrics,
             .fc-detail-toolbar[data-inline-tabs="true"] .fc-detail-metrics {
                 order: 2;
-                margin-left: auto !important;
-                flex: 0 1 auto;
+                position: relative;
+                z-index: 1;
+                margin-left: 0 !important;
+                flex: none;
                 min-width: 0;
-                max-width: 58%;
+                max-width: 50%;
                 overflow-x: auto;
                 flex-wrap: nowrap;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
                 gap: 0.35rem;
                 padding: 0.2rem 0.4rem !important;
+                pointer-events: auto;
             }
             .fc-detail-toolbar .fc-detail-metrics::-webkit-scrollbar { display: none; }
             .fc-detail-toolbar .fc-detail-metrics > div { flex-shrink: 0; }
@@ -880,7 +904,6 @@
             .fc-replay-metrics { gap: 0.5rem; }
             .fc-replay-metrics-card { min-height: 0; padding: 0.65rem; }
             .fc-replay-controls { padding: 0.5rem !important; gap: 0.4rem; }
-            .fc-evaluation-table { min-width: 560px; }
             .fc-detail-panel > div { gap: 0.5rem; }
             .fc-overview-cards { padding-left: 0.25rem; padding-right: 0.25rem; }
             .fc-workspace { gap: 0.5rem; }
@@ -947,13 +970,43 @@
 
         .fc-validation-table,
         .fc-validation-table > thead,
-        .fc-validation-table > tbody {
+        .fc-validation-table > tbody,
+        .fc-evaluation-table,
+        .fc-evaluation-table > thead,
+        .fc-evaluation-table > tbody {
             display: block;
+            width: 100%;
         }
 
         .fc-validation-table tr {
             display: grid;
+            width: 100%;
             grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+        }
+
+        .fc-evaluation-table tr {
+            display: grid;
+            width: 100%;
+            align-items: center;
+            grid-template-columns:
+                minmax(0, 0.7fr)
+                minmax(0, 1.1fr)
+                minmax(0, 1.8fr)
+                repeat(3, minmax(0, 0.7fr));
+        }
+
+        .fc-forecast-values-table {
+            width: 100%;
+            table-layout: fixed;
+        }
+        .fc-forecast-values-table th,
+        .fc-forecast-values-table td {
+            overflow-wrap: anywhere;
+        }
+        .fc-forecast-values-table th:first-child,
+        .fc-forecast-values-table th[scope="row"] {
+            width: 5.75rem;
+            white-space: nowrap;
         }
 
         .scroller,
@@ -2986,7 +3039,7 @@
                 <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 min-w-0 fc-replay-chart-panel">
                     <div className="fc-replay-chart-header">
                         <div className="fc-replay-chart-header-start text-left">
-                            <h3 className="text-sm font-semibold">{t('sidebar.replay_evaluation')} {index + 1} / {replay.folds.length}</h3>
+                            <h3 className="text-[13px] font-semibold">{t('sidebar.replay_evaluation')} {index + 1} / {replay.folds.length}</h3>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('sidebar.replay_saved')} · {data.best_ts_model?.toUpperCase()}</p>
                         </div>
                         <div className="fc-replay-chart-header-center">
@@ -3023,7 +3076,7 @@
                 </div>
                 <div className="fc-replay-metrics">
                     {['current', 'overall'].map(scope => <section key={scope} aria-label={t(`sidebar.replay_${scope}`)} className="fc-replay-metrics-card rounded-lg border border-slate-200 dark:border-slate-700 p-3">
-                        <h4 className="text-xs font-semibold mb-3">{t(`sidebar.replay_${scope}`)}</h4>
+                        <h4 className="text-[13px] font-semibold mb-3">{t(`sidebar.replay_${scope}`)}</h4>
                         <dl className="fc-replay-metrics-values grid grid-cols-3 gap-2">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric)}</dd></div>)}</dl>
                     </section>)}
                 </div>
@@ -3148,8 +3201,8 @@
                     <p>{t('sidebar.validation_final')}: {data.final_training_periods}</p>
                     <div key={view} role="tabpanel" id={`fc-validation-panel-${view}`} aria-labelledby={`fc-validation-tab-${view}`} tabIndex={0} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 rounded-md">
                         <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t(`sidebar.validation_${view}_description`)}</p>
-                        {view === 'evaluation' ? (replay ? <div className="overflow-x-auto scroller rounded-md" tabIndex={0} role="region" aria-label={t('sidebar.validation_by_evaluation')}>
-                            <table className="fc-evaluation-table w-full min-w-[720px] border-separate border-spacing-0 text-right tabular-nums [&_th]:px-3 [&_th]:py-2 [&_td]:px-3 [&_td]:py-1.5" aria-label={t('sidebar.validation_by_evaluation')}>
+                        {view === 'evaluation' ? (replay ? <div className="min-w-0 overflow-x-auto scroller rounded-md" tabIndex={0} role="region" aria-label={t('sidebar.validation_by_evaluation')}>
+                            <table className="fc-evaluation-table w-full border-separate border-spacing-0 text-right tabular-nums [&_th]:px-3 [&_th]:py-2 [&_td]:px-3 [&_td]:py-1.5" aria-label={t('sidebar.validation_by_evaluation')}>
                                 <thead className="bg-slate-50 dark:bg-slate-800 [&_th]:font-semibold [&_th]:border-b [&_th]:border-slate-200 dark:[&_th]:border-slate-700"><tr>
                                     <th scope="col" className="text-left">{t('sidebar.replay_evaluation')}</th><th scope="col" className="text-left">{t('sidebar.validation_cutoff')}</th><th scope="col" className="text-left">{t('sidebar.validation_forecast_range')}</th><th scope="col">RMSE</th><th scope="col">MAE</th><th scope="col">MAPE</th>
                                 </tr></thead>
@@ -3157,8 +3210,8 @@
                                     <th scope="row" className="text-left font-normal"><button type="button" onClick={() => onReplayEvaluation(index)} aria-label={`${t('sidebar.replay_evaluation')} ${index + 1}: ${t('sidebar.validation_open_replay')}`} title={t('sidebar.validation_open_replay')} className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-400 underline underline-offset-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
                                         {index + 1}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
                                     </button></th>
-                                    <td className="text-left whitespace-nowrap">{replay.history[fold.end].date}</td>
-                                    <td className="text-left whitespace-nowrap">{replay.history[fold.end + 1].date} → {replay.history[fold.end + fold.points.length].date}</td>
+                                    <td className="text-left">{replay.history[fold.end].date}</td>
+                                    <td className="text-left">{replay.history[fold.end + 1].date} → {replay.history[fold.end + fold.points.length].date}</td>
                                     <td>{fmtNumber(fold.metrics.rmse, 1, 1)}</td><td>{fmtNumber(fold.metrics.mae, 1, 1)}</td><td>{formatEvaluationValue(fold.metrics.mape, 'mape')}</td>
                                 </tr>)}</tbody>
                             </table>
@@ -3186,7 +3239,7 @@
                 [t('sidebar.fc_h'), futureCount || '—'],
                 [t('sidebar.eval_metric'), data.evaluation_metric?.toUpperCase() || '—'],
             ];
-            return <section className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-xs leading-5" aria-label={t('sidebar.detail_process')}>
+            return <section className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300" aria-label={t('sidebar.detail_process')}>
                 <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-2">{t('sidebar.detail_process')}</h3>
                 <dl className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
                     {fields.map(([label, value]) => <div className="min-w-0" key={label}>
@@ -3202,7 +3255,7 @@
             const seasonal = data.model_configuration?.seasonal;
             if (!data.fallback_reason && !seasonal) return null;
             return <section aria-label={t(data.fallback_reason ? 'sidebar.model_substitution' : 'sidebar.model_variant')}
-                className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-xs leading-5 text-slate-600 dark:text-slate-300">
+                className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300">
                 {data.fallback_reason && <>
                     <p className="font-semibold text-amber-700 dark:text-amber-400">{t('sidebar.model_substitution')}</p>
                     <p>{t('sidebar.models_requested')}: <span className="uppercase">{requested || '—'}</span></p>
@@ -3245,13 +3298,13 @@
             return (
                 <section ref={sectionRef} className="fc-forecast-values shrink-0 min-w-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300" aria-label={t('charts.forecast_values')}>
                     <h3 className="mb-2 font-semibold">{t('charts.forecast_values')}</h3>
-                    <div ref={scrollRef} className="scroller overflow-x-auto rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500" tabIndex={0} role="region" aria-label={t('charts.forecast_values')}>
-                        <table className="w-full border-separate border-spacing-0 text-right tabular-nums whitespace-nowrap" aria-label={t('charts.forecast_values')}>
+                    <div ref={scrollRef} className="min-w-0 scroller overflow-x-auto rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500" tabIndex={0} role="region" aria-label={t('charts.forecast_values')}>
+                        <table className="fc-forecast-values-table w-full border-separate border-spacing-0 text-right tabular-nums" aria-label={t('charts.forecast_values')}>
                             <thead>
                                 <tr>
                                     <th scope="col" className="sticky left-0 z-10 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 text-left font-semibold">{t('charts.period')}</th>
                                     {forecasts.map(point => (
-                                        <th scope="col" key={point.date} className="min-w-[7.5rem] bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 font-semibold">{point.date.replace('T', ' ')}</th>
+                                        <th scope="col" key={point.date} className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 font-semibold">{point.date.replace('T', ' ')}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -4794,6 +4847,44 @@
             const [isSplitView, setIsSplitView] = useState(true); // For All-In-One
             const [activeTab, setActiveTab] = useState("overview"); // overview | sku id
             const [detailView, setDetailView] = useState("summary");
+            const detailTabTouch = useRef(null);
+            const selectDetailView = useCallback((view) => {
+                setDetailView(view);
+            }, []);
+            const bindDetailTab = (view) => ({
+                onPointerDown: (event) => {
+                    detailTabTouch.current = { view, x: event.clientX, y: event.clientY, id: event.pointerId };
+                },
+                onPointerUp: (event) => {
+                    const start = detailTabTouch.current;
+                    if (!start || start.view !== view || start.id !== event.pointerId) return;
+                    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 12) {
+                        detailTabTouch.current = null;
+                        return;
+                    }
+                    detailTabTouch.current = null;
+                    selectDetailView(view);
+                },
+                onPointerCancel: () => { detailTabTouch.current = null; },
+                onTouchStart: (event) => {
+                    const touch = event.changedTouches[0];
+                    if (!touch) return;
+                    detailTabTouch.current = { view, x: touch.clientX, y: touch.clientY, id: 'touch' };
+                },
+                onTouchEnd: (event) => {
+                    const start = detailTabTouch.current;
+                    const touch = event.changedTouches[0];
+                    detailTabTouch.current = null;
+                    if (!start || start.view !== view || !touch) return;
+                    if (Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 12) return;
+                    event.stopPropagation();
+                    selectDetailView(view);
+                },
+                onClick: (event) => {
+                    event.stopPropagation();
+                    selectDetailView(view);
+                },
+            });
             // Survives detail-panel unmounts; obsolete results can be collected.
             const replayPositions = useRef(new WeakMap());
             const [validationInformation, setValidationInformation] = useState(null);
@@ -6456,8 +6547,8 @@
                                                         <div role="tablist" aria-label={t('sidebar.detail_views')} className="fc-detail-view-tabs flex flex-wrap items-center gap-1 min-w-0">
                                                             {['summary', 'visualization', 'replay'].map(view => <button key={view} type="button" role="tab"
                                                                 id={`fc-detail-tab-${view}`} aria-controls={`fc-detail-panel-${view}`}
-                                                                aria-selected={detailView === view} tabIndex={detailView === view ? 0 : -1}
-                                                                onClick={() => setDetailView(view)}
+                                                                aria-selected={detailView === view} tabIndex={0}
+                                                                {...bindDetailTab(view)}
                                                                 onKeyDown={event => {
                                                                     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
                                                                     event.preventDefault();
@@ -6520,13 +6611,13 @@
                                                         {detailView === 'visualization' && <div key={`visualization-${skuData.sku}`} id="fc-detail-panel-visualization" role="tabpanel" aria-labelledby="fc-detail-tab-visualization" tabIndex={0} className="fc-visualization-panel fc-detail-scroll scroller flex-1 min-h-0">
                                                         <div className="fc-detail-charts min-w-0 gap-4 border border-slate-200 dark:border-slate-700 rounded-lg p-2">
                                                             <div className="fc-detail-chart flex flex-col border-b border-dashed border-slate-200 dark:border-slate-700 relative">
-                                                                <h3 className="shrink-0 px-2 text-xs font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_validation_chart')}</h3>
+                                                                <h3 className="shrink-0 px-2 text-[13px] font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_validation_chart')}</h3>
                                                                 <div className="flex-1 min-h-0">
                                                                 <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
                                                                 </div>
                                                             </div>
                                                             <div className="fc-detail-chart flex flex-col relative">
-                                                                <h3 className="shrink-0 px-2 text-xs font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_forecast_chart')}</h3>
+                                                                <h3 className="shrink-0 px-2 text-[13px] font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_forecast_chart')}</h3>
                                                                 <div className="flex-1 min-h-0">
                                                                 <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
                                                                 </div>
