@@ -478,11 +478,16 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .fc-detail-view-tabs { order: 1; flex: 1 0 100%; }
+        .fc-detail-toolbar { justify-content: center; }
+        .fc-detail-metrics { order: 1; }
+        .fc-detail-view-tabs { order: 2; flex: 1 0 100%; justify-content: center; }
         .fc-detail-view-tabs > button { flex-shrink: 0; white-space: nowrap; }
-        .fc-detail-metrics { order: 2; margin-left: auto; }
+        .fc-detail-view-tabs > button.ml-auto { margin-left: 0; }
 
-        .fc-detail-toolbar[data-inline-tabs="true"] .fc-detail-view-tabs { flex: 1 0 auto; width: max-content; }
+        .fc-detail-toolbar[data-inline-tabs="true"] { justify-content: flex-start; }
+        .fc-detail-toolbar[data-inline-tabs="true"] .fc-detail-view-tabs { order: 1; flex: 1 0 auto; width: max-content; justify-content: flex-start; }
+        .fc-detail-toolbar[data-inline-tabs="true"] .fc-detail-view-tabs > button.ml-auto { margin-left: auto; }
+        .fc-detail-toolbar[data-inline-tabs="true"] .fc-detail-metrics { order: 2; margin-left: auto; }
 
         @keyframes fc-information-enter {
             from { transform: translateX(100%); }
@@ -497,6 +502,100 @@
         @media (max-width: 639px) {
             .fc-replay-chart { height: 300px; }
         }
+        .fc-replay-slider-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            flex: 1 1 0%;
+            height: 28px;
+        }
+        .fc-replay-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 28px;
+            margin: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+        .fc-replay-slider:disabled { cursor: not-allowed; opacity: 0.4; }
+        .fc-replay-slider:focus { outline: none; }
+        .fc-replay-slider::-webkit-slider-runnable-track {
+            height: 4px;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(to right, #f59e0b var(--fc-replay-progress, 0%), #e2e8f0 var(--fc-replay-progress, 0%));
+        }
+        .dark .fc-replay-slider::-webkit-slider-runnable-track {
+            background: linear-gradient(to right, #f59e0b var(--fc-replay-progress, 0%), #334155 var(--fc-replay-progress, 0%));
+        }
+        .fc-replay-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            margin-top: -5px;
+            border-radius: 999px;
+            background: #f59e0b;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+        }
+        .dark .fc-replay-slider::-webkit-slider-thumb {
+            border-color: #0f172a;
+            box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35), 0 1px 2px rgba(0, 0, 0, 0.45);
+        }
+        .fc-replay-slider:focus-visible::-webkit-slider-thumb {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4);
+        }
+        .dark .fc-replay-slider:focus-visible::-webkit-slider-thumb {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.45);
+        }
+        .fc-replay-slider::-moz-range-track {
+            height: 4px;
+            border: none;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+        .dark .fc-replay-slider::-moz-range-track { background: #334155; }
+        .fc-replay-slider::-moz-range-progress {
+            height: 4px;
+            border: none;
+            border-radius: 999px;
+            background: #f59e0b;
+        }
+        .fc-replay-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 999px;
+            background: #f59e0b;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+        }
+        .fc-replay-slider:focus-visible::-moz-range-thumb {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4);
+        }
+        .fc-replay-slider-ticks {
+            position: absolute;
+            left: 7px;
+            right: 7px;
+            top: 50%;
+            z-index: 0;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            transform: translateY(-50%);
+        }
+        .fc-replay-slider-ticks > span {
+            width: 2px;
+            height: 8px;
+            border-radius: 1px;
+            background: #cbd5e1;
+        }
+        .dark .fc-replay-slider-ticks > span { background: #475569; }
+        .fc-replay-slider-ticks > span.is-current { background: #f59e0b; }
 
         .fc-detail-scroll {
             overflow-x: hidden;
@@ -1107,6 +1206,7 @@
                     replay_saved: "Saved validation results",
                     replay_play: "Play",
                     replay_pause: "Pause",
+                    replay_reset: "Reset",
                     replay_previous: "Previous",
                     replay_next: "Next",
                     replay_speed: "Speed",
@@ -1385,6 +1485,7 @@
                     replay_saved: "Kết quả kiểm định đã lưu",
                     replay_play: "Phát",
                     replay_pause: "Tạm dừng",
+                    replay_reset: "Đặt lại",
                     replay_previous: "Trước",
                     replay_next: "Tiếp",
                     replay_speed: "Tốc độ",
@@ -1663,6 +1764,7 @@
                     replay_saved: "Gespeicherte Validierungsergebnisse",
                     replay_play: "Abspielen",
                     replay_pause: "Pause",
+                    replay_reset: "Zurücksetzen",
                     replay_previous: "Zurück",
                     replay_next: "Weiter",
                     replay_speed: "Tempo",
@@ -2481,6 +2583,7 @@
         const ReplayControlIcon = ({ kind }) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
             {kind === 'play' && <path d="M8 5l11 7-11 7Z" fill="currentColor" stroke="none" />}
             {kind === 'pause' && <><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" stroke="none" /><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" stroke="none" /></>}
+            {kind === 'reset' && <><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" /><path d="M4 4.5v5h5" /></>}
             {kind === 'previous' && <><path d="M5 5v14" /><path d="M18 5L8 12l10 7Z" fill="currentColor" stroke="none" /></>}
             {kind === 'next' && <><path d="M19 5v14" /><path d="M6 5l10 7-10 7Z" fill="currentColor" stroke="none" /></>}
             {kind === 'speed' && <><path d="M4.5 19a9 9 0 1 1 15 0M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18 12h3M12 15l5-8" /><circle cx="12" cy="15" r="1.5" fill="currentColor" /></>}
@@ -2606,11 +2709,16 @@
                         if (!playing && index === replay.folds.length - 1 && phase === 2) { setIndex(0); setPhase(0); }
                         setPlaying(!playing);
                     }}><ReplayControlIcon kind={playing ? 'pause' : 'play'} /></button>
+                    <button type="button" className={control} aria-label={t('sidebar.replay_reset')} title={t('sidebar.replay_reset')} disabled={index === 0 && phase === 0 && !playing} onClick={() => { setPlaying(false); setIndex(0); setPhase(0); }}><ReplayControlIcon kind="reset" /></button>
                     <button type="button" className={control} aria-label={t('sidebar.replay_previous')} title={t('sidebar.replay_previous')} disabled={index === 0} onClick={() => selectFold(index - 1)}><ReplayControlIcon kind="previous" /></button>
                     <button type="button" className={control} aria-label={t('sidebar.replay_next')} title={t('sidebar.replay_next')} disabled={index === replay.folds.length - 1} onClick={() => selectFold(index + 1)}><ReplayControlIcon kind="next" /></button>
-                    <label className="flex items-center gap-2 text-xs flex-1 min-w-[180px]">
+                    <label className="flex items-center gap-3 text-xs flex-1 min-w-[180px] text-slate-500 dark:text-slate-400">
                         <span className="shrink-0 whitespace-nowrap">{t('sidebar.replay_evaluation')}</span>
-                        <input type="range" min="0" max={replay.folds.length - 1} value={index} disabled={replay.folds.length === 1} onChange={event => selectFold(Number(event.target.value))} aria-label={t('sidebar.replay_evaluation')} aria-valuetext={`${index + 1} / ${replay.folds.length}`} className="min-w-0 w-0 flex-1 accent-amber-500" /></label>
+                        <span className="fc-replay-slider-wrap">
+                            {replay.folds.length > 1 && <span className="fc-replay-slider-ticks" aria-hidden="true">{replay.folds.map((_, tick) => <span key={tick} className={tick === index ? 'is-current' : undefined} />)}</span>}
+                            <input type="range" min="0" max={replay.folds.length - 1} step="1" value={index} disabled={replay.folds.length === 1} onChange={event => selectFold(Number(event.target.value))} aria-label={t('sidebar.replay_evaluation')} aria-valuetext={`${index + 1} / ${replay.folds.length}`} className="fc-replay-slider" style={{ '--fc-replay-progress': `${replay.folds.length <= 1 ? 0 : (index / (replay.folds.length - 1)) * 100}%` }} />
+                        </span>
+                    </label>
                     <label className="flex items-center gap-2 text-xs" title={t('sidebar.replay_speed')}><ReplayControlIcon kind="speed" /><select aria-label={t('sidebar.replay_speed')} value={speed} onChange={event => setSpeed(Number(event.target.value))} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5">{[0.5, 1, 2].map(value => <option key={value} value={value}>{value}×</option>)}</select></label>
                 </div>
                 <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 min-w-0">
@@ -5180,7 +5288,11 @@
                 && !!normalizedJobStatus
                 && !TERMINAL_JOB_STATUSES.has(normalizedJobStatus)
                 && normalizedJobStatus !== 'cancel_requested';
-            const visibleModelOptions = SELECTABLE_FORECAST_MODELS.filter((option) => visibleModels.includes(option.value));
+            const visibleModelOptions = SELECTABLE_FORECAST_MODELS.filter((option) => {
+                if (!visibleModels.includes(option.value)) return false;
+                const checking = !option.disabled && option.advanced && forecastCapabilities.status === 'loading';
+                return checking || isForecastModelAvailable(option.value);
+            });
             const availableSelectableCodes = visibleModelOptions
                 .filter((option) => isForecastModelAvailable(option.value))
                 .map((option) => option.value);
@@ -5525,7 +5637,7 @@
                                                                         <label
                                                                             key={option.value}
                                                                             className={`fc-model-picker-option${available ? '' : ' is-disabled'}`}
-                                                                            title={option.disabled ? t('sidebar.model_temporarily_disabled') : (available ? undefined : t('sidebar.models_unavailable'))}
+                                                                            title={available ? undefined : t('sidebar.availability_checking')}
                                                                         >
                                                                             <input
                                                                                 type="checkbox"
