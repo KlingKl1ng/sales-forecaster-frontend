@@ -92,7 +92,7 @@
 
         @media (max-width: 639px) {
             .fc-kpi-bar {
-                min-height: 3rem;
+                min-height: 2.5rem;
             }
         }
 
@@ -478,6 +478,26 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .fc-detail-view-tabs { order: 1; flex: 1 0 100%; }
+        .fc-detail-view-tabs > button { flex-shrink: 0; white-space: nowrap; }
+        .fc-detail-metrics { order: 2; margin-left: auto; }
+
+        .fc-detail-toolbar[data-inline-tabs="true"] .fc-detail-view-tabs { flex: 1 0 auto; width: max-content; }
+
+        @keyframes fc-information-enter {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .fc-information-drawer { animation: fc-information-enter 180ms ease-out; }
+        @media (prefers-reduced-motion: reduce) {
+            .fc-information-drawer { animation: none; }
+        }
+
+        .fc-replay-chart { height: clamp(280px, 38vh, 440px); }
+        @media (max-width: 639px) {
+            .fc-replay-chart { height: 300px; }
+        }
+
         .fc-detail-scroll {
             overflow-x: hidden;
             overflow-y: auto;
@@ -493,10 +513,8 @@
             display: grid;
             grid-template-columns: minmax(0, 1fr);
             grid-template-rows: repeat(2, minmax(0, 1fr));
-            flex: 1 0 640px;
+            height: 100%;
             min-height: 640px;
-            max-height: min(680px, calc(100vh - 240px));
-            max-height: min(680px, calc(100dvh - 240px));
         }
 
         .fc-detail-chart {
@@ -508,22 +526,6 @@
         .fc-validation-table > thead,
         .fc-validation-table > tbody {
             display: block;
-        }
-
-        .fc-validation-table > thead,
-        .fc-validation-table > tbody {
-            /* Reserve the same gutter so header and body columns stay aligned. */
-            scrollbar-gutter: stable;
-        }
-
-        .fc-validation-table > thead {
-            overflow: hidden;
-        }
-
-        .fc-validation-table > tbody {
-            max-height: 124px;
-            overflow-y: auto;
-            overscroll-behavior-y: contain;
         }
 
         .fc-validation-table tr {
@@ -1023,8 +1025,8 @@
     <div id="root" class="h-full w-full flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo, useCallback, memo } = React;
-        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart, Bar, BarChart, Brush } = window.Recharts;
+        const { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback, memo } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart, Bar, BarChart, Brush, ReferenceArea, ReferenceLine } = window.Recharts;
 
         function useOperartisTheme() {
             const [theme, setThemeState] = useState(() => window.getOperartisTheme());
@@ -1098,6 +1100,29 @@
                     validation_auto: "Automatic split: keeps at least {train} training periods for eligible selected models.",
                     validation_manual: "Manual split. Your train and test horizons are kept when the forecast horizon changes.",
                     validation_recommend: "Use recommended split",
+                    detail_summary: "Summary",
+                    detail_visualization: "Visualization",
+                    detail_replay: "Simulation",
+                    replay_evaluation: "Evaluation",
+                    replay_saved: "Saved validation results",
+                    replay_play: "Play",
+                    replay_pause: "Pause",
+                    replay_previous: "Previous",
+                    replay_next: "Next",
+                    replay_speed: "Speed",
+                    replay_training: "Training window",
+                    replay_targets: "Forecast window",
+                    replay_current: "Current evaluation",
+                    replay_overall: "Overall validation",
+                    replay_scores_pending: "Scores appear when actuals are revealed.",
+                    replay_unavailable: "This result has no complete evaluation records for simulation. Run the forecast again to generate them.",
+                    replay_stage_0: "1 · Training window",
+                    replay_stage_1: "2 · Forecast",
+                    replay_stage_2: "3 · Actuals and errors",
+                    detail_views: "ID details",
+                    detail_process: "Forecast setup",
+                    detail_validation_chart: "Validation performance",
+                    detail_forecast_chart: "Final forecast",
                     model_substitution: "Model substituted",
                     models_requested: "Requested models",
                     model_used: "Model used",
@@ -1108,7 +1133,45 @@
                     seasonal_mul: "Multiplicative",
                     validation_simple: "One forecast over the entire test period. Fastest option.",
                     validation_details: "Validation details",
-                    validation_counts: "{count} evaluations · {horizon} periods ahead · {pairs} scored forecasts",
+                    info_panel: "Information Panel",
+                    info_close: "Close information panel",
+                    info_about: "Information about",
+                    info_meaning: "What this table means",
+                    info_purpose: "Why use it?",
+                    info_reading: "How to read it",
+                    info_example: "A simple numerical example",
+                    info_example_predictions: "Example forecast values",
+                    info_example_scores: "Resulting scores",
+                    info_calculation: "Calculation for the first row",
+                    info_lead_one: "1 period ahead",
+                    info_lead_two: "2 periods ahead",
+                    info_overall: "How this relates to overall validation",
+                    info_meaning_evaluation: "Each row is one evaluation: the model is fitted using the data available at a training cutoff, then forecasts the entire test window for that evaluation. The scores compare those forecasts with the actual observations. Five evaluations therefore produce five rows, even if each forecasts six periods.",
+                    info_meaning_distance: "Each row combines predictions with the same forecast distance across all evaluations. Row 1 scores the first period ahead from every evaluation; row 2 scores the second period ahead, and so on. Five evaluations forecasting six periods therefore produce six rows, with five predictions contributing to each row.",
+                    info_purpose_evaluation: "Use this view to compare performance at different points in history. It helps identify evaluations where the model struggled and assess how consistent its accuracy was. Expanding windows grow the training history; rolling windows move a fixed-length training history forward. Simple Split has only one evaluation.",
+                    info_purpose_distance: "Use this view to assess how accuracy changes as the forecast looks further ahead. It can help you judge which planning horizons are useful and where uncertainty deserves more attention. Accuracy does not necessarily get worse with distance; this table shows what happened in the saved evaluations.",
+                    info_reading_evaluation: "Training cutoff is the last date used to fit that evaluation. Forecast date range is the span of dates being predicted and scored. Click the evaluation number to open its exact frame in Simulation, including forecasts and actuals.",
+                    info_reading_distance: "Periods ahead is a distance from each training cutoff, not an evaluation number or a single calendar date. With monthly data, 1 means next month; with daily data, next day. Each row is calculated directly from all scored prediction–actual pairs at that distance.",
+                    info_mae: "Mean absolute error: the average size of the error, in the same units as the forecast. Lower is better.",
+                    info_rmse: "Root mean squared error: square the errors, average them, then take the square root. It gives large errors more weight and uses the original units. Lower is better.",
+                    info_mape: "Mean absolute percentage error: average the absolute error divided by the absolute actual value, then multiply by 100. Actual values at or very near zero are excluded. If none remain, MAPE is unavailable; small actuals can make it very large.",
+                    info_example_setup: "This is an illustrative example, not your uploaded data. There are two evaluations, each forecasting two periods: four scored predictions in total. Assume the actual value is 100 for every prediction. The forecasts are:",
+                    info_grouping_evaluation: "Read across each evaluation. Evaluation 1 has absolute errors 10 and 20; evaluation 2 has 10 and 40. For the first row:",
+                    info_grouping_distance: "Read down each forecast-distance column. At 1 period ahead, forecasts 90 and 110 both have absolute error 10. At 2 periods ahead, forecasts 80 and 140 have errors 20 and 40. For the first row:",
+                    info_interpretation_evaluation: "Evaluation 2 was less accurate overall, mainly because its second prediction had a much larger error. This view tells you which evaluation deserves closer inspection.",
+                    info_interpretation_distance: "The second period ahead was less accurate than the first across these evaluations. This view identifies the weaker forecast distance, even though the same four predictions underlie both tables.",
+                    info_overall_body: "Both views regroup the same scored predictions. Overall MAE in this example is (10 + 20 + 10 + 40) ÷ 4 = 20, overall RMSE is √550 ≈ 23.45, and overall MAPE is 20%. Overall RMSE is calculated from all squared errors; it is not the average of the displayed row RMSE values.",
+                    info_cautions: "These metrics measure error size, not whether forecasts are consistently too high or too low; inspect predictions against actuals in Simulation for direction. Overlapping evaluations can predict the same date more than once, and each prediction is scored separately; those observations are not independent. Historical validation does not guarantee future accuracy.",
+                    validation_breakdown: "Validation breakdown",
+                    validation_by_evaluation: "By evaluation",
+                    validation_by_distance: "By forecast distance",
+                    validation_cutoff: "Training cutoff",
+                    validation_forecast_range: "Forecast date range",
+                    validation_open_replay: "Open in Simulation",
+                    validation_evaluation_description: "Each row scores one evaluation across its full forecast window. Select an evaluation to open its simulation.",
+                    validation_distance_description: "Each row groups forecasts the same number of periods ahead across all evaluations.",
+                    validation_evaluation_unavailable: "Per-evaluation records are unavailable for this result. View forecast-distance scores, or run the forecast again to generate evaluation records.",
+                    validation_counts: "{count} evaluations · {horizon} periods per evaluation · {pairs} scored forecasts",
                     validation_chart: "Scores include every evaluation and lead time. The chart shows the latest forecast for each date; fitted values are retrospective, not validation predictions.",
                     validation_lead: "Periods ahead",
                     validation_final: "Final training periods",
@@ -1315,6 +1378,29 @@
                     validation_auto: "Chia tự động: giữ ít nhất {train} kỳ huấn luyện cho các mô hình đã chọn đủ điều kiện.",
                     validation_manual: "Chia thủ công. Giữ chu kỳ huấn luyện và kiểm định khi thay đổi chu kỳ dự báo.",
                     validation_recommend: "Dùng cách chia đề xuất",
+                    detail_summary: "Tóm tắt",
+                    detail_visualization: "Biểu đồ",
+                    detail_replay: "Mô phỏng",
+                    replay_evaluation: "Lần kiểm định",
+                    replay_saved: "Kết quả kiểm định đã lưu",
+                    replay_play: "Phát",
+                    replay_pause: "Tạm dừng",
+                    replay_previous: "Trước",
+                    replay_next: "Tiếp",
+                    replay_speed: "Tốc độ",
+                    replay_training: "Cửa sổ huấn luyện",
+                    replay_targets: "Cửa sổ dự báo",
+                    replay_current: "Lần kiểm định hiện tại",
+                    replay_overall: "Toàn bộ kiểm định",
+                    replay_scores_pending: "Điểm số xuất hiện khi hiển thị giá trị thực tế.",
+                    replay_unavailable: "Kết quả này chưa có đầy đủ dữ liệu từng lần kiểm định để mô phỏng. Hãy chạy lại dự báo.",
+                    replay_stage_0: "1 · Cửa sổ huấn luyện",
+                    replay_stage_1: "2 · Dự báo",
+                    replay_stage_2: "3 · Thực tế và sai số",
+                    detail_views: "Chi tiết ID",
+                    detail_process: "Thiết lập dự báo",
+                    detail_validation_chart: "Kết quả kiểm định",
+                    detail_forecast_chart: "Dự báo cuối cùng",
                     model_substitution: "Đã thay thế mô hình",
                     models_requested: "Mô hình yêu cầu",
                     model_used: "Mô hình sử dụng",
@@ -1325,7 +1411,45 @@
                     seasonal_mul: "Nhân",
                     validation_simple: "Một lần dự báo cho toàn bộ giai đoạn kiểm định. Nhanh nhất.",
                     validation_details: "Chi tiết kiểm định",
-                    validation_counts: "{count} lần kiểm định · {horizon} kỳ phía trước · {pairs} dự báo được chấm điểm",
+                    info_panel: "Bảng thông tin",
+                    info_close: "Đóng bảng thông tin",
+                    info_about: "Thông tin về",
+                    info_meaning: "Bảng này có ý nghĩa gì?",
+                    info_purpose: "Tại sao cần bảng này?",
+                    info_reading: "Cách đọc bảng",
+                    info_example: "Ví dụ số đơn giản",
+                    info_example_predictions: "Giá trị dự báo trong ví dụ",
+                    info_example_scores: "Điểm số tính được",
+                    info_calculation: "Cách tính dòng đầu tiên",
+                    info_lead_one: "Trước 1 kỳ",
+                    info_lead_two: "Trước 2 kỳ",
+                    info_overall: "Liên hệ với kết quả kiểm định tổng thể",
+                    info_meaning_evaluation: "Mỗi dòng là một lần kiểm định: mô hình được huấn luyện bằng dữ liệu có sẵn đến mốc kết thúc huấn luyện, sau đó dự báo toàn bộ cửa sổ kiểm tra của lần đó. Điểm số so sánh các dự báo với giá trị thực tế. Vì vậy, năm lần kiểm định tạo ra năm dòng, ngay cả khi mỗi lần dự báo sáu kỳ.",
+                    info_meaning_distance: "Mỗi dòng tổng hợp các dự báo có cùng khoảng cách dự báo từ tất cả các lần kiểm định. Dòng 1 chấm điểm kỳ đầu tiên phía trước của mỗi lần; dòng 2 chấm điểm kỳ thứ hai, v.v. Vì vậy, năm lần kiểm định, mỗi lần dự báo sáu kỳ, tạo ra sáu dòng; mỗi dòng có năm dự báo đóng góp.",
+                    info_purpose_evaluation: "Dùng cách xem này để so sánh hiệu quả ở các thời điểm khác nhau trong lịch sử. Bảng giúp tìm ra những lần mô hình dự báo kém và đánh giá độ ổn định của độ chính xác. Cửa sổ mở rộng tăng dần lịch sử huấn luyện; cửa sổ cuốn dịch chuyển lịch sử có độ dài cố định. Tách đơn giản chỉ có một lần kiểm định.",
+                    info_purpose_distance: "Dùng cách xem này để đánh giá độ chính xác thay đổi thế nào khi dự báo xa hơn. Bảng giúp cân nhắc phạm vi lập kế hoạch phù hợp và những kỳ cần chú ý hơn đến độ bất định. Độ chính xác không nhất thiết giảm khi dự báo xa hơn; bảng phản ánh kết quả của các lần kiểm định đã lưu.",
+                    info_reading_evaluation: "Mốc kết thúc huấn luyện là ngày cuối cùng được dùng để huấn luyện trong lần kiểm định đó. Khoảng thời gian dự báo gồm các ngày được dự báo và chấm điểm. Nhấp vào số thứ tự lần kiểm định để mở đúng khung hình trong Mô phỏng, gồm dự báo và giá trị thực tế.",
+                    info_reading_distance: "Số kỳ phía trước là khoảng cách từ mốc kết thúc huấn luyện của mỗi lần, không phải số thứ tự lần kiểm định hay một ngày lịch cụ thể. Với dữ liệu tháng, 1 là tháng tiếp theo; với dữ liệu ngày, là ngày tiếp theo. Mỗi dòng được tính trực tiếp từ tất cả cặp dự báo–thực tế đã chấm điểm ở khoảng cách đó.",
+                    info_mae: "Sai số tuyệt đối trung bình: độ lớn sai số trung bình, cùng đơn vị với giá trị dự báo. Càng thấp càng tốt.",
+                    info_rmse: "Căn bậc hai của sai số bình phương trung bình: bình phương sai số, lấy trung bình rồi lấy căn bậc hai. Chỉ số này nhấn mạnh các sai số lớn và dùng đơn vị gốc. Càng thấp càng tốt.",
+                    info_mape: "Sai số phần trăm tuyệt đối trung bình: lấy trung bình của sai số tuyệt đối chia cho trị tuyệt đối của giá trị thực tế, rồi nhân 100. Giá trị thực tế bằng hoặc rất gần 0 được loại khỏi phép tính. Nếu không còn giá trị nào, MAPE không có; giá trị thực tế nhỏ có thể làm MAPE rất lớn.",
+                    info_example_setup: "Đây là ví dụ minh họa, không phải dữ liệu bạn tải lên. Có hai lần kiểm định, mỗi lần dự báo hai kỳ: tổng cộng bốn dự báo được chấm điểm. Giả sử giá trị thực tế luôn là 100. Các giá trị dự báo là:",
+                    info_grouping_evaluation: "Đọc theo từng dòng kiểm định. Lần 1 có sai số tuyệt đối 10 và 20; lần 2 có 10 và 40. Cách tính dòng đầu tiên:",
+                    info_grouping_distance: "Đọc theo từng cột khoảng cách dự báo. Ở kỳ thứ 1, dự báo 90 và 110 đều có sai số tuyệt đối 10. Ở kỳ thứ 2, dự báo 80 và 140 có sai số 20 và 40. Cách tính dòng đầu tiên:",
+                    info_interpretation_evaluation: "Lần kiểm định 2 có độ chính xác tổng thể thấp hơn, chủ yếu vì dự báo kỳ thứ hai có sai số lớn hơn nhiều. Cách xem này cho biết lần kiểm định nào cần xem xét kỹ hơn.",
+                    info_interpretation_distance: "Qua các lần kiểm định này, kỳ thứ hai phía trước kém chính xác hơn kỳ thứ nhất. Cách xem này chỉ ra khoảng cách dự báo yếu hơn, dù cả hai bảng đều dùng cùng bốn dự báo.",
+                    info_overall_body: "Cả hai cách xem chỉ nhóm lại cùng các dự báo đã chấm điểm. Trong ví dụ, MAE tổng thể là (10 + 20 + 10 + 40) ÷ 4 = 20, RMSE tổng thể là √550 ≈ 23.45 và MAPE tổng thể là 20%. RMSE tổng thể được tính từ tất cả sai số bình phương, không phải trung bình các giá trị RMSE hiển thị theo dòng.",
+                    info_cautions: "Các chỉ số này đo độ lớn sai số, không cho biết dự báo thường quá cao hay quá thấp; hãy so sánh dự báo và thực tế trong Mô phỏng để xem chiều sai lệch. Các lần kiểm định chồng lấn có thể dự báo cùng một ngày nhiều lần; mỗi dự báo được chấm điểm riêng và các quan sát đó không độc lập. Kiểm định trên lịch sử không bảo đảm độ chính xác tương lai.",
+                    validation_breakdown: "Phân tích kiểm định",
+                    validation_by_evaluation: "Theo lần kiểm định",
+                    validation_by_distance: "Theo kỳ dự báo",
+                    validation_cutoff: "Mốc kết thúc huấn luyện",
+                    validation_forecast_range: "Khoảng thời gian dự báo",
+                    validation_open_replay: "Mở trong Mô phỏng",
+                    validation_evaluation_description: "Mỗi dòng chấm điểm một lần kiểm định trên toàn bộ cửa sổ dự báo. Chọn một lần kiểm định để xem mô phỏng.",
+                    validation_distance_description: "Mỗi dòng tổng hợp các dự báo có cùng số kỳ phía trước từ tất cả các lần kiểm định.",
+                    validation_evaluation_unavailable: "Kết quả này chưa có dữ liệu từng lần kiểm định. Xem điểm theo kỳ dự báo hoặc chạy lại dự báo để tạo dữ liệu kiểm định.",
+                    validation_counts: "{count} lần kiểm định · {horizon} kỳ mỗi lần · {pairs} dự báo được chấm điểm",
                     validation_chart: "Điểm số dùng mọi lần kiểm định và kỳ dự báo. Biểu đồ dùng dự báo mới nhất tại mỗi ngày; giá trị khớp là hồi cứu, không phải dự báo kiểm định.",
                     validation_lead: "Số kỳ phía trước",
                     validation_final: "Số kỳ huấn luyện cuối",
@@ -1532,6 +1656,29 @@
                     validation_auto: "Automatische Aufteilung: mindestens {train} Trainingsperioden für geeignete ausgewählte Modelle.",
                     validation_manual: "Manuelle Aufteilung. Trainings- und Testhorizont bleiben bei Änderungen des Prognosehorizonts erhalten.",
                     validation_recommend: "Empfohlene Aufteilung verwenden",
+                    detail_summary: "Zusammenfassung",
+                    detail_visualization: "Visualisierung",
+                    detail_replay: "Simulation",
+                    replay_evaluation: "Auswertung",
+                    replay_saved: "Gespeicherte Validierungsergebnisse",
+                    replay_play: "Abspielen",
+                    replay_pause: "Pause",
+                    replay_previous: "Zurück",
+                    replay_next: "Weiter",
+                    replay_speed: "Tempo",
+                    replay_training: "Trainingsfenster",
+                    replay_targets: "Prognosefenster",
+                    replay_current: "Aktuelle Auswertung",
+                    replay_overall: "Gesamte Validierung",
+                    replay_scores_pending: "Kennzahlen erscheinen nach Einblendung der Istwerte.",
+                    replay_unavailable: "Dieses Ergebnis enthält keine vollständigen Auswertungsdaten für die Simulation. Bitte die Prognose erneut ausführen.",
+                    replay_stage_0: "1 · Trainingsfenster",
+                    replay_stage_1: "2 · Prognose",
+                    replay_stage_2: "3 · Istwerte und Fehler",
+                    detail_views: "ID-Details",
+                    detail_process: "Prognoseeinstellungen",
+                    detail_validation_chart: "Validierungsergebnisse",
+                    detail_forecast_chart: "Finale Prognose",
                     model_substitution: "Modell ersetzt",
                     models_requested: "Angeforderte Modelle",
                     model_used: "Verwendetes Modell",
@@ -1542,7 +1689,45 @@
                     seasonal_mul: "Multiplikativ",
                     validation_simple: "Eine Prognose über den gesamten Testzeitraum. Schnellste Option.",
                     validation_details: "Validierungsdetails",
-                    validation_counts: "{count} Auswertungen · {horizon} Perioden voraus · {pairs} bewertete Prognosen",
+                    info_panel: "Informationsbereich",
+                    info_close: "Informationsbereich schließen",
+                    info_about: "Informationen zu",
+                    info_meaning: "Was zeigt diese Tabelle?",
+                    info_purpose: "Wozu dient sie?",
+                    info_reading: "So lesen Sie die Tabelle",
+                    info_example: "Ein einfaches Zahlenbeispiel",
+                    info_example_predictions: "Prognosewerte im Beispiel",
+                    info_example_scores: "Berechnete Kennzahlen",
+                    info_calculation: "Berechnung der ersten Zeile",
+                    info_lead_one: "1 Periode voraus",
+                    info_lead_two: "2 Perioden voraus",
+                    info_overall: "Bezug zur gesamten Validierung",
+                    info_meaning_evaluation: "Jede Zeile ist eine Auswertung: Das Modell wird mit den bis zum Trainingsende verfügbaren Daten angepasst und prognostiziert anschließend das gesamte Testfenster dieser Auswertung. Die Kennzahlen vergleichen diese Prognosen mit den Istwerten. Fünf Auswertungen ergeben fünf Zeilen, auch wenn jede sechs Perioden prognostiziert.",
+                    info_meaning_distance: "Jede Zeile bündelt Prognosen mit demselben zeitlichen Abstand über alle Auswertungen. Zeile 1 bewertet jeweils die erste Periode voraus, Zeile 2 die zweite usw. Fünf Auswertungen mit jeweils sechs Prognoseperioden ergeben daher sechs Zeilen mit jeweils fünf Prognosen.",
+                    info_purpose_evaluation: "Vergleichen Sie damit die Leistung zu verschiedenen historischen Zeitpunkten. So erkennen Sie schwierige Auswertungen und sehen, wie stabil die Genauigkeit war. Bei einem expandierenden Fenster wächst die Trainingshistorie; bei einem rollierenden Fenster wird eine gleich lange Historie verschoben. Simple Split hat nur eine Auswertung.",
+                    info_purpose_distance: "Damit erkennen Sie, wie sich die Genauigkeit mit wachsendem Prognoseabstand verändert. Das hilft bei der Wahl sinnvoller Planungshorizonte und zeigt, wo Unsicherheit besondere Aufmerksamkeit verdient. Die Genauigkeit muss mit größerem Abstand nicht schlechter werden; die Tabelle zeigt die gespeicherten Auswertungsergebnisse.",
+                    info_reading_evaluation: "Das Trainingsende ist das letzte zum Anpassen des Modells verwendete Datum dieser Auswertung. Der Prognosezeitraum umfasst die vorhergesagten und bewerteten Daten. Klicken Sie auf die Auswertungsnummer, um genau diesen Schritt mit Prognosen und Istwerten in der Simulation zu öffnen.",
+                    info_reading_distance: "Perioden voraus bezeichnet den Abstand vom jeweiligen Trainingsende, keine Auswertungsnummer und kein einzelnes Kalenderdatum. Bei Monatsdaten bedeutet 1 den nächsten Monat, bei Tagesdaten den nächsten Tag. Jede Zeile wird direkt aus allen bewerteten Prognose-Istwert-Paaren dieses Abstands berechnet.",
+                    info_mae: "Mittlerer absoluter Fehler: die durchschnittliche Fehlergröße in derselben Einheit wie die Prognose. Niedriger ist besser.",
+                    info_rmse: "Wurzel des mittleren quadratischen Fehlers: Fehler quadrieren, mitteln und daraus die Wurzel ziehen. Große Fehler werden stärker gewichtet; die Einheit bleibt unverändert. Niedriger ist besser.",
+                    info_mape: "Mittlerer absoluter prozentualer Fehler: den absoluten Fehler durch den absoluten Istwert teilen, mitteln und mit 100 multiplizieren. Istwerte bei oder sehr nahe null werden ausgeschlossen. Bleiben keine übrig, ist MAPE nicht verfügbar; kleine Istwerte können sehr große Prozentfehler erzeugen.",
+                    info_example_setup: "Dies ist ein veranschaulichendes Beispiel, nicht Ihr hochgeladener Datensatz. Zwei Auswertungen prognostizieren jeweils zwei Perioden: insgesamt vier bewertete Prognosen. Der Istwert sei jedes Mal 100. Die Prognosen lauten:",
+                    info_grouping_evaluation: "Lesen Sie die Werte je Auswertung zusammen. Auswertung 1 hat absolute Fehler von 10 und 20, Auswertung 2 von 10 und 40. Für die erste Zeile gilt:",
+                    info_grouping_distance: "Lesen Sie die Werte je Prognoseabstand zusammen. Bei 1 Periode voraus haben die Prognosen 90 und 110 jeweils einen absoluten Fehler von 10. Bei 2 Perioden voraus haben 80 und 140 Fehler von 20 und 40. Für die erste Zeile gilt:",
+                    info_interpretation_evaluation: "Auswertung 2 war insgesamt ungenauer, vor allem wegen des deutlich größeren Fehlers ihrer zweiten Prognose. Diese Ansicht zeigt, welche Auswertung genauer untersucht werden sollte.",
+                    info_interpretation_distance: "Über diese Auswertungen war die zweite Periode voraus ungenauer als die erste. Diese Ansicht zeigt den schwächeren Prognoseabstand, obwohl beiden Tabellen dieselben vier Prognosen zugrunde liegen.",
+                    info_overall_body: "Beide Ansichten gruppieren dieselben bewerteten Prognosen neu. Im Beispiel beträgt die gesamte MAE (10 + 20 + 10 + 40) ÷ 4 = 20, die gesamte RMSE √550 ≈ 23.45 und die gesamte MAPE 20%. Die gesamte RMSE wird aus allen quadrierten Fehlern berechnet, nicht als Mittelwert der angezeigten Zeilen-RMSE.",
+                    info_cautions: "Diese Kennzahlen messen die Fehlergröße, nicht eine systematische Über- oder Unterschätzung. Vergleichen Sie dafür Prognosen und Istwerte in der Simulation. Überlappende Auswertungen können dasselbe Datum mehrfach prognostizieren; jede Prognose wird separat bewertet, diese Beobachtungen sind nicht unabhängig. Historische Validierung garantiert keine zukünftige Genauigkeit.",
+                    validation_breakdown: "Validierungsaufschlüsselung",
+                    validation_by_evaluation: "Nach Auswertung",
+                    validation_by_distance: "Nach Prognoseabstand",
+                    validation_cutoff: "Trainingsende",
+                    validation_forecast_range: "Prognosezeitraum",
+                    validation_open_replay: "In der Simulation öffnen",
+                    validation_evaluation_description: "Jede Zeile bewertet eine Auswertung über ihr gesamtes Prognosefenster. Wählen Sie eine Auswertung für die Simulation.",
+                    validation_distance_description: "Jede Zeile fasst Prognosen mit demselben zeitlichen Abstand über alle Auswertungen zusammen.",
+                    validation_evaluation_unavailable: "Für dieses Ergebnis fehlen Einzeldaten je Auswertung. Sie können die Kennzahlen nach Prognoseabstand ansehen oder die Prognose erneut ausführen.",
+                    validation_counts: "{count} Auswertungen · {horizon} Perioden je Auswertung · {pairs} bewertete Prognosen",
                     validation_chart: "Die Kennzahlen berücksichtigen alle Auswertungen und Vorlaufzeiten. Das Diagramm zeigt die neueste Prognose je Datum; angepasste Werte sind rückblickend, keine Testprognosen.",
                     validation_lead: "Perioden voraus",
                     validation_final: "Perioden im finalen Training",
@@ -2045,6 +2230,31 @@
             return fallback;
         };
 
+        // Status responses repeat completed results as newly parsed JSON objects.
+        // Preserve unchanged IDs so their chart/playback state survives polling.
+        const equalForecastResult = (previous, incoming) => {
+            if (previous === incoming) return true;
+            if (previous == null || incoming == null || typeof previous !== 'object' || typeof incoming !== 'object') return false;
+            if (Array.isArray(previous) !== Array.isArray(incoming)) return false;
+            const keys = Object.keys(previous);
+            return keys.length === Object.keys(incoming).length && keys.every(key =>
+                Object.prototype.hasOwnProperty.call(incoming, key) && equalForecastResult(previous[key], incoming[key]));
+        };
+
+        const mergeForecastResults = (previous, incoming) => {
+            if (!incoming.length) return previous;
+            const results = new Map((previous || []).map(result => [String(result.sku), result]));
+            let changed = false;
+            for (const result of incoming) {
+                const key = String(result.sku);
+                if (!equalForecastResult(results.get(key), result)) {
+                    results.set(key, result);
+                    changed = true;
+                }
+            }
+            return changed ? Array.from(results.values()) : previous;
+        };
+
         const getAdaptivePollDelay = ({ cloud, unchangedPolls, hadError }) => {
             const baseDelay = cloud ? 2000 : 1000;
             const maxDelay = cloud ? 15000 : 5000;
@@ -2150,13 +2360,13 @@
             const mobileLabel = shortLabel || label;
             return (
                 <div
-                    className={`fc-kpi-metric flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 ${bgClass} backdrop-blur-md px-1 py-1.5 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
+                    className={`fc-kpi-metric flex flex-col justify-center items-center h-full border-r border-white/20 dark:border-white/10 last:border-r-0 ${bgClass} backdrop-blur-md px-1 py-1 sm:px-2 md:px-4 transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]`}
                     title={label}
                 >
                     <span className={`sm:hidden text-[9px] ${caseClass} font-bold ${labelClass} tracking-wide mb-0.5 text-center leading-[1.15] w-full min-w-0 truncate px-0.5`}>{mobileLabel}</span>
-                    <span className={`hidden sm:block text-[11px] md:text-xs ${caseClass} font-bold ${labelClass} tracking-wide mb-0.5 text-center leading-[1.15] w-full min-w-0 truncate px-0.5`}>{label}</span>
+                    <span className={`hidden sm:block text-[10px] md:text-[11px] ${caseClass} font-bold ${labelClass} tracking-wide mb-0.5 text-center leading-[1.15] w-full min-w-0 truncate px-0.5`}>{label}</span>
                     <div className="flex items-baseline gap-1 justify-center min-w-0 max-w-full">
-                        <span className={`text-xs sm:text-base md:text-lg font-bold font-mono leading-none truncate ${colorClass} drop-shadow-sm`}>{value}</span>
+                        <span className={`text-xs sm:text-sm md:text-base font-bold font-mono leading-none truncate ${colorClass} drop-shadow-sm`}>{value}</span>
                         {subValue && <span className="text-[10px] md:text-xs font-medium text-slate-400 dark:text-slate-500 shrink-0">{subValue}</span>}
                     </div>
                 </div>
@@ -2236,6 +2446,357 @@
                     </div>
             );
         });
+
+        const DetailToolbar = ({ children }) => {
+            const toolbarRef = useRef(null);
+            useLayoutEffect(() => {
+                const toolbar = toolbarRef.current;
+                const tabs = toolbar.querySelector('.fc-detail-view-tabs');
+                const metrics = toolbar.querySelector('.fc-detail-metrics');
+                const buttons = Array.from(tabs.children);
+                let disposed = false;
+                const measure = () => {
+                    if (disposed) return;
+                    const style = getComputedStyle(toolbar);
+                    const gap = parseFloat(style.columnGap) || 0;
+                    const tabGap = parseFloat(getComputedStyle(tabs).columnGap) || 0;
+                    // Measure the controls, not the stretched tab row, so moving
+                    // between one and two rows cannot change the fit decision.
+                    const required = buttons.reduce((width, button) => width + button.getBoundingClientRect().width, 0)
+                        + tabGap * Math.max(0, buttons.length - 1);
+                    const available = toolbar.clientWidth
+                        - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0)
+                        - metrics.getBoundingClientRect().width - gap;
+                    toolbar.dataset.inlineTabs = String(available >= Math.ceil(required));
+                };
+                const observer = new ResizeObserver(measure);
+                [toolbar, metrics, ...buttons].forEach(element => observer.observe(element));
+                measure();
+                document.fonts?.ready.then(measure);
+                return () => { disposed = true; observer.disconnect(); };
+            }, [children]);
+            return <div ref={toolbarRef} className="fc-detail-toolbar shrink-0 flex flex-wrap items-center gap-2 min-w-0 border-b border-slate-200 dark:border-slate-700 pb-2">{children}</div>;
+        };
+
+        const ReplayControlIcon = ({ kind }) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            {kind === 'play' && <path d="M8 5l11 7-11 7Z" fill="currentColor" stroke="none" />}
+            {kind === 'pause' && <><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" stroke="none" /><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" stroke="none" /></>}
+            {kind === 'previous' && <><path d="M5 5v14" /><path d="M18 5L8 12l10 7Z" fill="currentColor" stroke="none" /></>}
+            {kind === 'next' && <><path d="M19 5v14" /><path d="M6 5l10 7-10 7Z" fill="currentColor" stroke="none" /></>}
+            {kind === 'speed' && <><path d="M4.5 19a9 9 0 1 1 15 0M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18 12h3M12 15l5-8" /><circle cx="12" cy="15" r="1.5" fill="currentColor" /></>}
+        </svg>;
+
+        // Keep every origin separate: overlapping target dates are distinct forecasts.
+        const buildValidationReplay = (data) => {
+            const timestamp = value => {
+                if (typeof value !== 'string') return NaN;
+                const iso = value.includes('T') && !/(Z|[+-]\d{2}:?\d{2})$/.test(value) ? `${value}Z` : value;
+                return Date.parse(iso);
+            };
+            const finite = value => typeof value === 'number' && Number.isFinite(value);
+            const historyMap = new Map();
+            for (const point of [...(data.validation_data || []), ...(data.forecast_data || [])]) {
+                const value = point.actual_history ?? point.actual_train ?? point.actual_test;
+                const time = timestamp(point.date);
+                if (Number.isFinite(time) && finite(value)) historyMap.set(time, { date: point.date, value, time });
+            }
+            const history = [...historyMap.values()].sort((a, b) => a.time - b.time);
+            const groups = new Map();
+            const pairs = data.validation_forecasts;
+            if (!history.length || !Array.isArray(pairs) || !pairs.length) return null;
+            for (const pair of pairs) {
+                const origin = timestamp(pair.origin), time = timestamp(pair.date);
+                if (!Number.isFinite(origin) || !Number.isFinite(time) || time <= origin || !finite(pair.actual) || !finite(pair.forecast) || !Number.isInteger(pair.lead) || pair.lead < 1) return null;
+                if (!groups.has(origin)) groups.set(origin, []);
+                groups.get(origin).push({ ...pair, time });
+            }
+            const summary = data.validation_summary || {};
+            if (summary.evaluations != null && summary.evaluations !== groups.size) return null;
+            const method = data.validation_method;
+            if (!['simple', 'walk_forward', 'rolling_window'].includes(method)) return null;
+            const positions = new Map(history.map((point, i) => [point.time, i]));
+            const initialStart = history.length - summary.training_window - summary.validation_period;
+            if (!Number.isInteger(summary.training_window) || summary.training_window < 1 || !Number.isInteger(summary.validation_period) || summary.validation_period < 1 || initialStart < 0) return null;
+            const folds = [];
+            let low = 0, high = 0;
+            history.forEach(point => { low = Math.min(low, point.value); high = Math.max(high, point.value); });
+            for (const [origin, points] of [...groups].sort(([a], [b]) => a - b)) {
+                points.sort((a, b) => a.lead - b.lead);
+                const end = positions.get(origin);
+                const start = method === 'rolling_window' ? end - summary.training_window + 1 : initialStart;
+                if (end == null || end < initialStart + summary.training_window - 1 || !Number.isInteger(start) || start < 0 || (summary.forecast_horizon != null && points.length !== summary.forecast_horizon)) return null;
+                if (points.some((p, i) => p.lead !== i + 1 || positions.get(p.time) !== end + i + 1)) return null;
+                let squared = 0, absolute = 0, percentage = 0, percentageCount = 0;
+                points.forEach(point => {
+                    const error = point.forecast - point.actual;
+                    squared += error * error; absolute += Math.abs(error);
+                    // Match backend metrics: zero actuals do not contribute to MAPE.
+                    if (Math.abs(point.actual) > 1e-12) { percentage += Math.abs(error / point.actual) * 100; percentageCount++; }
+                    low = Math.min(low, point.forecast, point.actual); high = Math.max(high, point.forecast, point.actual);
+                });
+                folds.push({ start, end, points, metrics: { rmse: Math.sqrt(squared / points.length), mae: absolute / points.length, mape: percentageCount ? percentage / percentageCount : null } });
+            }
+            const padding = (high - low || 1) * 0.08;
+            return { history, folds, domain: [low < 0 ? low - padding : 0, high + padding] };
+        };
+
+        const ValidationReplay = ({ data, isDark, t, savedPositions }) => {
+            const replay = useMemo(() => buildValidationReplay(data), [data]);
+            const initialPosition = useRef(savedPositions.current.get(data));
+            const positionData = useRef(data);
+            const [index, setIndex] = useState(() => initialPosition.current?.index ?? 0);
+            const [phase, setPhase] = useState(() => initialPosition.current?.phase ?? 0);
+            const [playing, setPlaying] = useState(false);
+            const [speed, setSpeed] = useState(() => initialPosition.current?.speed ?? 1);
+            useLayoutEffect(() => {
+                // A replacement result is a new run, not the old replay position.
+                // Skip saving this render's old position against the new result.
+                if (positionData.current !== data) {
+                    positionData.current = data;
+                    setIndex(0); setPhase(0); setSpeed(1); setPlaying(false);
+                    return;
+                }
+                savedPositions.current.set(data, { index, phase, speed });
+            }, [data, index, phase, speed, savedPositions]);
+            const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            useEffect(() => {
+                const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+                const update = () => setReducedMotion(media.matches);
+                media.addEventListener('change', update);
+                return () => media.removeEventListener('change', update);
+            }, []);
+            useEffect(() => { setPlaying(false); }, [replay]);
+            useEffect(() => {
+                const pauseWhenHidden = () => { if (document.hidden) setPlaying(false); };
+                document.addEventListener('visibilitychange', pauseWhenHidden);
+                return () => document.removeEventListener('visibilitychange', pauseWhenHidden);
+            }, []);
+            useEffect(() => {
+                if (!playing || !replay) return;
+                const timer = setTimeout(() => {
+                    if (phase < 2) setPhase(phase + 1);
+                    else if (index < replay.folds.length - 1) { setIndex(index + 1); setPhase(0); }
+                    else setPlaying(false);
+                }, 1400 / speed);
+                return () => clearTimeout(timer);
+            }, [playing, phase, index, speed, replay]);
+            if (!replay) return <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5 text-sm text-slate-500 dark:text-slate-400">{t('sidebar.replay_unavailable')}</div>;
+            const fold = replay.folds[Math.min(index, replay.folds.length - 1)];
+            const { history } = replay;
+            const targetEnd = fold.end + fold.points.length;
+            const chartData = history.map((point, i) => {
+                const target = fold.points[i - fold.end - 1];
+                return { date: point.date, position: i,
+                    training: i >= fold.start && i <= fold.end ? point.value : null,
+                    forecast: phase >= 1 && target ? target.forecast : null,
+                    actual: phase >= 2 && target ? target.actual : null };
+            });
+            const selectFold = next => { setPlaying(false); setIndex(next); setPhase(2); };
+            const stage = t(`sidebar.replay_stage_${phase}`);
+            const control = 'w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500';
+            const tickColor = isDark ? '#cbd5e1' : '#64748b';
+            return <section className="flex flex-col gap-4 min-w-0 text-slate-700 dark:text-slate-200" aria-label={t('sidebar.detail_replay')}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div><h3 className="text-sm font-semibold">{t('sidebar.replay_evaluation')} {index + 1} / {replay.folds.length}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('sidebar.replay_saved')} · {data.best_ts_model?.toUpperCase()}</p></div>
+                    <span role="status" className="text-xs font-semibold rounded-full px-3 py-1 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400">{stage}</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+                    <button type="button" className={control} aria-label={t(playing ? 'sidebar.replay_pause' : 'sidebar.replay_play')} title={t(playing ? 'sidebar.replay_pause' : 'sidebar.replay_play')} onClick={() => {
+                        if (!playing && index === replay.folds.length - 1 && phase === 2) { setIndex(0); setPhase(0); }
+                        setPlaying(!playing);
+                    }}><ReplayControlIcon kind={playing ? 'pause' : 'play'} /></button>
+                    <button type="button" className={control} aria-label={t('sidebar.replay_previous')} title={t('sidebar.replay_previous')} disabled={index === 0} onClick={() => selectFold(index - 1)}><ReplayControlIcon kind="previous" /></button>
+                    <button type="button" className={control} aria-label={t('sidebar.replay_next')} title={t('sidebar.replay_next')} disabled={index === replay.folds.length - 1} onClick={() => selectFold(index + 1)}><ReplayControlIcon kind="next" /></button>
+                    <label className="flex items-center gap-2 text-xs flex-1 min-w-[180px]">
+                        <span className="shrink-0 whitespace-nowrap">{t('sidebar.replay_evaluation')}</span>
+                        <input type="range" min="0" max={replay.folds.length - 1} value={index} disabled={replay.folds.length === 1} onChange={event => selectFold(Number(event.target.value))} aria-label={t('sidebar.replay_evaluation')} aria-valuetext={`${index + 1} / ${replay.folds.length}`} className="min-w-0 w-0 flex-1 accent-amber-500" /></label>
+                    <label className="flex items-center gap-2 text-xs" title={t('sidebar.replay_speed')}><ReplayControlIcon kind="speed" /><select aria-label={t('sidebar.replay_speed')} value={speed} onChange={event => setSpeed(Number(event.target.value))} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5">{[0.5, 1, 2].map(value => <option key={value} value={value}>{value}×</option>)}</select></label>
+                </div>
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 min-w-0">
+                    <div className="grid sm:grid-cols-2 gap-2 text-xs mb-3">
+                        <p><span className="font-semibold">{t('sidebar.replay_training')}: </span>{history[fold.start].date} → {history[fold.end].date} ({fold.end - fold.start + 1})</p>
+                        <p><span className="font-semibold">{t('sidebar.replay_targets')}: </span>{history[fold.end + 1].date} → {history[targetEnd].date} ({fold.points.length})</p>
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mb-2" aria-hidden="true">
+                        <span className="text-slate-500 dark:text-slate-400">● {t('charts.act_train')}</span><span className="text-amber-600 dark:text-amber-400">┄ {t('charts.val_fc')}</span><span className="text-emerald-600 dark:text-emerald-400">● {t('charts.act_test')}</span>
+                    </div>
+                    <div className="fc-replay-chart w-full" aria-label={`${t('sidebar.replay_evaluation')} ${index + 1}: ${stage}`}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={chartData} margin={{ top: 18, right: 16, bottom: 24, left: 0 }}>
+                                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} />
+                                <XAxis type="number" dataKey="position" domain={[0, history.length - 1]} allowDecimals={false} tickCount={6} tickFormatter={position => history[position]?.date || ''} tick={{ fill: tickColor, fontSize: 10 }} minTickGap={32} axisLine={false} tickLine={false} />
+                                <YAxis domain={replay.domain} tickFormatter={value => Math.abs(value) > 0 && Math.abs(value) < 0.01 ? value.toExponential(1) : new Intl.NumberFormat('en-US', { notation: Math.abs(value) >= 10000 ? 'compact' : 'standard', maximumFractionDigits: 2 }).format(value)} allowDataOverflow width={48} tick={{ fill: tickColor, fontSize: 10 }} axisLine={false} tickLine={false} />
+                                <Tooltip labelFormatter={position => history[position]?.date || ''} formatter={value => fmtNumber(value, 0, 2)} contentStyle={{ backgroundColor: isDark ? '#0f172a' : '#fff', borderColor: isDark ? '#334155' : '#e2e8f0', fontSize: 12 }} />
+                                <ReferenceArea x1={fold.start} x2={fold.end} fill="#64748b" fillOpacity={0.08} />
+                                <ReferenceArea x1={fold.end + 1} x2={targetEnd} fill="#f59e0b" fillOpacity={0.06} />
+                                <ReferenceLine x={fold.end} stroke="#94a3b8" strokeDasharray="4 4" />
+                                <Line type="linear" dataKey="training" name={t('charts.act_train')} stroke="#64748b" strokeWidth={2} dot={false} isAnimationActive={false} />
+                                <Line type="linear" dataKey="forecast" name={t('charts.val_fc')} stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 4" dot={fold.points.length === 1 ? { r: 4 } : false} isAnimationActive={!reducedMotion && playing} animationDuration={400 / speed} />
+                                <Line type="linear" dataKey="actual" name={t('charts.act_test')} stroke="#10b981" strokeWidth={2} dot={fold.points.length === 1 ? { r: 4 } : false} isAnimationActive={!reducedMotion && playing} animationDuration={400 / speed} />
+                            </ComposedChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-3">
+                    {['current', 'overall'].map(scope => <section key={scope} aria-label={t(`sidebar.replay_${scope}`)} className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+                        <h4 className="text-xs font-semibold mb-3">{t(`sidebar.replay_${scope}`)}</h4>
+                        <dl className="grid grid-cols-3 gap-2">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric)}</dd></div>)}</dl>
+                        {scope === 'current' && phase < 2 && <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t('sidebar.replay_scores_pending')}</p>}
+                    </section>)}
+                </div>
+            </section>;
+        };
+
+        const InformationIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><circle cx="12" cy="7.5" r="0.7" fill="currentColor" stroke="none" /></svg>;
+
+        const ValidationInformationPanel = ({ mode, t, onClose }) => {
+            const panelRef = useRef(null);
+            const closeRef = useRef(null);
+            useEffect(() => {
+                const trigger = document.activeElement;
+                const root = document.getElementById('root');
+                const wasInert = root?.inert;
+                const overflow = document.body.style.overflow;
+                if (root) root.inert = true;
+                document.body.style.overflow = 'hidden';
+                closeRef.current?.focus();
+                const handleKey = event => {
+                    if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onClose(); }
+                    if (event.key !== 'Tab') return;
+                    const focusable = [...panelRef.current.querySelectorAll('button, a[href], input, select, textarea, [tabindex]')]
+                        .filter(node => !node.disabled && node.tabIndex >= 0 && node.getClientRects().length);
+                    const first = focusable[0], last = focusable[focusable.length - 1];
+                    if (event.shiftKey && (document.activeElement === first || !panelRef.current.contains(document.activeElement))) { event.preventDefault(); last?.focus(); }
+                    else if (!event.shiftKey && (document.activeElement === last || !panelRef.current.contains(document.activeElement))) { event.preventDefault(); first?.focus(); }
+                };
+                document.addEventListener('keydown', handleKey, true);
+                return () => {
+                    document.removeEventListener('keydown', handleKey, true);
+                    if (root) root.inert = wasInert;
+                    document.body.style.overflow = overflow;
+                    const returnTarget = trigger?.isConnected ? trigger : document.getElementById(`fc-validation-info-${mode}`);
+                    returnTarget?.focus({ preventScroll: true });
+                };
+            }, [onClose]);
+            const evaluation = mode === 'evaluation';
+            const results = evaluation ? [['1', '15', '15.81', '15%'], ['2', '25', '29.15', '25%']] : [['1', '10', '10', '10%'], ['2', '30', '31.62', '30%']];
+            const sectionClass = 'space-y-2';
+            const headingClass = 'text-sm font-semibold text-slate-800 dark:text-slate-100';
+            return ReactDOM.createPortal(<div className="fixed inset-0 z-[95] flex justify-end">
+                <div className="absolute inset-0 bg-slate-950/20" onClick={onClose} aria-hidden="true" />
+                <section ref={panelRef} id="validation-information-panel" role="dialog" aria-modal="true" aria-labelledby="validation-information-title" className="fc-information-drawer relative h-full w-full max-w-[420px] min-w-0 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-2xl flex flex-col">
+                    <header className="shrink-0 flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+                        <h2 id="validation-information-title" className="flex items-center gap-2 text-base font-semibold text-slate-800 dark:text-slate-100"><InformationIcon />{t('sidebar.info_panel')}</h2>
+                        <button ref={closeRef} type="button" onClick={onClose} aria-label={t('sidebar.info_close')} title={t('sidebar.info_close')} className="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500"><XIcon /></button>
+                    </header>
+                    <div tabIndex={0} role="region" aria-label={t(`sidebar.validation_by_${mode}`)} className="flex-1 min-h-0 overflow-y-auto overscroll-contain scroller p-5 space-y-6 text-[13px] leading-6 text-slate-600 dark:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
+                        <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-400">{t(`sidebar.validation_by_${mode}`)}</h3>
+                        <section className={sectionClass}><h4 className={headingClass}>{t('sidebar.info_meaning')}</h4><p>{t(`sidebar.info_meaning_${mode}`)}</p></section>
+                        <section className={sectionClass}><h4 className={headingClass}>{t('sidebar.info_purpose')}</h4><p>{t(`sidebar.info_purpose_${mode}`)}</p></section>
+                        <section className={sectionClass}><h4 className={headingClass}>{t('sidebar.info_reading')}</h4><p>{t(`sidebar.info_reading_${mode}`)}</p>
+                            <dl className="space-y-2"><div><dt className="font-semibold">MAE</dt><dd>{t('sidebar.info_mae')}</dd></div><div><dt className="font-semibold">RMSE</dt><dd>{t('sidebar.info_rmse')}</dd></div><div><dt className="font-semibold">MAPE</dt><dd>{t('sidebar.info_mape')}</dd></div></dl>
+                        </section>
+                        <section className={sectionClass}><h4 className={headingClass}>{t('sidebar.info_example')}</h4><p>{t('sidebar.info_example_setup')}</p>
+                            <table className="w-full border-separate border-spacing-0 text-xs text-right tabular-nums [&_th]:px-2 [&_th]:py-2 [&_td]:px-2 [&_td]:py-2" aria-label={t('sidebar.info_example_predictions')}>
+                                <caption className="text-left font-semibold pb-2">{t('sidebar.info_example_predictions')}</caption>
+                                <thead className="bg-slate-50 dark:bg-slate-800"><tr><th scope="col" className="text-left">{t('sidebar.replay_evaluation')}</th><th scope="col">{t('sidebar.info_lead_one')}</th><th scope="col">{t('sidebar.info_lead_two')}</th></tr></thead>
+                                <tbody><tr><th scope="row" className="text-left font-normal">1</th><td>90</td><td>80</td></tr><tr><th scope="row" className="text-left font-normal">2</th><td>110</td><td>140</td></tr></tbody>
+                            </table>
+                            <p>{t(`sidebar.info_grouping_${mode}`)}</p>
+                            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 space-y-1 text-xs font-mono leading-6" aria-label={t('sidebar.info_calculation')}>
+                                <p>MAE = {evaluation ? '(10 + 20) ÷ 2 = 15' : '(10 + 10) ÷ 2 = 10'}</p>
+                                <p>RMSE = {evaluation ? '√[(10² + 20²) ÷ 2] ≈ 15.81' : '√[(10² + 10²) ÷ 2] = 10'}</p>
+                                <p>MAPE = {evaluation ? '(10% + 20%) ÷ 2 = 15%' : '(10% + 10%) ÷ 2 = 10%'}</p>
+                            </div>
+                            <table className="w-full border-separate border-spacing-0 text-xs text-right tabular-nums [&_th]:px-2 [&_th]:py-2 [&_td]:px-2 [&_td]:py-2" aria-label={t('sidebar.info_example_scores')}>
+                                <caption className="text-left font-semibold py-2">{t('sidebar.info_example_scores')}</caption>
+                                <thead className="bg-slate-50 dark:bg-slate-800"><tr><th scope="col" className="text-left">{t(evaluation ? 'sidebar.replay_evaluation' : 'sidebar.validation_lead')}</th><th scope="col">MAE</th><th scope="col">RMSE</th><th scope="col">MAPE</th></tr></thead>
+                                <tbody>{results.map(([row, mae, rmse, mape]) => <tr key={row}><th scope="row" className="text-left font-normal">{row}</th><td>{mae}</td><td>{rmse}</td><td>{mape}</td></tr>)}</tbody>
+                            </table>
+                            <p>{t(`sidebar.info_interpretation_${mode}`)}</p>
+                        </section>
+                        <section className={sectionClass}><h4 className={headingClass}>{t('sidebar.info_overall')}</h4><p>{t('sidebar.info_overall_body')}</p><p>{t('sidebar.info_cautions')}</p></section>
+                    </div>
+                </section>
+            </div>, document.body);
+        };
+
+        const ValidationDetails = ({ data, t, onReplayEvaluation, onInformation }) => {
+            const [view, setView] = useState('evaluation');
+            const replay = useMemo(() => buildValidationReplay(data), [data]);
+            const summary = data.validation_summary;
+            if (!summary) return null;
+            return <section className="shrink-0 text-[13px] leading-5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg p-3 min-w-0" aria-label={t('sidebar.validation_details')}>
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <h3 className="font-semibold">{t('sidebar.validation_details')}</h3>
+                    <div role="tablist" aria-label={t('sidebar.validation_breakdown')} className="flex flex-wrap gap-1">
+                        {['evaluation', 'distance'].map(mode => <div key={mode} role="presentation" className="inline-flex items-center"><button type="button" role="tab" id={`fc-validation-tab-${mode}`} aria-controls={`fc-validation-panel-${mode}`} aria-selected={view === mode} tabIndex={view === mode ? 0 : -1}
+                            onClick={() => setView(mode)} onKeyDown={event => {
+                                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                                event.preventDefault();
+                                const next = event.key === 'Home' ? 'evaluation' : event.key === 'End' ? 'distance' : mode === 'evaluation' ? 'distance' : 'evaluation';
+                                setView(next); document.getElementById(`fc-validation-tab-${next}`)?.focus();
+                            }}
+                            className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${view === mode ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>{t(`sidebar.validation_by_${mode}`)}</button>
+                            <button id={`fc-validation-info-${mode}`} type="button" onClick={() => onInformation(mode)} aria-label={`${t('sidebar.info_about')} ${t(`sidebar.validation_by_${mode}`)}`} title={`${t('sidebar.info_about')} ${t(`sidebar.validation_by_${mode}`)}`} aria-haspopup="dialog" aria-controls="validation-information-panel" className="w-7 h-7 inline-flex items-center justify-center rounded-full text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500"><InformationIcon /></button>
+                        </div>)}
+                    </div>
+                </div>
+                <p className="font-semibold">{t('sidebar.validation_counts').replace('{count}', summary.evaluations).replace('{horizon}', summary.forecast_horizon).replace('{pairs}', summary.scored_pairs)}</p>
+                <div className="mt-2 space-y-2">
+                    {summary.scheme === 'fixed_horizon' && summary.evaluations < summary.max_evaluations && <p>{t('sidebar.validation_limited').replace('{max}', summary.max_evaluations)}</p>}
+                    <p>{t('sidebar.validation_final')}: {data.final_training_periods}</p>
+                    <div key={view} role="tabpanel" id={`fc-validation-panel-${view}`} aria-labelledby={`fc-validation-tab-${view}`} tabIndex={0} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 rounded-md">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t(`sidebar.validation_${view}_description`)}</p>
+                        {view === 'evaluation' ? (replay ? <div className="overflow-x-auto scroller rounded-md" tabIndex={0} role="region" aria-label={t('sidebar.validation_by_evaluation')}>
+                            <table className="fc-evaluation-table w-full min-w-[720px] border-separate border-spacing-0 text-right tabular-nums [&_th]:px-3 [&_th]:py-2 [&_td]:px-3 [&_td]:py-1.5" aria-label={t('sidebar.validation_by_evaluation')}>
+                                <thead className="bg-slate-50 dark:bg-slate-800 [&_th]:font-semibold [&_th]:border-b [&_th]:border-slate-200 dark:[&_th]:border-slate-700"><tr>
+                                    <th scope="col" className="text-left">{t('sidebar.replay_evaluation')}</th><th scope="col" className="text-left">{t('sidebar.validation_cutoff')}</th><th scope="col" className="text-left">{t('sidebar.validation_forecast_range')}</th><th scope="col">RMSE</th><th scope="col">MAE</th><th scope="col">MAPE</th>
+                                </tr></thead>
+                                <tbody>{replay.folds.map((fold, index) => <tr key={replay.history[fold.end].date} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                                    <th scope="row" className="text-left font-normal"><button type="button" onClick={() => onReplayEvaluation(index)} aria-label={`${t('sidebar.replay_evaluation')} ${index + 1}: ${t('sidebar.validation_open_replay')}`} title={t('sidebar.validation_open_replay')} className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-400 underline underline-offset-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
+                                        {index + 1}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                                    </button></th>
+                                    <td className="text-left whitespace-nowrap">{replay.history[fold.end].date}</td>
+                                    <td className="text-left whitespace-nowrap">{replay.history[fold.end + 1].date} → {replay.history[fold.end + fold.points.length].date}</td>
+                                    <td>{fmtNumber(fold.metrics.rmse, 1, 1)}</td><td>{fmtNumber(fold.metrics.mae, 1, 1)}</td><td>{formatEvaluationValue(fold.metrics.mape, 'mape')}</td>
+                                </tr>)}</tbody>
+                            </table>
+                        </div> : <p className="py-3">{t('sidebar.validation_evaluation_unavailable')}</p>) : <table role="table" aria-label={t('sidebar.validation_by_distance')} className="fc-validation-table w-full border-separate border-spacing-0 text-right tabular-nums [&_td]:px-3 [&_td]:py-1">
+                            <thead role="rowgroup" className="rounded-t-md bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 [&_th]:px-3 [&_th]:py-2 [&_th]:font-semibold">
+                                <tr role="row"><th role="columnheader" scope="col" className="text-left">{t('sidebar.validation_lead')}</th><th role="columnheader" scope="col">RMSE</th><th role="columnheader" scope="col">MAE</th><th role="columnheader" scope="col">MAPE</th></tr>
+                            </thead>
+                            <tbody role="rowgroup" className="rounded-b-md">{(summary.metrics_by_lead || []).map(metric => <tr role="row" key={metric.lead}><td role="cell" className="text-left">{metric.lead}</td><td role="cell">{fmtNumber(metric.rmse, 1, 1)}</td><td role="cell">{fmtNumber(metric.mae, 1, 1)}</td><td role="cell">{formatEvaluationValue(metric.mape, 'mape')}</td></tr>)}</tbody>
+                        </table>}
+                    </div>
+                </div>
+            </section>;
+        };
+
+        const ForecastRunSummary = ({ data, t }) => {
+            const summary = data.validation_summary || {};
+            const history = (data.forecast_data || []).filter(point => point.actual_history != null);
+            const frequency = inferFrequencyFromHeaders(history.map(point => point.date));
+            const futureCount = (data.forecast_data || []).filter(point => point.future_forecast != null).length;
+            const fields = [
+                [t('sidebar.models_requested'), (data.requested_models?.length ? data.requested_models : [data.requested_model]).filter(Boolean).join(', ').toUpperCase() || '—'],
+                [t('sidebar.detected_frequency'), frequency === 'unsupported' ? '—' : t(`sidebar.freq_${frequency}`)],
+                [t('sidebar.train_h'), summary.training_window ?? '—'],
+                [t('sidebar.test_h'), summary.validation_period ?? '—'],
+                [t('sidebar.fc_h'), futureCount || '—'],
+                [t('sidebar.eval_metric'), data.evaluation_metric?.toUpperCase() || '—'],
+            ];
+            return <section className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-xs leading-5" aria-label={t('sidebar.detail_process')}>
+                <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-2">{t('sidebar.detail_process')}</h3>
+                <dl className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
+                    {fields.map(([label, value]) => <div className="min-w-0" key={label}>
+                        <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
+                        <dd className="font-medium text-slate-700 dark:text-slate-200 break-words">{value}</dd>
+                    </div>)}
+                </dl>
+            </section>;
+        };
 
         const ModelSelectionNotice = ({ data, t }) => {
             const requested = (data.requested_models?.length ? data.requested_models : [data.requested_model]).filter(Boolean).join(', ');
@@ -2339,8 +2900,8 @@
             }, [results, hasData, skuCount]);
 
             return (
-                <div className="fc-kpi-bar min-h-12 sm:min-h-16">
-                    <div className="fc-kpi-metrics min-h-12 sm:min-h-16">
+                <div className="fc-kpi-bar min-h-10 sm:min-h-12">
+                    <div className="fc-kpi-metrics min-h-10 sm:min-h-12">
                         <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} preserveLabelCase />
                         <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
                         <MetricTile label={t('dashboard.avg_mape')} shortLabel={t('dashboard.avg_mape_short')} value={formatEvaluationValue(avgMape, 'mape')} />
@@ -3188,10 +3749,10 @@
                             <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
                             <Tooltip contentStyle={{ backgroundColor: isDark ? "#0f172a" : "#fff", borderColor: isDark ? "#334155" : "#e2e8f0", fontSize: '12px', color: isDark ? '#fff' : '#000' }} />
                             <Legend verticalAlign="top" height={36} wrapperStyle={{ color: isDark ? '#cbd5e1' : '#64748b' }} />
-                            <Area type="monotone" dataKey="actual_train" name={t('charts.act_train')} stroke="#64748b" fill="url(#gd_bt_actual_train)" strokeWidth={2} isAnimationActive={false} />
-                            <Area type="monotone" dataKey="actual_test" name={t('charts.act_test')} stroke="#10b981" fill="url(#gd_bt_actual_test)" strokeWidth={2} isAnimationActive={false} />
-                            <Area type="monotone" dataKey="fitted" name={t('charts.fitted')} stroke="#94a3b8" fill="url(#gd_bt_fitted)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
-                            <Area type="monotone" dataKey="val_forecast" name={t('charts.val_fc')} stroke="#f59e0b" fill="url(#gd_bt_val_forecast)" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
+                            <Area type="linear" dataKey="actual_train" name={t('charts.act_train')} stroke="#64748b" fill="url(#gd_bt_actual_train)" strokeWidth={2} isAnimationActive={false} />
+                            <Area type="linear" dataKey="actual_test" name={t('charts.act_test')} stroke="#10b981" fill="url(#gd_bt_actual_test)" strokeWidth={2} isAnimationActive={false} />
+                            <Area type="linear" dataKey="fitted" name={t('charts.fitted')} stroke="#94a3b8" fill="url(#gd_bt_fitted)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
+                            <Area type="linear" dataKey="val_forecast" name={t('charts.val_fc')} stroke="#f59e0b" fill="url(#gd_bt_val_forecast)" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
@@ -3261,9 +3822,9 @@
                             <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
                             <Tooltip contentStyle={{ backgroundColor: isDark ? "#0f172a" : "#fff", borderColor: isDark ? "#334155" : "#e2e8f0", fontSize: '12px', color: isDark ? '#fff' : '#000' }} />
                             <Legend verticalAlign="top" height={36} wrapperStyle={{ color: isDark ? '#cbd5e1' : '#64748b' }} />
-                            <Area type="monotone" dataKey="actual_history" name={t('charts.history')} stroke="#64748b" fill="url(#gd_fc_history)" strokeWidth={2} isAnimationActive={false} />
-                            <Area type="monotone" dataKey="final_fit" name={t('charts.final_fit')} stroke="#94a3b8" fill="url(#gd_fc_final_fit)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
-                            <Area type="monotone" dataKey="future_forecast" name={t('charts.future_fc')} stroke="#f59e0b" fill="url(#gd_fc_future)" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
+                            <Area type="linear" dataKey="actual_history" name={t('charts.history')} stroke="#64748b" fill="url(#gd_fc_history)" strokeWidth={2} isAnimationActive={false} />
+                            <Area type="linear" dataKey="final_fit" name={t('charts.final_fit')} stroke="#94a3b8" fill="url(#gd_fc_final_fit)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
+                            <Area type="linear" dataKey="future_forecast" name={t('charts.future_fc')} stroke="#f59e0b" fill="url(#gd_fc_future)" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
@@ -3712,6 +4273,11 @@
             const [isFullScreen, setIsFullScreen] = useState(false);
             const [isSplitView, setIsSplitView] = useState(true); // For All-In-One
             const [activeTab, setActiveTab] = useState("overview"); // overview | sku id
+            const [detailView, setDetailView] = useState("summary");
+            // Survives detail-panel unmounts; obsolete results can be collected.
+            const replayPositions = useRef(new WeakMap());
+            const [validationInformation, setValidationInformation] = useState(null);
+            const closeValidationInformation = useCallback(() => setValidationInformation(null), []);
             const [overviewSearchQuery, setOverviewSearchQuery] = useState("");
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [settingsTab, setSettingsTab] = useState('theme');
@@ -4013,11 +4579,7 @@
 
                             const incoming = data.result?.results || [];
                             if (incoming.length > 0) {
-                                setBatchResults((prev) => {
-                                    const map = new Map((prev || []).map((r) => [String(r.sku), r]));
-                                    for (const r of incoming) map.set(String(r.sku), r);
-                                    return Array.from(map.values());
-                                });
+                                setBatchResults((prev) => mergeForecastResults(prev, incoming));
                                 const done = new Set(incoming.map((r) => String(r.sku)));
                                 setRunningSkus((prev) => prev.filter((sku) => !done.has(String(sku))));
                             }
@@ -4598,20 +5160,7 @@
                 });
             }, []);
 
-            const cycleSku = (dir) => {
-                if (!itemTabs.length) return;
-                const current = activeTab !== 'overview' ? activeTab : currentSku;
-                if (!current) return;
-                const idx = itemTabs.indexOf(current);
-                if (idx === -1) return;
-                if (itemTabs.length === 1) return;
-                let newIdx = idx + dir;
-                if (newIdx < 0) newIdx = itemTabs.length - 1;
-                if (newIdx >= itemTabs.length) newIdx = 0;
-                const nextSku = itemTabs[newIdx];
-                setCurrentSku(nextSku);
-                setActiveTab(nextSku);
-            };
+
 
             const getCurrentSkuData = () => {
                 if (!batchResults) return null;
@@ -5321,7 +5870,7 @@
 
                             {/* KPI BAR — with Overview tab after mapping confirm */}
                             {mappingReady && (
-                            <div className="fc-kpi-shell min-h-12 sm:min-h-16 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-visible relative">
+                            <div className="fc-kpi-shell min-h-10 sm:min-h-12 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shrink-0 shadow-sm overflow-visible relative">
                                 <KPICards results={batchResults} skuCount={mappedSkus.length} t={t} />
                             </div>
                             )}
@@ -5376,72 +5925,90 @@
                                                 />
                                             )}
                                             {isDetailTab && skuData && (
-                                                <div className="fc-detail-scroll scroller h-full w-full max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm pt-4 px-3 pb-3 sm:pt-5 lg:p-4 lg:pt-5 mobile-compact-p relative min-h-0" key={layoutKey} role="region" aria-label={skuData.sku} tabIndex={0}>
-                                                    <div className="flex flex-col min-h-full gap-4">
-                                                        {/* Dedicated toolbar — keeps SKU + metrics off the chart legend */}
-                                                        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-w-0 px-0.5">
-                                                            <div className="flex items-center gap-0.5 lg:gap-1 min-w-0 max-w-full sm:max-w-[55%] bg-slate-100/80 dark:bg-white/5 pl-0.5 pr-1.5 py-0.5 lg:pl-1 lg:pr-3 lg:py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-sm">
-                                                                <button type="button" onClick={() => cycleSku(-1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Previous SKU"><ChevronLeftIcon /></button>
-                                                                <span className="min-w-0 truncate text-xs lg:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight mx-0.5 lg:mx-1" title={skuData.sku}>{skuData.sku}</span>
-                                                                <button type="button" onClick={() => cycleSku(1)} className="shrink-0 p-0.5 lg:p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Next SKU"><ChevronRightIcon /></button>
-                                                            </div>
-                                                            <div className="flex items-center gap-2 lg:gap-4 shrink-0 bg-slate-100/80 dark:bg-white/5 px-2 py-1 lg:px-3 lg:py-1.5 rounded-lg lg:rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
+                                                <div className="h-full w-full flex flex-col overflow-hidden max-md:bg-transparent md:border md:border-slate-200 md:dark:border-slate-800 md:rounded-lg md:bg-white md:dark:bg-slate-900 md:shadow-sm p-3 lg:p-4 relative min-h-0" key={layoutKey} role="region" aria-label={skuData.sku}>
+                                                    <div className="flex flex-col flex-1 min-h-0 gap-3">
+                                                        {/* Detail views and validation metrics */}
+                                                        <DetailToolbar>
+                                                        <div role="tablist" aria-label={t('sidebar.detail_views')} className="fc-detail-view-tabs flex flex-wrap items-center gap-1 min-w-0">
+                                                            {['summary', 'visualization', 'replay'].map(view => <button key={view} type="button" role="tab"
+                                                                id={`fc-detail-tab-${view}`} aria-controls={`fc-detail-panel-${view}`}
+                                                                aria-selected={detailView === view} tabIndex={detailView === view ? 0 : -1}
+                                                                onClick={() => setDetailView(view)}
+                                                                onKeyDown={event => {
+                                                                    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                                                                    event.preventDefault();
+                                                                    const views = ['summary', 'visualization', 'replay'];
+                                                                    const next = event.key === 'Home' ? views[0] : event.key === 'End' ? views[views.length - 1] : views[(views.indexOf(view) + (event.key === 'ArrowRight' ? 1 : views.length - 1)) % views.length];
+                                                                    setDetailView(next);
+                                                                    document.getElementById(`fc-detail-tab-${next}`)?.focus();
+                                                                }}
+                                                                className={`px-3 py-2 rounded-lg text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${detailView === view ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                                            >{t(`sidebar.detail_${view}`)}</button>)}
+                                                            {skuData.fallback_reason && <button type="button" onClick={() => setDetailView('summary')}
+                                                                className="ml-auto text-[10px] text-amber-700 dark:text-amber-400 font-semibold underline underline-offset-2">
+                                                                {t('sidebar.model_substitution')}
+                                                            </button>}
+                                                        </div>
+                                                            <div className="fc-detail-metrics flex items-center gap-2 sm:gap-1.5 lg:gap-2.5 shrink-0 bg-slate-100/80 dark:bg-white/5 px-2 py-1 sm:px-1.5 sm:py-0.5 lg:px-2 lg:py-1 rounded-lg border border-slate-200/80 dark:border-white/10 shadow-sm">
                                                                 <div className="flex flex-col items-center text-center max-w-[7.5rem] lg:max-w-none">
-                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.table_validation')}</span>
+                                                                    <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.table_validation')}</span>
                                                                     <span
-                                                                        className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300 truncate max-w-full"
+                                                                        className="text-[10px] lg:text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate max-w-full"
                                                                         title={formatValidationMethod(skuData.validation_method || skuValidationMethods[String(skuData.sku)], t)}
                                                                     >
                                                                         {formatValidationMethod(skuData.validation_method || skuValidationMethods[String(skuData.sku)], t)}
                                                                     </span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
-                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
-                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{skuData.best_ts_model.toUpperCase()}</span>
+                                                                    <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
+                                                                    <span className="text-[10px] lg:text-[11px] font-bold text-slate-700 dark:text-slate-300">{skuData.best_ts_model.toUpperCase()}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
-                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.table_mape')}</span>
-                                                                    <span className="text-[10px] lg:text-xs font-bold text-slate-700 dark:text-slate-300">{formatEvaluationValue(evaluationMetricValue(skuData, 'mape'), 'mape')}</span>
+                                                                    <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.table_mape')}</span>
+                                                                    <span className="text-[10px] lg:text-[11px] font-bold text-slate-700 dark:text-slate-300">{formatEvaluationValue(evaluationMetricValue(skuData, 'mape'), 'mape')}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
-                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.table_rmse')}</span>
-                                                                    <span className={`text-[10px] lg:text-xs font-bold ${rowContestMetric(skuData, contestMetric) === 'rmse' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'rmse'), 'rmse')}</span>
+                                                                    <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.table_rmse')}</span>
+                                                                    <span className={`text-[10px] lg:text-[11px] font-bold ${rowContestMetric(skuData, contestMetric) === 'rmse' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'rmse'), 'rmse')}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
-                                                                    <span className="text-[8px] lg:text-[10px] uppercase font-bold text-slate-400">{t('dashboard.table_mae')}</span>
-                                                                    <span className={`text-[10px] lg:text-xs font-bold ${rowContestMetric(skuData, contestMetric) === 'mae' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'mae'), 'mae')}</span>
+                                                                    <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.table_mae')}</span>
+                                                                    <span className={`text-[10px] lg:text-[11px] font-bold ${rowContestMetric(skuData, contestMetric) === 'mae' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'mae'), 'mae')}</span>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </DetailToolbar>
+                                                        {detailView === 'summary' && <div key={`summary-${skuData.sku}`} id="fc-detail-panel-summary" role="tabpanel" aria-labelledby="fc-detail-tab-summary" tabIndex={0} className="fc-detail-scroll scroller flex-1 min-h-0">
+                                                            <div className="flex flex-col gap-4 pb-1 pr-1">
+                                                        <ForecastRunSummary data={skuData} t={t} />
                                                         <ModelSelectionNotice data={skuData} t={t} />
-                                                        {skuData.validation_summary && (
-                                                            <section className="shrink-0 text-[13px] leading-5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg p-3" aria-label={t('sidebar.validation_details')}>
-                                                                <p className="font-semibold">
-                                                                    {t('sidebar.validation_counts').replace('{count}', skuData.validation_summary.evaluations).replace('{horizon}', skuData.validation_summary.forecast_horizon).replace('{pairs}', skuData.validation_summary.scored_pairs)}
-                                                                </p>
-                                                                <div className="mt-2 space-y-2">
-                                                                    {skuData.validation_summary.scheme === 'fixed_horizon' && skuData.validation_summary.evaluations < skuData.validation_summary.max_evaluations && <p>{t('sidebar.validation_limited').replace('{max}', skuData.validation_summary.max_evaluations)}</p>}
-                                                                    <p>{t('sidebar.validation_final')}: {skuData.final_training_periods}</p>
-                                                                    <table role="table" aria-label={t('sidebar.validation_details')} className="fc-validation-table w-full border-separate border-spacing-0 text-right tabular-nums [&_td]:px-3 [&_td]:py-1">
-                                                                        <thead role="rowgroup" className="scroller rounded-t-md bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 [&_th]:px-3 [&_th]:py-2 [&_th]:font-semibold">
-                                                                            <tr role="row"><th role="columnheader" scope="col" className="text-left">{t('sidebar.validation_lead')}</th><th role="columnheader" scope="col">RMSE</th><th role="columnheader" scope="col">MAE</th><th role="columnheader" scope="col">MAPE</th></tr>
-                                                                        </thead>
-                                                                        <tbody role="rowgroup" tabIndex={0} aria-label={t('sidebar.validation_details')} className="fc-validation-table-scroll scroller rounded-b-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
-                                                                            {(skuData.validation_summary.metrics_by_lead || []).map(metric => <tr role="row" key={metric.lead}><td role="cell" className="text-left">{metric.lead}</td><td role="cell">{fmtNumber(metric.rmse, 1, 1)}</td><td role="cell">{fmtNumber(metric.mae, 1, 1)}</td><td role="cell">{formatEvaluationValue(metric.mape, 'mape')}</td></tr>)}
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                            </section>
-                                                        )}
+                                                        <ValidationDetails data={skuData} t={t} onInformation={setValidationInformation} onReplayEvaluation={index => {
+                                                            const saved = replayPositions.current.get(skuData);
+                                                            replayPositions.current.set(skuData, { index, phase: 2, speed: saved?.speed ?? 1 });
+                                                            setDetailView('replay');
+                                                            document.getElementById('fc-detail-tab-replay')?.focus();
+                                                        }} />
                                                         <ForecastValuesTable data={skuData.forecast_data} t={t} />
-                                                        <div className="fc-detail-charts min-w-0 gap-4 border border-slate-200 dark:border-slate-700 rounded-lg p-2">
-                                                            <div className="fc-detail-chart border-b border-dashed border-slate-200 dark:border-slate-700 relative">
-                                                                <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
                                                             </div>
-                                                            <div className="fc-detail-chart relative">
+                                                        </div>}
+                                                        {detailView === 'replay' && <div key={`replay-${skuData.sku}`} id="fc-detail-panel-replay" role="tabpanel" aria-labelledby="fc-detail-tab-replay" tabIndex={0} className="fc-detail-scroll scroller flex-1 min-h-0">
+                                                            <ValidationReplay data={skuData} isDark={isDark} t={t} savedPositions={replayPositions} />
+                                                        </div>}
+                                                        {detailView === 'visualization' && <div key={`visualization-${skuData.sku}`} id="fc-detail-panel-visualization" role="tabpanel" aria-labelledby="fc-detail-tab-visualization" tabIndex={0} className="fc-detail-scroll scroller flex-1 min-h-0">
+                                                        <div className="fc-detail-charts min-w-0 gap-4 border border-slate-200 dark:border-slate-700 rounded-lg p-2">
+                                                            <div className="fc-detail-chart flex flex-col border-b border-dashed border-slate-200 dark:border-slate-700 relative">
+                                                                <h3 className="shrink-0 px-2 text-xs font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_validation_chart')}</h3>
+                                                                <div className="flex-1 min-h-0">
+                                                                <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
+                                                                </div>
+                                                            </div>
+                                                            <div className="fc-detail-chart flex flex-col relative">
+                                                                <h3 className="shrink-0 px-2 text-xs font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_forecast_chart')}</h3>
+                                                                <div className="flex-1 min-h-0">
                                                                 <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                        </div>}
                                                     </div>
                                                 </div>
                                             )}
@@ -5455,6 +6022,7 @@
                     {/* FULL SCREEN */}
 
 
+                    {validationInformation && <ValidationInformationPanel mode={validationInformation} t={t} onClose={closeValidationInformation} />}
                     <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} activeTab={settingsTab} setActiveTab={setSettingsTab} theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} t={t} visibleModels={visibleModels} onToggleVisibleModel={toggleVisibleModel} isModelAvailable={isForecastModelAvailable} capabilitiesStatus={forecastCapabilities.status} isRunning={isRunning} />
                 </div>
             );
