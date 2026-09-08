@@ -1121,6 +1121,9 @@
                     freq_weekly: "Weekly",
                     freq_monthly: "Monthly",
                     freq_quarterly: "Quarterly",
+                    freq_yearly: "Yearly",
+                    freq_business_daily: "Business daily (Mon–Fri)",
+                    frequency_unsupported: "Unsupported or irregular dates. Use a complete hourly, daily, Mon–Fri, weekly, monthly, quarterly or yearly calendar. Use Excel date cells or ISO date text (YYYY-MM-DD).",
                     horizon_mismatch: "Train + Test must equal",
                     execute_btn: "Execute Forecast",
                     processing: "Processing...",
@@ -1323,6 +1326,9 @@
                     freq_weekly: "Theo tuần",
                     freq_monthly: "Theo tháng",
                     freq_quarterly: "Theo quý",
+                    freq_yearly: "Theo năm",
+                    freq_business_daily: "Ngày làm việc (Thứ 2–6)",
+                    frequency_unsupported: "Ngày không đều hoặc tần suất chưa hỗ trợ. Dùng lịch đầy đủ theo giờ, ngày, Thứ 2–6, tuần, tháng, quý hoặc năm. Dùng ô ngày Excel hoặc ngày ISO (YYYY-MM-DD).",
                     horizon_mismatch: "Huấn luyện + Thử nghiệm phải bằng",
                     execute_btn: "Chạy dự báo",
                     processing: "Đang xử lý...",
@@ -1525,6 +1531,9 @@
                     freq_weekly: "Wöchentlich",
                     freq_monthly: "Monatlich",
                     freq_quarterly: "Vierteljährlich",
+                    freq_yearly: "Jährlich",
+                    freq_business_daily: "Werktäglich (Mo–Fr)",
+                    frequency_unsupported: "Unregelmäßige Daten oder nicht unterstütztes Intervall. Verwenden Sie einen vollständigen Stunden-, Tages-, Mo–Fr-, Wochen-, Monats-, Quartals- oder Jahreskalender sowie Excel-Datumszellen oder ISO-Datumstext (YYYY-MM-DD).",
                     horizon_mismatch: "Training + Test muss gleich sein",
                     execute_btn: "Prognose ausführen",
                     processing: "Verarbeitung...",
@@ -1839,6 +1848,8 @@
         const DEFAULT_FREQUENCY_PROFILES = {
             hourly: { label: 'Hourly', max_history_columns: 720, max_train_horizon: 720, max_test_horizon: 48, max_forecast_horizon: 48, mlp_lag_window: 24, prophet_min_points: 336 },
             daily: { label: 'Daily', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 14, prophet_min_points: 14 },
+            business_daily: { label: 'Business daily (Mon-Fri)', max_history_columns: 730, max_train_horizon: 730, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 10, prophet_min_points: 10 },
+            yearly: { label: 'Yearly', max_history_columns: 100, max_train_horizon: 100, max_test_horizon: 20, max_forecast_horizon: 20, mlp_lag_window: 4, prophet_min_points: 8 },
             weekly: { label: 'Weekly', max_history_columns: 312, max_train_horizon: 312, max_test_horizon: 52, max_forecast_horizon: 52, mlp_lag_window: 52, prophet_min_points: 104 },
             monthly: { label: 'Monthly', max_history_columns: 240, max_train_horizon: 240, max_test_horizon: 60, max_forecast_horizon: 60, mlp_lag_window: 12, prophet_min_points: 24 },
             quarterly: { label: 'Quarterly', max_history_columns: 80, max_train_horizon: 80, max_test_horizon: 16, max_forecast_horizon: 16, mlp_lag_window: 4, prophet_min_points: 8 },
@@ -1865,46 +1876,61 @@
 
         const parseForecastHeaderDate = (header) => {
             const text = String(header == null ? '' : header).trim();
-            if (!text) return NaN;
-            if (/(?:19|20)\d{2}/.test(text)) {
-                const parsed = Date.parse(text);
-                if (!Number.isNaN(parsed)) return parsed;
+            const iso = text.match(/^(\d{4})(?:-(\d{2})(?:-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,6}))?)?(Z|[+-]\d{2}:\d{2})?)?)?)?$/);
+            if (iso) {
+                const [, y, m = '01', d = '01', h = '00', min = '00', sec = '00', fraction = '', zone = 'Z'] = iso;
+                const utc = new Date(Date.UTC(+y, +m - 1, +d, +h, +min, +sec));
+                if (utc.getUTCFullYear() !== +y || utc.getUTCMonth() !== +m - 1 || utc.getUTCDate() !== +d || utc.getUTCHours() !== +h || utc.getUTCMinutes() !== +min || utc.getUTCSeconds() !== +sec) return NaN;
+                return Date.parse(`${y}-${m}-${d}T${h}:${min}:${sec}.${fraction.padEnd(3, '0').slice(0, 3)}${zone}`);
             }
-            const lowered = text.toLowerCase();
-            const monthNames = Object.keys(FORECAST_MONTH_NAMES).sort((left, right) => right.length - left.length);
-            for (let index = 0; index < monthNames.length; index += 1) {
-                const monthName = monthNames[index];
-                if (!new RegExp(`(?:^|[^a-z])${monthName}(?:$|[^a-z])`).test(lowered)) continue;
-                const yearMatch = text.match(/\b(20\d{2}|19\d{2}|\d{2})\b/);
-                if (!yearMatch) return NaN;
-                let year = parseInt(yearMatch[1], 10);
-                if (yearMatch[1].length === 2) year = year < 70 ? 2000 + year : 1900 + year;
-                return Date.UTC(year, FORECAST_MONTH_NAMES[monthName], 1);
-            }
-            const parsed = Date.parse(text);
-            return Number.isNaN(parsed) ? NaN : parsed;
+            const monthYear = text.match(/^([a-z]+)[\s/-]+(\d{2}|\d{4})$/i);
+            if (!monthYear || FORECAST_MONTH_NAMES[monthYear[1].toLowerCase()] == null) return NaN;
+            let year = Number(monthYear[2]);
+            if (monthYear[2].length === 2) year += year < 70 ? 2000 : 1900;
+            return Date.UTC(year, FORECAST_MONTH_NAMES[monthYear[1].toLowerCase()], 1);
         };
 
         const inferFrequencyFromHeaders = (headers) => {
-            const dates = [];
-            (headers || []).forEach((header) => {
-                const parsed = parseForecastHeaderDate(header);
-                if (!Number.isNaN(parsed)) dates.push(parsed);
-            });
-            if (dates.length < 2) return 'monthly';
-            dates.sort((left, right) => left - right);
-            const diffs = [];
-            for (let index = 1; index < dates.length; index += 1) {
-                diffs.push((dates[index] - dates[index - 1]) / 1000);
+            const timestamps = (headers || []).map(parseForecastHeaderDate);
+            if (timestamps.length < 2 || timestamps.some((date, i) => !Number.isFinite(date) || (i > 0 && date <= timestamps[i - 1]))) return 'unsupported';
+            const dates = timestamps.map(value => new Date(value));
+            const diffs = timestamps.slice(1).map((date, i) => date - timestamps[i]);
+            const dayMs = 86400000;
+            const sameTime = timestamps.every(value => ((value % dayMs) + dayMs) % dayMs === ((timestamps[0] % dayMs) + dayMs) % dayMs);
+            const allMonthStart = dates.every(date => date.getUTCDate() === 1);
+            const allMonthEnd = dates.every(date => date.getUTCDate() === new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate());
+            const sameDay = dates.every(date => date.getUTCDate() === dates[0].getUTCDate());
+            if (sameTime && (allMonthStart || allMonthEnd || sameDay)) {
+                for (const [months, name] of [[1, 'monthly'], [3, 'quarterly'], [12, 'yearly']]) {
+                    if (!allMonthStart && !allMonthEnd && months !== 12 && dates[0].getUTCDate() > 28) continue;
+                    if (dates.slice(1).every((date, i) => (date.getUTCFullYear() - dates[i].getUTCFullYear()) * 12 + date.getUTCMonth() - dates[i].getUTCMonth() === months)) return name;
+                }
             }
-            diffs.sort((left, right) => left - right);
-            const median = diffs[Math.floor(diffs.length / 2)];
-            if (median >= 3400 && median <= 3800) return 'hourly';
-            if (median >= 86000 && median <= 87000) return 'daily';
-            if (median >= 600000 && median <= 610000) return 'weekly';
-            if (median >= 2400000 && median <= 2700000) return 'monthly';
-            if (median >= 7700000 && median <= 8000000) return 'quarterly';
-            return 'monthly';
+            if (diffs.every(diff => diff === 3600000)) return 'hourly';
+            if (diffs.every(diff => diff === dayMs)) return 'daily';
+            if (dates.every(date => date.getUTCDay() >= 1 && date.getUTCDay() <= 5) && diffs.every((diff, i) => diff === (dates[i].getUTCDay() === 5 ? 3 : 1) * dayMs)) return 'business_daily';
+            if (diffs.every(diff => diff === 7 * dayMs)) return 'weekly';
+            return 'unsupported';
+        };
+
+        const readForecastWorksheet = (workbook) => {
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            // Formatted values preserve SKU labels such as 000123. Read date headers
+            // separately from their raw serials so display formats cannot lose hours.
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+            const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+            const headers = (rows[0] || []).map((label, col) => {
+                const cell = sheet[XLSX.utils.encode_cell({ r: range.s.r, c: range.s.c + col })];
+                if (cell && cell.t === 'n' && cell.z && XLSX.SSF.is_date(cell.z)) {
+                    const date = XLSX.SSF.parse_date_code(cell.v, { date1904: !!workbook.Workbook?.WBProps?.date1904 });
+                    if (!date) return String(label);
+                    return new Date(Date.UTC(date.y, date.m - 1, date.d, date.H, date.M, date.S, Math.round((date.u || 0) * 1000)))
+                        .toISOString().replace('T', ' ').replace('Z', '');
+                }
+                // Numeric year headers are years, not Excel date serials.
+                return String(cell?.v ?? label);
+            });
+            return { headers, rows: rows.slice(1) };
         };
 
         const parseForecastCapabilities = (data) => {
@@ -3835,7 +3861,8 @@
             );
             const modelType = deriveModelType(selectedModels);
             const frequencyProfiles = forecastCapabilities.frequencyProfiles || parseFrequencyProfiles();
-            const activeFrequencyProfile = frequencyProfiles[inferredFrequency] || frequencyProfiles.monthly;
+            const invalidFrequency = totalTimeSeries > 0 && !frequencyProfiles[inferredFrequency];
+            const activeFrequencyProfile = frequencyProfiles[inferredFrequency] || {};
             const maxTrainHorizon = Number(activeFrequencyProfile.max_train_horizon) || 240;
             const maxTestHorizon = Number(activeFrequencyProfile.max_test_horizon) || 60;
             const maxForecastHorizon = Number(activeFrequencyProfile.max_forecast_horizon) || 60;
@@ -3999,45 +4026,18 @@
                 setStartColIdx(-1);
                 setEndColIdx(-1);
                 setInferredFrequency("monthly");
+                setTotalTimeSeries(0);
                 setActiveTab("overview");
                 const reader = new FileReader();
                 reader.onload = (evt) => {
                     try {
-                        const wb = XLSX.read(evt.target.result, { type: 'binary', cellDates: true });
+                        const wb = XLSX.read(evt.target.result, { type: 'binary', cellDates: false, cellNF: true, raw: true });
                         window.OperartisSecurity.validateWorkbook(wb);
-                        const ws = wb.Sheets[wb.SheetNames[0]];
-                        const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
-                        const rawHeaders = rawRows[0] || [];
-
-                        // Convert headers - handle Date objects and other types
-                        const formatHeaderDate = (value) => {
-                            const pad = (part) => String(part).padStart(2, '0');
-                            const hasTime = value.getHours() || value.getMinutes() || value.getSeconds();
-                            const datePart = `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
-                            if (!hasTime) return datePart;
-                            return `${datePart} ${pad(value.getHours())}:${pad(value.getMinutes())}:${pad(value.getSeconds())}`;
-                        };
-                        const normalizeCell = (h) => {
-                            if (h instanceof Date) {
-                                return formatHeaderDate(h);
-                            } else if (typeof h === 'number') {
-                                // Could be Excel serial date number - try to convert
-                                // Excel serial date: days since 1900-01-01
-                                const excelEpoch = new Date(1899, 11, 30);
-                                const possibleDate = new Date(excelEpoch.getTime() + h * 24 * 60 * 60 * 1000);
-                                // Check if it's a reasonable date (between 1990 and 2100)
-                                if (possibleDate.getFullYear() >= 1990 && possibleDate.getFullYear() <= 2100) {
-                                    return formatHeaderDate(possibleDate);
-                                }
-                                return String(h);
-                            }
-                            return String(h);
-                        };
-                        const headers = rawHeaders.map(normalizeCell);
+                        const { headers, rows } = readForecastWorksheet(wb);
 
                         if (headers && headers.length > 0) {
                             setAvailableCols(headers);
-                            setSheetRows(rawRows.slice(1));
+                            setSheetRows(rows);
                             setIsMappingModalOpen(true);
                         } else {
                             setError("No headers found in file.");
@@ -4105,8 +4105,9 @@
                     : [];
                 const frequency = inferFrequencyFromHeaders(dateHeaders);
                 const profile = (forecastCapabilities.frequencyProfiles || parseFrequencyProfiles())[frequency]
-                    || DEFAULT_FREQUENCY_PROFILES.monthly;
+                    || {};
                 setInferredFrequency(frequency);
+                setError(frequency === 'unsupported' ? t('sidebar.frequency_unsupported') : null);
                 setTotalTimeSeries(total);
 
                 // Set initial values: Test = 6, Train = Total - 6, Forecast = Test
@@ -4128,6 +4129,10 @@
                 if (!skusToRun.length) return;
                 if (validationHorizonTooShort) {
                     setAlertMessage(t('sidebar.validation_short'));
+                    return;
+                }
+                if (invalidFrequency) {
+                    setAlertMessage(t('sidebar.frequency_unsupported'));
                     return;
                 }
                 if (historyTooLong) {
@@ -4253,6 +4258,10 @@
                 }
                 if (selectedSkus.length > 100) {
                     setAlertMessage(t('job.max_skus'));
+                    return;
+                }
+                if (invalidFrequency) {
+                    setAlertMessage(t('sidebar.frequency_unsupported'));
                     return;
                 }
                 if (historyTooLong) {
@@ -4743,8 +4752,8 @@
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
                                 onClick={handleExecute}
-                                disabled={!file || isRunning || historyTooLong || validationHorizonTooShort}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${isRunning ? 'fc-status-active cursor-not-allowed' : !file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
+                                disabled={!file || isRunning || invalidFrequency || historyTooLong || validationHorizonTooShort}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${isRunning ? 'fc-status-active cursor-not-allowed' : !file || invalidFrequency || historyTooLong || validationHorizonTooShort ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
                                 title={isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
                             >
                                 {isRunning ? <RunningSpinnerIcon size={16} /> : <PlayIcon />}
@@ -5066,8 +5075,10 @@
                                         </div>
                                     </div>
                                     {totalTimeSeries > 0 && (
-                                        <div className={`text-[9px] leading-4 ${horizonMismatch || historyTooLong ? 'text-red-500' : 'text-slate-400'}`}>
-                                            {historyTooLong
+                                        <div className={`text-[9px] leading-4 ${invalidFrequency || horizonMismatch || historyTooLong ? 'text-red-500' : 'text-slate-400'}`}>
+                                            {invalidFrequency
+                                                ? t('sidebar.frequency_unsupported')
+                                                : historyTooLong
                                                 ? `⚠️ ${t('sidebar.history_too_long')
                                                     .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
                                                     .replace('{count}', String(totalTimeSeries))
@@ -5112,8 +5123,8 @@
                                     <button
                                         type="button"
                                         onClick={handleExecute}
-                                        disabled={!file || isRunning || historyTooLong || validationHorizonTooShort}
-                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isRunning ? 'fc-status-active cursor-not-allowed' : !file ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
+                                        disabled={!file || isRunning || invalidFrequency || historyTooLong || validationHorizonTooShort}
+                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isRunning ? 'fc-status-active cursor-not-allowed' : !file || invalidFrequency || historyTooLong || validationHorizonTooShort ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
                                     >
                                         {isRunning ? <RunningSpinnerIcon size={14} /> : <PlayIcon />}
                                         {isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
