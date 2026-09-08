@@ -752,6 +752,11 @@
             display: inline-flex;
             margin: 0;
         }
+        .fc-chart-touch,
+        .fc-chart-touch .recharts-wrapper,
+        .fc-chart-touch .recharts-surface {
+            touch-action: none;
+        }
         @media (max-width: 768px) {
             .fc-detail-charts {
                 min-height: 0;
@@ -762,6 +767,15 @@
             .fc-detail-chart {
                 min-height: 220px;
                 height: min(52vw, 280px);
+            }
+        }
+        /* Phones (portrait and landscape): hide +/- zoom buttons; one-finger page scroll stays. */
+        @media (max-width: 768px), screen and (orientation: landscape) and (max-height: 500px) {
+            .fc-chart-zoom-btns { display: none !important; }
+            .fc-chart-touch,
+            .fc-chart-touch .recharts-wrapper,
+            .fc-chart-touch .recharts-surface {
+                touch-action: pan-y;
             }
         }
 
@@ -866,7 +880,6 @@
             .fc-replay-metrics { gap: 0.5rem; }
             .fc-replay-metrics-card { min-height: 0; padding: 0.65rem; }
             .fc-replay-controls { padding: 0.5rem !important; gap: 0.4rem; }
-            .fc-chart-zoom { transform: scale(0.9); transform-origin: top right; }
             .fc-evaluation-table { min-width: 560px; }
             .fc-detail-panel > div { gap: 0.5rem; }
             .fc-overview-cards { padding-left: 0.25rem; padding-right: 0.25rem; }
@@ -3963,94 +3976,174 @@
                 });
             };
 
-            // Touch support for mobile pinch-to-zoom (Native Listeners for passive: false)
+            // Touch: two-finger pan (horizontal) + pinch zoom. One-finger still scrolls the page.
             const lastTouchDistance = useRef(null);
             const lastTouchCenter = useRef(null);
+            const panAccum = useRef(0);
+            const zoomDomainRef = useRef(zoomDomain);
+            const dragStartRef = useRef(dragStart);
+            const isDraggingRef = useRef(isDragging);
+            zoomDomainRef.current = zoomDomain;
+            dragStartRef.current = dragStart;
+            isDraggingRef.current = isDragging;
 
             useEffect(() => {
                 const el = containerRef.current;
                 if (!el) return;
 
+                const plotRect = () => (
+                    el.querySelector('.recharts-cartesian-grid')?.getBoundingClientRect()
+                    || el.getBoundingClientRect()
+                );
+
+                const twoFingerMetrics = (touches) => {
+                    const dx = touches[0].clientX - touches[1].clientX;
+                    const dy = touches[0].clientY - touches[1].clientY;
+                    return {
+                        distance: Math.hypot(dx, dy),
+                        centerX: (touches[0].clientX + touches[1].clientX) / 2,
+                    };
+                };
+
+                const setTwoFingerCapture = (on) => {
+                    const value = on ? 'none' : '';
+                    el.style.touchAction = value;
+                    el.querySelectorAll('.recharts-wrapper, .recharts-surface').forEach((node) => {
+                        node.style.touchAction = value;
+                    });
+                };
+
                 const onTouchStart = (e) => {
+                    if (e.touches.length >= 2) {
+                        e.preventDefault();
+                        setTwoFingerCapture(true);
+                        const { distance, centerX } = twoFingerMetrics(e.touches);
+                        lastTouchDistance.current = distance;
+                        lastTouchCenter.current = centerX;
+                        panAccum.current = 0;
+                        setIsDragging(false);
+                        setDragStart(null);
+                        return;
+                    }
                     const rect = el.getBoundingClientRect();
                     const touchY = e.touches[0].clientY - rect.top;
-                    const isBottomArea = touchY > rect.height * 0.85; // Bottom 15% is axis/slice area
-
-                    if (e.touches.length === 2) {
-                        const dx = e.touches[0].clientX - e.touches[1].clientX;
-                        const dy = e.touches[0].clientY - e.touches[1].clientY;
-                        lastTouchDistance.current = Math.sqrt(dx * dx + dy * dy);
-                        lastTouchCenter.current = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                    } else if (e.touches.length === 1 && isBottomArea) {
-                        // Single touch on x-axis area: initiate drag/pan
+                    const isBottomArea = touchY > rect.height * 0.85;
+                    if (e.touches.length === 1 && isBottomArea) {
                         setIsDragging(true);
-                        setDragStart({ x: e.touches[0].clientX, domain: { ...zoomDomain } });
+                        setDragStart({ x: e.touches[0].clientX, domain: { ...zoomDomainRef.current } });
                     }
                 };
 
                 const onTouchMove = (e) => {
-                    if (e.touches.length === 2 && lastTouchDistance.current) {
-                        e.preventDefault(); // CRITICAL: Stop browser zoom
-                        const dx = e.touches[0].clientX - e.touches[1].clientX;
-                        const dy = e.touches[0].clientY - e.touches[1].clientY;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-                        const scale = distance / lastTouchDistance.current;
-
-                        const { start, end } = zoomDomain;
-                        const range = end - start;
-                        const minRange = Math.max(5, Math.floor(dataLength * 0.05));
-
-                        const rect = el.getBoundingClientRect();
-                        const center = lastTouchCenter.current;
-                        const cursorRatio = rect ? (center - rect.left) / rect.width : 0.5;
-
-                        if (scale > 1 && range > minRange) {
-                            // Pinch out = zoom in
-                            const reduction = Math.max(1, Math.floor(range * (scale - 1) * 0.5));
-                            setZoomDomain({
-                                start: Math.min(start + Math.floor(reduction * cursorRatio), end - minRange),
-                                end: Math.max(end - Math.floor(reduction * (1 - cursorRatio)), start + minRange)
-                            });
-                        } else if (scale < 1 && range < dataLength - 1) {
-                            // Pinch in = zoom out
-                            const expansion = Math.max(1, Math.floor(range * (1 - scale) * 0.5));
-                            setZoomDomain({
-                                start: Math.max(0, start - Math.floor(expansion * cursorRatio)),
-                                end: Math.min(dataLength - 1, end + Math.floor(expansion * (1 - cursorRatio)))
-                            });
-                        }
+                    if (e.touches.length >= 2) {
+                        e.preventDefault();
+                        const { distance, centerX } = twoFingerMetrics(e.touches);
+                        const prevDist = lastTouchDistance.current;
+                        const prevCenter = lastTouchCenter.current;
                         lastTouchDistance.current = distance;
-                    } else if (e.touches.length === 1 && isDragging && dragStart) {
-                        // Single touch pan/slice logic
-                        e.preventDefault(); // Prevent page scroll while dragging chart
-                        const rect = el.getBoundingClientRect();
-                        const deltaX = e.touches[0].clientX - dragStart.x;
-                        const range = dragStart.domain.end - dragStart.domain.start;
-                        const pixelsPerPoint = rect.width / range;
+                        lastTouchCenter.current = centerX;
+                        if (!prevDist || prevCenter == null) return;
+
+                        const scale = distance / prevDist;
+                        const panPx = centerX - prevCenter;
+                        const rect = plotRect();
+                        const plotWidth = Math.max(1, rect.width);
+                        const currentRange = Math.max(1, zoomDomainRef.current.end - zoomDomainRef.current.start);
+                        panAccum.current += -panPx / (plotWidth / currentRange);
+                        const panPoints = Math.round(panAccum.current);
+                        if (panPoints !== 0) panAccum.current -= panPoints;
+
+                        setZoomDomain((prev) => {
+                            const last = Math.max(0, dataLength - 1);
+                            const minRange = Math.min(last, Math.max(5, Math.floor(dataLength * 0.05)));
+                            let start = prev.start;
+                            let end = prev.end;
+                            let range = Math.max(1, end - start);
+
+                            if (panPoints !== 0) {
+                                const newStart = Math.max(0, Math.min(last - range, start + panPoints));
+                                start = newStart;
+                                end = start + range;
+                            }
+
+                            const zoomed = scale > 1.008 || scale < 0.992;
+                            if (zoomed) {
+                                const cursorRatio = Math.min(1, Math.max(0, (centerX - rect.left) / plotWidth));
+                                const nextRange = Math.max(minRange, Math.min(last, range / scale));
+                                const focus = start + range * cursorRatio;
+                                start = focus - nextRange * cursorRatio;
+                                end = start + nextRange;
+                            }
+
+                            if (end - start > last) {
+                                start = 0;
+                                end = last;
+                            } else if (start < 0) {
+                                end -= start;
+                                start = 0;
+                                if (end > last) end = last;
+                            } else if (end > last) {
+                                start -= (end - last);
+                                end = last;
+                                if (start < 0) start = 0;
+                            }
+
+                            start = Math.round(Math.max(0, Math.min(start, last)));
+                            end = Math.round(Math.max(start, Math.min(end, last)));
+                            if (end - start < minRange && last >= minRange) {
+                                end = Math.min(last, start + minRange);
+                                start = Math.max(0, end - minRange);
+                            }
+                            return { start, end };
+                        });
+                        return;
+                    }
+
+                    const start = dragStartRef.current;
+                    if (e.touches.length === 1 && isDraggingRef.current && start) {
+                        e.preventDefault();
+                        const rect = plotRect();
+                        const deltaX = e.touches[0].clientX - start.x;
+                        const range = start.domain.end - start.domain.start;
+                        const pixelsPerPoint = rect.width / Math.max(1, range);
                         const pointsDelta = Math.round(-deltaX / pixelsPerPoint);
-
-                        const newStart = Math.max(0, Math.min(dataLength - 1 - range, dragStart.domain.start + pointsDelta));
-                        const newEnd = newStart + range;
-
-                        setZoomDomain({ start: newStart, end: Math.min(dataLength - 1, newEnd) });
+                        const newStart = Math.max(0, Math.min(dataLength - 1 - range, start.domain.start + pointsDelta));
+                        setZoomDomain({ start: newStart, end: Math.min(dataLength - 1, newStart + range) });
                     }
                 };
 
-                const onTouchEnd = () => {
-                    lastTouchDistance.current = null;
-                    lastTouchCenter.current = null;
+                const onTouchEnd = (e) => {
+                    if (e.touches.length < 2) {
+                        lastTouchDistance.current = null;
+                        lastTouchCenter.current = null;
+                        panAccum.current = 0;
+                        setTwoFingerCapture(false);
+                    }
+                    if (e.touches.length === 0) {
+                        setIsDragging(false);
+                        setDragStart(null);
+                    }
                 };
 
-                el.addEventListener('touchstart', onTouchStart, { passive: true });
-                el.addEventListener('touchmove', onTouchMove, { passive: false }); // Key fix for iOS
+                const preventGesture = (e) => { e.preventDefault(); };
+
+                el.addEventListener('touchstart', onTouchStart, { passive: false });
+                el.addEventListener('touchmove', onTouchMove, { passive: false });
                 el.addEventListener('touchend', onTouchEnd);
+                el.addEventListener('touchcancel', onTouchEnd);
+                el.addEventListener('gesturestart', preventGesture, { passive: false });
+                el.addEventListener('gesturechange', preventGesture, { passive: false });
 
                 return () => {
+                    setTwoFingerCapture(false);
                     el.removeEventListener('touchstart', onTouchStart);
                     el.removeEventListener('touchmove', onTouchMove);
                     el.removeEventListener('touchend', onTouchEnd);
+                    el.removeEventListener('touchcancel', onTouchEnd);
+                    el.removeEventListener('gesturestart', preventGesture);
+                    el.removeEventListener('gesturechange', preventGesture);
                 };
-            }, [zoomDomain, dataLength]); // Re-bind when state changes to capture correct values
+            }, [dataLength]);
 
             return {
                 zoomDomain,
@@ -4116,9 +4209,8 @@
                     ]} />
                     <div
                         ref={containerRef}
-                        className={`flex-1 min-h-0 relative ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                        className={`fc-chart-touch flex-1 min-h-0 relative ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                         {...handlers}
-                        style={{ touchAction: 'none' }}
                     >
                     <div
                         className="fc-chart-zoom absolute top-2 right-2 z-10 flex items-center gap-1"
@@ -4142,7 +4234,7 @@
                                 </button>
                             </div>
                         )}
-                        <div className="flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
+                        <div className="fc-chart-zoom-btns flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
                             <button type="button" onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom In">+</button>
                             <button type="button" onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom Out">-</button>
                         </div>
@@ -4198,9 +4290,8 @@
                     ]} />
                     <div
                         ref={containerRef}
-                        className={`flex-1 min-h-0 relative ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                        className={`fc-chart-touch flex-1 min-h-0 relative ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                         {...handlers}
-                        style={{ touchAction: 'none' }}
                     >
                     <div
                         className="fc-chart-zoom absolute top-2 right-2 z-10 flex items-center gap-1"
@@ -4224,7 +4315,7 @@
                                 </button>
                             </div>
                         )}
-                        <div className="flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
+                        <div className="fc-chart-zoom-btns flex flex-col gap-1 bg-white/80 dark:bg-slate-900/80 p-0.5 rounded-lg backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-sm">
                             <button type="button" onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom In">+</button>
                             <button type="button" onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs" aria-label="Zoom Out">-</button>
                         </div>
