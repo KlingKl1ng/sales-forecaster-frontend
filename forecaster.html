@@ -1732,8 +1732,8 @@
                     availability_checking: "Checking forecasting model availability...",
                     models_unavailable: "Advanced models are currently unavailable on the backend.",
                     val_method: "Validation Method",
-                    val_simple: "Simple Split",
-                    val_walk_forward: "Expanding Window",
+                    val_simple: "Simple Split (Fast)",
+                    val_walk_forward: "Expanding Window (Slow)",
                     validation_plan: "{count} evaluations × {horizon} periods ahead. Up to {max} dates, spread across the validation period.",
                     validation_short: "Validation period must be at least the forecast horizon.",
                     validation_limited: "This split allows fewer than {max} evaluations.",
@@ -1823,7 +1823,7 @@
                     validation_lead: "Periods ahead",
                     validation_final: "Final training periods",
                     validation_coverage: "{dates} of {periods} test dates scored. Overlapping evaluations are not independent samples.",
-                    val_rolling_window: "Rolling Window",
+                    val_rolling_window: "Rolling Window (Slow)",
                     eval_metric: "Evaluation Metric",
                     eval_rmse: "RMSE",
                     eval_mae: "MAE",
@@ -2018,8 +2018,8 @@
                     availability_checking: "Đang kiểm tra các mô hình dự báo...",
                     models_unavailable: "Các mô hình nâng cao hiện không khả dụng trên máy chủ.",
                     val_method: "Phương pháp kiểm định",
-                    val_simple: "Tách đơn giản",
-                    val_walk_forward: "Cửa sổ mở rộng",
+                    val_simple: "Tách đơn giản (Nhanh)",
+                    val_walk_forward: "Cửa sổ mở rộng (Chậm)",
                     validation_plan: "{count} lần kiểm định × {horizon} kỳ phía trước. Tối đa {max} mốc, phân bố trong giai đoạn kiểm định.",
                     validation_short: "Giai đoạn kiểm định phải dài ít nhất bằng chu kỳ dự báo.",
                     validation_limited: "Cách chia này cho phép ít hơn {max} lần kiểm định.",
@@ -2109,7 +2109,7 @@
                     validation_lead: "Số kỳ phía trước",
                     validation_final: "Số kỳ huấn luyện cuối",
                     validation_coverage: "Chấm điểm {dates}/{periods} ngày kiểm định. Các lần kiểm định chồng lấn không phải mẫu độc lập.",
-                    val_rolling_window: "Cửa sổ trượt",
+                    val_rolling_window: "Cửa sổ trượt (Chậm)",
                     eval_metric: "Chỉ số đánh giá",
                     eval_rmse: "RMSE",
                     eval_mae: "MAE",
@@ -2304,8 +2304,8 @@
                     availability_checking: "Verfügbarkeit der Prognosemodelle wird geprüft...",
                     models_unavailable: "Erweiterte Modelle sind derzeit auf dem Backend nicht verfügbar.",
                     val_method: "Validierungsmethode",
-                    val_simple: "Einfacher Split",
-                    val_walk_forward: "Erweiterndes Fenster",
+                    val_simple: "Einfacher Split (Schnell)",
+                    val_walk_forward: "Erweiterndes Fenster (Langsam)",
                     validation_plan: "{count} Auswertungen × {horizon} Perioden voraus. Bis zu {max} über den Testzeitraum verteilte Startpunkte.",
                     validation_short: "Der Testzeitraum muss mindestens so lang wie der Prognosehorizont sein.",
                     validation_limited: "Diese Aufteilung ermöglicht weniger als {max} Auswertungen.",
@@ -2395,7 +2395,7 @@
                     validation_lead: "Perioden voraus",
                     validation_final: "Perioden im finalen Training",
                     validation_coverage: "{dates} von {periods} Testdaten bewertet. Überlappende Auswertungen sind keine unabhängigen Stichproben.",
-                    val_rolling_window: "Rolling Window",
+                    val_rolling_window: "Rolling Window (Langsam)",
                     eval_metric: "Bewertungskennzahl",
                     eval_rmse: "RMSE",
                     eval_mae: "MAE",
@@ -2671,6 +2671,17 @@
             return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
         };
         const SELECTABLE_MODEL_ORDER = SELECTABLE_FORECAST_MODELS.filter((option) => !option.disabled).map((option) => option.value);
+        const FORECAST_MODEL_LABEL_KEYS = Object.fromEntries(
+            SELECTABLE_FORECAST_MODELS.map((option) => [option.value, option.labelKey])
+        );
+        const formatForecastModelLabel = (code, t) => {
+            const labelKey = FORECAST_MODEL_LABEL_KEYS[String(code || '').toLowerCase()];
+            return labelKey ? t(labelKey) : String(code || '');
+        };
+        const formatForecastModelList = (models, fallbackCode, t) => {
+            const codes = (models?.length ? models : [fallbackCode]).filter(Boolean);
+            return codes.length ? codes.map((code) => formatForecastModelLabel(code, t)).join(', ') : '—';
+        };
         const VISIBLE_FORECAST_MODELS_KEY = 'fc-visible-forecast-models-v1';
         const readVisibleForecastModels = () => {
             const allModels = SELECTABLE_FORECAST_MODELS.map((option) => option.value);
@@ -3510,20 +3521,22 @@
             const history = (data.forecast_data || []).filter(point => point.actual_history != null);
             const frequency = inferFrequencyFromHeaders(history.map(point => point.date));
             const futureCount = (data.forecast_data || []).filter(point => point.future_forecast != null).length;
+            const requestedModels = formatForecastModelList(data.requested_models, data.requested_model, t);
             const fields = [
-                [t('sidebar.models_requested'), (data.requested_models?.length ? data.requested_models : [data.requested_model]).filter(Boolean).join(', ').toUpperCase() || '—'],
-                [t('sidebar.detected_frequency'), frequency === 'unsupported' ? '—' : t(`sidebar.freq_${frequency}`)],
-                [t('sidebar.train_h'), summary.training_window ?? '—'],
-                [t('sidebar.test_h'), summary.validation_period ?? '—'],
-                [t('sidebar.fc_h'), futureCount || '—'],
-                [t('sidebar.eval_metric'), data.evaluation_metric?.toUpperCase() || '—'],
+                { label: t('sidebar.models_requested'), value: requestedModels, valueClassName: 'text-xs font-normal text-slate-600 dark:text-slate-300 break-words' },
+                { label: t('sidebar.detected_frequency'), value: frequency === 'unsupported' ? '—' : t(`sidebar.freq_${frequency}`) },
+                { label: t('sidebar.train_h'), value: summary.training_window ?? '—' },
+                { label: t('sidebar.test_h'), value: summary.validation_period ?? '—' },
+                { label: t('sidebar.fc_h'), value: futureCount || '—' },
+                { label: t('sidebar.eval_metric'), value: data.evaluation_metric?.toUpperCase() || '—' },
             ];
+            const defaultValueClassName = 'font-medium text-slate-700 dark:text-slate-200 break-words';
             return <section className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300" aria-label={t('sidebar.detail_process')}>
                 <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-2">{t('sidebar.detail_process')}</h3>
                 <dl className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
-                    {fields.map(([label, value]) => <div className="min-w-0" key={label}>
+                    {fields.map(({ label, value, valueClassName }) => <div className="min-w-0" key={label}>
                         <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
-                        <dd className="font-medium text-slate-700 dark:text-slate-200 break-words">{value}</dd>
+                        <dd className={valueClassName || defaultValueClassName}>{value}</dd>
                     </div>)}
                 </dl>
             </section>;
@@ -6968,7 +6981,7 @@
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.best_model')}</span>
-                                                                    <span className="text-[10px] lg:text-[11px] font-bold text-slate-700 dark:text-slate-300">{skuData.best_ts_model.toUpperCase()}</span>
+                                                                    <span className="text-[10px] lg:text-[11px] font-bold text-slate-700 dark:text-slate-300">{skuData.best_ts_model ? formatForecastModelLabel(skuData.best_ts_model, t) : '—'}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.table_mape')}</span>
