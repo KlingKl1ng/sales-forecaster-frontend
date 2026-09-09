@@ -1777,7 +1777,8 @@
                     model_variant: "TES seasonality",
                     seasonal_add: "Additive",
                     seasonal_mul: "Multiplicative",
-                    validation_simple: "One forecast over the entire test period. Fastest option.",
+                    validation_simple: "One evaluation at the forecast horizon. Test Horizon matches Forecast Horizon; all remaining periods are used for training.",
+                    validation_simple_invalid: "Choose a forecast horizon that leaves at least 4 training periods and fits the supported training and test limits.",
                     validation_details: "Validation details",
                     info_panel: "Information Panel",
                     info_close: "Close information panel",
@@ -2062,7 +2063,8 @@
                     model_variant: "Tính mùa vụ TES",
                     seasonal_add: "Cộng",
                     seasonal_mul: "Nhân",
-                    validation_simple: "Một lần dự báo cho toàn bộ giai đoạn kiểm định. Nhanh nhất.",
+                    validation_simple: "Một lần kiểm định theo chu kỳ dự báo. Chu kỳ kiểm định bằng chu kỳ dự báo; các kỳ còn lại dùng để huấn luyện.",
+                    validation_simple_invalid: "Chọn chu kỳ dự báo để còn ít nhất 4 kỳ huấn luyện và không vượt giới hạn huấn luyện, kiểm định.",
                     validation_details: "Chi tiết kiểm định",
                     info_panel: "Bảng thông tin",
                     info_close: "Đóng bảng thông tin",
@@ -2347,7 +2349,8 @@
                     model_variant: "TES-Saisonalität",
                     seasonal_add: "Additiv",
                     seasonal_mul: "Multiplikativ",
-                    validation_simple: "Eine Prognose über den gesamten Testzeitraum. Schnellste Option.",
+                    validation_simple: "Eine Auswertung mit dem Prognosehorizont. Test- und Prognosehorizont sind gleich; alle übrigen Perioden dienen dem Training.",
+                    validation_simple_invalid: "Wählen Sie einen Prognosehorizont mit mindestens 4 verbleibenden Trainingsperioden innerhalb der unterstützten Trainings- und Testgrenzen.",
                     validation_details: "Validierungsdetails",
                     info_panel: "Informationsbereich",
                     info_close: "Informationsbereich schließen",
@@ -3233,6 +3236,8 @@
             );
         };
 
+        const chartPointStyle = color => ({ r: 4, fill: color, fillOpacity: 0.6, stroke: color, strokeWidth: 2, strokeDasharray: '0' });
+
         const ValidationReplay = ({ data, isDark, t, savedPositions }) => {
             const replay = useMemo(() => buildValidationReplay(data), [data]);
             const initialPosition = useRef(savedPositions.current.get(data));
@@ -3341,8 +3346,9 @@
                                 )} />
                                 <ReferenceLine x={fold.end} stroke="#94a3b8" strokeDasharray="4 4" />
                                 <Line type="linear" dataKey="training" name={t('charts.act_train')} stroke="#64748b" strokeWidth={2} dot={false} isAnimationActive={false} />
-                                <Line type="linear" dataKey="forecast" name={t('charts.val_fc')} stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 4" dot={fold.points.length === 1 ? { r: 4 } : false} isAnimationActive={!reducedMotion && playing} animationDuration={400 / speed} />
-                                <Line type="linear" dataKey="actual" name={t('charts.act_test')} stroke="#10b981" strokeWidth={2} dot={fold.points.length === 1 ? { r: 4 } : false} isAnimationActive={!reducedMotion && playing} animationDuration={400 / speed} />
+                                {/* Line animation hides dots until completion; a single point must stay visible across phases. */}
+                                <Line type="linear" dataKey="forecast" name={t('charts.val_fc')} stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 4" dot={singleForecast ? chartPointStyle('#f59e0b') : false} isAnimationActive={!singleForecast && !reducedMotion && playing} animationDuration={400 / speed} />
+                                <Line type="linear" dataKey="actual" name={t('charts.act_test')} stroke="#10b981" strokeWidth={2} dot={singleForecast ? chartPointStyle('#10b981') : false} isAnimationActive={!singleForecast && !reducedMotion && playing} animationDuration={400 / speed} />
                             </ComposedChart>
                         </ResponsiveContainer>
                     </div>
@@ -4565,6 +4571,12 @@
             );
         };
 
+        // A single observation cannot form a line or filled area. Keep it visible,
+        // including when zooming leaves just one finite point in the series.
+        const singlePointDot = (data, key, color) => data.filter(point => Number.isFinite(point[key])).length === 1
+            ? chartPointStyle(color)
+            : false;
+
         const BacktestChart = ({ data, syncId, isDark, t }) => {
             if (!data) return null;
 
@@ -4637,9 +4649,9 @@
                             <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
                             <Tooltip wrapperClassName="fc-chart-tooltip-wrapper" cursor={{ stroke: isDark ? '#475569' : '#cbd5e1', strokeWidth: 1 }} content={<ChartTooltipContent isDark={isDark} />} />
                             <Area type="linear" dataKey="actual_train" name={t('charts.act_train')} stroke="#64748b" fill="url(#gd_bt_actual_train)" strokeWidth={2} isAnimationActive={false} />
-                            <Area type="linear" dataKey="actual_test" name={t('charts.act_test')} stroke="#10b981" fill="url(#gd_bt_actual_test)" strokeWidth={2} isAnimationActive={false} />
+                            <Area type="linear" dataKey="actual_test" name={t('charts.act_test')} stroke="#10b981" fill="url(#gd_bt_actual_test)" strokeWidth={2} dot={singlePointDot(visibleData, 'actual_test', '#10b981')} isAnimationActive={false} />
                             <Area type="linear" dataKey="fitted" name={t('charts.fitted')} stroke="#94a3b8" fill="url(#gd_bt_fitted)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
-                            <Area type="linear" dataKey="val_forecast" name={t('charts.val_fc')} stroke="#f59e0b" fill="url(#gd_bt_val_forecast)" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
+                            <Area type="linear" dataKey="val_forecast" name={t('charts.val_fc')} stroke="#f59e0b" fill="url(#gd_bt_val_forecast)" strokeWidth={2} strokeDasharray="5 5" dot={singlePointDot(visibleData, 'val_forecast', '#f59e0b')} isAnimationActive={false} />
                         </ComposedChart>
                     </ResponsiveContainer>
                     </div>
@@ -4716,7 +4728,7 @@
                             <Tooltip wrapperClassName="fc-chart-tooltip-wrapper" cursor={{ stroke: isDark ? '#475569' : '#cbd5e1', strokeWidth: 1 }} content={<ChartTooltipContent isDark={isDark} />} />
                             <Area type="linear" dataKey="actual_history" name={t('charts.history')} stroke="#64748b" fill="url(#gd_fc_history)" strokeWidth={2} isAnimationActive={false} />
                             <Area type="linear" dataKey="final_fit" name={t('charts.final_fit')} stroke="#94a3b8" fill="url(#gd_fc_final_fit)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
-                            <Area type="linear" dataKey="future_forecast" name={t('charts.future_fc')} stroke="#f59e0b" fill="url(#gd_fc_future)" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
+                            <Area type="linear" dataKey="future_forecast" name={t('charts.future_fc')} stroke="#f59e0b" fill="url(#gd_fc_future)" strokeWidth={2} strokeDasharray="5 5" dot={singlePointDot(visibleData, 'future_forecast', '#f59e0b')} isAnimationActive={false} />
                         </ComposedChart>
                     </ResponsiveContainer>
                     </div>
@@ -5470,6 +5482,22 @@
                 setTestHorizon(String(recommendedTest));
             }, [adaptiveValidation, automaticValidationSplit, recommendedTrain, recommendedTest]);
 
+            const simpleSplitInvalid = !adaptiveValidation && totalTimeSeries > 0 && (
+                !Number.isInteger(Number(forecastSteps)) || Number(forecastSteps) < 1
+                || Number(forecastSteps) > Math.min(maxForecastHorizon, maxTestHorizon)
+                || totalTimeSeries - Number(forecastSteps) < 4
+                || totalTimeSeries - Number(forecastSteps) > maxTrainHorizon
+            );
+            useEffect(() => {
+                if (adaptiveValidation) return;
+                setTestHorizon(forecastSteps);
+                if (totalTimeSeries > 0) {
+                    const horizon = Number(forecastSteps);
+                    setTrainHorizon(Number.isInteger(horizon) && horizon > 0
+                        ? String(Math.max(0, totalTimeSeries - horizon)) : '');
+                }
+            }, [adaptiveValidation, forecastSteps, totalTimeSeries]);
+
             // --- POLLING (merge partial results as each SKU completes) ---
             useEffect(() => {
                 let disposed = false;
@@ -5731,6 +5759,10 @@
 
             const startBatchForSkus = async (skusToRun) => {
                 if (!skusToRun.length) return;
+                if (simpleSplitInvalid) {
+                    setAlertMessage(t('sidebar.validation_simple_invalid'));
+                    return;
+                }
                 if (validationHorizonTooShort) {
                     setAlertMessage(t('sidebar.validation_short'));
                     return;
@@ -6348,8 +6380,8 @@
                             <div className="h-px w-8 bg-slate-200 dark:bg-slate-700 my-1"></div>
                             <button
                                 onClick={handleExecute}
-                                disabled={!file || isRunning || invalidFrequency || historyTooLong || validationHorizonTooShort}
-                                className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${isRunning ? 'fc-status-active cursor-not-allowed' : !file || invalidFrequency || historyTooLong || validationHorizonTooShort ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
+                                disabled={!file || isRunning || invalidFrequency || historyTooLong || validationHorizonTooShort || simpleSplitInvalid}
+                                className={`flex items-center justify-center h-11 w-11 rounded-xl shadow-sm transition-all ${isRunning ? 'fc-status-active cursor-not-allowed' : !file || invalidFrequency || historyTooLong || validationHorizonTooShort || simpleSplitInvalid ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white hover:bg-brand-dark'}`}
                                 title={isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
                             >
                                 {isRunning ? <RunningSpinnerIcon size={16} /> : <PlayIcon />}
@@ -6646,20 +6678,25 @@
                                                 type="number"
                                                 id="forecast-train-horizon"
                                                 value={trainHorizon}
+                                                readOnly={!adaptiveValidation}
+                                                disabled={!adaptiveValidation}
+                                                title={!adaptiveValidation ? t('sidebar.validation_simple') : undefined}
                                                 onChange={(e) => {
+                                                    if (!adaptiveValidation) return;
                                                     setAutomaticValidationSplit(false);
                                                     setTrainHorizon(e.target.value);
                                                     const train = Number(e.target.value);
                                                     if (Number.isInteger(train) && train >= 4 && train < totalTimeSeries) setTestHorizon(String(totalTimeSeries - train));
                                                 }}
                                                 onBlur={() => {
+                                                    if (!adaptiveValidation) return;
                                                     const train = Math.min(maxTrainHorizon, totalTimeSeries > 4 ? totalTimeSeries - 1 : maxTrainHorizon, Math.max(4, totalTimeSeries - maxTestHorizon, parseInt(trainHorizon) || 4));
                                                     setTrainHorizon(String(train));
                                                     if (totalTimeSeries > train) setTestHorizon(String(totalTimeSeries - train));
                                                 }}
                                                 min="4"
                                                 max={maxTrainHorizon}
-                                                className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
+                                                className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] disabled:cursor-not-allowed disabled:opacity-60 ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                         <div className="min-w-0 flex flex-col">
@@ -6668,7 +6705,11 @@
                                                 type="number"
                                                 id="forecast-test-horizon"
                                                 value={testHorizon}
+                                                readOnly={!adaptiveValidation}
+                                                disabled={!adaptiveValidation}
+                                                title={!adaptiveValidation ? t('sidebar.validation_simple') : undefined}
                                                 onChange={(e) => {
+                                                    if (!adaptiveValidation) return;
                                                     setAutomaticValidationSplit(false);
                                                     const newTest = parseInt(e.target.value) || 0;
                                                     setTestHorizon(e.target.value);
@@ -6677,13 +6718,14 @@
                                                     }
                                                 }}
                                                 onBlur={() => {
+                                                    if (!adaptiveValidation) return;
                                                     const test = Math.min(maxTestHorizon, totalTimeSeries > 4 ? totalTimeSeries - 4 : maxTestHorizon, Math.max(1, totalTimeSeries - maxTrainHorizon, parseInt(testHorizon) || 1));
                                                     setTestHorizon(String(test));
                                                     if (totalTimeSeries > test) setTrainHorizon(String(totalTimeSeries - test));
                                                 }}
                                                 min="1"
                                                 max={maxTestHorizon}
-                                                className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] ${horizonMismatch ? 'border-red-400' : ''}`}
+                                                className={`fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark] disabled:cursor-not-allowed disabled:opacity-60 ${horizonMismatch ? 'border-red-400' : ''}`}
                                             />
                                         </div>
                                     </div>
@@ -6720,8 +6762,8 @@
                                             className="fc-sidebar-control w-full text-xxs px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 outline-none focus:border-brand-gold transition-colors dark:[color-scheme:dark]"
                                         />
                                     </div>
-                                    <div aria-live="polite" className={`text-[10px] leading-relaxed ${validationHorizonTooShort ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`}>
-                                        {validationHorizonTooShort ? t('sidebar.validation_short') : adaptiveValidation ? (
+                                    <div aria-live="polite" className={`text-[10px] leading-relaxed ${validationHorizonTooShort || simpleSplitInvalid ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                                        {simpleSplitInvalid ? t('sidebar.validation_simple_invalid') : validationHorizonTooShort ? t('sidebar.validation_short') : adaptiveValidation ? (
                                             <>{t('sidebar.validation_plan').replace('{count}', validationEvaluations).replace('{horizon}', forecastSteps).replace('{max}', maxValidationEvaluations)}
                                                 {validationEvaluations === 1 && <div className="mt-1">{t('sidebar.validation_single')}</div>}
                                                 {automaticValidationSplit && recommendedValidationSplit && <div className="mt-1">{t('sidebar.validation_auto').replace('{train}', recommendedValidationSplit.minimumTrain)}</div>}
@@ -6745,8 +6787,8 @@
                                     <button
                                         type="button"
                                         onClick={handleExecute}
-                                        disabled={!file || isRunning || invalidFrequency || historyTooLong || validationHorizonTooShort}
-                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isRunning ? 'fc-status-active cursor-not-allowed' : !file || invalidFrequency || historyTooLong || validationHorizonTooShort ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
+                                        disabled={!file || isRunning || invalidFrequency || historyTooLong || validationHorizonTooShort || simpleSplitInvalid}
+                                        className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isRunning ? 'fc-status-active cursor-not-allowed' : !file || invalidFrequency || historyTooLong || validationHorizonTooShort || simpleSplitInvalid ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20 hover:shadow-brand-gold/40 hover:bg-amber-600 hover:scale-[1.02] transform active:scale-95'}`}
                                     >
                                         {isRunning ? <RunningSpinnerIcon size={14} /> : <PlayIcon />}
                                         {isRunning ? t('sidebar.processing') : t('sidebar.execute_btn')}
