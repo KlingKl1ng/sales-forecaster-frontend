@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const fs = require('node:fs');
 const path = require('node:path');
 const source = fs.readFileSync(path.join(__dirname, '../forecaster.html'), 'utf8');
-const build = new Function(source.slice(source.indexOf('const buildValidationReplay ='), source.indexOf('const ValidationReplay =')) + '; return buildValidationReplay;')();
+const build = new Function(source.slice(source.indexOf('const buildValidationReplay ='), source.indexOf('const ReplayWindowLabel =')) + '; return buildValidationReplay;')();
 const dates = Array.from({length:8}, (_,i)=>`2024-01-0${i+1}`);
 function result(method='walk_forward') {
     return {validation_method:method, validation_summary:{training_window:3,validation_period:5,forecast_horizon:2,evaluations:2},
