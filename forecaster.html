@@ -3559,7 +3559,7 @@
             const futureCount = (data.forecast_data || []).filter(point => point.future_forecast != null).length;
             const requestedModels = formatForecastModelList(data.requested_models, data.requested_model, t);
             const fields = [
-                { label: t('sidebar.models_requested'), value: requestedModels, valueClassName: 'text-xs font-normal text-slate-600 dark:text-slate-300 break-words' },
+                { label: t('sidebar.models_requested'), value: requestedModels },
                 { label: t('sidebar.detected_frequency'), value: frequency === 'unsupported' ? '—' : t(`sidebar.freq_${frequency}`) },
                 { label: t('sidebar.train_h'), value: summary.training_window == null ? '—' : fmtNumber(summary.training_window, 0, 0, t.numberLocale) },
                 { label: t('sidebar.test_h'), value: summary.validation_period == null ? '—' : fmtNumber(summary.validation_period, 0, 0, t.numberLocale) },
