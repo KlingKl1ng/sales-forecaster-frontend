@@ -1,5 +1,52 @@
 (function () {
     var originalFetch = window.fetch.bind(window);
+    var sessionRenewalTimer = null;
+    var sessionRenewalActive = false;
+    var lastSessionRenewal = 0;
+    var sessionRenewalInFlight = false;
+    var SESSION_RENEWAL_INTERVAL = 10 * 60 * 1000;
+
+    function stopSessionRenewal() {
+        sessionRenewalActive = false;
+        clearTimeout(sessionRenewalTimer);
+        sessionRenewalTimer = null;
+    }
+    function scheduleSessionRenewal() {
+        if (!sessionRenewalActive || sessionRenewalTimer) return;
+        sessionRenewalTimer = setTimeout(function () {
+            sessionRenewalTimer = null;
+            renewSessionIfDue();
+        }, SESSION_RENEWAL_INTERVAL);
+    }
+    async function renewSessionIfDue() {
+        if (!sessionRenewalActive || sessionRenewalInFlight) return;
+        if (document.hidden || Date.now() - lastSessionRenewal < SESSION_RENEWAL_INTERVAL) {
+            scheduleSessionRenewal();
+            return;
+        }
+        sessionRenewalInFlight = true;
+        try {
+            var response = await originalFetch(getDefaultApiBase() + '/auth/session/renew', {credentials: 'include'});
+            if (response.ok) lastSessionRenewal = Date.now();
+            else if (response.status === 401) {
+                stopSessionRenewal();
+                window.dispatchEvent(new CustomEvent('operartis:unauthorized'));
+            }
+        } catch (error) { /* A temporary connection failure must not sign the user out. */ }
+        finally { sessionRenewalInFlight = false; scheduleSessionRenewal(); }
+    }
+    function startSessionRenewal() {
+        if (!sessionRenewalActive) lastSessionRenewal = Date.now();
+        sessionRenewalActive = true;
+        scheduleSessionRenewal();
+    }
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) renewSessionIfDue(); });
+    window.addEventListener('operartis:auth-state', function (event) {
+        if (event.detail?.user) startSessionRenewal();
+        else stopSessionRenewal();
+    });
+    window.addEventListener('operartis:unauthorized', stopSessionRenewal);
+    window.addEventListener('operartis:logged-out', stopSessionRenewal);
     var csrfToken = sessionStorage.getItem('operartis_csrf_token') || '';
     var AUTH_BROADCAST_KEY = 'operartis_auth_broadcast';
     var DASHBOARD_BROADCAST_KEY = 'operartis_dashboard_data_changed';
@@ -169,9 +216,8 @@
                 var data = await response.json().catch(function () { return {}; });
                 if (data && data.csrf_token) {
                     setCsrf(data.csrf_token);
-                    if (data.user) {
-                        window.dispatchEvent(new CustomEvent('operartis:auth-state', { detail: { user: data.user } }));
-                    }
+                    // Refresh credentials only. Announcing an auth-state change
+                    // reloads the dashboard and overwrites the unsaved form.
                     return true;
                 }
             } catch (error) { }
@@ -195,9 +241,17 @@
         var response = await originalFetch(input, options);
 
         if (apiRequest && unsafe && response.status === 403 && !isCsrfBootstrapExempt(input)) {
-            var refreshed = await refreshCsrfToken();
-            if (refreshed) {
-                response = await originalFetch(input, withAuthOptions(init));
+            var failure = await response.clone().json().catch(function () { return {}; });
+            if (failure.detail === 'Invalid CSRF token.') {
+                var refreshed = await refreshCsrfToken();
+                if (refreshed) response = await originalFetch(input, withAuthOptions(init));
+            }
+            if (response.status === 403) {
+                failure = await response.clone().json().catch(function () { return {}; });
+                if (failure.detail?.code === 'reauthentication_required' && window.OperartisAuth?.requestReauthentication) {
+                    var confirmed = await window.OperartisAuth.requestReauthentication();
+                    if (confirmed) response = await originalFetch(input, withAuthOptions(init));
+                }
             }
         }
 
@@ -253,6 +307,7 @@
         var response = await apiFetch('/auth/me', { method: 'GET' });
         var data = await parseJsonResponse(response);
         setCsrf(data.csrf_token);
+        startSessionRenewal();
         return data.user;
     }
 
@@ -264,6 +319,7 @@
         });
         var data = await parseJsonResponse(response);
         setCsrf(data.csrf_token);
+        startSessionRenewal();
         broadcastAuthEvent('login');
         return data.user;
     }
@@ -293,10 +349,19 @@
     }
 
     async function logout() {
+        stopSessionRenewal();
         await apiFetch('/auth/logout', { method: 'POST' }).catch(function () { });
         setCsrf('');
         broadcastAuthEvent('logout');
         window.dispatchEvent(new CustomEvent('operartis:logged-out'));
+    }
+
+    async function reauthenticate(password) {
+        var response = await apiFetch('/auth/reauthenticate', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: password })
+        });
+        return parseJsonResponse(response);
     }
 
     async function submitContact(payload) {
@@ -316,6 +381,7 @@
         setCsrf: setCsrf,
         me: me,
         login: login,
+        reauthenticate: reauthenticate,
         requestPasswordReset: requestPasswordReset,
         validatePasswordReset: validatePasswordReset,
         confirmPasswordReset: confirmPasswordReset,

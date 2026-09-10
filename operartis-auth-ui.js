@@ -863,7 +863,66 @@
         handleUnauthenticated();
     }
 
+    var reauthenticationPromise = null;
+    function requestReauthentication() {
+        if (reauthenticationPromise) return reauthenticationPromise;
+        addStyles();
+        var copy = {
+            en: { title: 'Confirm your identity', description: 'Enter your password to continue with this sensitive change. Your session expiry stays the same.', confirm: 'Continue', cancel: 'Cancel', error: 'Could not confirm your password. Try again.', limited: 'Too many attempts. Try again in 15 minutes.' },
+            vi: { title: 'Xác nhận danh tính', description: 'Nhập mật khẩu để tiếp tục thay đổi quan trọng này. Thời hạn phiên đăng nhập không thay đổi.', confirm: 'Tiếp tục', cancel: 'Hủy', error: 'Không thể xác nhận mật khẩu. Vui lòng thử lại.', limited: 'Quá nhiều lần thử. Vui lòng thử lại sau 15 phút.' },
+            de: { title: 'Identität bestätigen', description: 'Geben Sie Ihr Passwort ein, um diese sensible Änderung fortzusetzen. Die Sitzungsdauer bleibt unverändert.', confirm: 'Weiter', cancel: 'Abbrechen', error: 'Das Passwort konnte nicht bestätigt werden. Bitte erneut versuchen.', limited: 'Zu viele Versuche. Bitte in 15 Minuten erneut versuchen.' }
+        }[authLang()];
+        var previousFocus = document.activeElement;
+        reauthenticationPromise = new Promise(function (resolve) {
+            var dialog = document.createElement('dialog');
+            dialog.id = 'operartis-reauthenticate';
+            dialog.className = 'op-auth-overlay';
+            dialog.dataset.authTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            dialog.style.cssText = 'display:flex;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border:0;overflow:auto';
+            dialog.setAttribute('aria-labelledby', 'operartis-reauth-title');
+            dialog.innerHTML = '<form class="op-auth-card"><h2 id="operartis-reauth-title" class="op-auth-title"></h2><p class="op-auth-sub"></p><label class="op-auth-field"><span class="op-auth-label"></span><input class="op-auth-input" type="password" name="password" autocomplete="current-password" required maxlength="1024"></label><div class="op-auth-error" role="alert"></div><button type="submit" class="op-auth-button"></button><button type="button" class="op-auth-link"></button></form>';
+            var input = dialog.querySelector('input');
+            var submit = dialog.querySelector('[type=submit]');
+            var cancel = dialog.querySelector('[type=button]');
+            var error = dialog.querySelector('.op-auth-error');
+            dialog.querySelector('h2').textContent = copy.title;
+            dialog.querySelector('p').textContent = copy.description;
+            dialog.querySelector('.op-auth-label').textContent = t('password');
+            submit.textContent = copy.confirm;
+            cancel.textContent = copy.cancel;
+            var confirmed = false;
+            dialog.addEventListener('close', function () {
+                input.value = '';
+                dialog.remove();
+                previousFocus?.focus?.();
+                resolve(confirmed);
+            });
+            cancel.addEventListener('click', function () { dialog.close(); });
+            dialog.querySelector('form').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                if (submit.disabled) return;
+                submit.disabled = true;
+                error.style.display = 'none';
+                try {
+                    await window.OperartisApi.reauthenticate(input.value);
+                    confirmed = true;
+                    if (dialog.open) dialog.close();
+                } catch (failure) {
+                    error.textContent = failure.message?.includes('Too many attempts') ? copy.limited : copy.error;
+                    error.style.display = 'block';
+                    input.value = '';
+                    input.focus();
+                } finally { submit.disabled = false; }
+            });
+            document.body.appendChild(dialog);
+            dialog.showModal();
+            input.focus();
+        }).finally(function () { reauthenticationPromise = null; });
+        return reauthenticationPromise;
+    }
+
     window.OperartisAuth = {
+        requestReauthentication: requestReauthentication,
         showLogin: showLogin,
         refresh: refresh,
         logout: logout,

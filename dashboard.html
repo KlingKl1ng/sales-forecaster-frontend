@@ -10,8 +10,10 @@
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-format.js"></script>
     <script src="./operartis-dashboard-i18n.js"></script>
+    <script src="./operartis-language-catalog.js"></script>
+    <script src="./operartis-language-picker.js"></script>
     <script src="./operartis-security.js"></script>
-    <script src="./operartis-api.js?v=20260622-auth-session-sync"></script>
+    <script src="./operartis-api.js?v=20260910-stable-csrf"></script>
     <script>
         window.OPERARTIS_AUTH_AUTO_PROMPT = false;
         window.OPERARTIS_AUTH_FLOATING_ACCOUNT = false;
@@ -1685,6 +1687,26 @@
         }
         .shortcut-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         .shortcut-list { grid-template-columns: 1fr; gap: 10px; }
+        #profile-form .form-grid > label { align-self: start; }
+        .profile-language-picker { min-width: 0; align-self: start; }
+        .language-picker-label { margin-bottom: 7px; }
+        .language-picker-trigger { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-input); color: var(--text); font: inherit; font-size: 12px; text-align: left; cursor: pointer; }
+        .language-picker-trigger > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .language-picker-trigger[aria-expanded="true"] { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.12); }
+        .language-picker-panel { position: fixed; z-index: 10000; display: flex; flex-direction: column; min-height: 0; padding: 8px; gap: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-input); color: var(--text); box-shadow: 0 16px 42px rgba(0,0,0,.24); }
+        html:not(.dark) .language-picker-panel { background: #fff; }
+        html.dark .language-picker-panel { background: #0f172a; }
+        .language-picker-panel[hidden] { display: none; }
+        .language-picker-search { flex-shrink: 0; }
+        .language-picker-list { overflow-y: auto; overscroll-behavior: contain; min-height: 0; flex: 1; }
+        .language-picker-option { font-family: inherit; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 38px; padding: 8px 10px; border: 0; border-radius: 7px; color: var(--text); background: transparent; text-align: left; cursor: pointer; }
+        .language-picker-option > span:first-child { flex: 1; overflow-wrap: anywhere; }
+        .language-picker-option small { color: var(--muted); }
+        .language-picker-option > span:last-child { width: 14px; color: #f59e0b; }
+        .language-picker-option:hover, .language-picker-option.is-active { background: rgba(148,163,184,.14); }
+        .language-picker-option[aria-selected="true"] { background: rgba(245,158,11,.12); }
+        .language-picker-option[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+        .language-picker-status, .language-picker-empty { color: var(--muted); font-size: 11px; line-height: 1.5; margin: 0; padding: 4px; }
         .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .api-key-create-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1789,6 +1811,10 @@
             gap: 12px;
             margin-bottom: 14px;
         }
+        .shortcut-badges { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 5px; min-width: 0; }
+        .shortcut-badges .badge { min-width: 0; height: auto; white-space: normal; text-align: center; overflow-wrap: anywhere; }
+        .badge.module-last-used { color: var(--text); background: rgba(59, 130, 246, .13); border-color: rgba(59, 130, 246, .35); }
+        .badge.module-most-used { color: var(--text); background: rgba(245, 158, 11, .13); border-color: rgba(245, 158, 11, .4); }
         .shortcut-copy {
             flex: 1;
             display: flex;
@@ -2250,7 +2276,14 @@
         .user-run-table th, .user-run-table td { padding: 12px; white-space: normal; overflow-wrap: anywhere; }
         .user-run-table .badge { min-width: 0; max-width: 100%; height: auto; white-space: normal; }
         .user-run-cell-label { display: none; }
+        .user-run-sort-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; }
+        .user-run-sort-button:focus-visible { outline: 2px solid var(--accent, #f59e0b); outline-offset: 3px; border-radius: 3px; }
+        .user-run-sort-controls { display: none; }
+
         @container user-runs (max-width: 900px) {
+            .user-run-sort-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
+            .user-run-sort-controls select { flex: 1; min-width: 0; }
+
             .user-run-totals { grid-template-columns: repeat(3, minmax(0, 1fr)); }
             .user-run-table, .user-run-table tbody { display: block; }
             .user-run-table thead { display: none; }
@@ -3047,15 +3080,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card reports-status-card">
-                            <div class="section-head">
-                                <div>
-                                    <h2 data-i18n="sections.reports.run_status">Run Status</h2>
-                                    <p class="section-sub" data-i18n="sections.reports.run_status_sub">Distribution of your current job history.</p>
-                                </div>
-                                <div id="status-list" class="status-board"></div>
-                            </div>
-                        </div>
+                        <div id="reports-run-statistics" class="card user-run-statistics" aria-live="polite"></div>
                     </div>
                 </section>
 
@@ -3101,13 +3126,7 @@
                                     </select>
                                 </label>
                                 <label><span data-i18n="sections.profile.phone">Phone</span><input id="profile-phone" name="phone" autocomplete="tel" maxlength="64"></label>
-                                <label><span data-i18n="sections.profile.language">Language</span>
-                                    <select id="profile-locale" name="locale">
-                                        <option value="en" data-i18n="sections.profile.lang_en">English</option>
-                                        <option value="vi" data-i18n="sections.profile.lang_vi">Vietnamese</option>
-                                        <option value="de" data-i18n="sections.profile.lang_de">German</option>
-                                    </select>
-                                </label>
+                                <div id="profile-locale"></div>
                                 <label><span data-i18n="sections.profile.timezone">Timezone</span><input id="profile-timezone" name="timezone" autocomplete="off" maxlength="64" placeholder="Europe/Berlin"></label>
                             </div>
                             <div class="form-actions">
@@ -3461,6 +3480,7 @@
                         </div>
                         <div id="admin-user-details" class="kv-list"></div>
                     </div>
+                    <div id="admin-user-session-policy" class="card" style="margin-top:18px"></div>
                     <div id="admin-user-run-statistics" class="card user-run-statistics" aria-live="polite"></div>
                 </section>
 
@@ -3688,6 +3708,8 @@
             overview: null,
             jobs: [],
             artifacts: [],
+            runStatistics: null,
+            runStatisticsFailed: false,
             notifications: [],
             unreadNotifications: 0,
             notificationFilter: 'all',
@@ -4213,18 +4235,21 @@
         async function loadDashboard(options = {}) {
             const silent = options.silent === true;
             if (!silent) showMessage('');
-            const [user, overview, jobs, artifacts, notifications, apiKeys] = await Promise.all([
+            const [user, overview, jobs, artifacts, notifications, apiKeys, runStatisticsResult] = await Promise.all([
                 window.OperartisApi.me(),
                 api('/auth/dashboard/overview'),
                 api('/auth/dashboard/jobs'),
                 api('/auth/dashboard/artifacts'),
                 api('/auth/notifications'),
                 api('/auth/api-keys'),
+                api('/auth/dashboard/run-statistics').then(stats => ({stats, failed: false})).catch(() => ({stats: null, failed: true})),
             ]);
             state.user = user;
             state.overview = overview;
             state.jobs = jobs;
             state.artifacts = artifacts;
+            state.runStatistics = runStatisticsResult.stats;
+            state.runStatisticsFailed = runStatisticsResult.failed;
             state.notifications = notifications.notifications || [];
             state.unreadNotifications = notifications.unread_count || 0;
             state.apiKeys = Array.isArray(apiKeys) ? apiKeys : [];
@@ -4315,8 +4340,20 @@
         }
 
         function profileLocaleLabel(locale) {
-            if (locale === 'en' || locale === 'vi' || locale === 'de') return dt('sections.profile.lang_' + locale);
-            return dt('profile_summary.missing');
+            return locale ? window.OperartisLanguagePicker.label(locale, window.getOperartisLang?.() || 'en') : dt('profile_summary.missing');
+        }
+
+        let profileLanguagePicker;
+        function languagePicker() {
+            return profileLanguagePicker ||= window.OperartisLanguagePicker.mount(document.getElementById('profile-locale'), dt, () => window.getOperartisLang?.() || 'en');
+        }
+
+        function profileLanguages(user) {
+            return Array.isArray(user?.languages) ? user.languages : (user?.locale ? [user.locale] : []);
+        }
+
+        function profileLanguagesLabel(user) {
+            return profileLanguages(user).map(profileLocaleLabel).join(', ') || dt('profile_summary.missing');
         }
 
         function genderLabel(gender) {
@@ -4341,12 +4378,14 @@
             setSection(`admin-user?id=${encodeURIComponent(userId)}`);
         }
 
-        function paintUserRunStatistics(stats, failed = false) {
-            const container = document.getElementById('admin-user-run-statistics');
+        const userRunSorts = {};
+
+        function paintUserRunStatistics(stats, failed = false, containerId = 'admin-user-run-statistics') {
+            const container = document.getElementById(containerId);
             if (!container) return;
             clear(container);
             container.appendChild(el('h2', { text: dt('run_stats.title') }));
-            container.appendChild(el('p', { class: 'section-sub', text: dt('run_stats.description') }));
+            container.appendChild(el('p', { class: 'section-sub', text: dt(containerId === 'reports-run-statistics' ? 'run_stats.personal_description' : 'run_stats.description') }));
             if (!stats) {
                 container.appendChild(el('div', { class: 'empty', text: dt(failed ? 'run_stats.error' : 'run_stats.loading') }));
                 return;
@@ -4361,31 +4400,139 @@
                 ]));
             });
             container.appendChild(totals);
-            function appendTable(title, labels, rows) {
+            function appendTable(key, title, labels, rows, sortValues) {
                 container.appendChild(el('h3', { text: title }));
                 if (!rows.length) {
                     container.appendChild(el('div', { class: 'empty', text: dt('empty.no_runs') }));
                     return;
                 }
+                const sorting = userRunSorts[`${containerId}:${key}`] ||= {column: key === 'recent' ? 5 : null, direction: 'desc'};
                 const body = el('tbody');
-                rows.forEach(cells => body.appendChild(el('tr', {}, cells.map((value, index) => el('td', {}, [
+                const rowNodes = rows.map(cells => el('tr', {}, cells.map((value, index) => el('td', {}, [
                     el('span', { class: 'user-run-cell-label', text: labels[index] }),
                     el('div', { class: 'user-run-cell-value' }, [typeof value === 'string' ? document.createTextNode(value) : value]),
-                ])))));
-                container.appendChild(el('div', { class: 'user-run-table-wrap' }, [el('table', { class: 'user-run-table' }, [
-                    el('thead', {}, [el('tr', {}, labels.map(label => el('th', { scope: 'col', text: label })))]), body,
+                ]))));
+                const headers = labels.map((label, index) => {
+                    const button = el('button', {type: 'button', class: 'user-run-sort-button'});
+                    button.addEventListener('click', () => {
+                        sorting.direction = sorting.column === index && sorting.direction === 'asc' ? 'desc' : 'asc';
+                        sorting.column = index;
+                        renderRows();
+                    });
+                    return el('th', {scope: 'col'}, [button]);
+                });
+                const selectId = `${containerId}-sort-${key}`;
+                const select = el('select', {id: selectId, class: 'select-small'}, [
+                    el('option', {value: '', text: dt('run_stats.default_order')}),
+                    ...labels.map((label, index) => el('option', {value: String(index), text: label})),
+                ]);
+                const direction = el('button', {type: 'button', class: 'button-secondary'});
+                select.addEventListener('change', () => {sorting.column = select.value === '' ? null : Number(select.value); sorting.direction = 'asc'; renderRows();});
+                direction.addEventListener('click', () => {sorting.direction = sorting.direction === 'asc' ? 'desc' : 'asc'; renderRows();});
+                const controls = el('div', {class: 'user-run-sort-controls'}, [el('label', {for: selectId, text: dt('run_stats.sort_by')}), select, direction]);
+                function renderRows() {
+                    const indices = rows.map((_, index) => index);
+                    if (sorting.column !== null) indices.sort((a, b) => {
+                        const left = sortValues[a][sorting.column], right = sortValues[b][sorting.column];
+                        const comparison = typeof left === 'number' && typeof right === 'number'
+                            ? left - right : String(left).localeCompare(String(right), document.documentElement.lang || 'en', {numeric: true, sensitivity: 'base'});
+                        return (sorting.direction === 'asc' ? comparison : -comparison) || a - b;
+                    });
+                    body.replaceChildren(...indices.map(index => rowNodes[index]));
+                    headers.forEach((header, index) => {
+                        const active = sorting.column === index;
+                        header.setAttribute('aria-sort', active ? (sorting.direction === 'asc' ? 'ascending' : 'descending') : 'none');
+                        const button = header.firstChild;
+                        button.replaceChildren(document.createTextNode(labels[index] + ' '), el('span', {'aria-hidden': 'true', text: active ? (sorting.direction === 'asc' ? '↑' : '↓') : '↕'}));
+                    });
+                    select.value = sorting.column === null ? '' : String(sorting.column);
+                    direction.textContent = dt(sorting.direction === 'asc' ? 'run_stats.ascending' : 'run_stats.descending');
+                    direction.disabled = sorting.column === null;
+                }
+                container.appendChild(el('div', {class: 'user-run-table-wrap', 'data-run-table': key}, [controls, el('table', {class: 'user-run-table'}, [
+                    el('thead', {}, [el('tr', {}, headers)]), body,
                 ])]));
+                renderRows();
             }
-            appendTable(dt('run_stats.by_module'), [dt('table.module'), dt('run_stats.total'), ...statuses.map(statusLabel)],
+            const sourceStats = stats.sources || [];
+            appendTable('source', dt('run_stats.by_source'), [dt('table.source'), dt('run_stats.total'), ...statuses.map(statusLabel)],
+                ['app', 'api'].map(source => {
+                    const item = sourceStats.find(item => item.source === source);
+                    const sourceCounts = Object.fromEntries(statusCountEntries(item?.statuses));
+                    return [jobSourceLabel(source), formatNumber(item?.total || 0), ...statuses.map(key => formatNumber(sourceCounts[key] || 0))];
+                }), ['app', 'api'].map(source => {
+                    const item = sourceStats.find(item => item.source === source);
+                    const sourceCounts = Object.fromEntries(statusCountEntries(item?.statuses));
+                    return [jobSourceLabel(source), Number(item?.total || 0), ...statuses.map(key => Number(sourceCounts[key] || 0))];
+                }));
+            appendTable('module', dt('run_stats.by_module'), [dt('table.module'), dt('run_stats.total'), ...statuses.map(statusLabel)],
                 stats.modules.map(item => {
                     const moduleCounts = Object.fromEntries(statusCountEntries(item.statuses));
-                    return [moduleLabel(item.module), formatNumber(item.total), ...statuses.map(key => formatNumber(moduleCounts[key] || 0))];
+                    const moduleTotal = el('div', {}, [
+                        el('div', {text: formatNumber(item.total)}),
+                        ...['app', 'api'].map(source => el('div', {class: 'section-sub', style: 'margin:3px 0 0;font-size:11px', text: `${jobSourceLabel(source)}: ${formatNumber(item.sources?.[source] || 0)}`})),
+                    ]);
+                    return [moduleLabel(item.module), moduleTotal, ...statuses.map(key => formatNumber(moduleCounts[key] || 0))];
+                }), stats.modules.map(item => {
+                    const moduleCounts = Object.fromEntries(statusCountEntries(item.statuses));
+                    return [moduleLabel(item.module), Number(item.total), ...statuses.map(key => Number(moduleCounts[key] || 0))];
                 }));
-            appendTable(dt('run_stats.recent'), ['module', 'status', 'progress', 'file', 'created'].map(key => dt('table.' + key)),
-                stats.recent_jobs.map(job => [moduleLabel(job.module), badge(job.status), `${formatNumber(job.progress)}%`, job.input_filename || '—', formatDate(job.created_at)]));
+            appendTable('recent', dt('run_stats.recent'), ['module', 'source', 'status', 'progress', 'file', 'created'].map(key => dt('table.' + key)),
+                stats.recent_jobs.map(job => [moduleLabel(job.module), jobSourceLabel(job.source), badge(job.status), `${formatNumber(job.progress)}%`, job.input_filename || '—', formatDate(job.created_at)]),
+                stats.recent_jobs.map(job => [moduleLabel(job.module), jobSourceLabel(job.source), statusLabel(job.status), Number(job.progress || 0), job.input_filename || '', Date.parse(job.created_at) || 0]));
+        }
+
+        function paintUserSessionPolicy(user) {
+            const container = document.getElementById('admin-user-session-policy');
+            clear(container);
+            if (!user) return;
+            const isSelf = user.id === state.user?.id;
+            const canEdit = isSelf ? canUseAdminDashboard(state.user?.role) : (isPrimaryOwner()
+                || (state.user?.role === 'owner' && user.role !== 'owner' && !user.is_primary_owner)
+                || (canUseAdminDashboard(state.user?.role) && !isPrivilegedRole(user.role) && !user.is_primary_owner));
+            container.appendChild(el('h2', {text: dt('session_policy.title')}));
+            container.appendChild(el('p', {class: 'section-sub', text: dt('session_policy.description')}));
+            const controls = el('div', {class: 'row-actions', style: 'margin-top:16px;flex-wrap:wrap;gap:12px'});
+            const select = el('select', {id: 'admin-user-session-duration', class: 'select-small'}, [
+                el('option', {value: '12', text: dt('session_policy.standard')}),
+                el('option', {value: '168', text: dt('session_policy.extended')}),
+            ]);
+            select.value = String(user.session_ttl_hours || 12);
+            select.disabled = !canEdit;
+            const label = el('label', {for: select.id, text: dt('session_policy.duration')});
+            const save = el('button', {type: 'button', class: 'button-secondary', text: dt('session_policy.save')});
+            const revoke = el('button', {type: 'button', class: 'button-ghost', text: dt('session_policy.revoke')});
+            save.disabled = true;
+            revoke.disabled = !canEdit || isSelf;
+            select.addEventListener('change', () => {save.disabled = !canEdit || Number(select.value) === (user.session_ttl_hours || 12);});
+            async function updateSessionPolicy(revoking) {
+                if (!canEdit || (revoking && isSelf)) return;
+                if (revoking && !window.confirm(dt('session_policy.confirm_revoke'))) return;
+                save.disabled = revoke.disabled = select.disabled = true;
+                try {
+                    await api(`/auth/admin/users/${encodeURIComponent(user.id)}${revoking ? '/sessions/revoke' : ''}`, {
+                        method: revoking ? 'POST' : 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(revoking ? {} : {session_ttl_hours: Number(select.value)}),
+                    });
+                    await loadDashboard();
+                    showMessage(dt(revoking ? 'session_policy.revoked' : 'session_policy.saved'), 'success');
+                } catch (error) {
+                    showMessage(error.message || dt('session_policy.error'), 'error');
+                    select.disabled = !canEdit;
+                    revoke.disabled = !canEdit || isSelf;
+                    save.disabled = !canEdit || Number(select.value) === (user.session_ttl_hours || 12);
+                }
+            }
+            save.addEventListener('click', () => updateSessionPolicy(false));
+            revoke.addEventListener('click', () => updateSessionPolicy(true));
+            controls.append(label, select, save, revoke);
+            container.appendChild(controls);
+            if (!canEdit) container.appendChild(el('p', {class: 'section-sub', style: 'margin-top:12px', text: dt('session_policy.restricted')}));
         }
 
         function paintAdminUserDetail(user) {
+            paintUserSessionPolicy(user);
             paintUserRunStatistics(user.run_statistics);
             const details = document.getElementById('admin-user-details');
             const nameEl = document.getElementById('admin-user-name');
@@ -4402,7 +4549,7 @@
                 [dt('sections.profile.position'), profileDisplayValue(user.position_title)],
                 [dt('sections.profile.gender'), genderLabel(user.gender)],
                 [dt('sections.profile.phone'), profileDisplayValue(user.phone)],
-                [dt('sections.profile.language'), user.locale ? profileLocaleLabel(user.locale) : dt('profile_summary.missing')],
+                [dt('profile_languages.label'), profileLanguagesLabel(user)],
                 [dt('sections.profile.timezone'), profileDisplayValue(user.timezone)],
                 [dt('table.role'), roleLabel(user.role)],
                 [dt('table.status'), statusLabel(user.status)],
@@ -4426,6 +4573,7 @@
             if (!details || !nameEl || !emailEl) return;
             const userId = state.adminUserId;
             let user = (state.adminUsers || []).find(item => item.id === userId);
+            paintUserSessionPolicy(user);
             paintUserRunStatistics(user?.run_statistics);
             if (user) paintAdminUserDetail(user);
             if (!userId) {
@@ -4461,7 +4609,7 @@
 
         function profileCompletion() {
             const fields = ['full_name', 'company_name', 'position_title', 'phone', 'locale', 'timezone', 'avatar_data_url'];
-            const completed = fields.filter(field => Boolean(state.user?.[field])).length;
+            const completed = fields.filter(field => field === 'locale' ? profileLanguages(state.user).length > 0 : Boolean(state.user?.[field])).length;
             return Math.round((completed / fields.length) * 100);
         }
 
@@ -4503,11 +4651,27 @@
             });
         }
 
-        function shortcutCard(item, compact = false) {
+        function moduleUsageHighlights() {
+            const usage = new Map();
+            for (const item of state.runStatistics?.modules || []) {
+                const code = moduleMeta[item.module]?.code || (shortcuts.some(shortcut => shortcut.code === item.module) ? item.module : null);
+                if (!code) continue;
+                const current = usage.get(code) || {total: 0, last: 0};
+                current.total += Number(item.total || 0);
+                current.last = Math.max(current.last, Date.parse(item.last_run_at) || 0);
+                usage.set(code, current);
+            }
+            const maxCount = Math.max(0, ...[...usage.values()].map(item => item.total));
+            const mostUsed = new Set([...usage].filter(([, item]) => maxCount > 0 && item.total === maxCount).map(([code]) => code));
+            const lastUsed = [...usage].filter(([, item]) => item.last > 0).sort((a, b) => b[1].last - a[1].last)[0]?.[0];
+            return {mostUsed, lastUsed, usage};
+        }
+
+        function shortcutCard(item, compact = false, highlights = null) {
             const theme = shortcutThemes[item.code] || 'shortcut-theme-gold';
             const copy = shortcutCopy(item.code);
             if (compact) {
-                return el('article', { class: `shortcut-compact ${theme}` }, [
+                return el('article', { class: `shortcut-compact ${theme}`, 'data-module-code': item.code }, [
                     createShortcutIcon(item.code),
                     el('div', { class: 'shortcut-copy' }, [
                         el('h3', { text: copy.label }),
@@ -4516,10 +4680,13 @@
                     el('a', { class: 'shortcut-action', href: item.href, text: dt('actions.open') }),
                 ]);
             }
-            return el('article', { class: `card shortcut ${theme}` }, [
+            const badges = [];
+            if (highlights?.lastUsed === item.code) badges.push(el('span', {class: 'badge module-last-used', text: dt('module_usage.last_used'), title: dt('module_usage.last_hint')}));
+            else if (highlights?.mostUsed.has(item.code)) badges.push(el('span', {class: 'badge module-most-used', text: dt('module_usage.most_used'), title: dt('module_usage.most_hint')}));
+            return el('article', { class: `card shortcut ${theme}`, 'data-module-code': item.code }, [
                 el('div', { class: 'shortcut-top' }, [
                     createShortcutIcon(item.code),
-                    badge(dt('actions.available')),
+                    el('div', {class: 'shortcut-badges'}, badges),
                 ]),
                 el('div', { class: 'shortcut-copy' }, [
                     el('h3', { text: copy.label }),
@@ -4536,8 +4703,15 @@
             const full = document.getElementById('module-shortcuts');
             clear(overview);
             clear(full);
-            shortcuts.slice(0, 2).forEach(item => overview.appendChild(shortcutCard(item, true)));
-            shortcuts.forEach(item => full.appendChild(shortcutCard(item)));
+            const highlights = moduleUsageHighlights();
+            const alphabetically = (a, b) => shortcutCopy(a.code).label.localeCompare(shortcutCopy(b.code).label,
+                document.documentElement.lang || 'en', {sensitivity: 'base'}) || a.code.localeCompare(b.code);
+            const alphabetical = [...shortcuts].sort(alphabetically);
+            const first = shortcuts.find(item => item.code === highlights.lastUsed) || alphabetical[0];
+            const second = alphabetical.filter(item => item.code !== first?.code).sort((a, b) =>
+                (highlights.usage.get(b.code)?.total || 0) - (highlights.usage.get(a.code)?.total || 0) || alphabetically(a, b))[0];
+            [first, second].filter(Boolean).forEach(item => overview.appendChild(shortcutCard(item, true)));
+            shortcuts.forEach(item => full.appendChild(shortcutCard(item, false, highlights)));
         }
 
         function renderSummary() {
@@ -4548,7 +4722,7 @@
                 [dt('profile_summary.name'), state.user?.full_name || dt('profile_summary.missing')],
                 [dt('profile_summary.company'), state.user?.company_name || dt('profile_summary.missing')],
                 [dt('profile_summary.position'), state.user?.position_title || dt('profile_summary.missing')],
-                [dt('profile_summary.language'), profileLocaleLabel(state.user?.locale)],
+                [dt('profile_languages.label'), profileLanguagesLabel(state.user)],
             ];
             const summary = document.getElementById('profile-summary');
             clear(summary);
@@ -4627,21 +4801,8 @@
             });
         }
 
-        function renderStatusList() {
-            const container = document.getElementById('status-list');
-            clear(container);
-            const entries = statusCountEntries({
-                completed: 0,
-                failed: 0,
-                canceled: 0,
-                ...state.overview?.job_statuses,
-            });
-            entries.forEach(([label, count]) => {
-                container.appendChild(el('div', { class: 'status-stat' }, [
-                    badge(label),
-                    el('div', { class: 'status-stat-count', text: formatNumber(count) }),
-                ]));
-            });
+        function renderReportRunStatistics() {
+            paintUserRunStatistics(state.runStatistics, state.runStatisticsFailed, 'reports-run-statistics');
         }
 
         function jobRow(job, compact = false) {
@@ -5346,9 +5507,8 @@
             document.getElementById('profile-position').value = user.position_title || '';
             document.getElementById('profile-gender').value = user.gender || '';
             document.getElementById('profile-phone').value = user.phone || '';
-            const localeSelect = document.getElementById('profile-locale');
-            localeSelect.value = user.locale || '';
-            if (!localeSelect.value) localeSelect.selectedIndex = -1;
+            const languages = profileLanguages(user);
+            languagePicker().setValue(languages);
             document.getElementById('profile-timezone').value = user.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || '';
             state.avatarDraft = null;
             state.avatarChanged = false;
@@ -5394,7 +5554,7 @@
             renderAccount();
             renderNotifications();
             renderNotificationEvents();
-            renderStatusList();
+            renderReportRunStatistics();
             renderJobs();
             renderArtifacts();
             renderSecurityApi();
@@ -5404,6 +5564,11 @@
         }
 
         function showDashboard(user) {
+            if (state.user?.id !== user?.id) {
+                state.runStatistics = null;
+                state.runStatisticsFailed = false;
+                renderReportRunStatistics();
+            }
             state.user = user;
             if (!user) {
                 stopNotificationPoll();
@@ -5662,7 +5827,7 @@
                 position_title: document.getElementById('profile-position').value,
                 gender: document.getElementById('profile-gender').value,
                 phone: document.getElementById('profile-phone').value,
-                locale: document.getElementById('profile-locale').value,
+                languages: languagePicker().getValue(),
                 timezone: document.getElementById('profile-timezone').value,
             };
             if (state.avatarChanged) payload.avatar_data_url = state.avatarDraft;
