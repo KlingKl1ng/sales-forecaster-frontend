@@ -36,6 +36,7 @@
     </script>
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
+    <script src="./operartis-format.js"></script>
     <script src="./operartis-nav-indicator.js?v=20260812-cross-page-nav"></script>
     <script src="./operartis-security.js"></script>
     <script>
@@ -9118,6 +9119,8 @@
                 [content]
             );
 
+            const format = window.OperartisFormat.forLanguage(lang);
+
             // Derived stats for hero console + metrics band
             const stats = useMemo(() => {
                 const liveCount = Object.values(MODULE_STATIC_DATA).filter(m => m.status === 'live').length;
@@ -9125,12 +9128,12 @@
                 const horizonCount = content.matrix.length;
                 const blockCount = content.matrix.reduce((n, h) => n + h.blocks.length, 0);
                 return [
-                    { value: liveCount, label: content.ui.stat_live },
-                    { value: horizonCount, label: content.ui.stat_horizons },
-                    { value: blockCount, label: content.ui.stat_blocks },
-                    { value: totalModules, label: content.ui.stat_engines },
+                    { value: format.number(liveCount, 0, 0), label: content.ui.stat_live },
+                    { value: format.number(horizonCount, 0, 0), label: content.ui.stat_horizons },
+                    { value: format.number(blockCount, 0, 0), label: content.ui.stat_blocks },
+                    { value: format.number(totalModules, 0, 0), label: content.ui.stat_engines },
                 ];
-            }, [content]);
+            }, [content, lang]);
 
             const getAnchorOffset = useCallback(() => {
                 const headerH = headerNavRef.current?.closest('nav')?.offsetHeight ?? 72;
