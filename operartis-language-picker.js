@@ -25,7 +25,7 @@
     function mount(root, t, getLanguage) {
         let selected = [], opened = false, matches = [], shown = 0, active = -1;
         root.className = 'profile-language-picker';
-        root.innerHTML = '<label class="language-picker-label"></label><button type="button" class="language-picker-trigger" aria-haspopup="dialog" aria-expanded="false"><span></span><span aria-hidden="true">⌄</span></button>';
+        root.innerHTML = '<label class="language-picker-label"></label><button type="button" class="language-picker-trigger" aria-haspopup="dialog" aria-expanded="false"><span></span><svg class="language-picker-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>';
         const labelNode = root.querySelector('label'), trigger = root.querySelector('button'), summary = trigger.firstChild;
         trigger.id = root.id + '-trigger'; labelNode.htmlFor = trigger.id;
         const panel = document.createElement('div');
