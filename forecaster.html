@@ -2093,7 +2093,7 @@
                     info_grouping_distance: "Đọc theo từng cột khoảng cách dự báo. Ở kỳ thứ 1, dự báo 90 và 110 đều có sai số tuyệt đối 10. Ở kỳ thứ 2, dự báo 80 và 140 có sai số 20 và 40. Cách tính dòng đầu tiên:",
                     info_interpretation_evaluation: "Lần kiểm định 2 có độ chính xác tổng thể thấp hơn, chủ yếu vì dự báo kỳ thứ hai có sai số lớn hơn nhiều. Cách xem này cho biết lần kiểm định nào cần xem xét kỹ hơn.",
                     info_interpretation_distance: "Qua các lần kiểm định này, kỳ thứ hai phía trước kém chính xác hơn kỳ thứ nhất. Cách xem này chỉ ra khoảng cách dự báo yếu hơn, dù cả hai bảng đều dùng cùng bốn dự báo.",
-                    info_overall_body: "Cả hai cách xem chỉ nhóm lại cùng các dự báo đã chấm điểm. Trong ví dụ, MAE tổng thể là (10 + 20 + 10 + 40) ÷ 4 = 20, RMSE tổng thể là √550 ≈ 23.45 và MAPE tổng thể là 20%. RMSE tổng thể được tính từ tất cả sai số bình phương, không phải trung bình các giá trị RMSE hiển thị theo dòng.",
+                    info_overall_body: "Cả hai cách xem chỉ nhóm lại cùng các dự báo đã chấm điểm. Trong ví dụ, MAE tổng thể là (10 + 20 + 10 + 40) ÷ 4 = 20, RMSE tổng thể là √550 ≈ 23,45 và MAPE tổng thể là 20%. RMSE tổng thể được tính từ tất cả sai số bình phương, không phải trung bình các giá trị RMSE hiển thị theo dòng.",
                     info_cautions: "Các chỉ số này đo độ lớn sai số, không cho biết dự báo thường quá cao hay quá thấp; hãy so sánh dự báo và thực tế trong Mô phỏng để xem chiều sai lệch. Các lần kiểm định chồng lấn có thể dự báo cùng một ngày nhiều lần; mỗi dự báo được chấm điểm riêng và các quan sát đó không độc lập. Kiểm định trên lịch sử không bảo đảm độ chính xác tương lai.",
                     validation_breakdown: "Phân tích kiểm định",
                     validation_by_evaluation: "Theo lần kiểm định",
@@ -2379,7 +2379,7 @@
                     info_grouping_distance: "Lesen Sie die Werte je Prognoseabstand zusammen. Bei 1 Periode voraus haben die Prognosen 90 und 110 jeweils einen absoluten Fehler von 10. Bei 2 Perioden voraus haben 80 und 140 Fehler von 20 und 40. Für die erste Zeile gilt:",
                     info_interpretation_evaluation: "Auswertung 2 war insgesamt ungenauer, vor allem wegen des deutlich größeren Fehlers ihrer zweiten Prognose. Diese Ansicht zeigt, welche Auswertung genauer untersucht werden sollte.",
                     info_interpretation_distance: "Über diese Auswertungen war die zweite Periode voraus ungenauer als die erste. Diese Ansicht zeigt den schwächeren Prognoseabstand, obwohl beiden Tabellen dieselben vier Prognosen zugrunde liegen.",
-                    info_overall_body: "Beide Ansichten gruppieren dieselben bewerteten Prognosen neu. Im Beispiel beträgt die gesamte MAE (10 + 20 + 10 + 40) ÷ 4 = 20, die gesamte RMSE √550 ≈ 23.45 und die gesamte MAPE 20%. Die gesamte RMSE wird aus allen quadrierten Fehlern berechnet, nicht als Mittelwert der angezeigten Zeilen-RMSE.",
+                    info_overall_body: "Beide Ansichten gruppieren dieselben bewerteten Prognosen neu. Im Beispiel beträgt die gesamte MAE (10 + 20 + 10 + 40) ÷ 4 = 20, die gesamte RMSE √550 ≈ 23,45 und die gesamte MAPE 20%. Die gesamte RMSE wird aus allen quadrierten Fehlern berechnet, nicht als Mittelwert der angezeigten Zeilen-RMSE.",
                     info_cautions: "Diese Kennzahlen messen die Fehlergröße, nicht eine systematische Über- oder Unterschätzung. Vergleichen Sie dafür Prognosen und Istwerte in der Simulation. Überlappende Auswertungen können dasselbe Datum mehrfach prognostizieren; jede Prognose wird separat bewertet, diese Beobachtungen sind nicht unabhängig. Historische Validierung garantiert keine zukünftige Genauigkeit.",
                     validation_breakdown: "Validierungsaufschlüsselung",
                     validation_by_evaluation: "Nach Auswertung",
@@ -3056,18 +3056,36 @@
         });
 
         // Number formatter helper function
-        const fmtNumber = (val, minFrac = 0, maxFrac = 0) => {
+        const numberLocaleForLanguage = language => ({ en: 'en-US', vi: 'vi-VN', de: 'de-DE' }[language] || 'en-US');
+        const fmtNumber = (val, minFrac = 0, maxFrac = 0, locale = 'en-US') => {
             if (val === null || val === undefined || val === '-') return '-';
             const num = Number(val);
             if (isNaN(num)) return val;
-            return num.toLocaleString('en-US', { minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
+            return num.toLocaleString(locale, { minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
         };
 
-        const formatEvaluationValue = (value, code) => {
+        const formatEvaluationValue = (value, code, locale = 'en-US') => {
             if (value === null || value === undefined || value === '-' || Number.isNaN(Number(value))) return '-';
-            if (String(code || '').toLowerCase() === 'mape') return `${fmtNumber(value, 1, 1)}%`;
-            return fmtNumber(value, 0, 0);
+            if (String(code || '').toLowerCase() === 'mape') return `${fmtNumber(value, 1, 1, locale)}%`;
+            return fmtNumber(value, 0, 0, locale);
         };
+        // Format only the calendar text; never reinterpret dates in the browser's
+        // timezone or change the ISO timestamps used for calculations and requests.
+        const formatForecastDate = (value, locale = 'en-US') => {
+            if (value == null) return '';
+            const text = String(value);
+            const match = text.match(/^(\d{4})-(\d{2})-(\d{2})(?=$|[T ])(.*)$/);
+            if (!match) return text;
+            const [, year, month, day, time] = match;
+            const date = locale === 'vi-VN' ? `${day}/${month}/${year}`
+                : locale === 'de-DE' ? `${day}.${month}.${year}` : `${year}-${month}-${day}`;
+            return date + time.replace(/^T/, ' ');
+        };
+
+        const formatChartAxis = (value, locale = 'en-US', compact = false) => new Intl.NumberFormat(locale, {
+            notation: Math.abs(value) > 0 && Math.abs(value) < 0.01 ? 'scientific' : compact && Math.abs(value) >= 10000 ? 'compact' : 'standard',
+            maximumFractionDigits: 2,
+        }).format(value);
         const rowContestMetric = (row, fallback = 'rmse') => (
             normalizeContestMetric(row && row.evaluation_metric ? row.evaluation_metric : fallback)
         );
@@ -3319,8 +3337,8 @@
                         </div>
                         <div className="fc-replay-chart-header-center">
                             <div className="fc-replay-chart-header-windows">
-                                <p><span className="font-semibold">{t('sidebar.replay_training')}: </span>{history[fold.start].date} → {history[fold.end].date} ({fold.end - fold.start + 1})</p>
-                                <p><span className="font-semibold">{t('sidebar.replay_targets')}: </span>{forecastRangeStart}{forecastRangeEnd && forecastRangeEnd !== forecastRangeStart ? ` → ${forecastRangeEnd}` : ''} ({fold.points.length})</p>
+                                <p><span className="font-semibold">{t('sidebar.replay_training')}: </span>{formatForecastDate(history[fold.start].date, t.numberLocale)} → {formatForecastDate(history[fold.end].date, t.numberLocale)} ({fmtNumber(fold.end - fold.start + 1, 0, 0, t.numberLocale)})</p>
+                                <p><span className="font-semibold">{t('sidebar.replay_targets')}: </span>{formatForecastDate(forecastRangeStart, t.numberLocale)}{forecastRangeEnd && forecastRangeEnd !== forecastRangeStart ? ` → ${formatForecastDate(forecastRangeEnd, t.numberLocale)}` : ''} ({fold.points.length})</p>
                             </div>
                             <div className="fc-replay-chart-header-legend" aria-hidden="true">
                                 <span className="fc-replay-legend-item text-slate-500 dark:text-slate-400"><span className="fc-replay-legend-line is-train" aria-hidden="true" />{t('charts.act_train')}</span>
@@ -3336,9 +3354,9 @@
                         <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart data={chartData} margin={{ top: 8, right: 16, bottom: 24, left: 0 }}>
                                 <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} />
-                                <XAxis type="number" dataKey="position" domain={[0, chartMaxX]} allowDecimals={false} tickCount={6} tickFormatter={position => history[position]?.date || ''} tick={{ fill: tickColor, fontSize: 10 }} minTickGap={32} axisLine={false} tickLine={false} />
-                                <YAxis domain={replay.domain} tickFormatter={value => Math.abs(value) > 0 && Math.abs(value) < 0.01 ? value.toExponential(1) : new Intl.NumberFormat('en-US', { notation: Math.abs(value) >= 10000 ? 'compact' : 'standard', maximumFractionDigits: 2 }).format(value)} allowDataOverflow width={48} tick={{ fill: tickColor, fontSize: 10 }} axisLine={false} tickLine={false} />
-                                <Tooltip wrapperClassName="fc-chart-tooltip-wrapper" cursor={{ stroke: isDark ? '#475569' : '#cbd5e1', strokeWidth: 1 }} content={<ChartTooltipContent isDark={isDark} labelFormatter={position => history[position]?.date || ''} />} />
+                                <XAxis type="number" dataKey="position" domain={[0, chartMaxX]} allowDecimals={false} tickCount={6} tickFormatter={position => formatForecastDate(history[position]?.date || '', t.numberLocale)} tick={{ fill: tickColor, fontSize: 10 }} minTickGap={32} axisLine={false} tickLine={false} />
+                                <YAxis domain={replay.domain} tickFormatter={value => formatChartAxis(value, t.numberLocale, true)} allowDataOverflow width={48} tick={{ fill: tickColor, fontSize: 10 }} axisLine={false} tickLine={false} />
+                                <Tooltip wrapperClassName="fc-chart-tooltip-wrapper" cursor={{ stroke: isDark ? '#475569' : '#cbd5e1', strokeWidth: 1 }} content={<ChartTooltipContent locale={t.numberLocale} isDark={isDark} labelFormatter={position => history[position]?.date || ''} />} />
                                 <ReferenceArea x1={fold.start} x2={fold.end} fill="#64748b" fillOpacity={0.08} ifOverflow="visible" label={(props) => (
                                     <ReplayWindowLabel
                                         viewBox={props.viewBox}
@@ -3367,7 +3385,7 @@
                 <div className="fc-replay-metrics">
                     {['current', 'overall'].map(scope => <section key={scope} aria-label={t(`sidebar.replay_${scope}`)} className="fc-replay-metrics-card rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                         <h4 className="text-[13px] font-semibold mb-3">{t(`sidebar.replay_${scope}`)}</h4>
-                        <dl className="fc-replay-metrics-values">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric)}</dd></div>)}</dl>
+                        <dl className="fc-replay-metrics-values">{['rmse', 'mae', 'mape'].map(metric => <div key={metric}><dt className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{metric}</dt><dd className="font-mono text-sm mt-1">{scope === 'current' && phase < 2 ? '—' : formatEvaluationValue(scope === 'current' ? fold.metrics[metric] : evaluationMetricValue(data, metric), metric, t.numberLocale)}</dd></div>)}</dl>
                     </section>)}
                 </div>
                 <div className="fc-replay-controls flex flex-wrap items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
@@ -3385,7 +3403,7 @@
                             <input type="range" min="0" max={replay.folds.length - 1} step="1" value={index} disabled={replay.folds.length === 1} onChange={event => selectFold(Number(event.target.value))} aria-label={t('sidebar.replay_evaluation')} aria-valuetext={`${index + 1} / ${replay.folds.length}`} className="fc-replay-slider" style={{ '--fc-replay-progress': `${replay.folds.length <= 1 ? 0 : (index / (replay.folds.length - 1)) * 100}%` }} />
                         </span>
                     </label>
-                    <label className="flex items-center gap-2 text-xs" title={t('sidebar.replay_speed')}><ReplayControlIcon kind="speed" /><select aria-label={t('sidebar.replay_speed')} value={speed} onChange={event => setSpeed(Number(event.target.value))} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5">{[0.5, 1, 2].map(value => <option key={value} value={value}>{value}×</option>)}</select></label>
+                    <label className="flex items-center gap-2 text-xs" title={t('sidebar.replay_speed')}><ReplayControlIcon kind="speed" /><select aria-label={t('sidebar.replay_speed')} value={speed} onChange={event => setSpeed(Number(event.target.value))} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5">{[0.5, 1, 2].map(value => <option key={value} value={value}>{fmtNumber(value, 0, 1, t.numberLocale)}×</option>)}</select></label>
                 </div>
             </section>;
         };
@@ -3448,13 +3466,13 @@
                             <p>{t(`sidebar.info_grouping_${mode}`)}</p>
                             <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 space-y-1 text-xs font-mono leading-6" aria-label={t('sidebar.info_calculation')}>
                                 <p>MAE = {evaluation ? '(10 + 20) ÷ 2 = 15' : '(10 + 10) ÷ 2 = 10'}</p>
-                                <p>RMSE = {evaluation ? '√[(10² + 20²) ÷ 2] ≈ 15.81' : '√[(10² + 10²) ÷ 2] = 10'}</p>
+                                <p>RMSE = {evaluation ? `√[(10² + 20²) ÷ 2] ≈ ${fmtNumber(15.81, 0, 2, t.numberLocale)}` : '√[(10² + 10²) ÷ 2] = 10'}</p>
                                 <p>MAPE = {evaluation ? '(10% + 20%) ÷ 2 = 15%' : '(10% + 10%) ÷ 2 = 10%'}</p>
                             </div>
                             <table className="w-full border-separate border-spacing-0 text-xs text-right tabular-nums [&_th]:px-2 [&_th]:py-2 [&_td]:px-2 [&_td]:py-2" aria-label={t('sidebar.info_example_scores')}>
                                 <caption className="text-left font-semibold py-2">{t('sidebar.info_example_scores')}</caption>
                                 <thead className="bg-slate-50 dark:bg-slate-800"><tr><th scope="col" className="text-left">{t(evaluation ? 'sidebar.replay_evaluation' : 'sidebar.validation_lead')}</th><th scope="col">MAE</th><th scope="col">RMSE</th><th scope="col">MAPE</th></tr></thead>
-                                <tbody>{results.map(([row, mae, rmse, mape]) => <tr key={row}><th scope="row" className="text-left font-normal">{row}</th><td>{mae}</td><td>{rmse}</td><td>{mape}</td></tr>)}</tbody>
+                                <tbody>{results.map(([row, mae, rmse, mape]) => <tr key={row}><th scope="row" className="text-left font-normal">{row}</th><td>{fmtNumber(mae, 0, 2, t.numberLocale)}</td><td>{fmtNumber(rmse, 0, 2, t.numberLocale)}</td><td>{mape}</td></tr>)}</tbody>
                             </table>
                             <p>{t(`sidebar.info_interpretation_${mode}`)}</p>
                         </section>
@@ -3485,10 +3503,10 @@
                         </div>)}
                     </div>
                 </div>
-                <p className="font-semibold">{t('sidebar.validation_counts').replace('{count}', summary.evaluations).replace('{horizon}', summary.forecast_horizon).replace('{pairs}', summary.scored_pairs)}</p>
+                <p className="font-semibold">{t('sidebar.validation_counts').replace('{count}', fmtNumber(summary.evaluations, 0, 0, t.numberLocale)).replace('{horizon}', fmtNumber(summary.forecast_horizon, 0, 0, t.numberLocale)).replace('{pairs}', fmtNumber(summary.scored_pairs, 0, 0, t.numberLocale))}</p>
                 <div className="mt-2 space-y-2">
-                    {summary.scheme === 'fixed_horizon' && summary.evaluations < summary.max_evaluations && <p>{t('sidebar.validation_limited').replace('{max}', summary.max_evaluations)}</p>}
-                    <p>{t('sidebar.validation_final')}: {data.final_training_periods}</p>
+                    {summary.scheme === 'fixed_horizon' && summary.evaluations < summary.max_evaluations && <p>{t('sidebar.validation_limited').replace('{max}', fmtNumber(summary.max_evaluations, 0, 0, t.numberLocale))}</p>}
+                    <p>{t('sidebar.validation_final')}: {fmtNumber(data.final_training_periods, 0, 0, t.numberLocale)}</p>
                     <div key={view} role="tabpanel" id={`fc-validation-panel-${view}`} aria-labelledby={`fc-validation-tab-${view}`} tabIndex={0} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 rounded-md">
                         <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t(`sidebar.validation_${view}_description`)}</p>
                         {view === 'evaluation' ? (replay ? <div className="min-w-0 overflow-x-auto scroller rounded-md" tabIndex={0} role="region" aria-label={t('sidebar.validation_by_evaluation')}>
@@ -3500,16 +3518,16 @@
                                     <th scope="row" className="text-left font-normal"><button type="button" onClick={() => onReplayEvaluation(index)} aria-label={`${t('sidebar.replay_evaluation')} ${index + 1}: ${t('sidebar.validation_open_replay')}`} title={t('sidebar.validation_open_replay')} className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-400 underline underline-offset-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
                                         {index + 1}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
                                     </button></th>
-                                    <td className="text-left whitespace-nowrap">{replay.history[fold.end].date}</td>
-                                    <td className="text-left whitespace-nowrap">{replay.history[fold.end + 1].date} → {replay.history[fold.end + fold.points.length].date}</td>
-                                    <td>{fmtNumber(fold.metrics.rmse, 1, 1)}</td><td>{fmtNumber(fold.metrics.mae, 1, 1)}</td><td>{formatEvaluationValue(fold.metrics.mape, 'mape')}</td>
+                                    <td className="text-left whitespace-nowrap">{formatForecastDate(replay.history[fold.end].date, t.numberLocale)}</td>
+                                    <td className="text-left whitespace-nowrap">{formatForecastDate(replay.history[fold.end + 1].date, t.numberLocale)} → {formatForecastDate(replay.history[fold.end + fold.points.length].date, t.numberLocale)}</td>
+                                    <td>{fmtNumber(fold.metrics.rmse, 1, 1, t.numberLocale)}</td><td>{fmtNumber(fold.metrics.mae, 1, 1, t.numberLocale)}</td><td>{formatEvaluationValue(fold.metrics.mape, 'mape', t.numberLocale)}</td>
                                 </tr>)}</tbody>
                             </table>
                         </div> : <p className="py-3">{t('sidebar.validation_evaluation_unavailable')}</p>) : <table role="table" aria-label={t('sidebar.validation_by_distance')} className="fc-validation-table w-full border-separate border-spacing-0 text-right tabular-nums [&_td]:px-3 [&_td]:py-1">
                             <thead role="rowgroup" className="rounded-t-md bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 [&_th]:px-3 [&_th]:py-2 [&_th]:font-semibold">
                                 <tr role="row"><th role="columnheader" scope="col" className="text-left">{t('sidebar.validation_lead')}</th><th role="columnheader" scope="col">RMSE</th><th role="columnheader" scope="col">MAE</th><th role="columnheader" scope="col">MAPE</th></tr>
                             </thead>
-                            <tbody role="rowgroup" className="rounded-b-md">{(summary.metrics_by_lead || []).map(metric => <tr role="row" key={metric.lead}><td role="cell" className="text-left">{metric.lead}</td><td role="cell">{fmtNumber(metric.rmse, 1, 1)}</td><td role="cell">{fmtNumber(metric.mae, 1, 1)}</td><td role="cell">{formatEvaluationValue(metric.mape, 'mape')}</td></tr>)}</tbody>
+                            <tbody role="rowgroup" className="rounded-b-md">{(summary.metrics_by_lead || []).map(metric => <tr role="row" key={metric.lead}><td role="cell" className="text-left">{metric.lead}</td><td role="cell">{fmtNumber(metric.rmse, 1, 1, t.numberLocale)}</td><td role="cell">{fmtNumber(metric.mae, 1, 1, t.numberLocale)}</td><td role="cell">{formatEvaluationValue(metric.mape, 'mape', t.numberLocale)}</td></tr>)}</tbody>
                         </table>}
                     </div>
                 </div>
@@ -3525,9 +3543,9 @@
             const fields = [
                 { label: t('sidebar.models_requested'), value: requestedModels, valueClassName: 'text-xs font-normal text-slate-600 dark:text-slate-300 break-words' },
                 { label: t('sidebar.detected_frequency'), value: frequency === 'unsupported' ? '—' : t(`sidebar.freq_${frequency}`) },
-                { label: t('sidebar.train_h'), value: summary.training_window ?? '—' },
-                { label: t('sidebar.test_h'), value: summary.validation_period ?? '—' },
-                { label: t('sidebar.fc_h'), value: futureCount || '—' },
+                { label: t('sidebar.train_h'), value: summary.training_window == null ? '—' : fmtNumber(summary.training_window, 0, 0, t.numberLocale) },
+                { label: t('sidebar.test_h'), value: summary.validation_period == null ? '—' : fmtNumber(summary.validation_period, 0, 0, t.numberLocale) },
+                { label: t('sidebar.fc_h'), value: futureCount ? fmtNumber(futureCount, 0, 0, t.numberLocale) : '—' },
                 { label: t('sidebar.eval_metric'), value: data.evaluation_metric?.toUpperCase() || '—' },
             ];
             const defaultValueClassName = 'font-medium text-slate-700 dark:text-slate-200 break-words';
@@ -3596,7 +3614,7 @@
                                 <tr>
                                     <th scope="col" className="sticky left-0 z-10 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 text-left font-semibold">{t('charts.period')}</th>
                                     {forecasts.map(point => (
-                                        <th scope="col" key={point.date} className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 font-semibold">{point.date.replace('T', ' ')}</th>
+                                        <th scope="col" key={point.date} className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 font-semibold">{formatForecastDate(point.date, t.numberLocale)}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -3604,7 +3622,7 @@
                                 <tr>
                                     <th scope="row" className="sticky left-0 z-10 bg-white dark:bg-slate-900 px-3 py-2 text-left font-semibold">{t('charts.future_fc')}</th>
                                     {forecasts.map(point => (
-                                        <td key={point.date} className="px-3 py-2">{fmtNumber(point.future_forecast, 0, 6)}</td>
+                                        <td key={point.date} className="px-3 py-2">{fmtNumber(point.future_forecast, 0, 6, t.numberLocale)}</td>
                                     ))}
                                 </tr>
                             </tbody>
@@ -3646,11 +3664,11 @@
             return (
                 <div className="fc-kpi-bar min-h-10 sm:min-h-12">
                     <div className="fc-kpi-metrics min-h-10 sm:min-h-12" id="fc-kpi-metrics">
-                        <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={totalSeries} preserveLabelCase />
-                        <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0)} />
-                        <MetricTile label={t('dashboard.avg_mape')} shortLabel={t('dashboard.avg_mape_short')} value={formatEvaluationValue(avgMape, 'mape')} />
-                        <MetricTile label={t('dashboard.avg_rmse')} shortLabel={t('dashboard.avg_rmse_short')} value={formatEvaluationValue(avgRmse, 'rmse')} />
-                        <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={formatEvaluationValue(avgMae, 'mae')} />
+                        <MetricTile label={t('dashboard.total_skus')} shortLabel={t('dashboard.total_skus_short')} value={fmtNumber(totalSeries, 0, 0, t.numberLocale)} preserveLabelCase />
+                        <MetricTile label={t('dashboard.total_vol')} shortLabel={t('dashboard.total_vol_short')} value={fmtNumber(totalForecastVolume, 0, 0, t.numberLocale)} />
+                        <MetricTile label={t('dashboard.avg_mape')} shortLabel={t('dashboard.avg_mape_short')} value={formatEvaluationValue(avgMape, 'mape', t.numberLocale)} />
+                        <MetricTile label={t('dashboard.avg_rmse')} shortLabel={t('dashboard.avg_rmse_short')} value={formatEvaluationValue(avgRmse, 'rmse', t.numberLocale)} />
+                        <MetricTile label={t('dashboard.avg_mae')} shortLabel={t('dashboard.avg_mae_short')} value={formatEvaluationValue(avgMae, 'mae', t.numberLocale)} />
                     </div>
                 </div>
             );
@@ -3837,7 +3855,7 @@
         });
 
         const BatchOverview = memo(({ results, onSelectSku, selectedSkus, onToggleSku, onToggleSelectAll, evaluationMetric = 'rmse', t }) => {
-            const formatMetric = (value, code) => formatEvaluationValue(value, code);
+            const formatMetric = (value, code) => formatEvaluationValue(value, code, t.numberLocale);
             const contestCode = normalizeContestMetric(evaluationMetric);
             const selectAllDesktopRef = useRef(null);
             const selectAllMobileRef = useRef(null);
@@ -4536,7 +4554,7 @@
             return split > 0 ? name.slice(0, split) : name;
         };
 
-        const CompactChartTooltip = ({ active, payload, label, isDark, compact }) => {
+        const CompactChartTooltip = ({ active, payload, label, isDark, compact, locale }) => {
             if (!active || !payload?.length) return null;
             const items = payload.filter(entry => entry?.value != null && entry.value !== '' && !Number.isNaN(Number(entry.value)));
             if (!items.length) return null;
@@ -4550,7 +4568,7 @@
                             <li key={entry.dataKey || entry.name} className="fc-chart-tooltip-item">
                                 <span className="fc-chart-tooltip-swatch" style={{ backgroundColor: entry.color }} aria-hidden="true" />
                                 <span className="fc-chart-tooltip-name">{chartTooltipLabel(entry.name, compact)}</span>
-                                <span className="fc-chart-tooltip-value">{fmtNumber(entry.value, 0, 2)}</span>
+                                <span className="fc-chart-tooltip-value">{fmtNumber(entry.value, 0, 2, locale)}</span>
                             </li>
                         ))}
                     </ul>
@@ -4558,10 +4576,10 @@
             );
         };
 
-        const ChartTooltipContent = ({ isDark, labelFormatter, active, payload, label }) => {
+        const ChartTooltipContent = ({ isDark, labelFormatter, active, payload, label, locale }) => {
             const compact = useCompactChartChrome();
-            const displayLabel = labelFormatter ? labelFormatter(label, payload) : label;
-            return <CompactChartTooltip active={active} payload={payload} label={displayLabel} isDark={isDark} compact={compact} />;
+            const displayLabel = formatForecastDate(labelFormatter ? labelFormatter(label, payload) : label, locale);
+            return <CompactChartTooltip locale={locale} active={active} payload={payload} label={displayLabel} isDark={isDark} compact={compact} />;
         };
 
         const ChartLineLegend = ({ payload }) => {
@@ -4658,9 +4676,9 @@
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#334155" : "#e2e8f0"} />
-                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={10} minTickGap={36} interval="preserveStartEnd" padding={{ left: 8, right: 8 }} />
-                            <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
-                            <Tooltip wrapperClassName="fc-chart-tooltip-wrapper" cursor={{ stroke: isDark ? '#475569' : '#cbd5e1', strokeWidth: 1 }} content={<ChartTooltipContent isDark={isDark} />} />
+                            <XAxis dataKey="date" tickFormatter={value => formatForecastDate(value, t.numberLocale)} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={10} minTickGap={36} interval="preserveStartEnd" padding={{ left: 8, right: 8 }} />
+                            <YAxis tickFormatter={value => formatChartAxis(value, t.numberLocale)} width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
+                            <Tooltip wrapperClassName="fc-chart-tooltip-wrapper" cursor={{ stroke: isDark ? '#475569' : '#cbd5e1', strokeWidth: 1 }} content={<ChartTooltipContent locale={t.numberLocale} isDark={isDark} />} />
                             <Area type="linear" dataKey="actual_train" name={t('charts.act_train')} stroke="#64748b" fill="url(#gd_bt_actual_train)" strokeWidth={2} isAnimationActive={false} />
                             <Area type="linear" dataKey="actual_test" name={t('charts.act_test')} stroke="#10b981" fill="url(#gd_bt_actual_test)" strokeWidth={2} dot={singlePointDot(visibleData, 'actual_test', '#10b981')} isAnimationActive={false} />
                             <Area type="linear" dataKey="fitted" name={t('charts.fitted')} stroke="#94a3b8" fill="url(#gd_bt_fitted)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
@@ -4736,9 +4754,9 @@
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#334155" : "#e2e8f0"} />
-                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={10} minTickGap={36} interval="preserveStartEnd" padding={{ left: 8, right: 8 }} />
-                            <YAxis width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
-                            <Tooltip wrapperClassName="fc-chart-tooltip-wrapper" cursor={{ stroke: isDark ? '#475569' : '#cbd5e1', strokeWidth: 1 }} content={<ChartTooltipContent isDark={isDark} />} />
+                            <XAxis dataKey="date" tickFormatter={value => formatForecastDate(value, t.numberLocale)} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={10} minTickGap={36} interval="preserveStartEnd" padding={{ left: 8, right: 8 }} />
+                            <YAxis tickFormatter={value => formatChartAxis(value, t.numberLocale)} width={44} axisLine={false} tickLine={false} tick={{ fill: isDark ? "#cbd5e1" : "#64748b", fontSize: 10 }} tickMargin={6} />
+                            <Tooltip wrapperClassName="fc-chart-tooltip-wrapper" cursor={{ stroke: isDark ? '#475569' : '#cbd5e1', strokeWidth: 1 }} content={<ChartTooltipContent locale={t.numberLocale} isDark={isDark} />} />
                             <Area type="linear" dataKey="actual_history" name={t('charts.history')} stroke="#64748b" fill="url(#gd_fc_history)" strokeWidth={2} isAnimationActive={false} />
                             <Area type="linear" dataKey="final_fit" name={t('charts.final_fit')} stroke="#94a3b8" fill="url(#gd_fc_final_fit)" strokeDasharray="3 3" strokeWidth={2} isAnimationActive={false} />
                             <Area type="linear" dataKey="future_forecast" name={t('charts.future_fc')} stroke="#f59e0b" fill="url(#gd_fc_future)" strokeWidth={2} strokeDasharray="5 5" dot={singlePointDot(visibleData, 'future_forecast', '#f59e0b')} isAnimationActive={false} />
@@ -5466,6 +5484,8 @@
                 return fallback || key;
             };
 
+            t.numberLocale = numberLocaleForLanguage(lang);
+
             const isForecastModelAvailable = (candidate) => forecastModelAvailable(candidate, forecastCapabilities);
             const hasAvailableAdvancedModels = SELECTABLE_FORECAST_MODELS.some(
                 (option) => option.advanced && isForecastModelAvailable(option.value)
@@ -5788,8 +5808,8 @@
                     setAlertMessage(
                         t('sidebar.history_too_long')
                             .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
-                            .replace('{count}', String(totalTimeSeries))
-                            .replace('{max}', String(maxHistoryColumns))
+                            .replace('{count}', fmtNumber(totalTimeSeries, 0, 0, t.numberLocale))
+                            .replace('{max}', fmtNumber(maxHistoryColumns, 0, 0, t.numberLocale))
                     );
                     return;
                 }
@@ -5917,8 +5937,8 @@
                     setAlertMessage(
                         t('sidebar.history_too_long')
                             .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
-                            .replace('{count}', String(totalTimeSeries))
-                            .replace('{max}', String(maxHistoryColumns))
+                            .replace('{count}', fmtNumber(totalTimeSeries, 0, 0, t.numberLocale))
+                            .replace('{max}', fmtNumber(maxHistoryColumns, 0, 0, t.numberLocale))
                     );
                     return;
                 }
@@ -6749,13 +6769,13 @@
                                                 : historyTooLong
                                                 ? `⚠️ ${t('sidebar.history_too_long')
                                                     .replace('{frequency}', t(`sidebar.freq_${inferredFrequency}`))
-                                                    .replace('{count}', String(totalTimeSeries))
-                                                    .replace('{max}', String(maxHistoryColumns))}`
+                                                    .replace('{count}', fmtNumber(totalTimeSeries, 0, 0, t.numberLocale))
+                                                    .replace('{max}', fmtNumber(maxHistoryColumns, 0, 0, t.numberLocale))}`
                                                 : horizonMismatch
-                                                ? `⚠️ ${t('sidebar.horizon_mismatch')} ${totalTimeSeries}`
+                                                ? `⚠️ ${t('sidebar.horizon_mismatch')} ${fmtNumber(totalTimeSeries, 0, 0, t.numberLocale)}`
                                                 : (
                                                     <>
-                                                        <div>{t('sidebar.total_periods')}: {totalTimeSeries}</div>
+                                                        <div>{t('sidebar.total_periods')}: {fmtNumber(totalTimeSeries, 0, 0, t.numberLocale)}</div>
                                                         <div>{t('sidebar.detected_frequency')}: {t(`sidebar.freq_${inferredFrequency}`)}</div>
                                                     </>
                                                 )
@@ -6777,10 +6797,10 @@
                                     </div>
                                     <div aria-live="polite" className={`text-[10px] leading-relaxed ${validationHorizonTooShort || simpleSplitInvalid ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`}>
                                         {simpleSplitInvalid ? t('sidebar.validation_simple_invalid') : validationHorizonTooShort ? t('sidebar.validation_short') : adaptiveValidation ? (
-                                            <>{t('sidebar.validation_plan').replace('{count}', validationEvaluations).replace('{horizon}', forecastSteps).replace('{max}', maxValidationEvaluations)}
+                                            <>{t('sidebar.validation_plan').replace('{count}', fmtNumber(validationEvaluations, 0, 0, t.numberLocale)).replace('{horizon}', fmtNumber(forecastSteps, 0, 0, t.numberLocale)).replace('{max}', fmtNumber(maxValidationEvaluations, 0, 0, t.numberLocale))}
                                                 {validationEvaluations === 1 && <div className="mt-1">{t('sidebar.validation_single')}</div>}
-                                                {automaticValidationSplit && recommendedValidationSplit && <div className="mt-1">{t('sidebar.validation_auto').replace('{train}', recommendedValidationSplit.minimumTrain)}</div>}
-                                                {validationEvaluations < maxValidationEvaluations && <div className="mt-1">{t('sidebar.validation_limited').replace('{max}', maxValidationEvaluations)}</div>}
+                                                {automaticValidationSplit && recommendedValidationSplit && <div className="mt-1">{t('sidebar.validation_auto').replace('{train}', fmtNumber(recommendedValidationSplit.minimumTrain, 0, 0, t.numberLocale))}</div>}
+                                                {validationEvaluations < maxValidationEvaluations && <div className="mt-1">{t('sidebar.validation_limited').replace('{max}', fmtNumber(maxValidationEvaluations, 0, 0, t.numberLocale))}</div>}
                                             </>
                                         ) : t('sidebar.validation_simple')}
                                         {adaptiveValidation && !automaticValidationSplit && <div className="mt-1">{t('sidebar.validation_manual')}</div>}
@@ -6985,15 +7005,15 @@
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.table_mape')}</span>
-                                                                    <span className="text-[10px] lg:text-[11px] font-bold text-slate-700 dark:text-slate-300">{formatEvaluationValue(evaluationMetricValue(skuData, 'mape'), 'mape')}</span>
+                                                                    <span className="text-[10px] lg:text-[11px] font-bold text-slate-700 dark:text-slate-300">{formatEvaluationValue(evaluationMetricValue(skuData, 'mape'), 'mape', t.numberLocale)}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.table_rmse')}</span>
-                                                                    <span className={`text-[10px] lg:text-[11px] font-bold ${rowContestMetric(skuData, contestMetric) === 'rmse' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'rmse'), 'rmse')}</span>
+                                                                    <span className={`text-[10px] lg:text-[11px] font-bold ${rowContestMetric(skuData, contestMetric) === 'rmse' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'rmse'), 'rmse', t.numberLocale)}</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-center text-center">
                                                                     <span className="text-[8px] lg:text-[9px] uppercase font-bold text-slate-400">{t('dashboard.table_mae')}</span>
-                                                                    <span className={`text-[10px] lg:text-[11px] font-bold ${rowContestMetric(skuData, contestMetric) === 'mae' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'mae'), 'mae')}</span>
+                                                                    <span className={`text-[10px] lg:text-[11px] font-bold ${rowContestMetric(skuData, contestMetric) === 'mae' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{formatEvaluationValue(evaluationMetricValue(skuData, 'mae'), 'mae', t.numberLocale)}</span>
                                                                 </div>
                                                             </div>
                                                         </DetailToolbar>

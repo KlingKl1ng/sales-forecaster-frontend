@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="./icononly_transparent_quadratic.png">
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
+    <script src="./operartis-format.js"></script>
     <script src="./operartis-dashboard-i18n.js"></script>
     <script src="./operartis-security.js"></script>
     <script src="./operartis-api.js?v=20260622-auth-session-sync"></script>
@@ -406,6 +407,7 @@
             justify-content: center;
             width: 44px;
             height: 44px;
+            flex-shrink: 0;
             min-height: 44px;
             max-height: 44px;
             margin-inline: auto;
@@ -1338,7 +1340,7 @@
             line-height: 1.45;
         }
         #section-notifications.single-filter th:first-child,
-        #section-notifications.single-filter td:first-child {
+        #section-notifications.single-filter td:not(.empty):first-child {
             visibility: collapse;
             padding: 0;
             border: 0;
@@ -1407,14 +1409,61 @@
         #section-admin-jobs.active .admin-jobs-table-wrap .split-table-body {
             max-height: none;
         }
-        .admin-jobs-table-wrap .split-table { min-width: 1080px; }
-        .admin-jobs-table-wrap .admin-jobs-col-user,
-        .admin-jobs-table-wrap .admin-jobs-col-file,
-        .admin-jobs-table-wrap td:nth-child(4),
-        .admin-jobs-table-wrap td:nth-child(7) {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .admin-jobs-table-wrap {
+            container-type: inline-size;
+            container-name: admin-jobs;
+        }
+        .admin-jobs-table-wrap .split-table { min-width: 0; }
+        .admin-jobs-table-wrap th,
+        .admin-jobs-table-wrap td {
+            padding: 12px;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+        @container admin-jobs (max-width: 1200px) {
+            .admin-jobs-table-wrap .split-table-head,
+            .admin-jobs-table-wrap colgroup { display: none; }
+            .admin-jobs-table-wrap .split-table,
+            .admin-jobs-table-wrap tbody { display: block; }
+            .admin-jobs-table-wrap tr[data-job-id] {
+                display: grid;
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+                gap: 14px 20px;
+                padding: 16px;
+                border-bottom: 1px solid var(--line);
+            }
+            .admin-jobs-table-wrap tr[data-job-id]:last-child { border-bottom: 0; }
+            .admin-jobs-table-wrap tr[data-job-id] td {
+                display: block;
+                grid-column: span 2;
+                min-width: 0;
+                padding: 0;
+                border: 0;
+            }
+            .admin-jobs-table-wrap tr[data-job-id] td:nth-child(7) { grid-column: 1 / -1; }
+            .admin-jobs-table-wrap tr[data-job-id] td:nth-child(n+8) { grid-column: span 3; }
+            .admin-jobs-table-wrap .responsive-cell-label {
+                display: block;
+                margin-bottom: 5px;
+                color: var(--muted);
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+            }
+            .admin-jobs-table-wrap tr:has(.empty),
+            .admin-jobs-table-wrap td.empty { display: block; width: 100%; }
+        }
+        @container admin-jobs (max-width: 600px) {
+            .admin-jobs-table-wrap tr[data-job-id] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .admin-jobs-table-wrap tr[data-job-id] td,
+            .admin-jobs-table-wrap tr[data-job-id] td:nth-child(n+8) { grid-column: span 1; }
+            .admin-jobs-table-wrap tr[data-job-id] td:nth-child(7) { grid-column: 1 / -1; }
+        }
+        @media (max-height: 600px) {
+            .main.main-fill:has(#section-notifications.active, #section-admin-jobs.active) { overflow-y: auto; }
+            #section-notifications.active, #section-admin-jobs.active { flex: 0 0 auto; }
+            #section-notifications.active > .card, #section-admin-jobs.active > .card { flex: 0 0 320px; }
         }
         #section-admin-audit.active {
             display: flex;
@@ -1980,24 +2029,25 @@
             background-position: right 10px center;
             background-size: 12px 12px;
         }
+        .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .settings-grid .settings-options { margin-top: auto; }
         .settings-options {
             display: grid;
             gap: 12px;
         }
-        .settings-options-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         .settings-option {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding: 16px 12px;
+            gap: 12px;
+            min-height: 76px;
+            padding: 14px 16px;
             border: 2px solid var(--line);
             border-radius: var(--radius-lg);
             background: var(--panel-soft);
-            color: var(--soft);
+            color: var(--text);
             font-weight: 700;
-            font-size: 13px;
-            text-align: center;
+            font-size: 14px;
+            text-align: left;
             transition: border-color .2s var(--ease), background .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
         }
         .settings-option:hover {
@@ -2034,35 +2084,45 @@
         .settings-option-icon.theme-dark { background: #1e293b; color: #fff; }
         .settings-option-icon.theme-system { background: #e2e8f0; color: #334155; }
         html.dark .settings-option-icon.theme-system { background: #334155; color: #cbd5e1; }
-        .settings-option.lang-option {
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            text-align: left;
-            padding: 14px 16px;
-        }
-        .settings-option.lang-option .lang-copy {
+        .settings-option .lang-copy {
             display: flex;
             align-items: center;
             gap: 12px;
             min-width: 0;
         }
-        .settings-option.lang-option .lang-flag { font-size: 24px; line-height: 1; }
-        .settings-option.lang-option strong {
+        .settings-option .lang-flag {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 999px;
+            background: var(--panel);
+            box-shadow: var(--shadow-sm);
+            font-size: 24px;
+            line-height: 1;
+        }
+        .settings-option strong {
             display: block;
             color: var(--text);
             font-size: 14px;
         }
-        .settings-option.lang-option span {
+        .settings-option [data-i18n-lang-sub] {
             display: block;
             color: var(--muted);
             font-size: 12px;
             font-weight: 500;
             margin-top: 2px;
         }
-        @media (max-width: 860px) {
-            .settings-options-three { grid-template-columns: 1fr; }
+        .settings-option-check {
+            margin-left: auto;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: transparent;
+            flex-shrink: 0;
         }
+        .settings-option.active .settings-option-check { background: var(--gold); }
         .row-actions {
             display: flex;
             align-items: center;
@@ -2324,12 +2384,67 @@
         .reports-table-wrap .reports-col-created { width: 22%; }
         .reports-table-wrap .reports-col-expires { width: 21%; }
         .reports-table-wrap .reports-col-actions { width: 12%; }
-        .notifications-table-wrap .split-table { min-width: 640px; }
+        .notifications-table-wrap {
+            container-type: inline-size;
+            container-name: notifications;
+        }
+        .notifications-table-wrap .split-table { min-width: 0; }
+        .notifications-table-wrap th,
+        .notifications-table-wrap td {
+            padding: 12px;
+            overflow-wrap: anywhere;
+        }
         .notifications-table-wrap .notification-detail span {
             display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+        .responsive-cell-label { display: none; }
+        .responsive-cell-value { min-width: 0; }
+        .notifications-table-wrap .badge,
+        .admin-jobs-table-wrap .badge {
+            max-width: 100%;
+            height: auto;
+            min-height: 24px;
+            padding: 4px 9px;
+            line-height: 1.3;
+            white-space: normal;
+        }
+        @container notifications (max-width: 760px) {
+            .notifications-table-wrap .split-table-head { display: none; }
+            .notifications-table-wrap colgroup { display: none; }
+            .notifications-table-wrap .split-table,
+            .notifications-table-wrap tbody { display: block; }
+            .notifications-table-wrap tr[data-notification-target] {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px 16px;
+                padding: 16px;
+                border-bottom: 1px solid var(--line);
+            }
+            .notifications-table-wrap tr[data-notification-target]:last-child { border-bottom: 0; }
+            .notifications-table-wrap tr[data-notification-target] td {
+                display: block;
+                min-width: 0;
+                padding: 0;
+                border: 0;
+            }
+            .notifications-table-wrap td:nth-child(3) { grid-column: 1; grid-row: 2; }
+            .notifications-table-wrap td:nth-child(4) { grid-column: 1 / -1; grid-row: 3; }
+            .notifications-table-wrap td:nth-child(5) { grid-column: 2; grid-row: 2; }
+            .notifications-table-wrap .responsive-cell-label {
+                display: block;
+                margin-bottom: 5px;
+                color: var(--muted);
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+            }
+            #section-notifications.single-filter tr[data-notification-target] td:first-child { display: none; }
+            #section-notifications.single-filter tr[data-notification-target] td:nth-child(2) { grid-column: 1 / -1; }
+            .notifications-table-wrap tr:has(.empty),
+            .notifications-table-wrap td.empty { display: block; width: 100%; }
         }
         #section-notifications.single-filter .notifications-col-type {
             width: 0 !important;
@@ -3115,7 +3230,7 @@
                             <p class="sub">Theme and language stay in sync with Operartis home and your optimization modules.</p>
                         </div>
                     </div>
-                    <div class="grid two-col">
+                    <div class="grid two-col settings-grid">
                         <div class="card">
                             <div class="section-head">
                                 <div>
@@ -3123,18 +3238,21 @@
                                     <p class="section-sub" data-i18n="sections.settings.theme_mode_sub">Shared with index, forecaster, ML forecaster, inventory, and ABC-XYZ.</p>
                                 </div>
                             </div>
-                            <div id="theme-options" class="settings-options settings-options-three" role="group" aria-label="Theme mode">
+                            <div id="theme-options" class="settings-options" role="group" aria-label="Theme mode">
                                 <button type="button" class="settings-option" data-theme="light" aria-pressed="false">
                                     <span class="settings-option-icon theme-light" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span>
                                     <span data-i18n-theme>Light</span>
+                                    <span class="settings-option-check" aria-hidden="true"></span>
                                 </button>
                                 <button type="button" class="settings-option" data-theme="dark" aria-pressed="false">
                                     <span class="settings-option-icon theme-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
                                     <span data-i18n-theme>Dark</span>
+                                    <span class="settings-option-check" aria-hidden="true"></span>
                                 </button>
                                 <button type="button" class="settings-option" data-theme="system" aria-pressed="false">
                                     <span class="settings-option-icon theme-system" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></span>
                                     <span data-i18n-theme>System</span>
+                                    <span class="settings-option-check" aria-hidden="true"></span>
                                 </button>
                             </div>
                         </div>
@@ -3158,8 +3276,7 @@
                                         <span><strong>Tiếng Việt</strong></span>
                                     </span>
                                 </button>
-                                <!-- German temporarily disabled -->
-                                <button type="button" class="settings-option lang-option hidden" data-lang="de" aria-pressed="false" hidden>
+                                <button type="button" class="settings-option lang-option" data-lang="de" aria-pressed="false">
                                     <span class="lang-copy">
                                         <span class="lang-flag" aria-hidden="true">🇩🇪</span>
                                         <span><strong>Deutsch</strong></span>
@@ -3509,7 +3626,6 @@
         const DASHBOARD_BROADCAST_KEY = 'operartis_dashboard_data_changed';
         const NOTIFICATION_POLL_MS = 60000;
         const NOTIFICATION_PREVIEW_WORDS = 12;
-        const GERMAN_LANG_ENABLED = false;
         const state = {
             activeSection: 'overview',
             user: null,
@@ -3546,7 +3662,12 @@
             'admin-jobs': ['All Jobs', 'Monitor organization module runs.'],
             'admin-audit': ['Audit Log', 'Review recent security and admin events.'],
         };
+        const displayFormat = () => window.OperartisFormat.forLanguage(window.getOperartisLang());
+        const formatNumber = (value, min = 0, max = 3) => displayFormat().number(value, min, max);
+
         function dt(key, vars) {
+            if (vars) vars = Object.fromEntries(Object.entries(vars).map(([key, value]) =>
+                [key, typeof value === 'number' ? formatNumber(value) : value]));
             return window.OperartisDashboardI18n ? window.OperartisDashboardI18n.t(key, vars) : key;
         }
         function roleLabel(role) {
@@ -3566,8 +3687,21 @@
         function isPrimaryOwner(user = state.user) {
             return Boolean(user?.is_primary_owner);
         }
+        function normalizeStatus(key) {
+            const status = String(key || '').trim().toLowerCase();
+            return status === 'cancelled' ? 'canceled' : status;
+        }
+        function statusCountEntries(values) {
+            const counts = new Map();
+            Object.entries(values || {}).forEach(([key, count]) => {
+                const status = normalizeStatus(key);
+                counts.set(status, (counts.get(status) || 0) + Number(count));
+            });
+            return Array.from(counts);
+        }
         function statusLabel(key) {
             if (!key) return '-';
+            key = normalizeStatus(key);
             const translated = dt('admin_status.' + key);
             return translated !== 'admin_status.' + key ? translated : String(key).replace(/_/g, ' ');
         }
@@ -3744,7 +3878,7 @@
                 : kind === 'audit'
                     ? auditEventLabel(value)
                     : statusLabel(value);
-            return el('span', { class: `badge ${String(value || '').toLowerCase()}`, text: text || 'unknown' });
+            return el('span', { class: `badge ${normalizeStatus(value)}`, text: text || 'unknown' });
         }
 
         function moduleLabel(value) {
@@ -3803,17 +3937,14 @@
         }
 
         function formatDate(value) {
-            if (!value) return '-';
-            const date = parseBackendDate(value);
-            if (Number.isNaN(date.getTime())) return value;
-            return date.toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+            return value ? displayFormat().dateTime(value, { timeZone: state.user?.timezone }) : '-';
         }
 
         function formatBytes(bytes) {
             const value = Number(bytes || 0);
-            if (value < 1024) return `${value} B`;
-            if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
-            return `${(value / 1024 / 1024).toFixed(1)} MB`;
+            if (value < 1024) return `${formatNumber(value)} B`;
+            if (value < 1024 * 1024) return `${formatNumber(value / 1024, 1, 1)} KB`;
+            return `${formatNumber(value / 1024 / 1024, 1, 1)} MB`;
         }
 
         function previewWords(value, maxWords = NOTIFICATION_PREVIEW_WORDS) {
@@ -4003,7 +4134,7 @@
             window.location.hash = sectionHash(section);
             if (section === 'notifications') {
                 renderNotificationEvents();
-                requestAnimationFrame(() => requestAnimationFrame(syncSplitTableLayout));
+                requestAnimationFrame(() => requestAnimationFrame(() => syncSplitTableLayout()));
             }
             if (section === 'admin-jobs') {
                 requestAnimationFrame(() => requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-jobs-table-wrap'))));
@@ -4262,7 +4393,7 @@
             items.forEach(([label, value, note]) => {
                 container.appendChild(el('div', { class: 'card metric-card' }, [
                     el('div', { class: 'metric-label', text: label }),
-                    el('div', { class: 'metric-value', text: value }),
+                    el('div', { class: 'metric-value', text: typeof value === 'number' ? formatNumber(value) : value }),
                     el('div', { class: 'metric-note', text: note }),
                 ]));
             });
@@ -4395,15 +4526,16 @@
         function renderStatusList() {
             const container = document.getElementById('status-list');
             clear(container);
-            const entries = Object.entries(state.overview?.job_statuses || {});
-            if (!entries.length) {
-                container.appendChild(el('div', { class: 'empty', text: dt('empty.no_runs') }));
-                return;
-            }
+            const entries = statusCountEntries({
+                completed: 0,
+                failed: 0,
+                canceled: 0,
+                ...state.overview?.job_statuses,
+            });
             entries.forEach(([label, count]) => {
                 container.appendChild(el('div', { class: 'status-stat' }, [
                     badge(label),
-                    el('div', { class: 'status-stat-count', text: String(count) }),
+                    el('div', { class: 'status-stat-count', text: formatNumber(count) }),
                 ]));
             });
         }
@@ -4412,7 +4544,7 @@
             const cells = compact ? [
                 el('td', { text: moduleLabel(job.module) }),
                 el('td', {}, [badge(job.status)]),
-                el('td', { text: `${job.progress || 0}%` }),
+                el('td', { text: `${formatNumber(job.progress || 0)}%` }),
                 el('td', { text: job.input_filename || '-' }),
                 el('td', { text: formatDate(job.created_at) }),
                 el('td', { text: formatDate(job.expires_at) }),
@@ -4420,9 +4552,9 @@
                 el('td', { text: moduleLabel(job.module) }),
                 el('td', { text: job.job_type || '-' }),
                 el('td', {}, [badge(job.status)]),
-                el('td', { text: `${job.progress || 0}%` }),
+                el('td', { text: `${formatNumber(job.progress || 0)}%` }),
                 el('td', { text: job.input_filename || '-' }),
-                el('td', { text: job.artifact_count || 0 }),
+                el('td', { text: formatNumber(job.artifact_count || 0) }),
                 el('td', { text: formatDate(job.updated_at) }),
             ];
             return el('tr', {}, cells);
@@ -4476,6 +4608,18 @@
 
         function systemNotifications() {
             return state.notifications.filter(notification => notification.category !== 'job');
+        }
+
+        function addResponsiveCellLabels(row, columns) {
+            Array.from(row.cells).forEach((cell, index) => {
+                const value = el('div', { class: 'responsive-cell-value' });
+                value.append(...cell.childNodes);
+                cell.append(
+                    el('span', { class: 'responsive-cell-label', text: dt('table.' + columns[index]) }),
+                    value
+                );
+            });
+            return row;
         }
 
         function notificationEventItems() {
@@ -4603,7 +4747,8 @@
                 });
                 return;
             }
-            items.forEach(item => tbody.appendChild(item.row));
+            const columns = ['type', 'event', 'status', 'details', 'updated'];
+            items.forEach(item => tbody.appendChild(addResponsiveCellLabels(item.row, columns)));
             focusNotificationRow(tbody);
             requestAnimationFrame(() => {
                 updateNotificationFilterIndicator();
@@ -4632,28 +4777,14 @@
             const bodyWidth = body.clientWidth;
             if (bodyWidth <= 0) return;
             const hideType = document.getElementById('section-notifications')?.classList.contains('single-filter');
-            const spec = hideType
-                ? [
-                    ['type', 0],
-                    ['event', 0.14],
-                    ['status', 0.11],
-                    ['details', 0.52],
-                    ['updated', 0.23],
-                ]
-                : [
-                    ['type', 0.10],
-                    ['event', 0.13],
-                    ['status', 0.10],
-                    ['details', 0.49],
-                    ['updated', 0.18],
-                ];
-            let assigned = 0;
-            const widths = spec.map(([, ratio], index) => {
-                if (index === spec.length - 1) return Math.max(0, bodyWidth - assigned);
-                const px = ratio === 0 ? 0 : Math.floor(bodyWidth * ratio);
-                assigned += px;
-                return px;
-            });
+            // Reserve readable widths for metadata; give the remaining space to details.
+            const typeWidth = hideType ? 0 : Math.min(140, Math.max(100, bodyWidth * 0.11));
+            const eventWidth = Math.min(220, Math.max(136, bodyWidth * 0.17));
+            const statusWidth = Math.min(180, Math.max(160, bodyWidth * 0.14));
+            const updatedWidth = Math.min(220, Math.max(176, bodyWidth * 0.19));
+            const spec = [['type'], ['event'], ['status'], ['details'], ['updated']];
+            const widths = [typeWidth, eventWidth, statusWidth,
+                Math.max(0, bodyWidth - typeWidth - eventWidth - statusWidth - updatedWidth), updatedWidth];
             tableWrap.querySelectorAll('colgroup').forEach((colgroup) => {
                 spec.forEach(([key], index) => {
                     const col = colgroup.querySelector(`.notifications-col-${key}`);
@@ -4669,24 +4800,16 @@
             if (!body) return;
             const bodyWidth = body.clientWidth;
             if (bodyWidth <= 0) return;
+            // Distribute spare width to user/file fields after reserving readable metadata widths.
             const spec = [
-                ['module', 0.10],
-                ['type', 0.11],
-                ['source', 0.08],
-                ['user', 0.15],
-                ['status', 0.09],
-                ['progress', 0.07],
-                ['file', 0.22],
-                ['created', 0.09],
-                ['expires', 0.09],
+                ['module', 110, 0.07], ['type', 118, 0.07], ['source', 76, 0.03],
+                ['user', 144, 0.20], ['status', 150, 0.03], ['progress', 90, 0.03],
+                ['file', 172, 0.35], ['created', 160, 0.11], ['expires', 160, 0.11],
             ];
-            let assigned = 0;
-            const widths = spec.map(([, ratio], index) => {
-                if (index === spec.length - 1) return Math.max(0, bodyWidth - assigned);
-                const px = Math.floor(bodyWidth * ratio);
-                assigned += px;
-                return px;
-            });
+            const minimum = spec.reduce((sum, [, width]) => sum + width, 0);
+            const extra = Math.max(0, bodyWidth - minimum);
+            const widths = spec.map(([, width, share]) => bodyWidth >= minimum
+                ? width + extra * share : bodyWidth * width / minimum);
             tableWrap.querySelectorAll('colgroup').forEach((colgroup) => {
                 spec.forEach(([key], index) => {
                     const col = colgroup.querySelector(`.admin-jobs-col-${key}`);
@@ -4759,7 +4882,7 @@
                 const emptyText = dt('empty.no_retained_downloads');
                 tbody.appendChild(el('tr', {}, [el('td', { class: 'empty', colspan: '5', text: emptyText })]));
                 list.appendChild(el('div', { class: 'empty artifact-list-empty', text: emptyText }));
-                requestAnimationFrame(syncSplitTableLayout);
+                requestAnimationFrame(() => syncSplitTableLayout());
                 return;
             }
             state.artifacts.forEach(artifact => {
@@ -4791,7 +4914,7 @@
                     el('button', { class: 'download-btn', type: 'button', dataset: { artifactId: artifact.id }, text: dt('actions.download') }),
                 ]));
             });
-            requestAnimationFrame(syncSplitTableLayout);
+            requestAnimationFrame(() => syncSplitTableLayout());
         }
 
         function renderAdminMetrics() {
@@ -4808,7 +4931,7 @@
             items.forEach(([label, value, note]) => {
                 container.appendChild(el('div', { class: 'card metric-card' }, [
                     el('div', { class: 'metric-label', text: label }),
-                    el('div', { class: 'metric-value', text: value }),
+                    el('div', { class: 'metric-value', text: typeof value === 'number' ? formatNumber(value) : value }),
                     el('div', { class: 'metric-note', text: note }),
                 ]));
             });
@@ -4817,7 +4940,7 @@
         function renderAdminStatusList(id, values) {
             const container = document.getElementById(id);
             clear(container);
-            const entries = Object.entries(values || {});
+            const entries = statusCountEntries(values);
             if (!entries.length) {
                 container.appendChild(el('div', { class: 'empty', text: dt('empty.no_data') }));
                 return;
@@ -4825,7 +4948,7 @@
             entries.forEach(([label, count]) => {
                 container.appendChild(el('div', { class: 'kv-row' }, [
                     el('span', { text: statusLabel(label) }),
-                    el('strong', { text: count }),
+                    el('strong', { text: formatNumber(count) }),
                 ]));
             });
         }
@@ -5070,17 +5193,18 @@
                 return;
             }
             state.adminJobs.forEach(job => {
-                tbody.appendChild(el('tr', {}, [
+                const row = el('tr', { dataset: { jobId: job.id } }, [
                     el('td', { text: moduleLabel(job.module) }),
                     el('td', { text: job.job_type || '-' }),
                     el('td', { text: jobSourceLabel(job.source) }),
                     el('td', { text: job.user_email || '-' }),
                     el('td', {}, [badge(job.status)]),
-                    el('td', { text: `${job.progress || 0}%` }),
+                    el('td', { text: `${formatNumber(job.progress || 0)}%` }),
                     el('td', { text: job.input_filename || '-' }),
                     el('td', { text: formatDate(job.created_at) }),
                     el('td', { text: formatDate(job.expires_at) }),
-                ]));
+                ]);
+                tbody.appendChild(addResponsiveCellLabels(row, ['module', 'type', 'source', 'user', 'status', 'progress', 'file', 'created', 'expires']));
             });
             requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-jobs-table-wrap')));
         }
@@ -5143,7 +5267,6 @@
                 button.setAttribute('aria-pressed', active ? 'true' : 'false');
             });
             document.querySelectorAll('[data-lang]').forEach(button => {
-                if (!GERMAN_LANG_ENABLED && button.dataset.lang === 'de') return;
                 const active = button.dataset.lang === lang;
                 button.classList.toggle('active', active);
                 button.setAttribute('aria-pressed', active ? 'true' : 'false');
@@ -5157,7 +5280,7 @@
         }
 
         function selectDashboardLang(lang) {
-            const allowed = GERMAN_LANG_ENABLED ? ['en', 'vi', 'de'] : ['en', 'vi'];
+            const allowed = ['en', 'vi', 'de'];
             if (!allowed.includes(lang)) return;
             window.persistOperartisLang(lang);
             syncDashboardI18n();
@@ -5307,6 +5430,12 @@
             window.addEventListener('resize', updateSecurityFilterIndicator);
             requestAnimationFrame(updateSecurityFilterIndicator);
         })();
+        document.querySelectorAll('.notifications-table-wrap, .admin-jobs-table-wrap').forEach(wrap => {
+            new ResizeObserver(() => {
+                requestAnimationFrame(() => syncSplitTableLayout(wrap));
+            }).observe(wrap);
+        });
+
         document.getElementById('theme-options').addEventListener('click', event => {
             const button = event.target.closest('[data-theme]');
             if (!button) return;

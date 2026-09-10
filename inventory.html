@@ -29,6 +29,7 @@
     </script>
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js?v=20260621-auth-lang-fix"></script>
+    <script src="./operartis-format.js"></script>
     <script src="./operartis-security.js"></script>
     <script>
         window.OPERARTIS_AUTH_AUTO_PROMPT = false;
@@ -2306,8 +2307,8 @@
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={true} stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
-                        <XAxis dataKey="date" tick={{ fontSize: 9, fill: isDark ? '#94a3b8' : '#64748b' }} minTickGap={50} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+                        <XAxis tickFormatter={t.format.date} dataKey="date" tick={{ fontSize: 9, fill: isDark ? '#94a3b8' : '#64748b' }} minTickGap={50} axisLine={false} tickLine={false} />
+                        <YAxis tickFormatter={value => t.format.number(value, 0, 2)} tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
 
                         {/* Zero reference line (like AnyLogic yellow line) */}
                         <ReferenceLine y={0} stroke="#eab308" strokeWidth={2} strokeOpacity={0.8} />
@@ -2326,12 +2327,12 @@
                                         minWidth: '180px'
                                     }}>
                                         <div style={{ color: isDark ? '#cbd5e1' : '#334155', fontSize: '10px', fontWeight: 'bold', marginBottom: '8px', borderBottom: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`, paddingBottom: '6px' }}>
-                                            {label} {data?.isReviewDay && <span style={{ color: '#f59e0b', marginLeft: '8px' }}>📋 {t ? t('reviewDay') : 'Review Day'}</span>}
+                                            {t.format.date(label)} {data?.isReviewDay && <span style={{ color: '#f59e0b', marginLeft: '8px' }}>📋 {t ? t('reviewDay') : 'Review Day'}</span>}
                                         </div>
                                         {payload.filter(p => p.value !== null && p.value !== undefined).map((entry, idx) => (
                                             <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', fontFamily: 'monospace', marginBottom: '3px' }}>
                                                 <span style={{ color: entry.color, fontWeight: '600' }}>{entry.name}</span>
-                                                <span style={{ color: isDark ? '#e2e8f0' : '#1e293b', fontWeight: 'bold' }}>{typeof entry.value === 'number' ? Math.round(entry.value).toLocaleString() : entry.value}</span>
+                                                <span style={{ color: isDark ? '#e2e8f0' : '#1e293b', fontWeight: 'bold' }}>{typeof entry.value === 'number' ? Math.round(entry.value).toLocaleString(t.format.locale) : entry.value}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -2422,7 +2423,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                             <span className="text-[9px] font-bold uppercase opacity-80">{t ? t('onHand') : 'On Hand'}</span>
                         </div>
-                        <div className="text-lg font-black">{Math.round(invAfterDemand).toLocaleString()}</div>
+                        <div className="text-lg font-black">{Math.round(invAfterDemand).toLocaleString(t.format.locale)}</div>
                         {stockoutEvent && <div className="text-[9px] font-bold mt-0.5 flex items-center gap-1"><AlertTriangleIcon size={10} /> {t ? t('stockout') : 'STOCKOUT!'}</div>}
                     </div>
 
@@ -2432,7 +2433,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>
                             <span className="text-[9px] font-bold uppercase">{t ? t('demand') : 'Demand'}</span>
                         </div>
-                        <div className="text-lg font-black text-slate-700 dark:text-slate-200">-{Math.round(actualDemand)}</div>
+                        <div className="text-lg font-black text-slate-700 dark:text-slate-200">-{t.format.number(actualDemand, 0, 0)}</div>
                     </div>
 
                     {/* Arrivals */}
@@ -2442,7 +2443,7 @@
                             <span className="text-[9px] font-bold uppercase">{t ? t('arrived') : 'Arrived'}</span>
                         </div>
                         <div className={`text-lg font-black ${arrivedQty > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
-                            {arrivedQty > 0 ? `+${Math.round(arrivedQty)}` : '—'}
+                            {arrivedQty > 0 ? `+${t.format.number(arrivedQty, 0, 0)}` : '—'}
                         </div>
                     </div>
 
@@ -2453,10 +2454,10 @@
                             <span className="text-[9px] font-bold uppercase">{t ? t('inTransit') : 'In Transit'}</span>
                         </div>
                         <div className="text-lg font-black text-blue-600 dark:text-blue-400">
-                            {inTransit > 0 ? Math.round(inTransit).toLocaleString() : '—'}
+                            {inTransit > 0 ? Math.round(inTransit).toLocaleString(t.format.locale) : '—'}
                         </div>
                         {pipelineOrders.length > 0 && (
-                            <div className="text-[8px] text-blue-500 mt-0.5">{pipelineOrders.length} {t ? t('orders') : 'order(s)'}</div>
+                            <div className="text-[8px] text-blue-500 mt-0.5">{t.format.number(pipelineOrders.length, 0, 0)} {t ? t('orders') : 'order(s)'}</div>
                         )}
                     </div>
 
@@ -2467,7 +2468,7 @@
                             <span className="text-[9px] font-bold uppercase">{t ? t('invPosition') : 'Inv. Position'}</span>
                         </div>
                         <div className={`text-lg font-black ${inventoryPosition < s_t ? 'text-amber-500' : 'text-indigo-600 dark:text-indigo-400'}`}>
-                            {Math.round(inventoryPosition).toLocaleString()}
+                            {Math.round(inventoryPosition).toLocaleString(t.format.locale)}
                         </div>
                         <div className="text-[8px] text-indigo-500 mt-0.5">IP = OH + IT - BL</div>
                     </div>
@@ -2479,7 +2480,7 @@
                             <span className="text-[9px] font-bold uppercase">{t ? t('backlog') : 'Backlog'}</span>
                         </div>
                         <div className={`text-lg font-black ${backlog > 0 ? 'text-red-500' : 'text-slate-400'}`}>
-                            {backlog > 0 ? Math.round(backlog).toLocaleString() : '—'}
+                            {backlog > 0 ? Math.round(backlog).toLocaleString(t.format.locale) : '—'}
                         </div>
                         {backlog > 0 && <div className="text-[8px] text-red-500 mt-0.5">{t ? t('unfulfilled') : 'Unfulfilled'}</div>}
                     </div>
@@ -2541,7 +2542,7 @@
                             style={{ backgroundImage: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${(currentDay / (maxDays - 1)) * 100}%, transparent ${(currentDay / (maxDays - 1)) * 100}%, transparent 100%)` }}
                         />
                         <div className="text-xs sm:text-[10px] font-mono font-bold text-slate-500 whitespace-nowrap min-w-[60px] sm:min-w-[70px] text-right">
-                            {t ? t('day') : 'Day'} {currentDay + 1} / {maxDays}
+                            {t ? t('day') : 'Day'} {t.format.number(currentDay + 1)} / {t.format.number(maxDays)}
                         </div>
                     </div>
 
@@ -2553,7 +2554,7 @@
                             onChange={e => setSpeed(parseInt(e.target.value))}
                             className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-0 rounded px-1.5 py-0.5 dark:text-white cursor-pointer"
                         >
-                            <option value="1000">0.5x</option>
+                            <option value="1000">{t.format.number(0.5)}x</option>
                             <option value="500">1x</option>
                             <option value="200">2x</option>
                             <option value="100">5x</option>
@@ -2590,15 +2591,15 @@
 
             // Define parameter rows - keys must match frontend camelCase convention (transformed from backend snake_case)
             const params = [
-                { key: 's_t', label: t ? t('reorderPoint') : 's_t (Reorder Point)', format: (d) => d.s_t?.toLocaleString(undefined, { maximumFractionDigits: 0 }) ?? '—', color: 'text-orange-500' },
-                { key: 'S_t', label: t ? t('orderUpTo') : 'S_t (Order-Up-To)', format: (d) => d.S_t?.toLocaleString(undefined, { maximumFractionDigits: 0 }) ?? '—', color: 'text-red-500' },
-                { key: 'actualDemand', label: t ? t('demand') : 'Demand', format: (d) => d.actualDemand?.toLocaleString(undefined, { maximumFractionDigits: 0 }) ?? '—' },
-                { key: 'orderPlaced', label: t ? t('orderPlaced') : 'Order Placed?', format: (d) => d.orderPlaced ? `✓ ${d.orderPlaced.qty?.toLocaleString()}` : '—', color: (d) => d.orderPlaced ? 'text-emerald-500 font-bold' : 'text-slate-400', headerColor: 'text-emerald-500' },
-                { key: 'arrivedQty', label: t ? t('arrivedOrders') : 'Arrived Orders', format: (d) => d.arrivedQty > 0 ? d.arrivedQty.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '—', color: (d) => d.arrivedQty > 0 ? 'text-teal-500' : 'text-slate-400', headerColor: 'text-teal-500' },
-                { key: 'inventoryPosition', label: t ? t('invPosition') : 'Inv. Position', format: (d) => d.inventoryPosition?.toLocaleString(undefined, { maximumFractionDigits: 0 }) ?? '—', color: 'text-purple-500' },
-                { key: 'invAfterDemand', label: t ? t('onHand') : 'On-Hand', format: (d) => d.invAfterDemand?.toLocaleString(undefined, { maximumFractionDigits: 0 }) ?? '—', color: 'text-cyan-500' },
-                { key: 'inTransit', label: t ? t('inTransit') : 'In Transit', format: (d) => d.inTransit > 0 ? d.inTransit.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '—', color: (d) => d.inTransit > 0 ? 'text-blue-500' : 'text-slate-400', headerColor: 'text-blue-500' },
-                { key: 'backlog', label: t ? t('backlog') : 'Backlog', format: (d) => d.backlog > 0 ? d.backlog.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '—', color: (d) => d.backlog > 0 ? 'text-red-500 font-bold' : 'text-slate-400', headerColor: 'text-red-500' },
+                { key: 's_t', label: t ? t('reorderPoint') : 's_t (Reorder Point)', format: (d) => d.s_t?.toLocaleString(t.format.locale, { maximumFractionDigits: 0 }) ?? '—', color: 'text-orange-500' },
+                { key: 'S_t', label: t ? t('orderUpTo') : 'S_t (Order-Up-To)', format: (d) => d.S_t?.toLocaleString(t.format.locale, { maximumFractionDigits: 0 }) ?? '—', color: 'text-red-500' },
+                { key: 'actualDemand', label: t ? t('demand') : 'Demand', format: (d) => d.actualDemand?.toLocaleString(t.format.locale, { maximumFractionDigits: 0 }) ?? '—' },
+                { key: 'orderPlaced', label: t ? t('orderPlaced') : 'Order Placed?', format: (d) => d.orderPlaced ? `✓ ${d.orderPlaced.qty?.toLocaleString(t.format.locale)}` : '—', color: (d) => d.orderPlaced ? 'text-emerald-500 font-bold' : 'text-slate-400', headerColor: 'text-emerald-500' },
+                { key: 'arrivedQty', label: t ? t('arrivedOrders') : 'Arrived Orders', format: (d) => d.arrivedQty > 0 ? d.arrivedQty.toLocaleString(t.format.locale, { maximumFractionDigits: 0 }) : '—', color: (d) => d.arrivedQty > 0 ? 'text-teal-500' : 'text-slate-400', headerColor: 'text-teal-500' },
+                { key: 'inventoryPosition', label: t ? t('invPosition') : 'Inv. Position', format: (d) => d.inventoryPosition?.toLocaleString(t.format.locale, { maximumFractionDigits: 0 }) ?? '—', color: 'text-purple-500' },
+                { key: 'invAfterDemand', label: t ? t('onHand') : 'On-Hand', format: (d) => d.invAfterDemand?.toLocaleString(t.format.locale, { maximumFractionDigits: 0 }) ?? '—', color: 'text-cyan-500' },
+                { key: 'inTransit', label: t ? t('inTransit') : 'In Transit', format: (d) => d.inTransit > 0 ? d.inTransit.toLocaleString(t.format.locale, { maximumFractionDigits: 0 }) : '—', color: (d) => d.inTransit > 0 ? 'text-blue-500' : 'text-slate-400', headerColor: 'text-blue-500' },
+                { key: 'backlog', label: t ? t('backlog') : 'Backlog', format: (d) => d.backlog > 0 ? d.backlog.toLocaleString(t.format.locale, { maximumFractionDigits: 0 }) : '—', color: (d) => d.backlog > 0 ? 'text-red-500 font-bold' : 'text-slate-400', headerColor: 'text-red-500' },
                 { key: 'stockoutEvent', label: t ? t('stockoutQuestion') : 'Stockout?', format: (d) => d.stockoutEvent ? '⚠ Yes' : '—', color: (d) => d.stockoutEvent ? 'text-red-600 font-bold bg-red-50 dark:bg-red-900/20' : 'text-slate-400', headerColor: 'text-red-600' },
                 { key: 'isReviewDay', label: t ? t('reviewDayQuestion') : 'Review Day?', format: (d) => d.isReviewDay ? '● Yes' : '—', color: (d) => d.isReviewDay ? 'text-brand-gold font-bold' : 'text-slate-400', headerColor: 'text-brand-gold' },
             ];
@@ -2620,7 +2621,7 @@
                         {/* Center: Title - Glassmorphism Box (Right aligned on mobile, Centered on Tablet+) */}
                         <div className="sm:absolute sm:left-1/2 sm:-translate-x-1/2 bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-md px-2 py-1 rounded-lg border border-slate-200 dark:border-white/10 shadow flex items-center gap-1.5">
                             <span className="text-[10px] sm:text-xs font-bold text-brand-gold uppercase tracking-wide whitespace-nowrap">{t ? t('statisticalLiveTable') : 'Statistical Live Table'}</span>
-                            <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-mono hidden sm:inline">{timeline.length} {t ? t('periods') : 'periods'}</span>
+                            <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-mono hidden sm:inline">{t.format.number(timeline.length, 0, 0)} {t ? t('periods') : 'periods'}</span>
                         </div>
                         {/* Right: Empty for balance (Hidden on mobile) */}
                         <div className="hidden sm:block"></div>
@@ -2645,7 +2646,7 @@
                                                 }`}
                                         >
                                             <div className="text-[9px] uppercase mb-0.5">{t ? t('day') : 'Day'} {idx + 1}</div>
-                                            <div className="text-[10px]">{day.date}</div>
+                                            <div className="text-[10px]">{t.format.date(day.date)}</div>
                                         </th>
                                     ))}
                                 </tr>
@@ -3145,11 +3146,11 @@
                                     <div className="grid grid-cols-2 gap-3 text-xs">
                                         <div className="bg-white/50 dark:bg-slate-800/50 rounded p-2">
                                             <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">{t ? t('p50Columns') : 'P50 Columns'}</div>
-                                            <div className="font-mono font-bold text-emerald-600">{mapping.p50_columns?.length || 0} {t ? t('days') : 'days'}</div>
+                                            <div className="font-mono font-bold text-emerald-600">{t.format.number(mapping.p50_columns?.length || 0, 0, 0)} {t ? t('days') : 'days'}</div>
                                         </div>
                                         <div className="bg-white/50 dark:bg-slate-800/50 rounded p-2">
                                             <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">{t ? t('p90Columns') : 'P90 Columns'}</div>
-                                            <div className="font-mono font-bold text-emerald-600">{mapping.p90_columns?.length || 0} {t ? t('days') : 'days'}</div>
+                                            <div className="font-mono font-bold text-emerald-600">{t.format.number(mapping.p90_columns?.length || 0, 0, 0)} {t ? t('days') : 'days'}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -3239,11 +3240,11 @@
                                     <div className="grid grid-cols-2 gap-3 text-xs">
                                         <div className="bg-white/50 dark:bg-slate-800/50 rounded p-2">
                                             <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">P50 Columns</div>
-                                            <div className="font-mono font-bold text-cyan-600">{mapping.p50_columns?.length || 0} days</div>
+                                            <div className="font-mono font-bold text-cyan-600">{t.format.number(mapping.p50_columns?.length || 0, 0, 0)} days</div>
                                         </div>
                                         <div className="bg-white/50 dark:bg-slate-800/50 rounded p-2">
                                             <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">P90 Columns</div>
-                                            <div className="font-mono font-bold text-cyan-600">{mapping.p90_columns?.length || 0} days</div>
+                                            <div className="font-mono font-bold text-cyan-600">{t.format.number(mapping.p90_columns?.length || 0, 0, 0)} days</div>
                                         </div>
                                     </div>
                                 </div>
@@ -3298,11 +3299,11 @@
                                     <div className="grid grid-cols-2 gap-3 text-xs">
                                         <div className="bg-white/50 dark:bg-slate-800/50 rounded p-2">
                                             <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">Forecast Days</div>
-                                            <div className="font-mono font-bold text-purple-600">{mapping.date_columns?.length || 0} days</div>
+                                            <div className="font-mono font-bold text-purple-600">{t.format.number(mapping.date_columns?.length || 0, 0, 0)} days</div>
                                         </div>
                                         <div className="bg-white/50 dark:bg-slate-800/50 rounded p-2">
                                             <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">P90 Formula</div>
-                                            <div className="font-mono font-bold text-purple-600">P50 × {mapping.p90_variance_factor || 1.3}</div>
+                                            <div className="font-mono font-bold text-purple-600">P50 × {t.format.number(mapping.p90_variance_factor || 1.3)}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -3331,7 +3332,7 @@
                                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
                                                     }`}
                                             >
-                                                ×{factor}
+                                                ×{t.format.number(factor)}
                                             </button>
                                         ))}
                                     </div>
@@ -3506,13 +3507,13 @@
                 return {
                     sku,
                     alpha: mc ? mc.alpha.mean : det.metrics.alpha,
-                    alphaCI: mc ? `${(mc.alpha.p5 * 100).toFixed(1)}% - ${(mc.alpha.p95 * 100).toFixed(1)}%` : null,
+                    alphaCI: mc ? { low: mc.alpha.p5, high: mc.alpha.p95 } : null,
                     beta: mc ? mc.beta.mean : det.metrics.beta,
-                    betaCI: mc ? `${(mc.beta.p5 * 100).toFixed(1)}% - ${(mc.beta.p95 * 100).toFixed(1)}%` : null,
+                    betaCI: mc ? { low: mc.beta.p5, high: mc.beta.p95 } : null,
                     avgInventory: mc ? mc.avgInventory.mean : det.metrics.avgInventory,
-                    avgInvCI: mc ? `${Math.round(mc.avgInventory.p5)} - ${Math.round(mc.avgInventory.p95)}` : null,
+                    avgInvCI: mc ? `${t.format.number(mc.avgInventory.p5, 0, 0)} - ${t.format.number(mc.avgInventory.p95, 0, 0)}` : null,
                     stockouts: mc ? mc.stockoutDays.mean : det.metrics.totalStockouts,
-                    stockoutsCI: mc ? `${mc.stockoutDays.p5.toFixed(0)} - ${mc.stockoutDays.p95.toFixed(0)}` : null,
+                    stockoutsCI: mc ? `${t.format.fixed(mc.stockoutDays.p5, 0)} - ${t.format.fixed(mc.stockoutDays.p95, 0)}` : null,
                     hasMC: !!mc,
                     isOptimized: false
                 };
@@ -3550,26 +3551,26 @@
                                 {t ? t('avgServiceLevel') : 'AVG SERVICE LEVEL (α)'} {hasMC && <span className="text-blue-400">• MC</span>}
                             </div>
                             <div className={`text-xl sm:text-2xl font-black ${avgAlpha >= 0.95 ? 'text-emerald-500' : avgAlpha >= 0.90 ? 'text-amber-500' : 'text-red-500'}`}>
-                                {(avgAlpha * 100).toFixed(1)}%
+                                {t.format.fixed((avgAlpha * 100), 1)}%
                             </div>
                         </div>
                         <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/50 dark:border-white/10 shadow-md ring-1 ring-white/40 dark:ring-white/5">
                             <div className="text-[9px] sm:text-[10px] font-bold text-slate-400 mb-1">
                                 {t ? t('avgFillRate') : 'AVG FILL RATE (β)'} {hasMC && <span className="text-blue-400">• MC</span>}
                             </div>
-                            <div className="text-xl sm:text-2xl font-black text-blue-500">{(avgBeta * 100).toFixed(1)}%</div>
+                            <div className="text-xl sm:text-2xl font-black text-blue-500">{t.format.fixed((avgBeta * 100), 1)}%</div>
                         </div>
                         <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/50 dark:border-white/10 shadow-md ring-1 ring-white/40 dark:ring-white/5">
                             <div className="text-[9px] sm:text-[10px] font-bold text-slate-400 mb-1">
                                 {t ? t('avgStockoutDays') : 'AVG STOCKOUT DAYS'} {hasMC && <span className="text-blue-400">• MC</span>}
                             </div>
                             <div className={`text-xl sm:text-2xl font-black ${avgStockouts < 1 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                {avgStockouts.toFixed(1)}
+                                {t.format.fixed(avgStockouts, 1)}
                             </div>
                         </div>
                         <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/50 dark:border-white/10 shadow-md ring-1 ring-white/40 dark:ring-white/5">
                             <div className="text-[9px] sm:text-[10px] font-bold text-slate-400 mb-1">{t ? t('skusBelow90') : 'SKUS BELOW 90% α'}</div>
-                            <div className={`text-xl sm:text-2xl font-black ${lowAlphaCount === 0 ? 'text-emerald-500' : 'text-amber-500'}`}>{lowAlphaCount} / {summaryData.length}</div>
+                            <div className={`text-xl sm:text-2xl font-black ${lowAlphaCount === 0 ? 'text-emerald-500' : 'text-amber-500'}`}>{t.format.number(lowAlphaCount)} / {t.format.number(summaryData.length)}</div>
                         </div>
                     </div>
                     <div className="summary-card-container flex-1 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-white/50 dark:border-white/10 shadow-lg ring-1 ring-white/50 dark:ring-white/5 overflow-hidden flex flex-col">
@@ -3579,7 +3580,7 @@
                                 {hasOptimized && <span className="text-[9px] sm:text-[10px] px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full font-bold w-fit">{t ? t('optimizedSteadyState') : '✓ Optimized'}</span>}
                                 {hasMC && !hasOptimized && <span className="text-[9px] sm:text-[10px] px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full font-bold w-fit">{t ? t('monteCarloRuns') : 'Monte Carlo (500 runs)'}</span>}
                             </div>
-                            <div className="text-xs text-slate-400">{summaryData.length} SKUs {hasOptimized ? (t ? t('skusOptimized') : 'optimized') : (t ? t('skusSimulated') : 'simulated')}</div>
+                            <div className="text-xs text-slate-400">{t.format.number(summaryData.length)} SKUs {hasOptimized ? (t ? t('skusOptimized') : 'optimized') : (t ? t('skusSimulated') : 'simulated')}</div>
                         </div>
                         <div className="flex-1 summary-table-container overflow-auto">
                             <table className="w-full text-xs sm:text-sm">
@@ -3598,27 +3599,27 @@
                                     {sortedData.map((row, idx) => (
                                         <tr key={row.sku} className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${idx % 2 === 0 ? '' : 'bg-slate-50/50 dark:bg-slate-800/30'}`} onClick={() => onSelectSku(row.sku)}>
                                             <td className="px-4 py-3 font-mono font-bold text-slate-700 dark:text-slate-200">{row.sku}</td>
-                                            <td className="px-4 py-3 text-center" title={row.alphaCI ? `90% CI: ${row.alphaCI}` : (row.isOptimized ? 'Avg of 500 Monte Carlo runs (steady-state)' : '')}>
+                                            <td className="px-4 py-3 text-center" title={row.alphaCI ? `90% CI: ${t.format.fixed(row.alphaCI.low * 100, 1)}% - ${t.format.fixed(row.alphaCI.high * 100, 1)}%` : (row.isOptimized ? 'Avg of 500 Monte Carlo runs (steady-state)' : '')}>
                                                 <span className={`px-2 py-1 rounded-full text-xs font-bold ${row.alpha >= 0.95 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : row.alpha >= 0.90 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
-                                                    {(row.alpha * 100).toFixed(1)}%
+                                                    {t.format.fixed((row.alpha * 100), 1)}%
                                                 </span>
-                                                {row.alphaCI && <div className="text-[9px] text-slate-400 mt-0.5">±{((row.alpha - parseFloat(row.alphaCI.split(' - ')[0]) / 100) * 100).toFixed(1)}%</div>}
+                                                {row.alphaCI && <div className="text-[9px] text-slate-400 mt-0.5">±{t.format.fixed(((row.alpha - row.alphaCI.low) * 100), 1)}%</div>}
                                             </td>
-                                            <td className="px-4 py-3 text-center" title={row.betaCI ? `90% CI: ${row.betaCI}` : (row.isOptimized ? 'Avg of 500 Monte Carlo runs (steady-state)' : '')}>
-                                                <span className="text-blue-600 dark:text-blue-400 font-bold">{(row.beta * 100).toFixed(1)}%</span>
-                                                {row.betaCI && <div className="text-[9px] text-slate-400">±{((row.beta - parseFloat(row.betaCI.split(' - ')[0]) / 100) * 100).toFixed(1)}%</div>}
+                                            <td className="px-4 py-3 text-center" title={row.betaCI ? `90% CI: ${t.format.fixed(row.betaCI.low * 100, 1)}% - ${t.format.fixed(row.betaCI.high * 100, 1)}%` : (row.isOptimized ? 'Avg of 500 Monte Carlo runs (steady-state)' : '')}>
+                                                <span className="text-blue-600 dark:text-blue-400 font-bold">{t.format.fixed((row.beta * 100), 1)}%</span>
+                                                {row.betaCI && <div className="text-[9px] text-slate-400">±{t.format.fixed(((row.beta - row.betaCI.low) * 100), 1)}%</div>}
                                             </td>
                                             {hasOptimized && (
                                                 <td className="px-4 py-3 text-center">
-                                                    <span className="font-bold text-cyan-600 dark:text-cyan-400">{row.safetyFactor || '-'}×</span>
+                                                    <span className="font-bold text-cyan-600 dark:text-cyan-400">{row.safetyFactor ? t.format.number(row.safetyFactor) : '-'}×</span>
                                                 </td>
                                             )}
                                             <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-300" title={row.avgInvCI ? `90% CI: ${row.avgInvCI}` : ''}>
-                                                {Math.round(row.avgInventory).toLocaleString()}
+                                                {Math.round(row.avgInventory).toLocaleString(t.format.locale)}
                                                 {row.avgInvCI && <div className="text-[9px] text-slate-400">{row.avgInvCI}</div>}
                                             </td>
                                             <td className="px-4 py-3 text-center" title={row.stockoutsCI ? `90% CI: ${row.stockoutsCI} days` : ''}>
-                                                {row.stockouts < 0.5 ? <span className="text-emerald-500 font-bold">✓ Rare</span> : <span className="text-red-500 font-bold">{row.stockouts.toFixed(1)} days</span>}
+                                                {row.stockouts < 0.5 ? <span className="text-emerald-500 font-bold">✓ Rare</span> : <span className="text-red-500 font-bold">{t.format.fixed(row.stockouts, 1)} days</span>}
                                                 {row.stockoutsCI && <div className="text-[9px] text-slate-400">{row.stockoutsCI}</div>}
                                             </td>
                                             <td className="px-4 py-3 text-center"><button className="px-3 py-1 text-xs font-bold text-brand-gold hover:bg-brand-gold/10 rounded transition-colors">{t ? t('view') : 'View'} →</button></td>
@@ -3908,6 +3909,7 @@
 
             // Translation helper
             const t = (key) => translations[language]?.[key] || translations.en[key] || key;
+            t.format = window.OperartisFormat.forLanguage(language);
             const renderParametersLockedMessage = () => {
                 if (language === 'vi') {
                     return <span>Tham số đã khóa. Chuyển sang chế độ <strong>Giả lập</strong> để chỉnh sửa.</span>;
@@ -5544,7 +5546,7 @@
                                     {isLeadTimeLocked ? (
                                         /* LOCKED: Show simple deterministic value from file */
                                         <div className="text-[10px] font-bold text-slate-500 uppercase">
-                                            {t('deterministic')}: <span className="text-brand-gold">{params.leadTimeConfig.deterministicValue} {t('days')}</span>
+                                            {t('deterministic')}: <span className="text-brand-gold">{t.format.number(params.leadTimeConfig.deterministicValue)} {t('days')}</span>
                                         </div>
                                     ) : (
                                         /* UNLOCKED: Show full configuration UI */
@@ -5575,7 +5577,7 @@
                                                     <input
                                                         type="number"
                                                         min="1"
-                                                        value={params.leadTimeConfig.deterministicValue}
+                                                        value={t.format.number(params.leadTimeConfig.deterministicValue)}
                                                         onChange={e => setParams({
                                                             ...params,
                                                             leadTimeConfig: { ...params.leadTimeConfig, deterministicValue: Math.max(1, +e.target.value) }
@@ -5665,7 +5667,7 @@
                                                         const isValid = Math.abs(sum - 1.0) < 0.01;
                                                         return (
                                                             <div className={`text-[9px] font-bold ${isValid ? 'text-emerald-500' : 'text-amber-500'}`}>
-                                                                Sum: {sum.toFixed(2)} {isValid ? '✓' : '(should be 1.0)'}
+                                                                Sum: {t.format.fixed(sum, 2)} {isValid ? '✓' : `(should be ${t.format.fixed(1, 1)})`}
                                                             </div>
                                                         );
                                                     })()}
@@ -5679,14 +5681,14 @@
                                                     <input
                                                         type="number"
                                                         min="1"
-                                                        value={params.leadTimeConfig.poissonLambda}
+                                                        value={t.format.number(params.leadTimeConfig.poissonLambda)}
                                                         onChange={e => setParams({
                                                             ...params,
                                                             leadTimeConfig: { ...params.leadTimeConfig, poissonLambda: Math.max(1, +e.target.value) }
                                                         })}
                                                         className="w-full bg-slate-100 dark:bg-slate-800 rounded px-3 py-2 text-sm font-sans border-0 focus:ring-1 focus:ring-brand-gold outline-none dark:text-white custom-input"
                                                     />
-                                                    <div className="text-[9px] text-slate-400 mt-1">{t('expectedValueDays')} {params.leadTimeConfig.poissonLambda} {t('days')}</div>
+                                                    <div className="text-[9px] text-slate-400 mt-1">{t('expectedValueDays')} {t.format.number(params.leadTimeConfig.poissonLambda)} {t('days')}</div>
                                                 </div>
                                             )}
 
@@ -5722,7 +5724,7 @@
                                                         />
                                                     </div>
                                                     <div className="col-span-2 text-[9px] text-slate-400">
-                                                        {t('expectedValueDays')} {(params.leadTimeConfig.binomialN * params.leadTimeConfig.binomialP).toFixed(1)} {t('days')}
+                                                        {t('expectedValueDays')} {t.format.fixed((params.leadTimeConfig.binomialN * params.leadTimeConfig.binomialP), 1)} {t('days')}
                                                     </div>
                                                 </div>
                                             )}
@@ -5757,7 +5759,7 @@
                                                         />
                                                     </div>
                                                     <div className="col-span-2 text-[9px] text-slate-400">
-                                                        {t('expectedValueDays')} {((params.leadTimeConfig.uniformMin + params.leadTimeConfig.uniformMax) / 2).toFixed(1)} {t('days')}
+                                                        {t('expectedValueDays')} {t.format.fixed(((params.leadTimeConfig.uniformMin + params.leadTimeConfig.uniformMax) / 2), 1)} {t('days')}
                                                     </div>
                                                 </div>
                                             )}
@@ -5790,7 +5792,7 @@
                                             {t('targetServiceLevel').replace('α', '').replace('α', '')}<span className="normal-case">(α)</span>
                                             {isServiceLevelLocked && <span className="ml-1 text-emerald-500">🔒</span>}
                                         </span>
-                                        <span className="font-bold text-brand-gold">{(params.serviceLevel * 100).toFixed(1)}%</span>
+                                        <span className="font-bold text-brand-gold">{t.format.fixed((params.serviceLevel * 100), 1)}%</span>
                                     </div>
                                     {/* Preset buttons */}
                                     <div className="flex gap-1 mb-2">
@@ -5810,7 +5812,7 @@
                                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                                     } ${isServiceLevelLocked ? 'cursor-not-allowed' : ''}`}
                                             >
-                                                {preset.label}
+                                                {t.format.number(preset.value * 100, 0, 1)}%
                                             </button>
                                         ))}
                                     </div>
@@ -5831,7 +5833,7 @@
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <span className="font-bold text-slate-500 uppercase text-[10px]">{t('safetyFactor')} (σ×)</span>
-                                            <span className="font-bold text-cyan-500">{params.safetyFactor.toFixed(1)}×</span>
+                                            <span className="font-bold text-cyan-500">{t.format.fixed(params.safetyFactor, 1)}×</span>
                                         </div>
                                         <div className="flex gap-1">
                                             {[
@@ -5848,13 +5850,13 @@
                                                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                                         }`}
                                                 >
-                                                    {preset.label}
+                                                    {t.format.fixed(preset.value, 1)}×
                                                 </button>
                                             ))}
                                         </div>
                                         <input type="range" min="1.0" max="4.0" step="0.1" value={params.safetyFactor} onChange={e => setParams({ ...params, safetyFactor: parseFloat(e.target.value) })} className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500" />
                                         <div className="text-[9px] text-slate-400 mt-1 text-center">
-                                            {params.safetyFactor > 1.0 ? `+${((params.safetyFactor - 1) * 100).toFixed(0)}% extra buffer on σ` : 'No extra buffer (default)'}
+                                            {params.safetyFactor > 1.0 ? `+${t.format.fixed(((params.safetyFactor - 1) * 100), 0)}% extra buffer on σ` : 'No extra buffer (default)'}
                                         </div>
                                     </div>
                                 )}
@@ -5879,32 +5881,32 @@
                                         <div className="space-y-3 text-xs font-medium">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-slate-500 dark:text-slate-400">{t('targetAlpha')}</span>
-                                                <span className="text-slate-800 dark:text-white font-bold">{parseFloat((optimResult.targetAlpha * 100).toFixed(2))}%</span>
+                                                <span className="text-slate-800 dark:text-white font-bold">{t.format.number(optimResult.targetAlpha * 100, 0, 2)}%</span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-slate-500 dark:text-slate-400">{t('achievedAlpha')}</span>
                                                 <span className={`font-bold ${optimResult.achievedAlpha >= optimResult.targetAlpha - 0.02 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                                                    {(optimResult.achievedAlpha * 100).toFixed(1)}%
+                                                    {t.format.fixed((optimResult.achievedAlpha * 100), 1)}%
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-slate-500 dark:text-slate-400">{t('achievedBeta')}</span>
-                                                <span className="font-bold text-blue-600 dark:text-blue-400">{(optimResult.achievedBeta * 100).toFixed(1)}%</span>
+                                                <span className="font-bold text-blue-600 dark:text-blue-400">{t.format.fixed((optimResult.achievedBeta * 100), 1)}%</span>
                                             </div>
 
                                             <div className="h-px bg-emerald-300 dark:bg-emerald-500/20 my-2"></div>
 
                                             <div className="flex justify-between items-center">
                                                 <span className="text-slate-500 dark:text-slate-400">{t('safetyFactor')}</span>
-                                                <span className="font-bold text-cyan-600 dark:text-cyan-400">{typeof optimResult.optimalSafetyFactor === 'number' ? optimResult.optimalSafetyFactor.toFixed(2) : optimResult.optimalSafetyFactor}×</span>
+                                                <span className="font-bold text-cyan-600 dark:text-cyan-400">{typeof optimResult.optimalSafetyFactor === 'number' ? t.format.fixed(optimResult.optimalSafetyFactor, 2) : optimResult.optimalSafetyFactor}×</span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-slate-500 dark:text-slate-400">{t('avgReorderPoint')}</span>
-                                                <span className="font-bold text-orange-600 dark:text-orange-400 font-mono">{optimResult.avgSt?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                                                <span className="font-bold text-orange-600 dark:text-orange-400 font-mono">{optimResult.avgSt?.toLocaleString(t.format.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-slate-500 dark:text-slate-400">{t('avgOrderUpTo')}</span>
-                                                <span className="font-bold text-red-600 dark:text-red-400 font-mono">{optimResult.avgST?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                                                <span className="font-bold text-red-600 dark:text-red-400 font-mono">{optimResult.avgST?.toLocaleString(t.format.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                                             </div>
 
                                             {/* MC Avg Inventory and Stockout Days - from optimization result */}
@@ -5912,11 +5914,11 @@
                                                 <>
                                                     <div className="flex justify-between items-center">
                                                         <span className="text-slate-500 dark:text-slate-400">{t('avgInv')}</span>
-                                                        <span className="font-bold text-purple-600 dark:text-purple-400 font-mono">{optimResult.mcAvgInventory?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                                                        <span className="font-bold text-purple-600 dark:text-purple-400 font-mono">{optimResult.mcAvgInventory?.toLocaleString(t.format.locale, { maximumFractionDigits: 0 })}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center">
                                                         <span className="text-slate-500 dark:text-slate-400">{t('avgStockoutDays')}</span>
-                                                        <span className="font-bold text-rose-600 dark:text-rose-400 font-mono">{optimResult.mcAvgStockoutDays?.toFixed(1)}</span>
+                                                        <span className="font-bold text-rose-600 dark:text-rose-400 font-mono">{t.format.fixed(optimResult.mcAvgStockoutDays, 1)}</span>
                                                     </div>
                                                 </>
                                             )}
@@ -5958,7 +5960,7 @@
                                         </button>
                                     </div>
                                     <div className="text-center text-[10px] text-slate-400">
-                                        {skuList.indexOf(currentSku) + 1} of {skuList.length} SKUs • {forecastData?.length || 0} days
+                                        {t.format.number(skuList.indexOf(currentSku) + 1, 0, 0)} of {t.format.number(skuList.length, 0, 0)} SKUs • {t.format.number(forecastData?.length || 0, 0, 0)} days
                                     </div>
                                 </div>
                             )}
@@ -5986,7 +5988,7 @@
                                         </button>
                                         {skuList.length > 1 && (
                                             <button onClick={runAllOptimizations} disabled={isOptimizing} className="w-full py-2 text-xs font-bold text-slate-500 hover:text-amber-500 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-amber-500 transition-colors disabled:opacity-50">
-                                                {t('optimizeAll')} ({skuList.length} SKUs)
+                                                {t('optimizeAll')} ({t.format.number(skuList.length, 0, 0)} SKUs)
                                             </button>
                                         )}
                                     </>
@@ -6011,7 +6013,7 @@
                                         </button>
                                         {skuList.length > 1 && (
                                             <button onClick={runAllSimulations} disabled={isRunningMC} className="w-full py-2 text-xs font-bold text-slate-500 hover:text-emerald-500 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-emerald-500 transition-colors disabled:opacity-50">
-                                                {t('simulateAll')} ({skuList.length} SKUs)
+                                                {t('simulateAll')} ({t.format.number(skuList.length, 0, 0)} SKUs)
                                             </button>
                                         )}
                                     </>
@@ -6210,7 +6212,7 @@
                                                         {/* Date & Day - Hidden on mobile/tablet, moved here to sit between SKU and Title on Desktop */}
                                                         <div className="hidden xl:flex items-center lg:h-8 bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-md px-2 sm:px-3 py-1 sm:py-1.5 lg:py-0 rounded-lg sm:rounded-xl border border-slate-200 dark:border-white/10 shadow">
                                                             <span className="text-[10px] sm:text-xs font-medium text-slate-600 dark:text-slate-300">
-                                                                <span className="hidden sm:inline">{currentDayData?.date} • </span><span className="text-brand-gold font-bold">{t('day')} {currentDay + 1}</span>
+                                                                <span className="hidden sm:inline">{t.format.date(currentDayData?.date)} • </span><span className="text-brand-gold font-bold">{t('day')} {t.format.number(currentDay + 1)}</span>
                                                             </span>
                                                         </div>
                                                     </div>
@@ -6226,13 +6228,13 @@
                                                             <div className="text-center border-r border-slate-300/50 dark:border-slate-600/50 pr-2 sm:pr-3">
                                                                 <div className="text-[8px] sm:text-[9px] text-slate-500 dark:text-slate-400 mb-0.5">{t('alphaFull')}</div>
                                                                 <div className={`font-bold ${simResult.metrics.alpha >= 0.9 ? 'text-emerald-500' : simResult.metrics.alpha >= 0.7 ? 'text-amber-500' : 'text-red-500'}`}>
-                                                                    {(simResult.metrics.alpha * 100).toFixed(1)}%
+                                                                    {t.format.fixed((simResult.metrics.alpha * 100), 1)}%
                                                                 </div>
                                                             </div>
                                                             <div className="text-center border-r border-slate-300/50 dark:border-slate-600/50 pr-2 sm:pr-3">
                                                                 <div className="text-[8px] sm:text-[9px] text-slate-500 dark:text-slate-400 mb-0.5">{t('betaFull')}</div>
                                                                 <div className={`font-bold ${simResult.metrics.beta >= 0.9 ? 'text-emerald-500' : simResult.metrics.beta >= 0.7 ? 'text-amber-500' : 'text-red-500'}`}>
-                                                                    {(simResult.metrics.beta * 100).toFixed(1)}%
+                                                                    {t.format.fixed((simResult.metrics.beta * 100), 1)}%
                                                                 </div>
                                                             </div>
                                                             {/* Steady-state metrics - hidden on tablets, shown on desktop */}
@@ -6241,20 +6243,20 @@
                                                                     <div className="text-center border-r border-slate-300/50 dark:border-slate-600/50 pr-3">
                                                                         <div className="text-[9px] text-blue-400 mb-0.5">{t('alphaSteady')}</div>
                                                                         <div className={`font-bold ${simResult.metrics.alpha_steady >= 0.9 ? 'text-emerald-500' : simResult.metrics.alpha_steady >= 0.7 ? 'text-amber-500' : 'text-red-500'}`}>
-                                                                            {(simResult.metrics.alpha_steady * 100).toFixed(1)}%
+                                                                            {t.format.fixed((simResult.metrics.alpha_steady * 100), 1)}%
                                                                         </div>
                                                                     </div>
                                                                     <div className="text-center border-r border-slate-300/50 dark:border-slate-600/50 pr-3">
                                                                         <div className="text-[9px] text-blue-400 mb-0.5">{t('betaSteady')}</div>
                                                                         <div className={`font-bold ${simResult.metrics.beta_steady >= 0.9 ? 'text-emerald-500' : simResult.metrics.beta_steady >= 0.7 ? 'text-amber-500' : 'text-red-500'}`}>
-                                                                            {(simResult.metrics.beta_steady * 100).toFixed(1)}%
+                                                                            {t.format.fixed((simResult.metrics.beta_steady * 100), 1)}%
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             )}
                                                             <div className="text-center">
                                                                 <div className="text-[8px] sm:text-[9px] text-slate-500 dark:text-slate-400 mb-0.5">{t('avgInv')}</div>
-                                                                <div className="font-bold text-slate-700 dark:text-slate-300">{Math.round(simResult.metrics.avgInventory).toLocaleString()}</div>
+                                                                <div className="font-bold text-slate-700 dark:text-slate-300">{Math.round(simResult.metrics.avgInventory).toLocaleString(t.format.locale)}</div>
                                                             </div>
                                                         </div>
                                                     )}
@@ -6266,18 +6268,18 @@
                                                         <div className="text-center">
                                                             <div className="text-[8px] text-slate-500 dark:text-slate-400 leading-tight">{t('alphaFull')}</div>
                                                             <div className={`text-[10px] font-bold leading-tight ${simResult.metrics.alpha >= 0.9 ? 'text-emerald-500' : simResult.metrics.alpha >= 0.7 ? 'text-amber-500' : 'text-red-500'}`}>
-                                                                {(simResult.metrics.alpha * 100).toFixed(1)}%
+                                                                {t.format.fixed((simResult.metrics.alpha * 100), 1)}%
                                                             </div>
                                                         </div>
                                                         <div className="text-center border-l border-slate-300/50 dark:border-slate-600/50 pl-3">
                                                             <div className="text-[8px] text-slate-500 dark:text-slate-400 leading-tight">{t('betaFull')}</div>
                                                             <div className={`text-[10px] font-bold leading-tight ${simResult.metrics.beta >= 0.9 ? 'text-emerald-500' : simResult.metrics.beta >= 0.7 ? 'text-amber-500' : 'text-red-500'}`}>
-                                                                {(simResult.metrics.beta * 100).toFixed(1)}%
+                                                                {t.format.fixed((simResult.metrics.beta * 100), 1)}%
                                                             </div>
                                                         </div>
                                                         <div className="text-center border-l border-slate-300/50 dark:border-slate-600/50 pl-3">
                                                             <div className="text-[8px] text-slate-500 dark:text-slate-400 leading-tight">{t('avgInv')}</div>
-                                                            <div className="text-[10px] font-bold text-slate-700 dark:text-slate-300 leading-tight">{Math.round(simResult.metrics.avgInventory).toLocaleString()}</div>
+                                                            <div className="text-[10px] font-bold text-slate-700 dark:text-slate-300 leading-tight">{Math.round(simResult.metrics.avgInventory).toLocaleString(t.format.locale)}</div>
                                                         </div>
                                                     </div>
                                                 )}
@@ -6296,12 +6298,12 @@
                                                         <div className="metric-item">
                                                             <span className="metric-label">OH</span>
                                                             <span className={`metric-value ${currentDayData.invAfterDemand <= 0 ? 'negative' : currentDayData.invAfterDemand <= currentDayData.s_t ? 'warning' : 'positive'}`}>
-                                                                {Math.round(currentDayData.invAfterDemand)}
+                                                                {t.format.number(currentDayData.invAfterDemand, 0, 0)}
                                                             </span>
                                                         </div>
                                                         <div className="metric-item">
                                                             <span className="metric-label">IP</span>
-                                                            <span className="metric-value">{Math.round(currentDayData.inventoryPosition)}</span>
+                                                            <span className="metric-value">{t.format.number(currentDayData.inventoryPosition, 0, 0)}</span>
                                                         </div>
                                                         {currentDayData.stockoutEvent && (
                                                             <div className="metric-item">
