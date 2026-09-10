@@ -1490,14 +1490,45 @@
         #section-admin-audit.active .admin-audit-table-wrap .split-table-body {
             max-height: none;
         }
-        .admin-audit-table-wrap .split-table { min-width: 720px; }
-        .admin-audit-table-wrap .admin-audit-col-user,
-        .admin-audit-table-wrap .admin-audit-col-details,
-        .admin-audit-table-wrap td:nth-child(2),
-        .admin-audit-table-wrap td:nth-child(3) {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .admin-audit-table-wrap { container: admin-audit / inline-size; }
+        .admin-audit-table-wrap .split-table { min-width: 0; }
+        .admin-audit-table-wrap th, .admin-audit-table-wrap td {
+            padding: 12px;
+            overflow-wrap: anywhere;
+            white-space: normal;
+        }
+        @container admin-audit (max-width: 760px) {
+            .admin-audit-table-wrap .split-table-head,
+            .admin-audit-table-wrap colgroup { display: none; }
+            .admin-audit-table-wrap .split-table,
+            .admin-audit-table-wrap tbody { display: block; }
+            .admin-audit-table-wrap tr[data-audit-id] {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px 16px;
+                padding: 16px;
+                border-bottom: 1px solid var(--line);
+            }
+            .admin-audit-table-wrap tr[data-audit-id]:last-child { border-bottom: 0; }
+            .admin-audit-table-wrap tr[data-audit-id] td { display: block; min-width: 0; padding: 0; border: 0; }
+            .admin-audit-table-wrap tr[data-audit-id] td:nth-child(4) { grid-column: 1 / -1; grid-row: 2; }
+            .admin-audit-table-wrap tr[data-audit-id] td:nth-child(3) { grid-column: 1 / -1; grid-row: 3; }
+            .admin-audit-table-wrap .responsive-cell-label {
+                display: block;
+                margin-bottom: 5px;
+                color: var(--muted);
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+            }
+            .admin-audit-table-wrap tr:has(.empty),
+            .admin-audit-table-wrap td.empty { display: block; width: 100%; }
+        }
+        @media (max-height: 600px) {
+            .main.main-fill:has(#section-admin-audit.active) { overflow-y: auto; }
+            #section-admin-audit.active { flex: 0 0 auto; }
+            #section-admin-audit.active > .card { flex: 0 0 320px; }
         }
         @keyframes notification-row-focus {
             0%, 45% {
@@ -2208,6 +2239,29 @@
             margin: 0 0 4px;
             font-size: 20px;
         }
+        .user-run-statistics { margin-top: 18px; min-width: 0; container: user-runs / inline-size; }
+        .user-run-statistics h2 { margin: 0 0 8px; font-size: 18px; }
+        .user-run-statistics h3 { margin: 24px 0 12px; font-size: 15px; }
+        .user-run-totals { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+        .user-run-totals .status-stat { min-width: 0; width: auto; }
+        .user-run-totals .metric-label { white-space: normal; overflow-wrap: anywhere; }
+        .user-run-table-wrap { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+        .user-run-table { width: 100%; min-width: 0; table-layout: fixed; }
+        .user-run-table th, .user-run-table td { padding: 12px; white-space: normal; overflow-wrap: anywhere; }
+        .user-run-table .badge { min-width: 0; max-width: 100%; height: auto; white-space: normal; }
+        .user-run-cell-label { display: none; }
+        @container user-runs (max-width: 900px) {
+            .user-run-totals { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .user-run-table, .user-run-table tbody { display: block; }
+            .user-run-table thead { display: none; }
+            .user-run-table tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 8px; border-bottom: 1px solid var(--line); }
+            .user-run-table td { display: block; min-width: 0; border: 0; }
+            .user-run-table td:first-child { grid-column: 1 / -1; font-weight: 700; }
+            .user-run-cell-label { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+        }
+        @container user-runs (max-width: 480px) {
+            .user-run-totals, .user-run-table tr { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
         .avatar-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .form-actions {
             display: flex;
@@ -2402,6 +2456,7 @@
         .responsive-cell-label { display: none; }
         .responsive-cell-value { min-width: 0; }
         .notifications-table-wrap .badge,
+        .admin-audit-table-wrap .badge,
         .admin-jobs-table-wrap .badge {
             max-width: 100%;
             height: auto;
@@ -3406,6 +3461,7 @@
                         </div>
                         <div id="admin-user-details" class="kv-list"></div>
                     </div>
+                    <div id="admin-user-run-statistics" class="card user-run-statistics" aria-live="polite"></div>
                 </section>
 
                 <section id="section-admin-invites" class="section admin-only">
@@ -4285,7 +4341,52 @@
             setSection(`admin-user?id=${encodeURIComponent(userId)}`);
         }
 
+        function paintUserRunStatistics(stats, failed = false) {
+            const container = document.getElementById('admin-user-run-statistics');
+            if (!container) return;
+            clear(container);
+            container.appendChild(el('h2', { text: dt('run_stats.title') }));
+            container.appendChild(el('p', { class: 'section-sub', text: dt('run_stats.description') }));
+            if (!stats) {
+                container.appendChild(el('div', { class: 'empty', text: dt(failed ? 'run_stats.error' : 'run_stats.loading') }));
+                return;
+            }
+            const statuses = ['queued', 'processing', 'completed', 'failed', 'canceled'];
+            const counts = Object.fromEntries(statusCountEntries(stats.statuses));
+            const totals = el('div', { class: 'user-run-totals' });
+            [[dt('run_stats.total'), stats.total], ...statuses.map(key => [statusLabel(key), counts[key] || 0])].forEach(([label, count]) => {
+                totals.appendChild(el('div', { class: 'status-stat' }, [
+                    el('span', { class: 'metric-label', text: label }),
+                    el('strong', { class: 'status-stat-count', text: formatNumber(count) }),
+                ]));
+            });
+            container.appendChild(totals);
+            function appendTable(title, labels, rows) {
+                container.appendChild(el('h3', { text: title }));
+                if (!rows.length) {
+                    container.appendChild(el('div', { class: 'empty', text: dt('empty.no_runs') }));
+                    return;
+                }
+                const body = el('tbody');
+                rows.forEach(cells => body.appendChild(el('tr', {}, cells.map((value, index) => el('td', {}, [
+                    el('span', { class: 'user-run-cell-label', text: labels[index] }),
+                    el('div', { class: 'user-run-cell-value' }, [typeof value === 'string' ? document.createTextNode(value) : value]),
+                ])))));
+                container.appendChild(el('div', { class: 'user-run-table-wrap' }, [el('table', { class: 'user-run-table' }, [
+                    el('thead', {}, [el('tr', {}, labels.map(label => el('th', { scope: 'col', text: label })))]), body,
+                ])]));
+            }
+            appendTable(dt('run_stats.by_module'), [dt('table.module'), dt('run_stats.total'), ...statuses.map(statusLabel)],
+                stats.modules.map(item => {
+                    const moduleCounts = Object.fromEntries(statusCountEntries(item.statuses));
+                    return [moduleLabel(item.module), formatNumber(item.total), ...statuses.map(key => formatNumber(moduleCounts[key] || 0))];
+                }));
+            appendTable(dt('run_stats.recent'), ['module', 'status', 'progress', 'file', 'created'].map(key => dt('table.' + key)),
+                stats.recent_jobs.map(job => [moduleLabel(job.module), badge(job.status), `${formatNumber(job.progress)}%`, job.input_filename || '—', formatDate(job.created_at)]));
+        }
+
         function paintAdminUserDetail(user) {
+            paintUserRunStatistics(user.run_statistics);
             const details = document.getElementById('admin-user-details');
             const nameEl = document.getElementById('admin-user-name');
             const emailEl = document.getElementById('admin-user-email');
@@ -4325,6 +4426,7 @@
             if (!details || !nameEl || !emailEl) return;
             const userId = state.adminUserId;
             let user = (state.adminUsers || []).find(item => item.id === userId);
+            paintUserRunStatistics(user?.run_statistics);
             if (user) paintAdminUserDetail(user);
             if (!userId) {
                 nameEl.textContent = dt('sections.admin-users.detail_title');
@@ -4346,6 +4448,8 @@
                     paintAdminUserDetail(user);
                 }
             } catch (error) {
+                if (state.activeSection !== 'admin-user' || state.adminUserId !== userId) return;
+                paintUserRunStatistics(null, true);
                 if (user) return;
                 nameEl.textContent = dt('sections.admin-users.detail_title');
                 emailEl.textContent = '';
@@ -4825,19 +4929,11 @@
             if (!body) return;
             const bodyWidth = body.clientWidth;
             if (bodyWidth <= 0) return;
-            const spec = [
-                ['event', 0.16],
-                ['user', 0.18],
-                ['details', 0.46],
-                ['created', 0.20],
-            ];
-            let assigned = 0;
-            const widths = spec.map(([, ratio], index) => {
-                if (index === spec.length - 1) return Math.max(0, bodyWidth - assigned);
-                const px = Math.floor(bodyWidth * ratio);
-                assigned += px;
-                return px;
-            });
+            const eventWidth = Math.min(220, Math.max(170, bodyWidth * .18));
+            const userWidth = Math.min(260, Math.max(180, bodyWidth * .20));
+            const createdWidth = Math.min(220, Math.max(176, bodyWidth * .19));
+            const spec = [['event'], ['user'], ['details'], ['created']];
+            const widths = [eventWidth, userWidth, Math.max(0, bodyWidth - eventWidth - userWidth - createdWidth), createdWidth];
             tableWrap.querySelectorAll('colgroup').forEach((colgroup) => {
                 spec.forEach(([key], index) => {
                     const col = colgroup.querySelector(`.admin-audit-col-${key}`);
@@ -5218,12 +5314,13 @@
                 return;
             }
             state.adminAuditEvents.forEach(event => {
-                tbody.appendChild(el('tr', {}, [
+                const row = el('tr', { dataset: { auditId: event.id } }, [
                     el('td', {}, [badge(event.event_type, 'audit')]),
                     el('td', { text: event.user_email || '-' }),
                     el('td', { text: event.details ? JSON.stringify(event.details) : '-' }),
                     el('td', { text: formatDate(event.created_at) }),
-                ]));
+                ]);
+                tbody.appendChild(addResponsiveCellLabels(row, ['event', 'user', 'details', 'created']));
             });
             requestAnimationFrame(() => syncSplitTableLayout(document.querySelector('.admin-audit-table-wrap')));
         }
@@ -5430,7 +5527,7 @@
             window.addEventListener('resize', updateSecurityFilterIndicator);
             requestAnimationFrame(updateSecurityFilterIndicator);
         })();
-        document.querySelectorAll('.notifications-table-wrap, .admin-jobs-table-wrap').forEach(wrap => {
+        document.querySelectorAll('.notifications-table-wrap, .admin-jobs-table-wrap, .admin-audit-table-wrap').forEach(wrap => {
             new ResizeObserver(() => {
                 requestAnimationFrame(() => syncSplitTableLayout(wrap));
             }).observe(wrap);

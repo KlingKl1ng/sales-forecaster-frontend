@@ -434,6 +434,7 @@
                 api_key_created: 'API key created',
                 api_key_revoked: 'API key revoked',
             },
+            run_stats: { title: 'Run statistics', description: 'All stored runs for this user. Recent runs shows the latest 10; totals include the full stored history.', total: 'Total runs', by_module: 'Runs by module', recent: 'Recent runs · latest 10', loading: 'Loading run statistics…', error: 'Run statistics could not be loaded. Use Refresh to try again.' },
             admin_status: {
                 active: 'Active',
                 pending: 'Pending',
@@ -936,6 +937,7 @@
                 api_key_created: 'Đã tạo khóa API',
                 api_key_revoked: 'Đã thu hồi khóa API',
             },
+            run_stats: { title: 'Thống kê lần chạy', description: 'Tất cả lần chạy được lưu của người dùng này. Danh sách gần đây hiển thị 10 lần mới nhất; tổng số bao gồm toàn bộ lịch sử được lưu.', total: 'Tổng lần chạy', by_module: 'Lần chạy theo mô-đun', recent: '10 lần chạy gần đây nhất', loading: 'Đang tải thống kê lần chạy…', error: 'Không thể tải thống kê lần chạy. Hãy làm mới để thử lại.' },
             admin_status: {
                 active: 'Hoạt động',
                 pending: 'Đang chờ',
@@ -1438,6 +1440,7 @@
                 api_key_created: 'API-Schlüssel erstellt',
                 api_key_revoked: 'API-Schlüssel widerrufen',
             },
+            run_stats: { title: 'Laufstatistik', description: 'Alle gespeicherten Läufe dieses Benutzers. Die Liste zeigt die letzten 10 Läufe; die Gesamtzahlen umfassen den gesamten gespeicherten Verlauf.', total: 'Läufe insgesamt', by_module: 'Läufe nach Modul', recent: 'Die letzten 10 Läufe', loading: 'Laufstatistik wird geladen…', error: 'Die Laufstatistik konnte nicht geladen werden. Bitte erneut aktualisieren.' },
             admin_status: {
                 active: 'Aktiv',
                 pending: 'Ausstehend',

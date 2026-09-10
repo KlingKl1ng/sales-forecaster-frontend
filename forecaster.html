@@ -853,6 +853,24 @@
             font-size: 0.75rem;
             line-height: 1rem;
         }
+        .fc-chart-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px 16px;
+            padding: 0 8px 4px;
+            flex-shrink: 0;
+            min-width: 0;
+        }
+        .fc-chart-header h3 { flex: 0 0 auto; max-width: 100%; margin: 0; }
+        .fc-chart-header .fc-chart-line-legend {
+            flex: 1 1 auto;
+            width: max-content;
+            max-width: 100%;
+            min-width: 0;
+            margin: 0;
+            padding: 0;
+        }
         .fc-chart-line-legend > li {
             display: inline-flex;
             margin: 0;
@@ -4206,16 +4224,11 @@
 
         // --- ZOOMABLE CHART WRAPPER ---
         // Supports: Mouse wheel zoom, pinch-to-zoom, drag to pan, double-click to reset
-        const useChartZoom = (dataLength) => {
-            const [zoomDomain, setZoomDomain] = useState({ start: 0, end: dataLength - 1 });
+        const useChartZoom = (dataLength, zoomState) => {
+            const [zoomDomain, setZoomDomain] = zoomState;
             const [isDragging, setIsDragging] = useState(false);
             const [dragStart, setDragStart] = useState(null);
             const containerRef = useRef(null);
-
-            // Reset zoom when data changes
-            useEffect(() => {
-                setZoomDomain({ start: 0, end: dataLength - 1 });
-            }, [dataLength]);
 
             useEffect(() => {
                 const el = containerRef.current;
@@ -4608,21 +4621,24 @@
             ? chartPointStyle(color)
             : false;
 
-        const BacktestChart = ({ data, syncId, isDark, t }) => {
+        const BacktestChart = ({ data, syncId, isDark, t, zoomState }) => {
             if (!data) return null;
 
-            const { zoomDomain, containerRef, handlers, isDragging, zoomIn, zoomOut } = useChartZoom(data.length);
+            const { zoomDomain, containerRef, handlers, isDragging, zoomIn, zoomOut } = useChartZoom(data.length, zoomState);
             const visibleData = data.slice(zoomDomain.start, zoomDomain.end + 1);
             const isZoomed = zoomDomain.start > 0 || zoomDomain.end < data.length - 1;
 
             return (
                 <div className="w-full h-full flex flex-col min-h-0">
-                    <ChartLineLegend payload={[
+                    <div className="fc-chart-header">
+                        <h3 className="text-[13px] font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_validation_chart')}</h3>
+                        <ChartLineLegend payload={[
                         { dataKey: 'actual_train', value: t('charts.act_train') },
                         { dataKey: 'actual_test', value: t('charts.act_test') },
                         { dataKey: 'fitted', value: t('charts.fitted') },
                         { dataKey: 'val_forecast', value: t('charts.val_fc') },
-                    ]} />
+                        ]} />
+                    </div>
                     <div
                         ref={containerRef}
                         className={`fc-chart-touch flex-1 min-h-0 relative ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
@@ -4690,20 +4706,48 @@
             );
         };
 
-        const ForecastChart = ({ data, syncId, isDark, t }) => {
+        // Both charts use the forecast timeline, including empty validation slots for future dates.
+        const SynchronizedForecastCharts = ({ validationData, forecastData, isDark, t }) => {
+            const dataLength = forecastData?.length || 0;
+            const zoomState = useState({ start: 0, end: dataLength - 1 });
+            const [, setZoomDomain] = zoomState;
+            const timelineKey = JSON.stringify((forecastData || []).map(point => point.date));
+            useEffect(() => {
+                setZoomDomain({ start: 0, end: dataLength - 1 });
+            }, [timelineKey]);
+            return (
+                <div className="fc-detail-charts min-w-0 gap-4 border border-slate-200 dark:border-slate-700 rounded-lg p-2">
+                    <div className="fc-detail-chart flex flex-col border-b border-dashed border-slate-200 dark:border-slate-700 relative">
+                        <div className="flex-1 min-h-0">
+                        <BacktestChart data={validationData} syncId="sv" zoomState={zoomState} isDark={isDark} t={t} />
+                        </div>
+                    </div>
+                    <div className="fc-detail-chart flex flex-col relative">
+                        <div className="flex-1 min-h-0">
+                        <ForecastChart data={forecastData} syncId="sv" zoomState={zoomState} isDark={isDark} t={t} />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ForecastChart = ({ data, syncId, isDark, t, zoomState }) => {
             if (!data) return null;
 
-            const { zoomDomain, containerRef, handlers, isDragging, zoomIn, zoomOut } = useChartZoom(data.length);
+            const { zoomDomain, containerRef, handlers, isDragging, zoomIn, zoomOut } = useChartZoom(data.length, zoomState);
             const visibleData = data.slice(zoomDomain.start, zoomDomain.end + 1);
             const isZoomed = zoomDomain.start > 0 || zoomDomain.end < data.length - 1;
 
             return (
                 <div className="w-full h-full flex flex-col min-h-0">
-                    <ChartLineLegend payload={[
+                    <div className="fc-chart-header">
+                        <h3 className="text-[13px] font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_forecast_chart')}</h3>
+                        <ChartLineLegend payload={[
                         { dataKey: 'actual_history', value: t('charts.history') },
                         { dataKey: 'final_fit', value: t('charts.final_fit') },
                         { dataKey: 'future_forecast', value: t('charts.future_fc') },
-                    ]} />
+                        ]} />
+                    </div>
                     <div
                         ref={containerRef}
                         className={`fc-chart-touch flex-1 min-h-0 relative ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
@@ -7034,20 +7078,7 @@
                                                             <ValidationReplay data={skuData} isDark={isDark} t={t} savedPositions={replayPositions} />
                                                         </div>}
                                                         {detailView === 'visualization' && <div key={`visualization-${skuData.sku}`} id="fc-detail-panel-visualization" role="tabpanel" aria-labelledby="fc-detail-tab-visualization" tabIndex={0} className="fc-visualization-panel fc-detail-scroll scroller flex-1 min-h-0">
-                                                        <div className="fc-detail-charts min-w-0 gap-4 border border-slate-200 dark:border-slate-700 rounded-lg p-2">
-                                                            <div className="fc-detail-chart flex flex-col border-b border-dashed border-slate-200 dark:border-slate-700 relative">
-                                                                <h3 className="shrink-0 px-2 text-[13px] font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_validation_chart')}</h3>
-                                                                <div className="flex-1 min-h-0">
-                                                                <BacktestChart data={alignedValidationData} syncId="sv" isDark={isDark} t={t} />
-                                                                </div>
-                                                            </div>
-                                                            <div className="fc-detail-chart flex flex-col relative">
-                                                                <h3 className="shrink-0 px-2 text-[13px] font-semibold text-slate-600 dark:text-slate-300">{t('sidebar.detail_forecast_chart')}</h3>
-                                                                <div className="flex-1 min-h-0">
-                                                                <ForecastChart data={skuData.forecast_data} syncId="sv" isDark={isDark} t={t} />
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        <SynchronizedForecastCharts key={skuData.sku} validationData={alignedValidationData} forecastData={skuData.forecast_data} isDark={isDark} t={t} />
                                                         </div>}
                                                     </div>
                                                 </div>
