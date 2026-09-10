@@ -455,7 +455,7 @@
             module_cards: {
                 SF: {
                     label: 'ML Forecaster',
-                    desc: 'Demand forecasting with time-series',
+                    desc: 'Demand forecasting with time-series.',
                 },
                 ML: {
                     label: 'Advanced ML Forecaster',
@@ -961,7 +961,7 @@
             module_cards: {
                 SF: {
                     label: 'Dự Báo Học Máy',
-                    desc: 'Dự báo nhu cầu với chuỗi thời gian',
+                    desc: 'Dự báo nhu cầu với chuỗi thời gian.',
                 },
                 ML: {
                     label: 'Dự Báo Học Máy Nâng Cao',
@@ -1467,7 +1467,7 @@
             module_cards: {
                 SF: {
                     label: 'ML-Prognose',
-                    desc: 'Nachfrageprognose mit Zeitreihen',
+                    desc: 'Nachfrageprognose mit Zeitreihen.',
                 },
                 ML: {
                     label: 'Erweiterte ML-Prognose',
