@@ -1702,6 +1702,19 @@
         .fc-prep-help, .fc-prep-heading small { color: var(--source-muted); font-size: 12px; line-height: 1.6; margin: 6px 0 10px; }
         .fc-prep-controls, .fc-prep-save { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0; }
         .fc-prep-controls label { font-size: 12px; color: var(--source-muted); }
+        .fc-prep-auto-frequency { display: inline-flex; align-items: center; padding: 3px 7px; border: 1px solid var(--source-line); border-radius: 5px; background: var(--source-bg); color: var(--source-text); font-size: 11px; white-space: nowrap; }
+        .fc-prep-dependent { min-width: 0; border: 0; margin: 0; padding: 0; }
+        .fc-prep-primary-options { display: flex; flex-wrap: wrap; align-items: center; gap: inherit; }
+        .fc-prep-dependent:disabled { opacity: .45; }
+        .fc-prep-dependent:disabled :is(input,select,button) { cursor: not-allowed; }
+        .fc-source-dialog .fc-prep-dependent:disabled button { opacity: 1; }
+        .fc-prep-final-check { max-width: 100%; }
+        .fc-prep-final-check:has(input:disabled) { opacity: .5; cursor: not-allowed; }
+        .fc-prep-status { display: inline-block; margin-left: 10px; font-size: 11px; font-weight: 500; }
+        .fc-source-foldout summary .fc-prep-status[data-tone="success"] { color: #15803d; }
+        .fc-source-foldout summary .fc-prep-status[data-tone="warning"] { color: #a16207; }
+        .dark .fc-source-foldout summary .fc-prep-status[data-tone="success"] { color: #4ade80; }
+        .dark .fc-source-foldout summary .fc-prep-status[data-tone="warning"] { color: #fbbf24; }
         .fc-prep-controls select, .fc-prep-controls input:not([type="checkbox"]), .fc-prep-save input { display: block; max-width: 100%; min-width: 0; padding: 8px 10px; border: 1px solid var(--source-line); background: var(--source-soft); border-radius: 8px; color: var(--source-text); font-size: 13px; }
         .fc-prep-controls label select { margin-top: 5px; }
         .fc-prep-check { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 1.5; cursor: pointer; }
@@ -1831,7 +1844,18 @@
         .fc-source-foldout > summary { cursor: pointer; padding: 8px 10px; font-size: 12px; font-weight: 600; }
         .fc-source-foldout > summary span { font-weight: 400; color: var(--source-muted); margin-left: 8px; }
         .fc-source-foldout[data-attention="true"] { border-color: rgb(245 158 11 / .55); background: rgb(245 158 11 / .06); }
-        .fc-source-foldout .fc-prep-panel { margin: 0; border: 0; border-top: 1px solid var(--source-line); border-radius: 0 0 8px 8px; padding: 10px 12px; max-height: 220px; }
+        .fc-source-foldout .fc-prep-panel { margin: 0; border: 0; border-top: 1px solid var(--source-line); border-radius: 0 0 8px 8px; padding: 10px 12px; max-height: none; overflow: visible; }
+        .fc-source-foldout .fc-prep-heading { gap: 6px 12px; }
+        .fc-source-foldout .fc-prep-help { margin: 4px 0 8px; }
+        .fc-source-foldout .fc-prep-controls { gap: 8px 14px; margin: 8px 0; }
+        .fc-source-foldout .fc-prep-controls > label:not(.fc-prep-check), .fc-prep-primary-options > label:not(.fc-prep-check) { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .fc-source-foldout .fc-prep-controls label select { margin-top: 0; }
+        .fc-source-foldout .fc-prep-controls select { padding: 6px 8px; font-size: 12px; }
+        .fc-source-foldout .fc-prep-warning { padding: 8px 10px; margin: 8px 0; }
+        .fc-source-foldout .fc-prep-panel details { margin: 8px 0; }
+        .fc-source-foldout .fc-prep-panel details > summary { padding: 6px 0; }
+        .fc-source-foldout .fc-prep-items { max-height: 180px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0 8px; margin-top: 4px; border: 1px solid var(--source-line); border-radius: 6px; background: var(--source-bg); }
+        .fc-source-foldout .fc-prep-item:last-child { border-bottom: 0; }
         .fc-source-foldout .fc-prep-save { margin: 0; padding: 10px; border-top: 1px solid var(--source-line); }
         .fc-source-foldout .fc-prep-help[role="status"] { padding: 0 10px; }
         .fc-source-preview-heading { margin: 2px 0 6px; }
@@ -5347,16 +5371,33 @@
                 </div></div>
             </section>;
         };
-        const MissingDataReview = ({review,update,filter,setFilter,onlyMissing,setOnlyMissing}) => {
+        const PreparationFrequency = ({frequency,automatic,detectedFrequency,detectionFailed,update}) => <label>Frequency<select aria-label="Missing data frequency" value={automatic ? '' : frequency} onChange={e=>update({frequency:e.target.value || null,frequency_confirmed:false})}><option value="">Detect automatically</option>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v.replace('_',' ')}</option>)}</select>{automatic && <span className="fc-prep-auto-frequency" role="status">{detectedFrequency ? `${detectedFrequency.replace('_',' ')} (auto)` : detectionFailed ? 'Not detected' : 'Detecting…'}</span>}</label>;
+        const missingHandlingStatus = (review, current, error) => {
+            if (error) return {readyToConfirm:false,tone:'warning',summary:'Resolve the scan error first',items:'Review paused'};
+            if (!review || !current) return {readyToConfirm:false,tone:'pending',summary:'Updating handling status…',items:'Updating…'};
+            const affected = review.items.filter(item=>item.missing);
+            const needsReview = item => item.review_required && !review.policy.reviewed_items.includes(item.id);
+            const outstanding = affected.filter(item=>item.unresolved || item.error || needsReview(item));
+            const reviews = affected.filter(needsReview).length;
+            const handled = review.missing_count - review.unresolved;
+            const readyToConfirm = review.unresolved === 0 && outstanding.length === 0;
+            const detail = [review.unresolved ? `${review.unresolved} unresolved` : '', reviews ? `${reviews} ${reviews===1?'item needs':'items need'} review` : ''].filter(Boolean).join(' · ');
+            return {readyToConfirm,tone:readyToConfirm && review.policy.frequency_confirmed ? 'success' : 'warning',
+                summary:readyToConfirm ? `All ${review.missing_count} gaps handled · ${review.policy.frequency_confirmed ? 'Review confirmed' : 'Confirm frequency & handling'}` : `${handled}/${review.missing_count} gaps handled · ${detail || 'Review required'}`,
+                items:outstanding.length ? `${outstanding.length}/${affected.length} items need attention` : `All ${affected.length} items handled`};
+        };
+        const MissingDataReview = ({review,update,filter,setFilter,onlyMissing,setOnlyMissing,frequencyAuto,detectedFrequency,detectionFailed,handlingLocked,handlingStatus}) => {
             const policy=review.policy, affected=review.items.filter(item=>item.missing);
             return <section className="fc-prep-panel" aria-label="Missing data">
                 <div className="fc-prep-heading"><h3>Missing data</h3><strong>{review.missing_count} gaps across {affected.length} {affected.length===1?'item':'items'}</strong></div>
                 <p className="fc-prep-help">{review.empty_count} empty quantities · {review.absent_periods} absent {review.absent_periods===1?'period':'periods'} · {review.unresolved} unresolved. Zeros remain unchanged.</p>
-                <div className="fc-prep-controls"><label>Frequency<select aria-label="Missing data frequency" value={policy.frequency} onChange={e=>update({frequency:e.target.value,frequency_confirmed:false})}>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v.replace('_',' ')}</option>)}</select></label><label className="fc-prep-check"><input type="checkbox" checked={policy.frequency_confirmed} onChange={e=>update({frequency_confirmed:e.target.checked})}/>I confirm this frequency</label><label>Default handling<select aria-label="Default missing data handling" value={policy.method} onChange={e=>update({method:e.target.value,overrides:{}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select></label></div>
-                {(policy.method==='zero' || Object.values(policy.overrides).includes('zero')) && <label className="fc-prep-check fc-prep-warning"><input type="checkbox" checked={policy.zero_confirmed} onChange={e=>update({zero_confirmed:e.target.checked})}/>I confirm these missing quantities mean no activity.</label>}
-                <details><summary>Review suggestions and per-item handling ({affected.length})</summary><div className="fc-prep-items">{affected.map(item=><div className="fc-prep-item" key={item.id}><strong>{item.id} · {item.missing} missing · longest gap {item.longest_gap}</strong><p>{item.reason}</p><div className="fc-prep-controls"><select aria-label={`Handling for ${item.id}`} disabled={item.entirely_missing} value={item.method} onChange={e=>update({overrides:{...policy.overrides,[item.id]:e.target.value}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select>{item.suggested!=='none' && <button type="button" className="fc-source-secondary" onClick={()=>update({overrides:{...policy.overrides,[item.id]:item.suggested}})}>Use suggested {PREPARATION_METHODS[item.suggested]}</button>}</div>{item.entirely_missing?<p className="fc-source-error">This entire series is missing. Correct the original data.</p>:item.review_required && <label className="fc-prep-check"><input type="checkbox" checked={policy.reviewed_items.includes(item.id)} onChange={e=>update({reviewed_items:e.target.checked?[...policy.reviewed_items,item.id]:policy.reviewed_items.filter(id=>id!==item.id)})}/>I reviewed this long or boundary gap, including whether it predates the item’s launch.</label>}{item.error && <p className="fc-source-error">{item.error}</p>}</div>)}</div></details>
+                <div className="fc-prep-controls"><PreparationFrequency frequency={policy.frequency} automatic={frequencyAuto} detectedFrequency={detectedFrequency} detectionFailed={detectionFailed} update={update}/><fieldset className="fc-prep-dependent fc-prep-primary-options" disabled={handlingLocked}><label>Default handling<select aria-label="Default missing data handling" value={policy.auto_suggest ? 'auto' : policy.method} onChange={e=>update(e.target.value==='auto' ? {auto_suggest:true,method:'none'} : {auto_suggest:false,suggested_methods:{},method:e.target.value,overrides:{}})}><option value="auto">Auto Suggestion</option>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select></label><label className="fc-prep-check fc-prep-final-check" title={handlingStatus.readyToConfirm ? 'Confirm the frequency and review the prepared values.' : 'Resolve all gaps and required item reviews first.'}><input type="checkbox" disabled={!handlingStatus.readyToConfirm} checked={policy.frequency_confirmed} onChange={e=>update({frequency_confirmed:e.target.checked})}/>I confirm the frequency and all missing-data handling</label></fieldset></div>
+                <fieldset className="fc-prep-dependent" disabled={handlingLocked}>
+                {policy.auto_suggest && <p className="fc-prep-help">Auto Suggestion uses each item’s recommended method and keeps manual overrides. Items without a recommendation remain unresolved; review the preview before confirming.</p>}
+                <details><summary>Review suggestions and per-item handling ({affected.length})<span className="fc-prep-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.items}</span></summary><div className="fc-prep-items">{affected.map(item=><div className="fc-prep-item" key={item.id}><strong>{item.id} · {item.missing} missing · longest gap {item.longest_gap}</strong><p>{item.reason}</p><div className="fc-prep-controls"><select aria-label={`Handling for ${item.id}`} disabled={item.entirely_missing} value={item.method} onChange={e=>update({overrides:{...policy.overrides,[item.id]:e.target.value}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select>{item.suggested!=='none' && <button type="button" className="fc-source-secondary" onClick={()=>update({overrides:{...policy.overrides,[item.id]:item.suggested}})}>Use suggested {PREPARATION_METHODS[item.suggested]}</button>}</div>{item.entirely_missing?<p className="fc-source-error">This entire series is missing. Correct the original data.</p>:item.review_required && <label className="fc-prep-check"><input type="checkbox" checked={policy.reviewed_items.includes(item.id)} onChange={e=>update({reviewed_items:e.target.checked?[...policy.reviewed_items,item.id]:policy.reviewed_items.filter(id=>id!==item.id)})}/>I reviewed this long or boundary gap, including whether it predates the item’s launch.</label>}{item.error && <p className="fc-source-error">{item.error}</p>}</div>)}</div></details>
                 <p className="fc-prep-help">Interpolation needs values on both sides. Seasonal filling uses earlier matching cycles. Validation reapplies your rule inside each training window; some boundary gaps may still require correction.</p>
-                <div className="fc-prep-controls"><label>Preview item<select aria-label="Preview item" value={filter} onChange={e=>setFilter(e.target.value)}><option value="">All items</option>{affected.map(item=><option key={item.id} value={item.id}>{item.id}</option>)}</select></label><label className="fc-prep-check"><input type="checkbox" checked={onlyMissing} onChange={e=>setOnlyMissing(e.target.checked)}/>Only missing values</label><button className="fc-source-secondary" onClick={()=>update({method:'none',overrides:{},zero_confirmed:false,reviewed_items:[]})}>Reset handling</button></div>
+                <div className="fc-prep-controls"><label>Preview item<select aria-label="Preview item" value={filter} onChange={e=>setFilter(e.target.value)}><option value="">All items</option>{affected.map(item=><option key={item.id} value={item.id}>{item.id}</option>)}</select></label><label className="fc-prep-check"><input type="checkbox" checked={onlyMissing} onChange={e=>setOnlyMissing(e.target.checked)}/>Only missing values</label><button className="fc-source-secondary" onClick={()=>update({method:'none',auto_suggest:false,suggested_methods:{},overrides:{},zero_confirmed:false,reviewed_items:[]})}>Reset handling</button></div>
+                </fieldset>
             </section>;
         };
 
@@ -5377,19 +5418,31 @@
             const [itemFilter,setItemFilter] = useState(''), [onlyMissing,setOnlyMissing] = useState(false);
             const [preparationOpen, setPreparationOpen] = useState(false);
             useEffect(() => { setPreparationOpen(false); }, [source?.file]);
+            const mappingSignature = source ? JSON.stringify([source.mapping,source.format]) : '';
             const signature = source ? JSON.stringify([source.mapping,source.preparation,source.format]) : '';
-            const review = reviewState?.file === source?.file && reviewState?.signature === signature ? reviewState.data : null;
-            const info = review ? {valid:review.valid,count:review.period_count,items:review.item_count,frequency:review.frequency} : {valid:false,count:0,items:0};
+            // Keep the mounted review and preview while new handling rules are scanned.
+            // Only a response for the exact current rules may enable confirmation/export.
+            const review = reviewState?.file === source?.file && reviewState?.mappingSignature === mappingSignature ? reviewState.data : null;
+            const reviewCurrent = !!review && reviewState.signature === signature;
+            const handlingLocked = !!reviewError || !review || (reviewState.frequencySelection ?? null) !== (source?.preparation?.frequency ?? null);
+            const detectedFrequency = review && reviewState.frequencySelection == null && source?.preparation?.frequency == null ? review.frequency : null;
+            const reviewUpdating = !!review && !reviewCurrent && !reviewError;
+            const draftPolicy = source?.preparation || review?.policy;
+            const displayReview = review && !reviewCurrent ? {...review,policy:{...review.policy,...draftPolicy},items:review.items.map(item=>({...item,method:draftPolicy?.overrides?.[item.id] || (draftPolicy?.auto_suggest ? item.suggested : draftPolicy?.method || review.policy.method)}))} : review;
+            const info = review ? {valid:reviewCurrent && !reviewError && review.valid,count:review.period_count,items:review.item_count,frequency:review.frequency} : {valid:false,count:0,items:0};
             const loading = busy === sourceKey;
+            const handlingStatus = missingHandlingStatus(review,reviewCurrent,reviewError);
+            useEffect(()=>{setPage(0);setReviewError('');},[source?.file,mappingSignature]);
             useEffect(()=>{
                 if (!source) return;
                 const controller = new AbortController();
-                setReviewError('');setPage(0);
+                // An existing error stays in place until a successful scan replaces it.
+                // Removing it at request start makes the entire dialog jump on every click.
                 const form = new FormData();form.append('file',source.file);form.append('mapping',JSON.stringify(preparationMapping(source)));form.append('preparation',JSON.stringify(source.preparation || {}));
-                datasetRequest(baseUrl,'/data/preview',{method:'POST',body:form,signal:controller.signal}).then(r=>r.json()).then(data=>{if(!controller.signal.aborted)setReviewState({file:source.file,signature,data});}).catch(e=>{if(!controller.signal.aborted)setReviewError(e.message);});
+                datasetRequest(baseUrl,'/data/preview',{method:'POST',body:form,signal:controller.signal}).then(r=>r.json()).then(data=>{if(!controller.signal.aborted){setReviewState({file:source.file,mappingSignature,signature,frequencySelection:source.preparation?.frequency ?? null,data});setReviewError('');}}).catch(e=>{if(!controller.signal.aborted)setReviewError(e.message);});
                 return ()=>controller.abort();
             },[source?.file,signature,baseUrl]);
-            const updatePreparation = patch => setSources(prev=>({...prev,[sourceKey]:{...prev[sourceKey],versionId:null,preparation:{...(review?.policy || prev[sourceKey].preparation || {}),...patch}}}));
+            const updatePreparation = patch => setSources(prev=>({...prev,[sourceKey]:{...prev[sourceKey],versionId:null,preparation:{...review?.policy,...prev[sourceKey].preparation,frequency:prev[sourceKey].preparation?.frequency ?? null,frequency_confirmed:false,...patch}}}));
             const readySource = () => ({...source,preparation:review?.policy || source.preparation,analysis:info,mode});
             const saveDataset = async () => {
                 setSaving(true);setSaveMessage('');
@@ -5551,9 +5604,10 @@
                                     </select>
                                 </div>)}
                             </div>
-                            {reviewError && <div role="alert" className="fc-source-error">{reviewError}<label className="fc-prep-controls">Calendar<select aria-label="Correct calendar frequency" value={source.preparation?.frequency || ''} onChange={e=>updatePreparation({frequency:e.target.value,frequency_confirmed:false})}><option value="">Choose frequency</option>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v}</option>)}</select></label></div>}
+                            {reviewError && <div role="alert" className="fc-source-error">{reviewError}</div>}
+                            {!review && reviewError && /calendar|frequency/i.test(reviewError) && <section className="fc-prep-panel" aria-label="Calendar settings"><div className="fc-prep-controls"><PreparationFrequency frequency={source.preparation?.frequency} automatic={source.preparation?.frequency == null} detectionFailed={!!reviewError} update={updatePreparation}/></div></section>}
                             {!review && !reviewError && <p role="status" className="fc-prep-help">Scanning quantities and calendar…</p>}
-                            {gapPreview && <details className="fc-source-foldout" open={preparationOpen} onToggle={event=>setPreparationOpen(event.currentTarget.open)} data-attention={!info.valid}><summary>Missing data<span>{review.missing_count} gaps · {info.valid ? 'Ready to confirm' : 'Review required'}</span></summary><MissingDataReview review={review} update={updatePreparation} filter={itemFilter} setFilter={value=>{setItemFilter(value);setPage(0);}} onlyMissing={onlyMissing} setOnlyMissing={value=>{setOnlyMissing(value);setPage(0);}} /></details>}
+                            {gapPreview && <details className="fc-source-foldout" open={preparationOpen} onToggle={event=>setPreparationOpen(event.currentTarget.open)} data-attention={!info.valid}><summary>Missing data<span className="fc-prep-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.summary}</span></summary><MissingDataReview review={displayReview} handlingStatus={handlingStatus} handlingLocked={handlingLocked} frequencyAuto={source.preparation?.frequency == null} detectedFrequency={detectedFrequency} detectionFailed={!!reviewError} update={updatePreparation} filter={itemFilter} setFilter={value=>{setItemFilter(value);setPage(0);}} onlyMissing={onlyMissing} setOnlyMissing={value=>{setOnlyMissing(value);setPage(0);}} /></details>}
                             {mode === 'custom' && <details className="fc-source-foldout"><summary>Save &amp; download<span>Keep a private version or export prepared data</span></summary><div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid} onClick={()=>downloadPreparedPreview(review,source.file.name)}>Download prepared data</button></div>
                             {saveMessage && <p role="status" className="fc-prep-help">{saveMessage}</p>}</details>}
                             <div className="fc-source-preview-heading"><h3>{t('mapping.preview')}</h3><span>{info.items} {t('mapping.items')} <span aria-hidden="true">·</span> {info.count} {t('mapping.months_detected')}</span></div>
