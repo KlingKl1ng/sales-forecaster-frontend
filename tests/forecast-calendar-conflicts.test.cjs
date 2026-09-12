@@ -1,0 +1,47 @@
+const assert = require('node:assert/strict');
+const {test} = require('node:test');
+const fs = require('node:fs');
+const path = require('node:path');
+const html = fs.readFileSync(path.join(__dirname,'../forecaster.html'),'utf8');
+const code = html.slice(html.indexOf('const groupCalendarConflicts ='),html.indexOf('const CalendarConflictSummary ='));
+const group = new Function(code+';return groupCalendarConflicts;')();
+
+test('groups shared dates, preserves every affected ID, and removes only represented duplicate alerts',()=>{
+    const review={records:[
+        {ds:'2026-02-14',unique_id:'B',conflict:true},
+        {ds:'2026-02-14',unique_id:'A',conflict:true},
+        {ds:'2026-01-12',unique_id:'A',conflict:true},
+        {ds:'2026-02-14',unique_id:'B',conflict:true},
+        {ds:'2026-01-13',unique_id:'C',closed:true,conflict:false},
+    ],items:[{id:'A',conflicts:2,error:'Sales on closures'},{id:'B',conflicts:1,error:'Sales on closures'}],
+    calendar_errors:['A: Sales on closures','B: Sales on closures','C: No open observations']};
+    assert.deepEqual(group(review),{dates:[{date:'2026-01-12',ids:['A']},{date:'2026-02-14',ids:['A','B']}],itemCount:2,otherErrors:['C: No open observations']});
+});
+test('does not hide errors when detailed conflict records are unavailable',()=>{
+    assert.deepEqual(group(null),{dates:[],itemCount:0,otherErrors:[]});
+    const review={items:[{id:'A',conflicts:1,error:'Conflict'}],calendar_errors:['A: Conflict']};
+    assert.deepEqual(group(review).otherErrors,['A: Conflict']);
+});
+
+const findConflicts = new Function(html.slice(html.indexOf('const findCalendarExceptionConflicts ='),html.indexOf('const OperatingCalendarEditor ='))+';return findCalendarExceptionConflicts;')();
+const exception=(status,start='2026-02-14',end=start,ids=[])=>({status,start,end,ids});
+test('opposite statuses on the same date are reported with their exception indices',()=>{
+    assert.deepEqual(findConflicts([exception('open'),exception('closed')]),[{indices:[0,1],start:'2026-02-14',end:'2026-02-14',ids:[]}]);
+});
+test('date ranges and intersecting item scopes identify the actual overlap',()=>{
+    assert.deepEqual(findConflicts([exception('open','2026-02-10','2026-02-20',['A','B']),exception('closed','2026-02-14','2026-02-25',['B','C'])]),[{indices:[0,1],start:'2026-02-14',end:'2026-02-20',ids:['B']}]);
+});
+test('distinct days, disjoint IDs and item-specific overrides are allowed',()=>{
+    for(const rows of [
+        [exception('open'),exception('closed','2026-02-15')],
+        [exception('open',undefined,undefined,['A']),exception('closed',undefined,undefined,['B'])],
+        [exception('open'),exception('closed',undefined,undefined,['A'])],
+    ]) assert.deepEqual(findConflicts(rows),[]);
+});
+
+test('repeated Open and Closed rules also conflict, including partially overlapping ranges',()=>{
+    for (const status of ['open','closed']) {
+        assert.equal(findConflicts([exception(status),exception(status)]).length,1);
+        assert.equal(findConflicts([exception(status,'2026-02-10','2026-02-15',['A']),exception(status,'2026-02-14','2026-02-20',['A'])]).length,1);
+    }
+});

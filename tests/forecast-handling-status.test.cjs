@@ -49,3 +49,22 @@ test('handling edits invalidate confirmation but explicit confirmation can resto
     update({overrides:{A:'backward'}});
     assert.equal(sources.custom.preparation.frequency_confirmed,false);
 });
+
+const filterRecords = new Function(code+';return filterPreparationRecords;')();
+test('unresolved preview includes conflicts and pending reviews while excluding resolved gaps and real zeros',()=>{
+    const review={policy:{reviewed_items:[]},items:[{id:'A',review_required:true},{id:'B'}],records:[
+        {unique_id:'B',ds:'empty',missing:true,prepared:null},
+        {unique_id:'B',ds:'absent',missing:true,kind:'absent_period',prepared:null},
+        {unique_id:'B',ds:'conflict',missing:false,closed:true,conflict:true,prepared:null},
+        {unique_id:'A',ds:'pending-review',missing:true,prepared:10},
+        {unique_id:'B',ds:'resolved',missing:true,prepared:0},
+        {unique_id:'B',ds:'observed-zero',missing:false,prepared:0},
+        {unique_id:'B',ds:'closure',missing:false,closed:true,prepared:0},
+    ]};
+    assert.deepEqual(filterRecords(review,'',true,false).map(r=>r.ds),['empty','absent','conflict','pending-review']);
+    assert.deepEqual(filterRecords(review,'B',true,true).map(r=>r.ds),['empty','absent','conflict']);
+    review.policy.reviewed_items=['A'];
+    assert.deepEqual(filterRecords(review,'A',true,false),[]);
+    assert.equal(filterRecords(review,'',false,false).length,7);
+    assert.deepEqual(filterRecords(null,'',true,false),[]);
+});

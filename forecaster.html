@@ -1705,13 +1705,82 @@
         .fc-prep-auto-frequency { display: inline-flex; align-items: center; padding: 3px 7px; border: 1px solid var(--source-line); border-radius: 5px; background: var(--source-bg); color: var(--source-text); font-size: 11px; white-space: nowrap; }
         .fc-prep-dependent { min-width: 0; border: 0; margin: 0; padding: 0; }
         .fc-prep-primary-options { display: flex; flex-wrap: wrap; align-items: center; gap: inherit; }
-        .fc-calendar-body { padding: 10px; display: grid; gap: 10px; }
-        .fc-calendar-body .fc-prep-controls { gap: 8px; }
-        .fc-calendar-body input:not([type="checkbox"]) { max-width: 210px; }
-        .fc-calendar-body button[aria-pressed="true"] { border-color: #f59e0b; background: #f59e0b22; }
-        .fc-calendar-exceptions { max-height: 160px; overflow: auto; margin-top: 8px; }
-        .fc-calendar-exceptions > div { padding: 4px 0; }
-        .fc-calendar-exceptions span { flex: 1; }
+        .fc-calendar-body { border-top: 1px solid var(--source-line); padding: 14px; display: grid; gap: 14px; }
+        .fc-calendar-intro, .fc-calendar-section-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+        .fc-calendar-intro strong { font-size: 13px; }
+        .fc-calendar-intro p, .fc-calendar-section-heading p { margin: 4px 0 0; color: var(--source-muted); font-size: 12px; }
+        .fc-calendar-switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; flex-shrink: 0; position: relative; }
+        .fc-calendar-switch input { position: absolute; opacity: 0; width: 34px; height: 20px; }
+        .fc-calendar-switch > span { width: 34px; height: 20px; border-radius: 20px; background: var(--source-line); padding: 3px; transition: background .15s; }
+        .fc-calendar-switch > span::after { content: ''; display: block; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #0003; transition: transform .15s; }
+        .fc-calendar-switch input:checked + span { background: #f59e0b; }
+        .fc-calendar-switch input:checked + span::after { transform: translateX(14px); }
+        .fc-calendar-switch input:focus-visible + span { outline: 2px solid #f59e0b; outline-offset: 3px; }
+        .fc-calendar-summary-state[data-dirty="true"] { font-size: 11px; font-weight: 400; color: #a16207; }
+        .dark .fc-calendar-summary-state[data-dirty="true"] { color: #fbbf24; }
+        .fc-calendar-nav { display: flex; gap: 4px; border-bottom: 1px solid var(--source-line); }
+        .fc-calendar-nav button { padding: 9px 14px; border-bottom: 2px solid transparent; color: var(--source-muted); font-size: 12px; font-weight: 600; }
+        .fc-calendar-nav button[aria-pressed="true"] { color: var(--source-text); border-bottom-color: #f59e0b; background: rgb(245 158 11 / .07); }
+        .fc-calendar-panel { display: grid; gap: 12px; }
+        .fc-calendar-panel[hidden] { display: none; }
+        .fc-calendar-section-heading h4 { font-size: 13px; font-weight: 600; margin: 0; }
+        .fc-calendar-muted { color: var(--source-muted); font-size: 12px; }
+        .fc-calendar-week { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 8px; }
+        .fc-calendar-week button { display: grid; gap: 4px; justify-items: center; padding: 9px 4px; border: 1px solid var(--source-line); background: var(--source-bg); border-radius: 8px; }
+        .fc-calendar-week button strong { font-size: 12px; font-weight: 600; }
+        .fc-calendar-week button span { font-size: 11px; color: var(--source-muted); }
+        .fc-calendar-week button[aria-pressed="true"] { background: rgb(245 158 11 / .08); border-color: #f59e0b; }
+        .fc-calendar-week button[aria-pressed="true"] span { color: #b45309; }
+        .dark .fc-calendar-week button[aria-pressed="true"] span { color: #fcd34d; }
+        .fc-calendar-fields { display: grid; align-items: end; gap: 10px; }
+        .fc-calendar-coverage { grid-template-columns: 1fr 1fr 1.5fr; }
+        .fc-calendar-fields label { display: block; min-width: 0; color: var(--source-muted); font-size: 11px; font-weight: 600; }
+        .fc-calendar-fields label > span { font-weight: 400; }
+        .fc-calendar-fields input, .fc-calendar-fields select { display: block; width: 100%; min-width: 0; padding: 8px 10px; margin-top: 5px; border: 1px solid var(--source-line); border-radius: 7px; background: var(--source-bg); color: var(--source-text); font-size: 12px; font-weight: 400; color-scheme: light; }
+        .dark .fc-calendar-fields input, .dark .fc-calendar-fields select { color-scheme: dark; }
+        .fc-calendar-note, .fc-calendar-import-help { color: var(--source-muted); font-size: 12px; line-height: 1.5; margin: 0; }
+        .fc-calendar-entry { grid-template-columns: 1fr 1fr .8fr 1.3fr; padding: 12px; border: 1px solid var(--source-line); background: var(--source-soft); border-radius: 9px; }
+        .fc-calendar-entry-reason { grid-column: span 3; }
+        .fc-calendar-add { min-height: 34px; }
+        .fc-calendar-exceptions { max-height: 190px; overflow: auto; }
+        .fc-calendar-event { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--source-line); }
+        .fc-calendar-event:last-child { border-bottom: 0; }
+        .fc-calendar-exception-warning { margin: 0; }
+        .fc-calendar-exception-warning p { margin: 6px 0; }
+        .fc-calendar-exception-warning ul { max-height: 100px; overflow: auto; }
+        .fc-calendar-event[data-conflict="true"] .fc-calendar-event-copy strong,
+        .fc-calendar-event[data-conflict="true"] .fc-calendar-day-status { color: #be123c; }
+        .dark .fc-calendar-event[data-conflict="true"] .fc-calendar-event-copy strong,
+        .dark .fc-calendar-event[data-conflict="true"] .fc-calendar-day-status { color: #fda4af; }
+
+        .fc-calendar-event-copy { display: grid; gap: 3px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+        .fc-calendar-event-copy strong { font-size: 12px; font-weight: 500; }
+        .fc-calendar-event-copy span { font-size: 11px; color: var(--source-muted); }
+        .fc-calendar-day-status { padding: 4px 8px; border-radius: 5px; font-size: 11px; color: var(--source-muted); background: var(--source-bg); border: 1px solid var(--source-line); min-width: 52px; text-align: center; }
+        .fc-calendar-day-status[data-status="open"] { color: #047857; }
+        .dark .fc-calendar-day-status[data-status="open"] { color: #6ee7b7; }
+        .fc-calendar-empty { padding: 18px; text-align: center; border: 1px dashed var(--source-line); border-radius: 8px; color: var(--source-muted); font-size: 12px; }
+        .fc-calendar-holiday-fields { grid-template-columns: 1fr 1fr auto; }
+        .fc-calendar-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--source-line); }
+        .fc-calendar-actions > div:last-child { display: flex; gap: 8px; }
+        .fc-calendar-action-status { display: grid; gap: 3px; font-size: 11px; color: var(--source-muted); }
+        .fc-calendar-action-status strong { font-weight: 500; color: var(--source-text); }
+        @media (max-width: 640px) {
+            .fc-calendar-intro { align-items: flex-start; }
+            .fc-calendar-switch strong { display: none; }
+            .fc-calendar-nav button { padding: 9px 6px; }
+            .fc-calendar-coverage, .fc-calendar-entry, .fc-calendar-holiday-fields { grid-template-columns: 1fr 1fr; }
+            .fc-calendar-coverage label:last-child, .fc-calendar-entry-reason { grid-column: span 2; }
+            .fc-calendar-actions { flex-wrap: wrap; }
+            .fc-calendar-week { gap: 4px; }
+        }
+        .fc-calendar-conflicts { margin-bottom: 0; }
+        .fc-calendar-conflicts p { margin: 6px 0; }
+        .fc-calendar-conflict-dates { max-height: 200px; overflow-y: auto; }
+        .fc-calendar-conflict-dates details { padding: 5px 0; }
+        .fc-calendar-conflict-dates summary { cursor: pointer; font-weight: 600; }
+        .fc-calendar-conflict-dates p { padding-left: 14px; color: var(--source-text); overflow-wrap: anywhere; }
+
         .fc-prep-dependent:disabled { opacity: .45; }
         .fc-prep-dependent:disabled :is(input,select,button) { cursor: not-allowed; }
         .fc-source-dialog .fc-prep-dependent:disabled button { opacity: 1; }
@@ -1736,10 +1805,12 @@
         .fc-source-dialog button:disabled { opacity: .5; cursor: not-allowed; }
         .fc-source-dialog :is(button,select,input,summary):focus-visible { outline: 2px solid #f59e0b; outline-offset: 3px; }
         .fc-prep-table th:nth-child(-n+2), .fc-prep-table td:nth-child(-n+2) { text-align: left; }
-        .fc-prep-table td.fc-prep-missing { color: #be123c; background: #fff1f2; font-style: italic; }
-        .fc-prep-table td.fc-prep-estimate { color: #92400e; background: #fef3c7; font-weight: 650; }
-        .dark .fc-prep-table td.fc-prep-missing { color: #fda4af; background: #351e2c; }
-        .dark .fc-prep-table td.fc-prep-estimate { color: #fcd34d; background: #3a2c19; }
+        .fc-prep-table td { font-size: inherit; font-style: normal; font-weight: 400; }
+
+        .fc-prep-table td.fc-prep-missing { color: #be123c; }
+        .fc-prep-table td.fc-prep-estimate { color: #92400e; }
+        .dark .fc-prep-table td.fc-prep-missing { color: #fda4af; }
+        .dark .fc-prep-table td.fc-prep-estimate { color: #fcd34d; }
         .fc-dataset-library { min-height: 0; }
         .fc-dataset-empty-state { min-height: 136px; display: grid; place-items: center; text-align: center; padding: 18px; border: 1px dashed var(--source-line); border-radius: 10px; font-size: 12px; line-height: 1.6; color: var(--source-muted); }
         .fc-dataset-detail > .fc-dataset-empty-state { margin-top: 12px; }
@@ -1774,17 +1845,30 @@
         .fc-source-table[data-format="vertical"] { width: 100%; table-layout: fixed; }
         .fc-source-table[data-format="vertical"] th:nth-child(2), .fc-source-table[data-format="vertical"] td:nth-child(2) { text-align: left; }
         @media (max-width: 640px) { .fc-source-format-row { align-items: stretch; flex-direction: column; gap: 6px; } }
-        .fc-source-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+        .fc-source-preview-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
         .fc-source-preview-heading h3 { font-size: 14px; font-weight: 650; }
         .fc-source-preview-heading span { color: var(--source-muted); font-size: 12px; }
         /* Reserve a header plus ten 35px rows, borders and scrollbar space. */
-        .fc-source-table-wrap { flex: 1 0 403px; min-height: 403px; overflow: auto; border: 1px solid var(--source-line); border-radius: 10px; }
+        .fc-source-table-wrap { flex: 1 0 403px; min-height: 403px; overflow: auto; overscroll-behavior: contain; border: 1px solid var(--source-line); border-radius: 10px; }
         .fc-source-table { min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 20px; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
         .fc-source-table th, .fc-source-table td { padding: 9px 14px; border-bottom: 1px solid var(--source-line); }
         .fc-source-table th { position: sticky; top: 0; z-index: 2; background: var(--source-soft); font-weight: 600; }
         .fc-source-table td { background: var(--source-bg); }
         .fc-source-table tr:nth-child(even) td { background: var(--source-soft); }
         .fc-source-table tr:last-child td { border-bottom: 0; }
+        .fc-prep-table td.fc-prep-resolved { color: #047857; }
+        .dark .fc-prep-table td.fc-prep-resolved { color: #6ee7b7; }
+        .fc-prep-table tr.fc-prep-conflict td:nth-last-child(-n+2) { color: #be123c; }
+        .dark .fc-prep-table tr.fc-prep-conflict td:nth-last-child(-n+2) { color: #fda4af; }
+        .fc-prep-table tr.fc-prep-unresolved td:nth-last-child(-n+2) { color: #be123c; }
+        .dark .fc-prep-table tr.fc-prep-unresolved td:nth-last-child(-n+2) { color: #fda4af; }
+        .fc-prep-table tr.fc-prep-closed td:nth-child(5) { color: #047857; }
+        .fc-prep-table tr.fc-prep-closed td:nth-child(4) { color: #92400e; }
+        .dark .fc-prep-table tr.fc-prep-closed td:nth-child(5) { color: #6ee7b7; }
+        .dark .fc-prep-table tr.fc-prep-closed td:nth-child(4) { color: #fcd34d; }
+
+
+
         .fc-source-table .fc-source-id { text-align: left; font-weight: 600; }
         .fc-source-table th:first-child, .fc-source-table td:first-child { position: sticky; left: 0; border-right: 1px solid var(--source-line); }
         .fc-source-table th:first-child { z-index: 3; }
@@ -1851,7 +1935,6 @@
         .fc-source-foldout { border: 1px solid var(--source-line); border-radius: 8px; margin-bottom: 8px; background: var(--source-soft); }
         .fc-source-foldout > summary { cursor: pointer; padding: 8px 10px; font-size: 12px; font-weight: 600; }
         .fc-source-foldout > summary span { font-weight: 400; color: var(--source-muted); margin-left: 8px; }
-        .fc-source-foldout[data-attention="true"] { border-color: rgb(245 158 11 / .55); background: rgb(245 158 11 / .06); }
         .fc-source-foldout .fc-prep-panel { margin: 0; border: 0; border-top: 1px solid var(--source-line); border-radius: 0 0 8px 8px; padding: 10px 12px; max-height: none; overflow: visible; }
         .fc-source-foldout .fc-prep-heading { gap: 6px 12px; }
         .fc-source-foldout .fc-prep-help { margin: 4px 0 8px; }
@@ -1862,7 +1945,69 @@
         .fc-source-foldout .fc-prep-warning { padding: 8px 10px; margin: 8px 0; }
         .fc-source-foldout .fc-prep-panel details { margin: 8px 0; }
         .fc-source-foldout .fc-prep-panel details > summary { padding: 6px 0; }
-        .fc-source-foldout .fc-prep-items { max-height: 180px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0 8px; margin-top: 4px; border: 1px solid var(--source-line); border-radius: 6px; background: var(--source-bg); }
+        .fc-source-foldout .fc-prep-items { max-height: 360px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0 8px; margin-top: 4px; border: 1px solid var(--source-line); border-radius: 6px; background: var(--source-bg); }
+        .fc-source-foldout .fc-missing-workspace { padding: 14px; display: grid; gap: 12px; background: var(--source-soft); }
+        .fc-missing-overview { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+        .fc-missing-overview h3 { font-size: 13px; font-weight: 600; margin: 0; }
+        .fc-missing-overview p { color: var(--source-muted); font-size: 12px; margin: 4px 0 0; }
+        .fc-missing-progress { width: 150px; flex-shrink: 0; font-size: 11px; color: var(--source-muted); }
+        .fc-missing-progress strong { color: var(--source-text); font-weight: 600; }
+        .fc-missing-progress [role="progressbar"] { height: 4px; background: var(--source-line); border-radius: 4px; margin-top: 7px; overflow: hidden; }
+        .fc-missing-progress i { display: block; height: 100%; background: #10b981; }
+        .fc-missing-counts { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--source-muted); }
+        .fc-missing-counts > span { padding: 5px 9px; border: 1px solid var(--source-line); border-radius: 6px; background: var(--source-bg); }
+        .fc-missing-counts strong { font-weight: 500; color: var(--source-text); }
+        .fc-missing-counts .fc-missing-attention { font-size: 11px; font-weight: 400; color: #a16207; }
+        .dark .fc-missing-counts .fc-missing-attention { color: #fbbf24; }
+        .fc-missing-review-status { margin-left: auto; align-self: center; font-size: 11px; font-weight: 400; color: var(--source-muted); }
+        .fc-missing-review-status[data-tone="warning"] { color: #a16207; }
+        .fc-missing-item-status { color: #b45309; }
+        .dark .fc-missing-review-status[data-tone="warning"] { color: #fbbf24; }
+        .dark .fc-missing-item-status { color: #fcd34d; }
+        .fc-missing-review-status[data-tone="success"], .fc-missing-item-status[data-complete="true"] { color: #047857; }
+        .dark .fc-missing-review-status[data-tone="success"], .dark .fc-missing-item-status[data-complete="true"] { color: #6ee7b7; }
+        .fc-missing-tab[hidden] { display: none; }
+        .fc-missing-setup { display: grid; grid-template-columns: 1fr 1fr 1.8fr; align-items: start; gap: 16px; padding: 4px 0; }
+        .fc-missing-setup label { font-size: 11px; color: var(--source-muted); display: block; }
+        .fc-missing-setup select { display: block; width: 100%; min-width: 0; margin-top: 6px; border: 1px solid var(--source-line); border-radius: 7px; padding: 7px 9px; background: var(--source-bg); color: var(--source-text); font-size: 12px; }
+        .fc-missing-setup p { font-size: 11px; color: var(--source-muted); margin: 6px 0 0; }
+        .fc-missing-frequency .fc-prep-auto-frequency { margin-top: 6px; }
+        .fc-missing-confirm { padding-top: 21px; }
+        .fc-missing-confirm .fc-prep-check { display: flex; align-items: flex-start; font-size: 12px; color: var(--source-text); }
+        .fc-missing-confirm input { margin-top: 2px; }
+        .fc-missing-confirm p { margin-left: 22px; }
+        .fc-missing-guidance, .fc-missing-lock { padding: 9px 11px; border-radius: 7px; border: 1px solid var(--source-line); font-size: 12px; color: var(--source-muted); margin: 8px 0 0; }
+        .fc-source-foldout .fc-missing-help { font-size: 11px; color: var(--source-muted); margin: 8px 0 0; }
+        .fc-missing-help p { margin-top: 6px; line-height: 1.5; }
+        .fc-source-foldout .fc-missing-items { max-height: 360px; margin: 0; padding: 0 12px; }
+        .fc-missing-item-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .fc-missing-item-heading > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; }
+        .fc-missing-item-heading strong { font-size: 12px; font-weight: 600; }
+        .fc-missing-item-heading span { font-size: 11px; }
+        .fc-missing-item-heading > div > span { color: var(--source-muted); }
+        .fc-missing-items .fc-prep-item p, .fc-missing-items .fc-prep-check { font-size: 12px; }
+        .fc-source-foldout .fc-missing-items .fc-prep-item:last-child { border: 0; }
+        .fc-source-foldout .fc-missing-preview-controls { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--source-line); padding-top: 10px; }
+        .fc-preview-search { display: flex; align-items: center; flex: 1 1 180px; min-width: 150px; border: 1px solid var(--source-line); border-radius: 8px; background: var(--source-soft); }
+        .fc-preview-search:has(input:focus-visible) { outline: 2px solid #f59e0b; outline-offset: 3px; }
+        .fc-source-dialog .fc-preview-search input:focus-visible { outline: none; box-shadow: none; }
+        .fc-preview-search input { width: 100%; min-width: 0; border: 0; background: transparent; padding: 6px 9px; font-size: 12px; color: var(--source-text); outline: none; }
+        .fc-preview-search input::-webkit-search-cancel-button { display: none; }
+        .fc-preview-search button { padding: 2px 9px; color: var(--source-muted); font-size: 18px; }
+        .fc-preview-search-results { color: var(--source-muted); font-size: 11px; margin: 4px 0 6px; }
+        .fc-source-table td.fc-preview-empty { text-align: center; padding: 24px; color: var(--source-muted); }
+        .fc-preview-filters { flex: 0 1 auto; }
+        .fc-preview-filters .fc-prep-controls { margin: 0; gap: 8px 14px; }
+        .fc-preview-filters .fc-prep-controls > label { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .fc-preview-filters .fc-prep-controls label select { margin-top: 0; padding: 6px 8px; font-size: 12px; }
+        @media (max-width: 700px) {
+            .fc-missing-setup { grid-template-columns: 1fr 1fr; }
+            .fc-missing-confirm { grid-column: span 2; padding-top: 0; }
+            .fc-missing-nav { flex-wrap: wrap; }
+            .fc-missing-review-status { flex-basis: 100%; padding: 4px 0; }
+            .fc-missing-overview { align-items: flex-start; }
+            .fc-missing-progress { width: 100px; }
+        }
         .fc-source-foldout .fc-prep-item:last-child { border-bottom: 0; }
         .fc-source-foldout .fc-prep-save { margin: 0; padding: 10px; border-top: 1px solid var(--source-line); }
         .fc-source-foldout .fc-prep-help[role="status"] { padding: 0 10px; }
@@ -5377,9 +5522,53 @@
                         <div className="fc-prep-controls"><button className="fc-source-confirm" disabled={busy} onClick={()=>action(()=>onOpen(detail,version))}>Open version</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'original')}>Original file</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'prepared')}>Prepared data</button><button className="fc-source-secondary" disabled={busy} onClick={()=>action(async()=>setHistory(await (await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/history`)).json()))}>Changes</button></div>
                         {!!version.forecasts.length && <p className="fc-prep-help">Linked forecasts: {version.forecasts.map(job=>`${job.id.slice(0,8)} (${job.status})`).join(', ')}</p>}
                     </article>)}
-                    {history && <div className="fc-prep-history"><h4>Recorded changes ({history.changes.length})</h4><p className="fc-prep-help">Frequency: {history.settings.preparation.frequency || 'Detected from source'}</p>{history.changes.map((row,i)=><p key={i}>{row.unique_id} · {row.ds} · {row.closed?'Closed':'Missing'} → {row.prepared ?? 'unresolved'} · {row.closed?'Operating calendar':PREPARATION_METHODS[row.method] || 'No change'}</p>)}</div>}
+                    {history && <div className="fc-prep-history"><h4>Recorded changes ({history.changes.length})</h4><p className="fc-prep-help">Frequency: {history.settings.preparation.frequency || 'Detected from source'}</p>{history.changes.map((row,i)=><p key={i}>{row.unique_id} · {row.ds} · {row.calendar_conflict_resolved?'Calendar conflict resolved':row.closed?'Closed':'Missing'} → {row.prepared ?? 'unresolved'} · {row.calendar_conflict_resolved?(row.closed ? 'Closed exception applied; original sales retained in source' : 'Original sales retained'):row.closed?'Operating calendar':PREPARATION_METHODS[row.method] || 'No change'}</p>)}</div>}
                 </div></div>
             </section>;
+        };
+        const groupCalendarConflicts = (review) => {
+            const dates = new Map(), ids = new Set();
+            for (const row of review?.records || []) {
+                if (!row.conflict) continue;
+                if (!dates.has(row.ds)) dates.set(row.ds, new Set());
+                dates.get(row.ds).add(row.unique_id);
+                ids.add(row.unique_id);
+            }
+            const groupedErrors = new Set((review?.items || []).filter(item=>item.conflicts && ids.has(item.id)).map(item=>`${item.id}: ${item.error}`));
+            return {
+                dates: [...dates].sort(([a],[b])=>a.localeCompare(b)).map(([date,items])=>({date,ids:[...items].sort()})),
+                itemCount: ids.size,
+                otherErrors: (review?.calendar_errors || []).filter(message=>!groupedErrors.has(message)),
+            };
+        };
+        const CalendarConflictSummary = ({review}) => {
+            const conflicts = groupCalendarConflicts(review);
+            return <>
+                {!!conflicts.dates.length && <section className="fc-source-error fc-calendar-conflicts" aria-label="Calendar conflicts">
+                    <strong role="alert">Sales recorded on closed dates: {conflicts.dates.length} {conflicts.dates.length===1?'date':'dates'} · {conflicts.itemCount} {conflicts.itemCount===1?'ID':'IDs'}</strong>
+                    <p>Apply an Open exception to retain sales, or a Closed exception to set prepared sales to zero. Original values are preserved. Expand a date to see affected IDs.</p>
+                    <div className="fc-calendar-conflict-dates">{conflicts.dates.map(group=><details key={group.date}>
+                        <summary>{group.date} · {group.ids.length} {group.ids.length===1?'ID':'IDs'}</summary>
+                        <p>{group.ids.join(', ')}</p>
+                    </details>)}</div>
+                </section>}
+                {conflicts.otherErrors.map((message,i)=><p key={i} className="fc-source-error" role="alert">{message}</p>)}
+            </>;
+        };
+        const findCalendarExceptionConflicts = (exceptions) => {
+            const conflicts = [];
+            for (let i=0;i<exceptions.length;i++) {
+                const left=exceptions[i];
+                for (let j=i+1;j<exceptions.length;j++) {
+                    const right=exceptions[j];
+                    const ids=left.ids.filter(id=>right.ids.includes(id));
+                    const sameScope=(!left.ids.length && !right.ids.length) || ids.length>0;
+                    if (sameScope && left.start<=right.end && right.start<=left.end) {
+                        conflicts.push({indices:[i,j],start:left.start>right.start?left.start:right.start,end:left.end<right.end?left.end:right.end,ids});
+                    }
+                }
+            }
+            return conflicts;
         };
         const OperatingCalendarEditor = ({calendar,review,baseUrl,update,onDirty}) => {
             const defaults = {enabled:false,start:'',end:'',weekdays:[0,1,2,3,4],ids:[],exceptions:[]};
@@ -5388,12 +5577,19 @@
             const [dirty,setDirty] = useState(false), [busy,setBusy] = useState(false), [error,setError] = useState('');
             const [entry,setEntry] = useState({start:'',end:'',status:'closed',ids:'',label:''});
             const [country,setCountry] = useState('DE'), [subdivision,setSubdivision] = useState(''), [holidays,setHolidays] = useState([]);
+            const [calendarView,setCalendarView] = useState('schedule');
+            const [exceptionConflicts,setExceptionConflicts] = useState([]);
+            const conflictNoticeRef = useRef(null);
+            useEffect(()=>{if(exceptionConflicts.length) conflictNoticeRef.current?.focus();},[exceptionConflicts]);
             const fileRef=useRef(null);
             const weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
             useEffect(()=>{if (!dirty) {setDraft({...defaults,...calendar});setScope((calendar?.ids||[]).join(', '));}},[JSON.stringify(calendar)]);
-            const change = patch => {setDraft(prev=>({...prev,...patch}));setDirty(true);onDirty(true);setError('');};
+            const change = patch => {setDraft(prev=>({...prev,...patch}));setDirty(true);onDirty(true);setError('');setExceptionConflicts([]);};
             const add = row => change({exceptions:[...draft.exceptions,row]});
             const apply = () => {
+                const conflicts = draft.enabled ? findCalendarExceptionConflicts(draft.exceptions) : [];
+                if(conflicts.length) {setExceptionConflicts(conflicts);setCalendarView('exceptions');return;}
+                setExceptionConflicts([]);
                 if(draft.enabled && (!draft.start || !draft.end || draft.end<draft.start || !draft.weekdays.length)) {setError('Set calendar coverage and at least one opening weekday.');return;}
                 update({operating_calendar:{...draft,start:draft.start||null,end:draft.end||null,ids:scope.split(',').map(v=>v.trim()).filter(Boolean)},...(draft.enabled?{frequency:'daily'}:{})});setDirty(false);onDirty(false);setError('');
             };
@@ -5409,27 +5605,44 @@
                 catch(e){setError(e.message);}finally{setBusy(false);}
             };
             const applied=calendar?.enabled;
-            return <details className="fc-source-foldout fc-calendar"><summary>Operating calendar<span>{dirty?'Unapplied changes':applied?`${calendar.weekdays.map(d=>weekdays[d]).join(', ')} · ${review?.closed_count||0} closed item-days`:'Optional · daily expected sales'}</span></summary>
+            return <details className="fc-source-foldout fc-calendar">
+                <summary>Operating calendar<span className="fc-calendar-summary-state" data-dirty={dirty}>{dirty?'Unapplied changes':applied?`${calendar.weekdays.map(d=>weekdays[d]).join(', ')} · ${calendar.exceptions.length} ${calendar.exceptions.length===1?'exception':'exceptions'}`:'Optional · set your opening days'}</span></summary>
                 <div className="fc-calendar-body">
-                    <label className="fc-prep-check"><input type="checkbox" checked={draft.enabled} onChange={e=>{const days=(review?.records||[]).map(r=>r.ds).sort();change({enabled:e.target.checked,...(e.target.checked && !draft.start && days.length ? {start:days[0].slice(0,10),end:`${Number(days[days.length-1].slice(0,4))+1}-12-31`}:{})});}}/>Use an operating calendar</label>
-                    {draft.enabled && <>
-                        <p className="fc-prep-help">Available for statistical models; deselect MLP. Closed dates need no source records. Forecasts cover calendar days and show zero expected sales on closures. Set coverage for both history and future forecasts.</p>
-                        <div className="fc-prep-controls"><label>Coverage from<input aria-label="Calendar coverage start" type="date" value={draft.start||''} onChange={e=>change({start:e.target.value})}/></label><label>Through<input aria-label="Calendar coverage end" type="date" value={draft.end||''} onChange={e=>change({end:e.target.value})}/></label><label>Applies to IDs<input aria-label="Calendar item IDs" placeholder="All IDs, or comma-separated IDs" value={scope} onChange={e=>{setScope(e.target.value);change({});}}/></label></div>
-                        <div className="fc-prep-controls" role="group" aria-label="Opening weekdays"><span>Open</span>{weekdays.map((day,i)=><button type="button" className="fc-source-secondary" key={day} aria-pressed={draft.weekdays.includes(i)} onClick={()=>change({weekdays:draft.weekdays.includes(i)?draft.weekdays.filter(d=>d!==i):[...draft.weekdays,i].sort()})}>{day}</button>)}</div>
-                        <details><summary>Exceptions ({draft.exceptions.length}) · closures and extra opening days</summary>
-                            <div className="fc-prep-controls"><label>From<input aria-label="Exception start" type="date" value={entry.start} onChange={e=>setEntry({...entry,start:e.target.value})}/></label><label>Through<input aria-label="Exception end" type="date" value={entry.end} onChange={e=>setEntry({...entry,end:e.target.value})}/></label><select aria-label="Exception status" value={entry.status} onChange={e=>setEntry({...entry,status:e.target.value})}><option value="closed">Closed</option><option value="open">Open</option></select><input aria-label="Exception item IDs" placeholder="All calendar IDs" value={entry.ids} onChange={e=>setEntry({...entry,ids:e.target.value})}/><input aria-label="Exception label" placeholder="Reason (optional)" maxLength={120} value={entry.label} onChange={e=>setEntry({...entry,label:e.target.value})}/><button className="fc-source-secondary" type="button" disabled={!entry.start || (entry.end && entry.end<entry.start) || draft.exceptions.length>=200} onClick={()=>{add({...entry,end:entry.end||entry.start,ids:entry.ids.split(',').map(v=>v.trim()).filter(Boolean)});setEntry({start:'',end:'',status:'closed',ids:'',label:''});}}>Add exception</button></div>
-                            <input ref={fileRef} type="file" accept=".xlsx,.csv" hidden onChange={importFile}/><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>fileRef.current?.click()}>Import calendar</button><p className="fc-prep-help">Excel/CSV first sheet: Start Date, End Date, Status (open/closed). Optional: Item ID, Label. Imported exceptions are added to this list.</p>
-                            <div className="fc-calendar-exceptions">{draft.exceptions.map((row,i)=><div className="fc-prep-controls" key={i}><span>{row.start}–{row.end} · {row.status} · {row.ids.join(', ')||'All calendar IDs'}{row.label?` · ${row.label}`:''}</span><button type="button" className="fc-source-secondary" aria-label={`Remove exception ${i+1}`} onClick={()=>change({exceptions:draft.exceptions.filter((_,j)=>j!==i)})}>Remove</button></div>)}</div>
-                        </details>
-                        <details><summary>Public holiday suggestions</summary><p className="fc-prep-help">A public holiday does not automatically close your business. Add only the dates you close.</p><div className="fc-prep-controls"><label>Country<select aria-label="Holiday country" value={country} onChange={e=>{setCountry(e.target.value);setHolidays([]);}}>{[['DE','Germany'],['VN','Vietnam'],['US','United States'],['GB','United Kingdom'],['FR','France'],['AU','Australia'],['CA','Canada']].map(([code,name])=><option key={code} value={code}>{name}</option>)}</select></label><label>Region code<input aria-label="Holiday region" placeholder="Optional, e.g. BE" value={subdivision} onChange={e=>{setSubdivision(e.target.value);setHolidays([]);}}/></label><button type="button" className="fc-source-secondary" disabled={busy} onClick={loadHolidays}>Find holidays</button></div><div className="fc-calendar-exceptions">{holidays.map(row=><div className="fc-prep-controls" key={row.date}><span>{row.date} · {row.label}</span><button type="button" className="fc-source-secondary" disabled={draft.exceptions.some(e=>e.start===row.date && e.end===row.date && e.status==='closed' && !e.ids.length)} onClick={()=>add({start:row.date,end:row.date,status:'closed',ids:[],label:row.label.slice(0,120)})}>Add closure</button></div>)}</div></details>
-                    </>}
+                    <div className="fc-calendar-intro">
+                        <div><strong>Forecast around your opening days</strong><p>Keep your weekly routine and one-off changes in one place.</p></div>
+                        <label className="fc-calendar-switch"><input type="checkbox" aria-label="Use an operating calendar" checked={draft.enabled} onChange={e=>{const days=(review?.records||[]).map(r=>r.ds).sort();change({enabled:e.target.checked,...(e.target.checked && !draft.start && days.length ? {start:days[0].slice(0,10),end:`${Number(days[days.length-1].slice(0,4))+1}-12-31`}:{})});}}/><span aria-hidden="true"/><strong>{draft.enabled?'Enabled':'Enable calendar'}</strong></label>
+                    </div>
+                    {draft.enabled ? <>
+                        <nav className="fc-calendar-nav" aria-label="Calendar sections">{[['schedule','Weekly schedule'],['exceptions',`Exceptions (${draft.exceptions.length})`],['holidays','Public holidays']].map(([key,label])=><button key={key} type="button" aria-pressed={calendarView===key} onClick={()=>setCalendarView(key)}>{label}</button>)}</nav>
+                        <div className="fc-calendar-panel" hidden={calendarView!=='schedule'}>
+                            <div className="fc-calendar-section-heading"><div><h4>Your regular week</h4><p>Select the days you are usually open.</p></div><span className="fc-calendar-muted">{draft.weekdays.length} open · {7-draft.weekdays.length} closed</span></div>
+                            <div className="fc-calendar-week" role="group" aria-label="Opening weekdays">{weekdays.map((day,i)=><button type="button" key={day} aria-label={`${day}: ${draft.weekdays.includes(i)?'open':'closed'}`} aria-pressed={draft.weekdays.includes(i)} onClick={()=>change({weekdays:draft.weekdays.includes(i)?draft.weekdays.filter(d=>d!==i):[...draft.weekdays,i].sort()})}><strong>{day}</strong><span>{draft.weekdays.includes(i)?'Open':'Closed'}</span></button>)}</div>
+                            <div className="fc-calendar-fields fc-calendar-coverage"><label>Coverage starts<input aria-label="Calendar coverage start" type="date" value={draft.start||''} onChange={e=>change({start:e.target.value})}/></label><label>Coverage ends<input aria-label="Calendar coverage end" type="date" value={draft.end||''} onChange={e=>change({end:e.target.value})}/></label><label>Applies to IDs<input aria-label="Calendar item IDs" placeholder="All IDs, or comma-separated IDs" value={scope} onChange={e=>{setScope(e.target.value);change({});}}/></label></div>
+                            <p className="fc-calendar-note">Include your historical data and forecast horizon. Closed days show zero expected sales. Available for statistical models; deselect MLP.</p>
+                        </div>
+                        <div className="fc-calendar-panel" hidden={calendarView!=='exceptions'}>
+                            <div className="fc-calendar-section-heading"><div><h4>Closures & extra opening days</h4><p>Exceptions override your regular week.</p></div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>fileRef.current?.click()}>Import calendar</button></div>
+                            {!!exceptionConflicts.length && <div ref={conflictNoticeRef} tabIndex={-1} className="fc-source-error fc-calendar-exception-warning" role="alert"><strong>Calendar exceptions conflict</strong><p>Exceptions repeat or contradict each other for the same dates and IDs. Remove or correct one of the highlighted exceptions, then apply again.</p><ul>{exceptionConflicts.map((conflict,i)=><li key={i}>Exceptions {conflict.indices.map(index=>index+1).join(' & ')} · {conflict.start}{conflict.end!==conflict.start?` – ${conflict.end}`:''} · {conflict.ids.join(', ')||'All calendar IDs'}</li>)}</ul></div>}
+                            <input ref={fileRef} type="file" accept=".xlsx,.csv" hidden onChange={importFile}/>
+                            <div className="fc-calendar-fields fc-calendar-entry"><label>From<input aria-label="Exception start" type="date" value={entry.start} onChange={e=>setEntry({...entry,start:e.target.value})}/></label><label>Through<input aria-label="Exception end" type="date" value={entry.end} onChange={e=>setEntry({...entry,end:e.target.value})}/></label><label>Status<select aria-label="Exception status" value={entry.status} onChange={e=>setEntry({...entry,status:e.target.value})}><option value="closed">Closed</option><option value="open">Open</option></select></label><label>Applies to<input aria-label="Exception item IDs" placeholder="All calendar IDs" value={entry.ids} onChange={e=>setEntry({...entry,ids:e.target.value})}/></label><label className="fc-calendar-entry-reason">Reason <span>(optional)</span><input aria-label="Exception label" placeholder="e.g. Extra Saturday opening" maxLength={120} value={entry.label} onChange={e=>setEntry({...entry,label:e.target.value})}/></label><button className="fc-source-secondary fc-calendar-add" type="button" disabled={!entry.start || (entry.end && entry.end<entry.start) || draft.exceptions.length>=200} onClick={()=>{add({...entry,end:entry.end||entry.start,ids:entry.ids.split(',').map(v=>v.trim()).filter(Boolean)});setEntry({start:'',end:'',status:'closed',ids:'',label:''});}}>+ Add exception</button></div>
+                            <p className="fc-calendar-note">Closed sets prepared sales to zero; Open retains recorded sales. Original values stay unchanged.</p>
+                            <div className="fc-calendar-exceptions">{!draft.exceptions.length && <p className="fc-calendar-empty">No exceptions yet. Add a date above or import your calendar.</p>}{draft.exceptions.map((row,i)=><div className="fc-calendar-event" data-conflict={exceptionConflicts.some(conflict=>conflict.indices.includes(i))} key={i}><span className="fc-calendar-day-status" data-status={row.status}>{row.status==='open'?'Open':'Closed'}</span><div className="fc-calendar-event-copy"><strong>{row.start}{row.end!==row.start?` – ${row.end}`:''}</strong><span>{row.label?`${row.label} · `:''}{row.ids.join(', ')||'All calendar IDs'}</span></div><button type="button" className="fc-source-secondary" aria-label={`Remove exception ${i+1}`} onClick={()=>change({exceptions:draft.exceptions.filter((_,j)=>j!==i)})}>Remove</button></div>)}</div>
+                            <details className="fc-calendar-import-help"><summary>Import file format</summary><p>Excel or CSV, first sheet: Start Date, End Date, Status (open/closed). Optional: Item ID, Label. Imported exceptions are added to your list.</p></details>
+                        </div>
+                        <div className="fc-calendar-panel" hidden={calendarView!=='holidays'}>
+                            <div className="fc-calendar-section-heading"><div><h4>Find public holidays</h4><p>Choose only the holidays when your business closes.</p></div></div>
+                            <div className="fc-calendar-fields fc-calendar-holiday-fields"><label>Country<select aria-label="Holiday country" value={country} onChange={e=>{setCountry(e.target.value);setHolidays([]);}}>{[['DE','Germany'],['VN','Vietnam'],['US','United States'],['GB','United Kingdom'],['FR','France'],['AU','Australia'],['CA','Canada']].map(([code,name])=><option key={code} value={code}>{name}</option>)}</select></label><label>Region code <span>(optional)</span><input aria-label="Holiday region" placeholder="e.g. BE" value={subdivision} onChange={e=>{setSubdivision(e.target.value);setHolidays([]);}}/></label><button type="button" className="fc-source-secondary" disabled={busy} onClick={loadHolidays}>{busy?'Loading…':'Find holidays'}</button></div>
+                            <p className="fc-calendar-note">Suggestions use your calendar coverage. Adding a holiday creates a Closed exception.</p>
+                            <div className="fc-calendar-exceptions">{!holidays.length && <p className="fc-calendar-empty">Holiday suggestions will appear here.</p>}{holidays.map(row=><div className="fc-calendar-event" key={row.date}><div className="fc-calendar-event-copy"><strong>{row.label}</strong><span>{row.date}</span></div><button type="button" className="fc-source-secondary" disabled={draft.exceptions.some(e=>e.start===row.date && e.end===row.date && e.status==='closed' && !e.ids.length)} onClick={()=>add({start:row.date,end:row.date,status:'closed',ids:[],label:row.label.slice(0,120)})}>{draft.exceptions.some(e=>e.start===row.date && e.end===row.date && e.status==='closed' && !e.ids.length)?'Added':'Add closure'}</button></div>)}</div>
+                        </div>
+                    </> : <p className="fc-calendar-note">Enable the calendar to distinguish scheduled closures from missing data, and show zero expected sales on closed days.</p>}
                     {error && <p className="fc-source-error" role="alert">{error}</p>}
-                    <div className="fc-prep-controls"><button type="button" className="fc-source-secondary" disabled={!dirty || busy} onClick={apply}>Apply calendar</button>{dirty && <button type="button" className="fc-source-secondary" onClick={()=>{setDraft({...defaults,...calendar});setScope((calendar?.ids||[]).join(', '));setDirty(false);onDirty(false);setError('');}}>Discard changes</button>}</div>
-                    {applied && <p className="fc-prep-help">Coverage: {calendar.start}–{calendar.end}. {review?.closed_count||0} closed item-days excluded from missing-data handling. {review?.conflict_count||0} calendar conflicts.</p>}
-                    {review?.calendar_errors?.map((message,i)=><p key={i} className="fc-source-error" role="alert">{message}</p>)}
+                    <CalendarConflictSummary review={review} />
+                    <div className="fc-calendar-actions"><div className="fc-calendar-action-status" role="status">{dirty?<><strong>Changes ready to apply</strong><span>Your preview updates after applying.</span></>:applied?<><strong>{review?.closed_count||0} closed item-days · {review?.conflict_count||0} conflicts</strong><span>{calendar.start} – {calendar.end}</span></>:<span>No calendar applied</span>}</div><div>{dirty && <button type="button" className="fc-source-secondary" onClick={()=>{setDraft({...defaults,...calendar});setScope((calendar?.ids||[]).join(', '));setDirty(false);onDirty(false);setError('');setExceptionConflicts([]);}}>Discard changes</button>}<button type="button" className="fc-source-confirm" disabled={!dirty || busy} onClick={apply}>Apply calendar</button></div></div>
                 </div>
             </details>;
         };
+
         const PreparationFrequency = ({frequency,automatic,detectedFrequency,detectionFailed,update}) => <label>Frequency<select aria-label="Missing data frequency" value={automatic ? '' : frequency} onChange={e=>update({frequency:e.target.value || null,frequency_confirmed:false})}><option value="">Detect automatically</option>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v.replace('_',' ')}</option>)}</select>{automatic && <span className="fc-prep-auto-frequency" role="status">{detectedFrequency ? `${detectedFrequency.replace('_',' ')} (auto)` : detectionFailed ? 'Not detected' : 'Detecting…'}</span>}</label>;
         const missingHandlingStatus = (review, current, error) => {
             if (review?.conflict_count) return {readyToConfirm:false,tone:'warning',summary:'Resolve calendar conflicts first',items:'Calendar review required'};
@@ -5446,18 +5659,62 @@
                 summary:readyToConfirm ? `All ${review.missing_count} gaps handled · ${review.policy.frequency_confirmed ? 'Review confirmed' : 'Confirm frequency & handling'}` : `${handled}/${review.missing_count} gaps handled · ${detail || 'Review required'}`,
                 items:outstanding.length ? `${outstanding.length}/${affected.length} items need attention` : `All ${affected.length} items handled`};
         };
-        const MissingDataReview = ({review,update,filter,setFilter,onlyMissing,setOnlyMissing,frequencyAuto,detectedFrequency,detectionFailed,handlingLocked,handlingStatus}) => {
-            const policy=review.policy, affected=review.items.filter(item=>item.missing);
-            return <section className="fc-prep-panel" aria-label="Missing data">
-                <div className="fc-prep-heading"><h3>Missing data</h3><strong>{review.missing_count} gaps across {affected.length} {affected.length===1?'item':'items'}</strong></div>
-                <p className="fc-prep-help">{review.empty_count} empty quantities · {review.absent_periods} absent {review.absent_periods===1?'period':'periods'} · {review.unresolved} unresolved. Zeros remain unchanged.</p>
-                <div className="fc-prep-controls"><PreparationFrequency frequency={policy.frequency} automatic={frequencyAuto} detectedFrequency={detectedFrequency} detectionFailed={detectionFailed} update={update}/><fieldset className="fc-prep-dependent fc-prep-primary-options" disabled={handlingLocked}><label>Default handling<select aria-label="Default missing data handling" value={policy.auto_suggest ? 'auto' : policy.method} onChange={e=>update(e.target.value==='auto' ? {auto_suggest:true,method:'none'} : {auto_suggest:false,suggested_methods:{},method:e.target.value,overrides:{}})}><option value="auto">Auto Suggestion</option>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select></label><label className="fc-prep-check fc-prep-final-check" title={handlingStatus.readyToConfirm ? 'Confirm the frequency and review the prepared values.' : 'Resolve all gaps and required item reviews first.'}><input type="checkbox" disabled={!handlingStatus.readyToConfirm} checked={policy.frequency_confirmed} onChange={e=>update({frequency_confirmed:e.target.checked})}/>I confirm the frequency and all missing-data handling</label></fieldset></div>
-                <fieldset className="fc-prep-dependent" disabled={handlingLocked}>
-                {policy.auto_suggest && <p className="fc-prep-help">Auto Suggestion uses each item’s recommended method and keeps manual overrides. Items without a recommendation remain unresolved; review the preview before confirming.</p>}
-                <details><summary>Review suggestions and per-item handling ({affected.length})<span className="fc-prep-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.items}</span></summary><div className="fc-prep-items">{affected.map(item=><div className="fc-prep-item" key={item.id}><strong>{item.id} · {item.missing} missing · longest gap {item.longest_gap}</strong><p>{item.reason}</p><div className="fc-prep-controls"><select aria-label={`Handling for ${item.id}`} disabled={item.entirely_missing} value={item.method} onChange={e=>update({overrides:{...policy.overrides,[item.id]:e.target.value}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select>{item.suggested!=='none' && <button type="button" className="fc-source-secondary" onClick={()=>update({overrides:{...policy.overrides,[item.id]:item.suggested}})}>Use suggested {PREPARATION_METHODS[item.suggested]}</button>}</div>{item.entirely_missing?<p className="fc-source-error">This entire series is missing. Correct the original data.</p>:item.review_required && <label className="fc-prep-check"><input type="checkbox" checked={policy.reviewed_items.includes(item.id)} onChange={e=>update({reviewed_items:e.target.checked?[...policy.reviewed_items,item.id]:policy.reviewed_items.filter(id=>id!==item.id)})}/>I reviewed this long or boundary gap, including whether it predates the item’s launch.</label>}{item.error && <p className="fc-source-error">{item.error}</p>}</div>)}</div></details>
-                <p className="fc-prep-help">Interpolation needs values on both sides. Seasonal filling uses earlier matching cycles. Validation reapplies your rule inside each training window; some boundary gaps may still require correction.</p>
-                <div className="fc-prep-controls"><label>Preview item<select aria-label="Preview item" value={filter} onChange={e=>setFilter(e.target.value)}><option value="">All items</option>{affected.map(item=><option key={item.id} value={item.id}>{item.id}</option>)}</select></label><label className="fc-prep-check"><input type="checkbox" checked={onlyMissing} onChange={e=>setOnlyMissing(e.target.checked)}/>Only missing values</label><button className="fc-source-secondary" onClick={()=>update({method:'none',auto_suggest:false,suggested_methods:{},overrides:{},zero_confirmed:false,reviewed_items:[]})}>Reset handling</button></div>
-                </fieldset>
+        const filterPreparationRecords = (review, itemFilter, onlyUnresolved, openOnly) => {
+            const reviewed = new Set(review?.policy?.reviewed_items || []);
+            const pendingItems = new Set((review?.items || []).filter(item=>item.error || (item.review_required && !reviewed.has(item.id))).map(item=>item.id));
+            return (review?.records || []).filter(row=>
+                (!itemFilter || row.unique_id===itemFilter) &&
+                (!onlyUnresolved || row.conflict || row.prepared == null || (row.missing && pendingItems.has(row.unique_id))) &&
+                (!openOnly || !row.closed || (onlyUnresolved && row.conflict)));
+        };
+        const preparationPreviewCells = row => [
+            row.unique_id, row.ds,
+            row.original ?? ((row.original_kind ?? row.kind)==='absent_period' || (row.original_kind === undefined && row.closed) ? 'Missing period' : 'Empty'),
+            row.prepared ?? (row.conflict ? 'Conflict' : 'Unresolved'),
+            row.conflict ? 'Calendar conflict' : row.calendar_conflict_resolved ? (row.closed ? 'Closed · conflict resolved' : 'Observed · conflict resolved') : row.closed ? (row.original == null ? 'No record · closed' : 'Closed') : PREPARATION_METHODS[row.method] || (row.missing ? 'Unresolved' : 'Observed')
+        ];
+        const normalizePreviewSearch = value => String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        const previewSearchTerms = query => Array.from(query.matchAll(/"([^"]*)"|(\S+)/g), match=>normalizePreviewSearch(match[1] ?? match[2]).trim()).filter(Boolean);
+        const indexPreviewRows = (rows, cells) => rows.map(row=>({row, values:cells(row).map(normalizePreviewSearch)}));
+        const searchPreviewRows = (index, terms) => index.filter(({values})=>terms.every(term=>values.some(value=>value.includes(term)))).map(({row})=>row);
+        const rawPreviewItemIds = (rows, itemColumn) => itemColumn < 0 ? [] : [...new Set(rows.map(row=>String(row[itemColumn] ?? '')).filter(Boolean))];
+        const filterRawPreviewItems = (rows, itemColumn, itemId) => !itemId || itemColumn < 0 ? rows : rows.filter(row=>String(row[itemColumn] ?? '')===itemId);
+        const MissingDataReview = ({review,update,frequencyAuto,detectedFrequency,detectionFailed,handlingLocked,handlingStatus}) => {
+            const policy=review.policy, affected=review.items.filter(item=>item.missing || item.conflicts);
+            const [view,setView] = useState('handling');
+            const handled=Math.max(0,review.missing_count-review.unresolved);
+            const progress=review.missing_count?Math.min(100,handled/review.missing_count*100):0;
+            return <section className="fc-prep-panel fc-missing-workspace" aria-label="Missing data">
+                <div className="fc-missing-overview">
+                    <div><h3>Prepare missing values</h3><p>{review.missing_count} gaps across {affected.length} {affected.length===1?'item':'items'} · Original zeros stay unchanged.</p></div>
+                    <div className="fc-missing-progress"><span><strong>{handled} / {review.missing_count}</strong> gaps filled</span><div role="progressbar" aria-label="Missing values filled" aria-valuenow={handled} aria-valuemin={0} aria-valuemax={review.missing_count || 1}><i style={{width:`${progress}%`}}/></div></div>
+                </div>
+                <div className="fc-missing-counts"><span><strong>{review.empty_count}</strong> empty {review.empty_count===1?'quantity':'quantities'}</span><span><strong>{review.absent_periods}</strong> missing {review.absent_periods===1?'period':'periods'}</span><span className="fc-missing-attention" data-complete={handlingStatus.readyToConfirm}><strong>{review.unresolved}</strong> unresolved</span></div>
+                {handlingLocked && <p className="fc-missing-lock" role="status">Choose a valid frequency and resolve the scan error to continue handling missing values.</p>}
+                <nav className="fc-calendar-nav fc-missing-nav" aria-label="Missing data sections"><button type="button" aria-pressed={view==='handling'} onClick={()=>setView('handling')}>Handling setup</button><button type="button" aria-pressed={view==='items'} onClick={()=>setView('items')}>Review items ({affected.length})</button><span className="fc-missing-review-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.items}</span></nav>
+                <div className="fc-missing-tab" hidden={view!=='handling'}>
+                    <div className="fc-missing-setup">
+                        <div className="fc-missing-frequency"><PreparationFrequency frequency={policy.frequency} automatic={frequencyAuto} detectedFrequency={detectedFrequency} detectionFailed={detectionFailed} update={update}/><p>The interval between observations.</p></div>
+                        <fieldset className="fc-prep-dependent fc-missing-default" disabled={handlingLocked}><label>Default handling<select aria-label="Default missing data handling" value={policy.auto_suggest ? 'auto' : policy.method} onChange={e=>update(e.target.value==='auto' ? {auto_suggest:true,method:'none'} : {auto_suggest:false,suggested_methods:{},method:e.target.value,overrides:{}})}><option value="auto">Auto Suggestion</option>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select></label><p>Set a method, then fine-tune each item.</p></fieldset>
+                        <fieldset className="fc-prep-dependent fc-missing-confirm" disabled={handlingLocked}><label className="fc-prep-check fc-prep-final-check" title={handlingStatus.readyToConfirm ? 'Confirm the frequency and review the prepared values.' : 'Resolve all gaps and required item reviews first.'}><input type="checkbox" disabled={!handlingStatus.readyToConfirm} checked={policy.frequency_confirmed} onChange={e=>update({frequency_confirmed:e.target.checked})}/>I confirm the frequency and all missing-data handling</label><p>{handlingStatus.readyToConfirm ? 'Review your preview, then confirm.' : 'Available after all gaps and item reviews are resolved.'}</p></fieldset>
+                    </div>
+                    {policy.auto_suggest && <p className="fc-missing-guidance">Auto Suggestion uses each item’s recommended method and keeps manual overrides. Items without a recommendation remain unresolved.</p>}
+                    <details className="fc-missing-help"><summary>How handling works</summary><p>Interpolation needs values on both sides. Seasonal filling uses earlier matching cycles. Validation reapplies your rule inside each training window; some boundary gaps may still require correction. Review prepared values before confirming.</p></details>
+                </div>
+                <div className="fc-missing-tab" hidden={view!=='items'}>
+                    <fieldset className="fc-prep-dependent" disabled={handlingLocked}><div className="fc-prep-items fc-missing-items">{affected.map(item=>{
+                        const needsReview=item.review_required && !policy.reviewed_items.includes(item.id);
+                        const status=item.conflicts?'Calendar conflict':item.error?'Needs attention':item.unresolved?`${item.unresolved} unresolved`:needsReview?'Review required':'Handled';
+                        return <article className="fc-prep-item" key={item.id}>
+                            <div className="fc-missing-item-heading"><div><strong>{item.id}</strong><span>{item.missing} missing · longest gap {item.longest_gap}</span></div><span className="fc-missing-item-status" data-complete={status==='Handled'}>{status}</span></div>
+                            <p>{item.reason}</p>
+                            <div className="fc-prep-controls"><label className="fc-missing-item-method">Handling<select aria-label={`Handling for ${item.id}`} disabled={item.entirely_missing} value={item.method} onChange={e=>update({overrides:{...policy.overrides,[item.id]:e.target.value}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select></label>{item.suggested!=='none' && <button type="button" className="fc-source-secondary" onClick={()=>update({overrides:{...policy.overrides,[item.id]:item.suggested}})}>Use suggested {PREPARATION_METHODS[item.suggested]}</button>}</div>
+                            {item.entirely_missing?<p className="fc-source-error">This entire series is missing. Correct the original data.</p>:item.review_required && <label className="fc-prep-check"><input type="checkbox" checked={policy.reviewed_items.includes(item.id)} onChange={e=>update({reviewed_items:e.target.checked?[...policy.reviewed_items,item.id]:policy.reviewed_items.filter(id=>id!==item.id)})}/>I reviewed this long or boundary gap, including whether it predates the item’s launch.</label>}
+                            {item.error && <p className="fc-source-error">{item.error}</p>}
+                        </article>;
+                    })}</div></fieldset>
+                </div>
+                <fieldset className="fc-prep-dependent fc-missing-preview-controls" disabled={handlingLocked}><button type="button" className="fc-source-secondary" onClick={()=>update({method:'none',auto_suggest:false,suggested_methods:{},overrides:{},zero_confirmed:false,reviewed_items:[]})}>Reset handling</button></fieldset>
             </section>;
         };
 
@@ -5469,16 +5726,17 @@
             const [busy, setBusy] = useState(null);
             const [errors, setErrors] = useState({});
             const [page, setPage] = useState(0);
+            const [previewQuery,setPreviewQuery] = useState('');
             const dialogRef = useRef(null);
             const inputRef = useRef(null);
             const uploadGeneration = useRef(0);
             const source = sources[sourceKey];
             const [reviewState, setReviewState] = useState(null), [reviewError, setReviewError] = useState('');
             const [libraryOpen, setLibraryOpen] = useState(false), [datasetName, setDatasetName] = useState(''), [saveMessage, setSaveMessage] = useState(''), [saving, setSaving] = useState(false);
-            const [itemFilter,setItemFilter] = useState(''), [onlyMissing,setOnlyMissing] = useState(false);
+            const [itemFilter,setItemFilter] = useState('');
             const [preparationOpen, setPreparationOpen] = useState(false);
-            const [calendarDirty,setCalendarDirty] = useState(false), [openOnly,setOpenOnly] = useState(false);
-            useEffect(()=>{setCalendarDirty(false);setOpenOnly(false);},[source?.file]);
+            const [calendarDirty,setCalendarDirty] = useState(false);
+            useEffect(()=>{setCalendarDirty(false);},[source?.file]);
             useEffect(() => { setPreparationOpen(false); }, [source?.file]);
             const mappingSignature = source ? JSON.stringify([source.mapping,source.format]) : '';
             const signature = source ? JSON.stringify([source.mapping,source.preparation,source.format]) : '';
@@ -5494,7 +5752,7 @@
             const info = review ? {valid:reviewCurrent && !reviewError && review.valid,count:review.period_count,items:review.item_count,frequency:review.frequency} : {valid:false,count:0,items:0};
             const loading = busy === sourceKey;
             const handlingStatus = missingHandlingStatus(review,reviewCurrent,reviewError);
-            useEffect(()=>{setPage(0);setReviewError('');},[source?.file,mappingSignature]);
+            useEffect(()=>{setPage(0);setPreviewQuery('');setItemFilter('');setReviewError('');},[source?.file,mappingSignature]);
             useEffect(()=>{
                 if (!source) return;
                 const controller = new AbortController();
@@ -5504,7 +5762,7 @@
                 datasetRequest(baseUrl,'/data/preview',{method:'POST',body:form,signal:controller.signal}).then(r=>r.json()).then(data=>{if(!controller.signal.aborted){setReviewState({file:source.file,mappingSignature,signature,frequencySelection:source.preparation?.frequency ?? null,data});setReviewError('');}}).catch(e=>{if(!controller.signal.aborted)setReviewError(e.message);});
                 return ()=>controller.abort();
             },[source?.file,signature,baseUrl]);
-            const updatePreparation = patch => setSources(prev=>({...prev,[sourceKey]:{...prev[sourceKey],versionId:null,preparation:{...review?.policy,...prev[sourceKey].preparation,frequency:prev[sourceKey].preparation?.frequency ?? null,frequency_confirmed:false,...patch}}}));
+            const updatePreparation = patch => setSources(prev=>({...prev,[sourceKey]:{...prev[sourceKey],versionId:null,preparation:{...review?.policy,...prev[sourceKey].preparation,calendar_conflicts_seen:review?.policy?.calendar_conflicts_seen || prev[sourceKey].preparation?.calendar_conflicts_seen || {},frequency:prev[sourceKey].preparation?.frequency ?? null,frequency_confirmed:false,...patch}}}));
             const readySource = () => ({...source,preparation:review?.policy || source.preparation,analysis:info,mode});
             const saveDataset = async () => {
                 setSaving(true);setSaveMessage('');
@@ -5520,7 +5778,7 @@
                 const draft=await readSource(new File([await response.blob()],dataset.filename),version.settings.data_format);
                 const config=version.settings;
                 draft.mapping=draft.format==='vertical'?{sku:draft.headers[config.sku_col_idx],date:draft.headers[config.date_col_idx],value:draft.headers[config.quantity_col_idx]}:{sku:draft.headers[config.sku_col_idx],start:draft.headers[config.start_col_idx],end:draft.headers[config.end_col_idx]};
-                setSources(prev=>({...prev,custom:{...draft,preparation:config.preparation,datasetId:dataset.id,versionId:version.id}}));setDatasetName(dataset.name);setMode('custom');setLibraryOpen(false);setPage(0);setItemFilter('');setOnlyMissing(false);
+                setSources(prev=>({...prev,custom:{...draft,preparation:config.preparation,datasetId:dataset.id,versionId:version.id}}));setDatasetName(dataset.name);setMode('custom');setLibraryOpen(false);setPage(0);setItemFilter('');
             };
             const closeRef = useRef(onClose);
             closeRef.current = onClose;
@@ -5603,7 +5861,6 @@
                 setDatasetName('');
                 setSaveMessage('');
                 setItemFilter('');
-                setOnlyMissing(false);
                 setPreparationOpen(false);
                 setPage(0);
                 if (inputRef.current) inputRef.current.value = '';
@@ -5612,10 +5869,27 @@
             const changeMapping = (key, value) => setSources(prev => ({ ...prev, [sourceKey]: { ...prev[sourceKey], versionId:null, preparation:undefined, mapping: { ...prev[sourceKey].mapping, [key]: value } } }));
             const chooseMode = value => { setMode(value); setPage(0); };
             const pageSize = 20;
-            const gapPreview = !!review?.missing_count;
+            const gapPreview = !!(review?.missing_count || review?.conflict_count);
             const preparedPreview = gapPreview || !!review?.policy?.operating_calendar?.enabled;
-            const previewRecords = review?.records.filter(row=>(!itemFilter || row.unique_id===itemFilter) && (!onlyMissing || row.missing) && (!openOnly || !row.closed)) || [];
-            const visibleRows = source?.rows.slice(page * pageSize, (page + 1) * pageSize) || [];
+            const searchTerms = useMemo(()=>previewSearchTerms(previewQuery),[previewQuery]);
+            const preparedSearchIndex = useMemo(()=>indexPreviewRows(review?.records || [],preparationPreviewCells),[review?.records]);
+            const rawSearchIndex = useMemo(()=>indexPreviewRows(source?.rows || [],row=>row.slice(0,60)),[source?.rows]);
+            const searchedRecords = useMemo(()=>searchPreviewRows(preparedSearchIndex,searchTerms),[preparedSearchIndex,searchTerms]);
+            const previewRecords = filterPreparationRecords({...review,records:searchedRecords}, itemFilter, false, false);
+            const itemColumn = source?.headers.indexOf(source?.mapping.sku) ?? -1;
+            const previewItemIds = useMemo(()=>preparedPreview
+                ? [...new Set((review?.records || []).map(row=>String(row.unique_id)))]
+                : rawPreviewItemIds(source?.rows || [],itemColumn),[preparedPreview,review?.records,source?.rows,itemColumn]);
+            const rawPreviewRows = useMemo(()=>filterRawPreviewItems(searchPreviewRows(rawSearchIndex,searchTerms),itemColumn,itemFilter),[rawSearchIndex,searchTerms,itemColumn,itemFilter]);
+            const previewRowCount = preparedPreview ? previewRecords.length : rawPreviewRows.length;
+            const unsearchedRowCount = preparedPreview ? filterPreparationRecords(review,itemFilter,false,false).length : filterRawPreviewItems(source?.rows || [],itemColumn,itemFilter).length;
+            useEffect(()=>{setPage(current=>Math.min(current, Math.max(0, Math.ceil(previewRowCount/pageSize)-1)));},[previewRowCount]);
+            const changePreviewQuery = value => {
+                setPreviewQuery(value);setPage(0);
+                const table=dialogRef.current?.querySelector('.fc-source-table-wrap');
+                if (table) table.scrollTop=0;
+            };
+            const visibleRows = rawPreviewRows.slice(page * pageSize, (page + 1) * pageSize);
             const visibleHeaders = source?.headers.slice(0, 60) || [];
             const uploadControl = <button type="button" className="fc-source-upload" data-empty={!source && !loading ? "true" : "false"}
                                 disabled={loading} onClick={() => inputRef.current?.click()} title={`${source?.file.name || t('mapping.upload_prompt')} · ${t('mapping.upload_formats')}`} aria-label={t(source ? 'mapping.replace_file' : 'mapping.choose_file')}>
@@ -5671,22 +5945,22 @@
                             {mode==='custom' && <OperatingCalendarEditor key={sourceKey+source.file.name+source.file.lastModified} calendar={source.preparation?.operating_calendar} review={review} baseUrl={baseUrl} update={updatePreparation} onDirty={setCalendarDirty}/>}
                             {!review && reviewError && /calendar|frequency/i.test(reviewError) && <section className="fc-prep-panel" aria-label="Calendar settings"><div className="fc-prep-controls"><PreparationFrequency frequency={source.preparation?.frequency} automatic={source.preparation?.frequency == null} detectionFailed={!!reviewError} update={updatePreparation}/></div></section>}
                             {!review && !reviewError && <p role="status" className="fc-prep-help">Scanning quantities and calendar…</p>}
-                            {gapPreview && <details className="fc-source-foldout" open={preparationOpen} onToggle={event=>setPreparationOpen(event.currentTarget.open)} data-attention={!info.valid}><summary>Missing data<span className="fc-prep-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.summary}</span></summary><MissingDataReview review={displayReview} handlingStatus={handlingStatus} handlingLocked={handlingLocked} frequencyAuto={source.preparation?.frequency == null} detectedFrequency={detectedFrequency} detectionFailed={!!reviewError} update={updatePreparation} filter={itemFilter} setFilter={value=>{setItemFilter(value);setPage(0);}} onlyMissing={onlyMissing} setOnlyMissing={value=>{setOnlyMissing(value);setPage(0);}} /></details>}
-                            {mode === 'custom' && <details className="fc-source-foldout"><summary>Save &amp; download<span>Keep a private version or export prepared data</span></summary><div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty} onClick={()=>downloadPreparedPreview({...review,records:review.records.filter(row=>!openOnly || !row.closed)},source.file.name)}>Download prepared data</button></div>
+                            {gapPreview && <details className="fc-source-foldout" open={preparationOpen} onToggle={event=>setPreparationOpen(event.currentTarget.open)} data-attention={!info.valid}><summary>Missing data<span className="fc-prep-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.summary}</span></summary><MissingDataReview review={displayReview} handlingStatus={handlingStatus} handlingLocked={handlingLocked} frequencyAuto={source.preparation?.frequency == null} detectedFrequency={detectedFrequency} detectionFailed={!!reviewError} update={updatePreparation} /></details>}
+                            {mode === 'custom' && <details className="fc-source-foldout"><summary>Save &amp; download<span>Keep a private version or export prepared data</span></summary><div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty} onClick={()=>downloadPreparedPreview(review,source.file.name)}>Download prepared data</button></div>
                             {saveMessage && <p role="status" className="fc-prep-help">{saveMessage}</p>}</details>}
-                            <div className="fc-source-preview-heading"><h3>{t('mapping.preview')}</h3><span>{info.items} {t('mapping.items')} <span aria-hidden="true">·</span> {info.count} {t('mapping.months_detected')}</span></div>
-                            {review?.policy?.operating_calendar?.enabled && <label className="fc-prep-check"><input type="checkbox" checked={openOnly} onChange={e=>{setOpenOnly(e.target.checked);setPage(0);}}/>Open days only in preview and prepared download</label>}
+                            <div className="fc-source-preview-heading"><h3>{t('mapping.preview')}</h3>{previewItemIds.length > 0 && <fieldset className="fc-prep-dependent fc-preview-filters" aria-label="Data Preview filters"><div className="fc-prep-controls"><label><select aria-label="Preview item" value={itemFilter} onChange={e=>{setItemFilter(e.target.value);setPage(0);}}><option value="">All items</option>{previewItemIds.map(id=><option key={id} value={id}>{id}</option>)}</select></label></div></fieldset>}<div className="fc-preview-search"><input type="search" aria-label="Search Data Preview" placeholder="Search preview…" value={previewQuery} onChange={e=>changePreviewQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Escape' && previewQuery){e.preventDefault();e.stopPropagation();changePreviewQuery('');}}}/>{previewQuery && <button type="button" aria-label="Clear preview search" onClick={()=>changePreviewQuery('')}>×</button>}</div><span>{info.items} {t('mapping.items')} <span aria-hidden="true">·</span> {info.count} {t('mapping.months_detected')}</span></div>
+                            {searchTerms.length > 0 && <p className="fc-preview-search-results" role="status">{previewRowCount} of {unsearchedRowCount} rows match within the current filters.</p>}
                             {preparedPreview ? <>
-                                <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label="Data Preview"><table className="fc-source-table fc-prep-table"><thead><tr>{['Item ID','Date','Original','Prepared','Method'].map(label=><th key={label}>{label}</th>)}</tr></thead><tbody>{previewRecords.slice(page*pageSize,(page+1)*pageSize).map((row,i)=><tr key={i}><td>{row.unique_id}</td><td>{row.ds}</td><td className={row.missing?'fc-prep-missing':''}>{row.original ?? (row.closed?'No record · closed':row.kind==='absent_period'?'Missing period':'Empty')}</td><td className={row.missing && row.prepared!==null?'fc-prep-estimate':''}>{row.prepared ?? (row.conflict?'Conflict':'Unresolved')}</td><td>{row.conflict?'Calendar conflict':row.closed?'Closed':PREPARATION_METHODS[row.method] || (row.missing ? 'Unresolved' : 'Observed')}</td></tr>)}</tbody></table></div>
-                                <div className="fc-source-preview-footer"><span>{previewRecords.length ? page*pageSize+1 : 0}–{Math.min((page+1)*pageSize,previewRecords.length)} / {previewRecords.length} rows · Amber = estimated</span><div><button disabled={page===0} aria-label="Previous rows" onClick={()=>setPage(p=>p-1)}><ChevronLeftIcon/></button><button disabled={(page+1)*pageSize>=previewRecords.length} aria-label="Next rows" onClick={()=>setPage(p=>p+1)}><ChevronRightIcon/></button></div></div>
+                                <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label="Data Preview"><table className="fc-source-table fc-prep-table"><thead><tr><th>Item ID</th><th>Date</th><th>Original</th><th>Prepared</th><th>Method</th></tr></thead><tbody>{!previewRecords.length && <tr><td colSpan={5} className="fc-preview-empty">No rows match. Try another search or adjust the preview filters.</td></tr>}{previewRecords.slice(page*pageSize,(page+1)*pageSize).map((row,i)=><tr key={i} className={row.conflict ? 'fc-prep-conflict' : row.prepared == null ? 'fc-prep-unresolved' : row.closed ? 'fc-prep-closed' : undefined}><td>{row.unique_id}</td><td>{row.ds}</td><td className={row.original == null ? 'fc-prep-missing' : ''}>{preparationPreviewCells(row)[2]}</td><td className={row.missing && row.prepared!==null?'fc-prep-estimate':''}>{preparationPreviewCells(row)[3]}</td><td className={row.calendar_conflict_resolved && !row.conflict ? 'fc-prep-resolved' : undefined} title={row.calendar_conflict_resolved && !row.conflict ? (row.closed ? 'Closed exception applied. Prepared sales set to zero; original sales retained in Original.' : 'Previously marked closed. Calendar corrected; original sales retained.') : undefined}>{preparationPreviewCells(row)[4]}</td></tr>)}</tbody></table></div>
+                                <div className="fc-source-preview-footer"><span>{previewRecords.length ? page*pageSize+1 : 0}–{Math.min((page+1)*pageSize,previewRecords.length)} / {previewRecords.length} rows · Amber = prepared value{review?.closed_count > 0 && ' · Green = calendar applied'}{(review?.unresolved > 0 || review?.conflict_count > 0) && ' · Red = unresolved or conflict'}</span><div><button disabled={page===0} aria-label="Previous rows" onClick={()=>setPage(p=>p-1)}><ChevronLeftIcon/></button><button disabled={(page+1)*pageSize>=previewRecords.length} aria-label="Next rows" onClick={()=>setPage(p=>p+1)}><ChevronRightIcon/></button></div></div>
                             </> : <>
                             <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label={t('mapping.preview')}>
                                 <table className="fc-source-table" data-format={source.format || "horizontal"}><thead><tr>{visibleHeaders.map((header, i) => <th key={i} scope="col" className={header === source.mapping.sku ? 'fc-source-id' : ''}>{header}</th>)}</tr></thead>
-                                    <tbody>{visibleRows.map((row, ri) => <tr key={page * pageSize + ri}>{visibleHeaders.map((header, ci) => <td key={ci} className={header === source.mapping.sku ? 'fc-source-id' : ''}>{String(row[ci] ?? '')}</td>)}</tr>)}</tbody>
+                                    <tbody>{!visibleRows.length && <tr><td colSpan={visibleHeaders.length || 1} className="fc-preview-empty">No rows match. Try another search.</td></tr>}{visibleRows.map((row, ri) => <tr key={page * pageSize + ri}>{visibleHeaders.map((header, ci) => <td key={ci} className={header === source.mapping.sku ? 'fc-source-id' : ''}>{String(row[ci] ?? '')}</td>)}</tr>)}</tbody>
                                 </table>
                             </div>
-                            <div className="fc-source-preview-footer"><span>{page * pageSize + 1}–{Math.min((page + 1) * pageSize, source.rows.length)} / {source.rows.length} {t('mapping.rows')}{source.headers.length > 60 ? ` · ${t('mapping.preview_columns')}` : ''}</span>
-                                {source.rows.length > pageSize && <div><button type="button" disabled={page === 0} onClick={() => setPage(p => p - 1)} aria-label={t('mapping.previous')}><ChevronLeftIcon /></button><button type="button" disabled={(page + 1) * pageSize >= source.rows.length} onClick={() => setPage(p => p + 1)} aria-label={t('mapping.next')}><ChevronRightIcon /></button></div>}
+                            <div className="fc-source-preview-footer"><span>{rawPreviewRows.length ? page * pageSize + 1 : 0}–{Math.min((page + 1) * pageSize, rawPreviewRows.length)} / {rawPreviewRows.length} {t('mapping.rows')}{source.headers.length > 60 ? ` · ${t('mapping.preview_columns')}` : ''}</span>
+                                {rawPreviewRows.length > pageSize && <div><button type="button" disabled={page === 0} onClick={() => setPage(p => p - 1)} aria-label={t('mapping.previous')}><ChevronLeftIcon /></button><button type="button" disabled={(page + 1) * pageSize >= rawPreviewRows.length} onClick={() => setPage(p => p + 1)} aria-label={t('mapping.next')}><ChevronRightIcon /></button></div>}
                             </div>
                             </>}
                         </>}
