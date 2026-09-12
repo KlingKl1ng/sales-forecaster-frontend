@@ -5,6 +5,14 @@ const path = require('node:path');
 const source = fs.readFileSync(path.join(__dirname, '../forecaster.html'), 'utf8');
 const build = new Function(source.slice(source.indexOf('const buildValidationReplay ='), source.indexOf('const ReplayWindowLabel =')) + '; return buildValidationReplay;')();
 const dates = Array.from({length:8}, (_,i)=>`2024-01-0${i+1}`);
+test('calendar closures remain visible but are excluded from replay accuracy',()=>{
+    const data=result();data.preparation={operating_calendar:{enabled:true}};
+    data.validation_forecasts[0]={...data.validation_forecasts[0],actual:0,forecast:0,closed:true};
+    const replay=build(data);
+    assert.equal(replay.folds[0].points.length,2);
+    assert.equal(replay.folds[0].scoredCount,1);
+    assert.equal(replay.folds[0].metrics.mae,4);
+});
 function result(method='walk_forward') {
     return {validation_method:method, validation_summary:{training_window:3,validation_period:5,forecast_horizon:2,evaluations:2},
         forecast_data:dates.map(date=>({date,actual_history:10})),

@@ -1705,6 +1705,13 @@
         .fc-prep-auto-frequency { display: inline-flex; align-items: center; padding: 3px 7px; border: 1px solid var(--source-line); border-radius: 5px; background: var(--source-bg); color: var(--source-text); font-size: 11px; white-space: nowrap; }
         .fc-prep-dependent { min-width: 0; border: 0; margin: 0; padding: 0; }
         .fc-prep-primary-options { display: flex; flex-wrap: wrap; align-items: center; gap: inherit; }
+        .fc-calendar-body { padding: 10px; display: grid; gap: 10px; }
+        .fc-calendar-body .fc-prep-controls { gap: 8px; }
+        .fc-calendar-body input:not([type="checkbox"]) { max-width: 210px; }
+        .fc-calendar-body button[aria-pressed="true"] { border-color: #f59e0b; background: #f59e0b22; }
+        .fc-calendar-exceptions { max-height: 160px; overflow: auto; margin-top: 8px; }
+        .fc-calendar-exceptions > div { padding: 4px 0; }
+        .fc-calendar-exceptions span { flex: 1; }
         .fc-prep-dependent:disabled { opacity: .45; }
         .fc-prep-dependent:disabled :is(input,select,button) { cursor: not-allowed; }
         .fc-source-dialog .fc-prep-dependent:disabled button { opacity: 1; }
@@ -1770,8 +1777,9 @@
         .fc-source-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
         .fc-source-preview-heading h3 { font-size: 14px; font-weight: 650; }
         .fc-source-preview-heading span { color: var(--source-muted); font-size: 12px; }
-        .fc-source-table-wrap { flex: 1 1 180px; min-height: 140px; overflow: auto; border: 1px solid var(--source-line); border-radius: 10px; }
-        .fc-source-table { min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+        /* Reserve a header plus ten 35px rows, borders and scrollbar space. */
+        .fc-source-table-wrap { flex: 1 0 403px; min-height: 403px; overflow: auto; border: 1px solid var(--source-line); border-radius: 10px; }
+        .fc-source-table { min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 20px; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
         .fc-source-table th, .fc-source-table td { padding: 9px 14px; border-bottom: 1px solid var(--source-line); }
         .fc-source-table th { position: sticky; top: 0; z-index: 2; background: var(--source-soft); font-weight: 600; }
         .fc-source-table td { background: var(--source-bg); }
@@ -3576,7 +3584,7 @@
                 let squared = 0, absolute = 0, percentage = 0, percentageCount = 0, scoredCount = 0;
                 points.forEach(point => {
                     low = Math.min(low, point.forecast); high = Math.max(high, point.forecast);
-                    if (!finite(point.actual)) return;
+                    if (!finite(point.actual) || point.closed) return;
                     scoredCount++;
                     const error = point.forecast - point.actual;
                     squared += error * error; absolute += Math.abs(error);
@@ -3852,6 +3860,7 @@
                         </div>)}
                     </div>
                 </div>
+                {summary.metrics_scope==='observed_open_days' && <p>Accuracy uses {summary.open_day_scored_pairs} observed open-day forecasts; {summary.closed_pairs} closed-day forecasts are excluded.</p>}
                 {summary.unscored_missing_pairs > 0 && <p className="text-amber-500">{summary.unscored_missing_pairs} missing test observations excluded from scoring.</p>}
                 <p className="font-semibold">{t('sidebar.validation_counts').replace('{count}', fmtNumber(summary.evaluations, 0, 0, t.numberLocale)).replace('{horizon}', fmtNumber(summary.forecast_horizon, 0, 0, t.numberLocale)).replace('{pairs}', fmtNumber(summary.scored_pairs, 0, 0, t.numberLocale))}</p>
                 <div className="mt-2 space-y-2">
@@ -3901,6 +3910,7 @@
             const defaultValueClassName = 'font-medium text-slate-700 dark:text-slate-200 break-words';
             return <section className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300" aria-label={t('sidebar.detail_process')}>
                 <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-2">{t('sidebar.detail_process')}</h3>
+                {data.preparation?.operating_calendar?.enabled && <p className="mb-2">Expected sales · {futureCount} calendar days. Confirmed closures forecast zero. Calendar coverage ends {data.preparation.operating_calendar.end}.</p>}
                 <dl className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
                     {fields.map(({ label, value, valueClassName }) => <div className="min-w-0" key={label}>
                         <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
@@ -5301,7 +5311,7 @@
             return response;
         };
         const downloadPreparedPreview = (review, filename) => {
-            const data = [['Item ID','Date','Quantity','Original Quantity','Imputed','Method','Missing type'], ...review.records.map(r=>[r.unique_id,r.ds,r.prepared,r.original,r.missing,r.method,r.kind])];
+            const data = [['Item ID','Date','Quantity','Original Quantity','Imputed','Method','Missing type','Closed'], ...review.records.map(r=>[r.unique_id,r.ds,r.prepared,r.original,r.missing,r.method,r.kind,r.closed||false])];
             const quote = value => '"' + String(value ?? '').replace(/"/g,'""') + '"';
             const csv = data.map(row=>row.map((value,index)=>quote(index === 0 && /^[=+@-]/.test(String(value)) ? "'"+value : value)).join(',')).join('\r\n');
             window.OperartisSecurity.downloadBlob(new Blob(['\uFEFF',csv],{type:'text/csv'}),filename.replace(/\.[^.]+$/,'')+'-prepared.csv');
@@ -5367,12 +5377,62 @@
                         <div className="fc-prep-controls"><button className="fc-source-confirm" disabled={busy} onClick={()=>action(()=>onOpen(detail,version))}>Open version</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'original')}>Original file</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'prepared')}>Prepared data</button><button className="fc-source-secondary" disabled={busy} onClick={()=>action(async()=>setHistory(await (await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/history`)).json()))}>Changes</button></div>
                         {!!version.forecasts.length && <p className="fc-prep-help">Linked forecasts: {version.forecasts.map(job=>`${job.id.slice(0,8)} (${job.status})`).join(', ')}</p>}
                     </article>)}
-                    {history && <div className="fc-prep-history"><h4>Recorded changes ({history.changes.length})</h4><p className="fc-prep-help">Frequency: {history.settings.preparation.frequency || 'Detected from source'}</p>{history.changes.map((row,i)=><p key={i}>{row.unique_id} · {row.ds} · missing → {row.prepared ?? 'unresolved'} · {PREPARATION_METHODS[row.method] || 'No change'}</p>)}</div>}
+                    {history && <div className="fc-prep-history"><h4>Recorded changes ({history.changes.length})</h4><p className="fc-prep-help">Frequency: {history.settings.preparation.frequency || 'Detected from source'}</p>{history.changes.map((row,i)=><p key={i}>{row.unique_id} · {row.ds} · {row.closed?'Closed':'Missing'} → {row.prepared ?? 'unresolved'} · {row.closed?'Operating calendar':PREPARATION_METHODS[row.method] || 'No change'}</p>)}</div>}
                 </div></div>
             </section>;
         };
+        const OperatingCalendarEditor = ({calendar,review,baseUrl,update,onDirty}) => {
+            const defaults = {enabled:false,start:'',end:'',weekdays:[0,1,2,3,4],ids:[],exceptions:[]};
+            const [draft,setDraft] = useState(()=>({...defaults,...calendar}));
+            const [scope,setScope] = useState((calendar?.ids||[]).join(', '));
+            const [dirty,setDirty] = useState(false), [busy,setBusy] = useState(false), [error,setError] = useState('');
+            const [entry,setEntry] = useState({start:'',end:'',status:'closed',ids:'',label:''});
+            const [country,setCountry] = useState('DE'), [subdivision,setSubdivision] = useState(''), [holidays,setHolidays] = useState([]);
+            const fileRef=useRef(null);
+            const weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+            useEffect(()=>{if (!dirty) {setDraft({...defaults,...calendar});setScope((calendar?.ids||[]).join(', '));}},[JSON.stringify(calendar)]);
+            const change = patch => {setDraft(prev=>({...prev,...patch}));setDirty(true);onDirty(true);setError('');};
+            const add = row => change({exceptions:[...draft.exceptions,row]});
+            const apply = () => {
+                if(draft.enabled && (!draft.start || !draft.end || draft.end<draft.start || !draft.weekdays.length)) {setError('Set calendar coverage and at least one opening weekday.');return;}
+                update({operating_calendar:{...draft,start:draft.start||null,end:draft.end||null,ids:scope.split(',').map(v=>v.trim()).filter(Boolean)},...(draft.enabled?{frequency:'daily'}:{})});setDirty(false);onDirty(false);setError('');
+            };
+            const importFile = async event => {
+                const file=event.target.files?.[0];event.target.value='';if(!file)return;setBusy(true);setError('');
+                try {const body=new FormData();body.append('file',file);const data=await(await datasetRequest(baseUrl,'/data/operating-calendar',{method:'POST',body})).json();change({exceptions:[...draft.exceptions,...data.exceptions]});}
+                catch(e){setError(e.message);}finally{setBusy(false);}
+            };
+            const loadHolidays = async () => {
+                if(!draft.start || !draft.end) {setError('Set calendar coverage before loading public holidays.');return;}
+                setBusy(true);setError('');
+                try {const query=new URLSearchParams({country,subdivision,start_year:draft.start.slice(0,4),end_year:draft.end.slice(0,4)});const data=await(await datasetRequest(baseUrl,`/data/public-holidays?${query}`)).json();setHolidays(data.holidays.filter(row=>row.date>=draft.start && row.date<=draft.end));}
+                catch(e){setError(e.message);}finally{setBusy(false);}
+            };
+            const applied=calendar?.enabled;
+            return <details className="fc-source-foldout fc-calendar"><summary>Operating calendar<span>{dirty?'Unapplied changes':applied?`${calendar.weekdays.map(d=>weekdays[d]).join(', ')} · ${review?.closed_count||0} closed item-days`:'Optional · daily expected sales'}</span></summary>
+                <div className="fc-calendar-body">
+                    <label className="fc-prep-check"><input type="checkbox" checked={draft.enabled} onChange={e=>{const days=(review?.records||[]).map(r=>r.ds).sort();change({enabled:e.target.checked,...(e.target.checked && !draft.start && days.length ? {start:days[0].slice(0,10),end:`${Number(days[days.length-1].slice(0,4))+1}-12-31`}:{})});}}/>Use an operating calendar</label>
+                    {draft.enabled && <>
+                        <p className="fc-prep-help">Available for statistical models; deselect MLP. Closed dates need no source records. Forecasts cover calendar days and show zero expected sales on closures. Set coverage for both history and future forecasts.</p>
+                        <div className="fc-prep-controls"><label>Coverage from<input aria-label="Calendar coverage start" type="date" value={draft.start||''} onChange={e=>change({start:e.target.value})}/></label><label>Through<input aria-label="Calendar coverage end" type="date" value={draft.end||''} onChange={e=>change({end:e.target.value})}/></label><label>Applies to IDs<input aria-label="Calendar item IDs" placeholder="All IDs, or comma-separated IDs" value={scope} onChange={e=>{setScope(e.target.value);change({});}}/></label></div>
+                        <div className="fc-prep-controls" role="group" aria-label="Opening weekdays"><span>Open</span>{weekdays.map((day,i)=><button type="button" className="fc-source-secondary" key={day} aria-pressed={draft.weekdays.includes(i)} onClick={()=>change({weekdays:draft.weekdays.includes(i)?draft.weekdays.filter(d=>d!==i):[...draft.weekdays,i].sort()})}>{day}</button>)}</div>
+                        <details><summary>Exceptions ({draft.exceptions.length}) · closures and extra opening days</summary>
+                            <div className="fc-prep-controls"><label>From<input aria-label="Exception start" type="date" value={entry.start} onChange={e=>setEntry({...entry,start:e.target.value})}/></label><label>Through<input aria-label="Exception end" type="date" value={entry.end} onChange={e=>setEntry({...entry,end:e.target.value})}/></label><select aria-label="Exception status" value={entry.status} onChange={e=>setEntry({...entry,status:e.target.value})}><option value="closed">Closed</option><option value="open">Open</option></select><input aria-label="Exception item IDs" placeholder="All calendar IDs" value={entry.ids} onChange={e=>setEntry({...entry,ids:e.target.value})}/><input aria-label="Exception label" placeholder="Reason (optional)" maxLength={120} value={entry.label} onChange={e=>setEntry({...entry,label:e.target.value})}/><button className="fc-source-secondary" type="button" disabled={!entry.start || (entry.end && entry.end<entry.start) || draft.exceptions.length>=200} onClick={()=>{add({...entry,end:entry.end||entry.start,ids:entry.ids.split(',').map(v=>v.trim()).filter(Boolean)});setEntry({start:'',end:'',status:'closed',ids:'',label:''});}}>Add exception</button></div>
+                            <input ref={fileRef} type="file" accept=".xlsx,.csv" hidden onChange={importFile}/><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>fileRef.current?.click()}>Import calendar</button><p className="fc-prep-help">Excel/CSV first sheet: Start Date, End Date, Status (open/closed). Optional: Item ID, Label. Imported exceptions are added to this list.</p>
+                            <div className="fc-calendar-exceptions">{draft.exceptions.map((row,i)=><div className="fc-prep-controls" key={i}><span>{row.start}–{row.end} · {row.status} · {row.ids.join(', ')||'All calendar IDs'}{row.label?` · ${row.label}`:''}</span><button type="button" className="fc-source-secondary" aria-label={`Remove exception ${i+1}`} onClick={()=>change({exceptions:draft.exceptions.filter((_,j)=>j!==i)})}>Remove</button></div>)}</div>
+                        </details>
+                        <details><summary>Public holiday suggestions</summary><p className="fc-prep-help">A public holiday does not automatically close your business. Add only the dates you close.</p><div className="fc-prep-controls"><label>Country<select aria-label="Holiday country" value={country} onChange={e=>{setCountry(e.target.value);setHolidays([]);}}>{[['DE','Germany'],['VN','Vietnam'],['US','United States'],['GB','United Kingdom'],['FR','France'],['AU','Australia'],['CA','Canada']].map(([code,name])=><option key={code} value={code}>{name}</option>)}</select></label><label>Region code<input aria-label="Holiday region" placeholder="Optional, e.g. BE" value={subdivision} onChange={e=>{setSubdivision(e.target.value);setHolidays([]);}}/></label><button type="button" className="fc-source-secondary" disabled={busy} onClick={loadHolidays}>Find holidays</button></div><div className="fc-calendar-exceptions">{holidays.map(row=><div className="fc-prep-controls" key={row.date}><span>{row.date} · {row.label}</span><button type="button" className="fc-source-secondary" disabled={draft.exceptions.some(e=>e.start===row.date && e.end===row.date && e.status==='closed' && !e.ids.length)} onClick={()=>add({start:row.date,end:row.date,status:'closed',ids:[],label:row.label.slice(0,120)})}>Add closure</button></div>)}</div></details>
+                    </>}
+                    {error && <p className="fc-source-error" role="alert">{error}</p>}
+                    <div className="fc-prep-controls"><button type="button" className="fc-source-secondary" disabled={!dirty || busy} onClick={apply}>Apply calendar</button>{dirty && <button type="button" className="fc-source-secondary" onClick={()=>{setDraft({...defaults,...calendar});setScope((calendar?.ids||[]).join(', '));setDirty(false);onDirty(false);setError('');}}>Discard changes</button>}</div>
+                    {applied && <p className="fc-prep-help">Coverage: {calendar.start}–{calendar.end}. {review?.closed_count||0} closed item-days excluded from missing-data handling. {review?.conflict_count||0} calendar conflicts.</p>}
+                    {review?.calendar_errors?.map((message,i)=><p key={i} className="fc-source-error" role="alert">{message}</p>)}
+                </div>
+            </details>;
+        };
         const PreparationFrequency = ({frequency,automatic,detectedFrequency,detectionFailed,update}) => <label>Frequency<select aria-label="Missing data frequency" value={automatic ? '' : frequency} onChange={e=>update({frequency:e.target.value || null,frequency_confirmed:false})}><option value="">Detect automatically</option>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v.replace('_',' ')}</option>)}</select>{automatic && <span className="fc-prep-auto-frequency" role="status">{detectedFrequency ? `${detectedFrequency.replace('_',' ')} (auto)` : detectionFailed ? 'Not detected' : 'Detecting…'}</span>}</label>;
         const missingHandlingStatus = (review, current, error) => {
+            if (review?.conflict_count) return {readyToConfirm:false,tone:'warning',summary:'Resolve calendar conflicts first',items:'Calendar review required'};
             if (error) return {readyToConfirm:false,tone:'warning',summary:'Resolve the scan error first',items:'Review paused'};
             if (!review || !current) return {readyToConfirm:false,tone:'pending',summary:'Updating handling status…',items:'Updating…'};
             const affected = review.items.filter(item=>item.missing);
@@ -5417,6 +5477,8 @@
             const [libraryOpen, setLibraryOpen] = useState(false), [datasetName, setDatasetName] = useState(''), [saveMessage, setSaveMessage] = useState(''), [saving, setSaving] = useState(false);
             const [itemFilter,setItemFilter] = useState(''), [onlyMissing,setOnlyMissing] = useState(false);
             const [preparationOpen, setPreparationOpen] = useState(false);
+            const [calendarDirty,setCalendarDirty] = useState(false), [openOnly,setOpenOnly] = useState(false);
+            useEffect(()=>{setCalendarDirty(false);setOpenOnly(false);},[source?.file]);
             useEffect(() => { setPreparationOpen(false); }, [source?.file]);
             const mappingSignature = source ? JSON.stringify([source.mapping,source.format]) : '';
             const signature = source ? JSON.stringify([source.mapping,source.preparation,source.format]) : '';
@@ -5551,7 +5613,8 @@
             const chooseMode = value => { setMode(value); setPage(0); };
             const pageSize = 20;
             const gapPreview = !!review?.missing_count;
-            const previewRecords = review?.records.filter(row=>(!itemFilter || row.unique_id===itemFilter) && (!onlyMissing || row.missing)) || [];
+            const preparedPreview = gapPreview || !!review?.policy?.operating_calendar?.enabled;
+            const previewRecords = review?.records.filter(row=>(!itemFilter || row.unique_id===itemFilter) && (!onlyMissing || row.missing) && (!openOnly || !row.closed)) || [];
             const visibleRows = source?.rows.slice(page * pageSize, (page + 1) * pageSize) || [];
             const visibleHeaders = source?.headers.slice(0, 60) || [];
             const uploadControl = <button type="button" className="fc-source-upload" data-empty={!source && !loading ? "true" : "false"}
@@ -5605,14 +5668,16 @@
                                 </div>)}
                             </div>
                             {reviewError && <div role="alert" className="fc-source-error">{reviewError}</div>}
+                            {mode==='custom' && <OperatingCalendarEditor key={sourceKey+source.file.name+source.file.lastModified} calendar={source.preparation?.operating_calendar} review={review} baseUrl={baseUrl} update={updatePreparation} onDirty={setCalendarDirty}/>}
                             {!review && reviewError && /calendar|frequency/i.test(reviewError) && <section className="fc-prep-panel" aria-label="Calendar settings"><div className="fc-prep-controls"><PreparationFrequency frequency={source.preparation?.frequency} automatic={source.preparation?.frequency == null} detectionFailed={!!reviewError} update={updatePreparation}/></div></section>}
                             {!review && !reviewError && <p role="status" className="fc-prep-help">Scanning quantities and calendar…</p>}
                             {gapPreview && <details className="fc-source-foldout" open={preparationOpen} onToggle={event=>setPreparationOpen(event.currentTarget.open)} data-attention={!info.valid}><summary>Missing data<span className="fc-prep-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.summary}</span></summary><MissingDataReview review={displayReview} handlingStatus={handlingStatus} handlingLocked={handlingLocked} frequencyAuto={source.preparation?.frequency == null} detectedFrequency={detectedFrequency} detectionFailed={!!reviewError} update={updatePreparation} filter={itemFilter} setFilter={value=>{setItemFilter(value);setPage(0);}} onlyMissing={onlyMissing} setOnlyMissing={value=>{setOnlyMissing(value);setPage(0);}} /></details>}
-                            {mode === 'custom' && <details className="fc-source-foldout"><summary>Save &amp; download<span>Keep a private version or export prepared data</span></summary><div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid} onClick={()=>downloadPreparedPreview(review,source.file.name)}>Download prepared data</button></div>
+                            {mode === 'custom' && <details className="fc-source-foldout"><summary>Save &amp; download<span>Keep a private version or export prepared data</span></summary><div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty} onClick={()=>downloadPreparedPreview({...review,records:review.records.filter(row=>!openOnly || !row.closed)},source.file.name)}>Download prepared data</button></div>
                             {saveMessage && <p role="status" className="fc-prep-help">{saveMessage}</p>}</details>}
                             <div className="fc-source-preview-heading"><h3>{t('mapping.preview')}</h3><span>{info.items} {t('mapping.items')} <span aria-hidden="true">·</span> {info.count} {t('mapping.months_detected')}</span></div>
-                            {gapPreview ? <>
-                                <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label="Data Preview"><table className="fc-source-table fc-prep-table"><thead><tr>{['Item ID','Date','Original','Prepared','Method'].map(label=><th key={label}>{label}</th>)}</tr></thead><tbody>{previewRecords.slice(page*pageSize,(page+1)*pageSize).map((row,i)=><tr key={i}><td>{row.unique_id}</td><td>{row.ds}</td><td className={row.missing?'fc-prep-missing':''}>{row.original ?? (row.kind==='absent_period'?'Missing period':'Empty')}</td><td className={row.missing && row.prepared!==null?'fc-prep-estimate':''}>{row.prepared ?? 'Unresolved'}</td><td>{PREPARATION_METHODS[row.method] || (row.missing ? 'Unresolved' : 'Observed')}</td></tr>)}</tbody></table></div>
+                            {review?.policy?.operating_calendar?.enabled && <label className="fc-prep-check"><input type="checkbox" checked={openOnly} onChange={e=>{setOpenOnly(e.target.checked);setPage(0);}}/>Open days only in preview and prepared download</label>}
+                            {preparedPreview ? <>
+                                <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label="Data Preview"><table className="fc-source-table fc-prep-table"><thead><tr>{['Item ID','Date','Original','Prepared','Method'].map(label=><th key={label}>{label}</th>)}</tr></thead><tbody>{previewRecords.slice(page*pageSize,(page+1)*pageSize).map((row,i)=><tr key={i}><td>{row.unique_id}</td><td>{row.ds}</td><td className={row.missing?'fc-prep-missing':''}>{row.original ?? (row.closed?'No record · closed':row.kind==='absent_period'?'Missing period':'Empty')}</td><td className={row.missing && row.prepared!==null?'fc-prep-estimate':''}>{row.prepared ?? (row.conflict?'Conflict':'Unresolved')}</td><td>{row.conflict?'Calendar conflict':row.closed?'Closed':PREPARATION_METHODS[row.method] || (row.missing ? 'Unresolved' : 'Observed')}</td></tr>)}</tbody></table></div>
                                 <div className="fc-source-preview-footer"><span>{previewRecords.length ? page*pageSize+1 : 0}–{Math.min((page+1)*pageSize,previewRecords.length)} / {previewRecords.length} rows · Amber = estimated</span><div><button disabled={page===0} aria-label="Previous rows" onClick={()=>setPage(p=>p-1)}><ChevronLeftIcon/></button><button disabled={(page+1)*pageSize>=previewRecords.length} aria-label="Next rows" onClick={()=>setPage(p=>p+1)}><ChevronRightIcon/></button></div></div>
                             </> : <>
                             <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label={t('mapping.preview')}>
@@ -5627,7 +5692,7 @@
                         </>}
                         </>}
                     </div>
-                    <footer className="fc-source-footer"><p>{libraryOpen ? 'Private files and version history' : t('mapping.confirm_hint')}</p><div><button type="button" className="fc-source-secondary" onClick={onClose}>{t('mapping.cancel')}</button><button type="button" className="fc-source-confirm" disabled={libraryOpen || !source || loading || !info.valid || saving || !!errors[sourceKey]} onClick={() => { if (source && !loading && info.valid && !errors[sourceKey]) onConfirm(source.mapping.sku, source.mapping.start, source.mapping.end, readySource()); }}>{t(mode === 'template' ? 'mapping.use_template' : 'mapping.confirm')}</button></div></footer>
+                    <footer className="fc-source-footer"><p>{libraryOpen ? 'Private files and version history' : t('mapping.confirm_hint')}</p><div><button type="button" className="fc-source-secondary" onClick={onClose}>{t('mapping.cancel')}</button><button type="button" className="fc-source-confirm" disabled={libraryOpen || !source || loading || !info.valid || calendarDirty || saving || !!errors[sourceKey]} onClick={() => { if (source && !loading && info.valid && !errors[sourceKey]) onConfirm(source.mapping.sku, source.mapping.start, source.mapping.end, readySource()); }}>{t(mode === 'template' ? 'mapping.use_template' : 'mapping.confirm')}</button></div></footer>
                 </div>
             </div>;
         };
