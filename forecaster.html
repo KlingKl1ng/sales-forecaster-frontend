@@ -1721,10 +1721,27 @@
         .dark .fc-prep-table td.fc-prep-missing { color: #fda4af; background: #351e2c; }
         .dark .fc-prep-table td.fc-prep-estimate { color: #fcd34d; background: #3a2c19; }
         .fc-dataset-library { min-height: 0; }
+        .fc-dataset-empty-state { min-height: 136px; display: grid; place-items: center; text-align: center; padding: 18px; border: 1px dashed var(--source-line); border-radius: 10px; font-size: 12px; line-height: 1.6; color: var(--source-muted); }
+        .fc-dataset-detail > .fc-dataset-empty-state { margin-top: 12px; }
         .fc-dataset-grid { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr); gap: 18px; margin-top: 18px; }
         .fc-dataset-list { display: flex; flex-direction: column; gap: 8px; }
-        .fc-dataset-list button { padding: 12px; border: 1px solid var(--source-line); border-radius: 10px; text-align: left; background: var(--source-soft); overflow-wrap: anywhere; }
-        .fc-dataset-list button[aria-pressed="true"] { border-color: #f59e0b; }
+        .fc-dataset-card { position: relative; border: 1px solid var(--source-line); border-radius: 10px; background: var(--source-soft); min-width: 0; }
+        .fc-dataset-card[data-selected="true"] { border-color: #f59e0b; }
+        .fc-dataset-card-row { display: flex; align-items: center; }
+        .fc-dataset-select { flex: 1; min-width: 0; padding: 12px; text-align: left; overflow-wrap: anywhere; border-radius: 10px; }
+        .fc-dataset-card-menu { position: relative; margin-right: 7px; flex-shrink: 0; }
+        .fc-dataset-more { display: grid; place-items: center; width: 30px; height: 32px; border-radius: 6px; color: var(--source-muted); }
+        .fc-dataset-more:hover, .fc-dataset-more[aria-expanded="true"] { background: rgb(148 163 184 / .16); color: var(--source-text); }
+        .fc-dataset-menu-panel { position: absolute; z-index: 8; right: 0; top: calc(100% + 4px); min-width: 132px; padding: 4px; border: 1px solid var(--source-line); border-radius: 8px; background: var(--source-bg); box-shadow: 0 8px 24px rgb(0 0 0 / .14); }
+        .fc-dataset-menu-panel button { display: block; width: 100%; padding: 8px 10px; border-radius: 5px; font-size: 12px; text-align: left; }
+        .fc-dataset-menu-panel button:hover { background: var(--source-soft); }
+        .fc-dataset-delete-action { color: #be123c; }
+        .dark .fc-dataset-delete-action { color: #fda4af; }
+        .fc-dataset-inline-edit, .fc-dataset-inline-delete { padding: 10px 12px 12px; border-top: 1px solid var(--source-line); font-size: 12px; }
+        .fc-dataset-inline-edit label { display: block; color: var(--source-muted); margin-bottom: 5px; }
+        .fc-dataset-inline-edit input { width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--source-line); border-radius: 6px; background: var(--source-bg); color: var(--source-text); }
+        .fc-dataset-inline-edit > div, .fc-dataset-inline-delete > div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; margin-top: 9px; }
+        .fc-dataset-inline-delete p { color: var(--source-muted); line-height: 1.5; margin-top: 5px; }
         .fc-dataset-list strong, .fc-dataset-version strong { display: block; font-size: 13px; }
         .fc-dataset-list small, .fc-dataset-version small { display: block; font-size: 12px; color: var(--source-muted); margin-top: 4px; }
         .fc-dataset-version { border: 1px solid var(--source-line); border-radius: 10px; padding: 14px; margin-top: 12px; }
@@ -1774,6 +1791,75 @@
             .fc-source-template-note { align-items: flex-start; flex-direction: column; }
             .fc-source-footer { flex-wrap: wrap; gap: 10px; }
             .fc-source-footer > div { width: 100%; justify-content: flex-end; }
+        }
+        /* Keep the preview as the main workspace; controls share compact rows. */
+        .fc-source-header { padding: 12px 18px; gap: 12px; }
+        .fc-source-heading { flex: 1; min-width: 0; gap: 10px; }
+        .fc-source-heading h2 { font-size: 17px; }
+        .fc-source-heading p { font-size: 12px; margin-top: 2px; }
+        .fc-source-icon { width: 32px; height: 32px; border-radius: 9px; }
+        .fc-source-body { padding: 12px 18px; }
+        .fc-source-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-bottom: 8px; }
+        .fc-source-choices { display: flex; gap: 4px; padding: 3px; border: 1px solid var(--source-line); border-radius: 10px; background: var(--source-soft); margin: 0; }
+        .fc-source-choice { gap: 7px; padding: 7px 10px; border-color: transparent; border-radius: 7px; background: transparent; }
+        .fc-source-choice strong, .fc-source-upload:not([data-empty="true"]) strong { font-size: 12px; font-weight: 650; line-height: 18px; white-space: nowrap; }
+        .fc-source-choice small { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+        .fc-source-radio { display: none; }
+        .fc-source-choice-icon svg, .fc-source-upload:not([data-empty="true"]) > svg { width: 16px; height: 16px; }
+        .fc-source-format-row { flex: 1; gap: 8px; margin: 0; }
+        .fc-source-format-row label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+        .fc-source-format-row select { min-width: 0; width: 225px; padding: 7px 9px; font-size: 12px; }
+        .fc-source-download { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; font-size: 12px; white-space: nowrap; color: #a16207; text-decoration: underline; text-underline-offset: 3px; }
+        .dark .fc-source-download { color: #fbbf24; }
+        .fc-source-download svg { width: 14px; height: 14px; }
+        .fc-source-template-note { font-size: 11px; margin: 0 0 4px; }
+        .fc-source-upload:not([data-empty="true"]) { gap: 10px; padding: 8px 12px; margin: 0; border-style: dashed; border-color: var(--source-muted); }
+        .fc-source-upload:not([data-empty="true"]) .fc-source-upload-copy { display: flex; align-items: center; gap: 12px; }
+        .fc-source-upload:not([data-empty="true"]) .fc-source-upload-copy > span { margin: 0 0 0 auto; font-size: 11px; }
+        .fc-source-upload-entry { position: relative; width: 250px; max-width: 100%; flex: 0 1 250px; }
+        .fc-source-upload-entry > .fc-source-upload { width: 100%; border-radius: 8px; padding-right: 38px; }
+        .fc-source-remove-upload { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 28px; height: 28px; color: var(--source-muted); border-radius: 5px; }
+        .fc-source-remove-upload:hover { color: var(--source-text); background: rgb(148 163 184 / .18); }
+        .fc-source-remove-upload svg { width: 14px; height: 14px; }
+        .fc-source-upload-entry > .fc-source-upload .fc-source-upload-copy { display: block; }
+        .fc-source-upload-entry > .fc-source-upload strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .fc-source-upload-entry > .fc-source-upload .fc-source-upload-copy > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+        .fc-source-mapping { gap: 12px; margin: 8px 0 10px; }
+        .fc-source-mapping label { font-size: 11px; margin-bottom: 4px; }
+        .fc-source-mapping select { padding: 7px 9px; font-size: 12px; }
+        .fc-source-foldout { border: 1px solid var(--source-line); border-radius: 8px; margin-bottom: 8px; background: var(--source-soft); }
+        .fc-source-foldout > summary { cursor: pointer; padding: 8px 10px; font-size: 12px; font-weight: 600; }
+        .fc-source-foldout > summary span { font-weight: 400; color: var(--source-muted); margin-left: 8px; }
+        .fc-source-foldout[data-attention="true"] { border-color: rgb(245 158 11 / .55); background: rgb(245 158 11 / .06); }
+        .fc-source-foldout .fc-prep-panel { margin: 0; border: 0; border-top: 1px solid var(--source-line); border-radius: 0 0 8px 8px; padding: 10px 12px; max-height: 220px; }
+        .fc-source-foldout .fc-prep-save { margin: 0; padding: 10px; border-top: 1px solid var(--source-line); }
+        .fc-source-foldout .fc-prep-help[role="status"] { padding: 0 10px; }
+        .fc-source-preview-heading { margin: 2px 0 6px; }
+        .fc-source-preview-heading h3 { font-size: 13px; }
+        .fc-source-preview-footer { margin-top: 6px; font-size: 11px; }
+        .fc-source-preview-footer button { padding: 4px; }
+        .fc-source-table th, .fc-source-table td { padding: 7px 12px; }
+        .fc-source-footer { padding: 10px 18px; gap: 12px; }
+        .fc-source-footer > p { font-size: 11px; }
+        .fc-source-secondary { padding: 7px 11px; font-size: 12px; }
+        .fc-source-confirm { padding: 8px 14px; font-size: 12px; }
+        @media (max-width: 640px) {
+            .fc-source-header, .fc-source-body, .fc-source-footer { padding: 10px 12px; }
+            .fc-source-heading p { display: none; }
+            .fc-source-heading h2 { font-size: 15px; }
+            .fc-source-icon { display: none; }
+            .fc-source-toolbar { gap: 8px; }
+            .fc-source-choices { width: 100%; }
+            .fc-source-choice { flex: 1; justify-content: center; padding: 7px 5px; }
+            .fc-source-choice strong { white-space: normal; }
+            .fc-source-format-row { flex-direction: row; align-items: center; }
+            .fc-source-format-row select { width: auto; max-width: 65%; }
+            .fc-source-mapping { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; }
+            .fc-source-mapping label { min-height: 28px; }
+            .fc-source-upload:not([data-empty="true"]) .fc-source-upload-copy { display: block; }
+            .fc-source-footer { gap: 6px; }
+            .fc-source-footer > div { width: auto; margin-left: auto; }
+            .fc-source-foldout > summary span { display: inline; margin-left: 5px; }
         }
     </style>
 
@@ -5199,26 +5285,66 @@
         const DatasetLibrary = ({baseUrl,onOpen}) => {
             const [datasets,setDatasets] = useState([]), [detail,setDetail] = useState(null), [history,setHistory] = useState(null);
             const [error,setError] = useState(''), [busy,setBusy] = useState(false), [rename,setRename] = useState(''), [deleteId,setDeleteId] = useState(null);
+            const [menuId,setMenuId] = useState(null), [editId,setEditId] = useState(null);
+            const [loadingLibrary,setLoadingLibrary] = useState(true);
+            const actionButtons = useRef(new Map());
+            useEffect(()=>{
+                const dismiss = event => { if (!event.target.closest('.fc-dataset-card-menu')) setMenuId(null); };
+                document.addEventListener('pointerdown',dismiss);
+                return ()=>document.removeEventListener('pointerdown',dismiss);
+            },[]);
             const refresh = async () => setDatasets((await (await datasetRequest(baseUrl,'/datasets')).json()).datasets);
-            useEffect(()=>{refresh().catch(e=>setError(e.message));},[]);
+            useEffect(()=>{
+                const controller = new AbortController();
+                setBusy(true);
+                (async()=>{
+                    try {
+                        const listing = await (await datasetRequest(baseUrl,'/datasets',{signal:controller.signal})).json();
+                        if (controller.signal.aborted) return;
+                        setDatasets(listing.datasets);
+                        if (listing.datasets.length) {
+                            const first = listing.datasets[0];
+                            const versions = await (await datasetRequest(baseUrl,`/datasets/${first.id}/versions`,{signal:controller.signal})).json();
+                            if (!controller.signal.aborted) setDetail(versions);
+                        }
+                    } catch(e) { if (!controller.signal.aborted) setError(e.message); }
+                    finally { if (!controller.signal.aborted) { setBusy(false);setLoadingLibrary(false); } }
+                })();
+                return ()=>controller.abort();
+            },[baseUrl]);
             const action = async fn => {setBusy(true);setError('');try {await fn();}catch(e){setError(e.message);}finally{setBusy(false);}};
-            const select = item => action(async()=>{const result=await (await datasetRequest(baseUrl,`/datasets/${item.id}/versions`)).json();setDetail(result);setRename(result.name);setHistory(null);setDeleteId(null);});
+            const select = item => action(async()=>{const result=await (await datasetRequest(baseUrl,`/datasets/${item.id}/versions`)).json();setDetail(result);setHistory(null);setDeleteId(null);setEditId(null);setMenuId(null);});
             const download = (version,kind) => action(async()=>{const response=await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/${kind}`);window.OperartisSecurity.downloadBlob(await response.blob(),kind==='original'?detail.filename:detail.name+'-prepared.csv');});
             return <section className="fc-dataset-library" aria-label="My datasets">
                 <div className="fc-prep-heading"><h3>My datasets</h3><small>Private to your account · 100 MB library · 50 datasets</small></div>
                 <p className="fc-prep-help">Reopen a saved version to preserve original observations and handling rules. Prepared downloads include estimate flags.</p>
                 {error && <p role="alert" className="fc-source-error">{error}</p>}
-                {!datasets.length && <p>No saved datasets yet. Upload data, review it, then save a version.</p>}
-                <div className="fc-dataset-grid"><div className="fc-dataset-list">{datasets.map(item=><button type="button" key={item.id} disabled={busy} aria-pressed={detail?.id===item.id} onClick={()=>select(item)}><strong>{item.name}</strong><small>{item.filename}</small></button>)}</div>
-                {detail && <div className="fc-dataset-detail">
-                    <div className="fc-prep-controls"><input aria-label="Dataset name" value={rename} maxLength={120} onChange={e=>setRename(e.target.value)} /><button className="fc-source-secondary" disabled={busy || !rename.trim()} onClick={()=>action(async()=>{await datasetRequest(baseUrl,`/datasets/${detail.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:rename})});setDetail({...detail,name:rename});await refresh();})}>Rename</button><button className="fc-source-secondary" disabled={busy} onClick={()=>setDeleteId(detail.id)}>Delete</button></div>
-                    {deleteId && <div className="fc-prep-warning" role="alert">Delete this dataset, its original file and all saved versions? Existing forecast reports remain available.<div><button className="fc-source-secondary" onClick={()=>setDeleteId(null)}>Keep dataset</button> <button className="fc-source-secondary" disabled={busy} onClick={()=>action(async()=>{await datasetRequest(baseUrl,`/datasets/${deleteId}`,{method:'DELETE'});setDetail(null);setDeleteId(null);await refresh();})}>Delete dataset permanently</button></div></div>}
-                    <h4>Version history</h4>{detail.versions.map((version,i)=><article key={version.id} className="fc-dataset-version"><div><strong>Version {detail.versions.length-i}</strong><small>{new Date(version.created_at+'Z').toLocaleString()} · {version.item_count} items · {version.missing_count} estimated values</small></div>
+                <div className="fc-dataset-grid"><div className="fc-dataset-list">{!datasets.length && <p className="fc-dataset-empty-state">{loadingLibrary ? 'Loading datasets…' : 'No saved datasets yet. Upload data, review it, then save a version.'}</p>}{datasets.map(item=><div className="fc-dataset-card" data-selected={detail?.id===item.id} key={item.id}>
+                    <div className="fc-dataset-card-row">
+                        <button type="button" className="fc-dataset-select" disabled={busy} aria-pressed={detail?.id===item.id} onClick={()=>select(item)}><strong>{item.name}</strong><small>{item.filename}</small></button>
+                        <div className="fc-dataset-card-menu" onKeyDownCapture={event=>{if(event.key==='Escape' && menuId===item.id){event.preventDefault();event.stopPropagation();setMenuId(null);actionButtons.current.get(item.id)?.focus();}}}>
+                            <button type="button" className="fc-dataset-more" ref={el=>{if(el)actionButtons.current.set(item.id,el);else actionButtons.current.delete(item.id);}} aria-label={`Actions for ${item.name}`} aria-expanded={menuId===item.id} aria-controls={`dataset-actions-${item.id}`} disabled={busy} onClick={()=>setMenuId(current=>current===item.id?null:item.id)}><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+                            {menuId===item.id && <div className="fc-dataset-menu-panel" id={`dataset-actions-${item.id}`} role="group" aria-label={`Dataset actions for ${item.name}`}>
+                                <button type="button" onClick={()=>{setRename(item.name);setEditId(item.id);setDeleteId(null);setMenuId(null);}}>Rename</button>
+                                <button type="button" className="fc-dataset-delete-action" onClick={()=>{setDeleteId(item.id);setEditId(null);setMenuId(null);}}>Delete</button>
+                            </div>}
+                        </div>
+                    </div>
+                    {editId===item.id && <form className="fc-dataset-inline-edit" onKeyDownCapture={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();setEditId(null);actionButtons.current.get(item.id)?.focus();}}} onSubmit={event=>{event.preventDefault();if(busy || !rename.trim())return;const name=rename.trim();action(async()=>{await datasetRequest(baseUrl,`/datasets/${item.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});setDetail(current=>current?.id===item.id?{...current,name}:current);setEditId(null);await refresh();actionButtons.current.get(item.id)?.focus();});}}>
+                        <label htmlFor={`dataset-name-${item.id}`}>Dataset name</label><input id={`dataset-name-${item.id}`} autoFocus value={rename} maxLength={120} disabled={busy} onChange={event=>setRename(event.target.value)} />
+                        <div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>{setEditId(null);actionButtons.current.get(item.id)?.focus();}}>Cancel rename</button><button type="submit" className="fc-source-confirm" disabled={busy || !rename.trim()}>Save name</button></div>
+                    </form>}
+                    {deleteId===item.id && <div className="fc-dataset-inline-delete" role="alert"><strong>Delete “{item.name}”?</strong><p>This removes the original file and all versions. Existing forecast reports remain available.</p><div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>{setDeleteId(null);actionButtons.current.get(item.id)?.focus();}}>Keep dataset</button><button type="button" className="fc-source-secondary fc-dataset-delete-action" disabled={busy} onClick={()=>action(async()=>{await datasetRequest(baseUrl,`/datasets/${item.id}`,{method:'DELETE'});if(detail?.id===item.id){setDetail(null);setHistory(null);}setDeleteId(null);await refresh();})}>Delete permanently</button></div></div>}
+                </div>)}</div>
+                <div className="fc-dataset-detail" role="region" aria-label="Version history">
+                    <h4>Version history</h4>
+                    {!detail && <p className="fc-dataset-empty-state" role="status">{loadingLibrary ? 'Loading version history…' : datasets.length ? 'Select a dataset to view its saved versions.' : 'Saved versions will appear here.'}</p>}
+                    {detail?.versions.map((version,i)=><article key={version.id} className="fc-dataset-version"><div><strong>Version {detail.versions.length-i}</strong><small>{new Date(version.created_at+'Z').toLocaleString()} · {version.item_count} items · {version.missing_count} estimated values</small></div>
                         <div className="fc-prep-controls"><button className="fc-source-confirm" disabled={busy} onClick={()=>action(()=>onOpen(detail,version))}>Open version</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'original')}>Original file</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'prepared')}>Prepared data</button><button className="fc-source-secondary" disabled={busy} onClick={()=>action(async()=>setHistory(await (await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/history`)).json()))}>Changes</button></div>
                         {!!version.forecasts.length && <p className="fc-prep-help">Linked forecasts: {version.forecasts.map(job=>`${job.id.slice(0,8)} (${job.status})`).join(', ')}</p>}
                     </article>)}
                     {history && <div className="fc-prep-history"><h4>Recorded changes ({history.changes.length})</h4><p className="fc-prep-help">Frequency: {history.settings.preparation.frequency || 'Detected from source'}</p>{history.changes.map((row,i)=><p key={i}>{row.unique_id} · {row.ds} · missing → {row.prepared ?? 'unresolved'} · {PREPARATION_METHODS[row.method] || 'No change'}</p>)}</div>}
-                </div>}</div>
+                </div></div>
             </section>;
         };
         const MissingDataReview = ({review,update,filter,setFilter,onlyMissing,setOnlyMissing}) => {
@@ -5249,6 +5375,8 @@
             const [reviewState, setReviewState] = useState(null), [reviewError, setReviewError] = useState('');
             const [libraryOpen, setLibraryOpen] = useState(false), [datasetName, setDatasetName] = useState(''), [saveMessage, setSaveMessage] = useState(''), [saving, setSaving] = useState(false);
             const [itemFilter,setItemFilter] = useState(''), [onlyMissing,setOnlyMissing] = useState(false);
+            const [preparationOpen, setPreparationOpen] = useState(false);
+            useEffect(() => { setPreparationOpen(false); }, [source?.file]);
             const signature = source ? JSON.stringify([source.mapping,source.preparation,source.format]) : '';
             const review = reviewState?.file === source?.file && reviewState?.signature === signature ? reviewState.data : null;
             const info = review ? {valid:review.valid,count:review.period_count,items:review.item_count,frequency:review.frequency} : {valid:false,count:0,items:0};
@@ -5350,6 +5478,22 @@
                     if (generation === uploadGeneration.current) setBusy(prev => prev === 'custom' ? null : prev);
                 }
             };
+            const clearUpload = () => {
+                ++uploadGeneration.current;
+                setSources(prev => ({ ...prev, custom: null }));
+                setErrors(prev => ({ ...prev, custom: null }));
+                setBusy(null);
+                setReviewState(null);
+                setReviewError('');
+                setDatasetName('');
+                setSaveMessage('');
+                setItemFilter('');
+                setOnlyMissing(false);
+                setPreparationOpen(false);
+                setPage(0);
+                if (inputRef.current) inputRef.current.value = '';
+                requestAnimationFrame(() => dialogRef.current?.querySelector('.fc-source-upload[data-empty="true"]')?.focus());
+            };
             const changeMapping = (key, value) => setSources(prev => ({ ...prev, [sourceKey]: { ...prev[sourceKey], versionId:null, preparation:undefined, mapping: { ...prev[sourceKey].mapping, [key]: value } } }));
             const chooseMode = value => { setMode(value); setPage(0); };
             const pageSize = 20;
@@ -5357,6 +5501,11 @@
             const previewRecords = review?.records.filter(row=>(!itemFilter || row.unique_id===itemFilter) && (!onlyMissing || row.missing)) || [];
             const visibleRows = source?.rows.slice(page * pageSize, (page + 1) * pageSize) || [];
             const visibleHeaders = source?.headers.slice(0, 60) || [];
+            const uploadControl = <button type="button" className="fc-source-upload" data-empty={!source && !loading ? "true" : "false"}
+                                disabled={loading} onClick={() => inputRef.current?.click()} title={`${source?.file.name || t('mapping.upload_prompt')} · ${t('mapping.upload_formats')}`} aria-label={t(source ? 'mapping.replace_file' : 'mapping.choose_file')}>
+                                <UploadIcon /><span className="fc-source-upload-copy"><strong>{source?.file.name || t('mapping.upload_prompt')}</strong><span>{t('mapping.upload_formats')}</span></span>
+                            </button>;
+
 
             return <div className="fc-source-overlay">
                 <div className="fc-source-backdrop" onClick={onClose} />
@@ -5368,6 +5517,7 @@
                     </header>
                     <div className="fc-source-body scroller">
                         {libraryOpen ? <DatasetLibrary baseUrl={baseUrl} onOpen={openDataset} /> : <>
+                        <div className="fc-source-toolbar">
                         <div className="fc-source-choices" role="group" aria-label={t('mapping.source_title')}>
                             {['template', 'custom'].map(value => <button key={value} type="button" aria-pressed={mode === value} className="fc-source-choice" onClick={() => chooseMode(value)}>
                                 <span className="fc-source-choice-icon">{value === 'template' ? <ColumnsIcon /> : <UploadIcon />}</span>
@@ -5381,18 +5531,18 @@
                                 <option value="vertical">{t('mapping.vertical_format')}</option>
                                 <option value="horizontal">{t('mapping.horizontal_format')}</option>
                             </select>
+                            <a className="fc-source-download" href={`./assets/templates/${FORECAST_TEMPLATE_FILES[templateFormat]}`} download={FORECAST_TEMPLATE_FILES[templateFormat]}><DownloadIcon />{t('mapping.download')}</a>
                         </div>}
+                        {mode === 'custom' && source && <div className="fc-source-upload-entry">{uploadControl}<button type="button" className="fc-source-remove-upload" aria-label="Remove uploaded file" title="Remove uploaded file" disabled={saving} onClick={clearUpload}><XIcon /></button></div>}
+                        </div>
                         {mode === 'custom' && <>
                             <input ref={inputRef} type="file" accept=".xlsx,.csv" hidden onChange={upload} aria-label={t('mapping.choose_file')} />
-                            <button type="button" className="fc-source-upload" data-empty={!source && !loading ? "true" : "false"}
-                                disabled={loading} onClick={() => inputRef.current?.click()} aria-label={t(source ? 'mapping.replace_file' : 'mapping.choose_file')}>
-                                <UploadIcon /><span className="fc-source-upload-copy"><strong>{source?.file.name || t('mapping.upload_prompt')}</strong><span>{t('mapping.upload_formats')}</span></span>
-                            </button>
+                            {!source && uploadControl}
                         </>}
                         {loading && <div role="status" className="fc-source-message">{t('mapping.loading')}</div>}
                         {errors[sourceKey] && <p role="alert" className="fc-source-error">{errors[sourceKey]}</p>}
                         {source && !loading && <>
-                            {mode === 'template' && <div className="fc-source-template-note"><p>{t('mapping.template_note')}</p><a href={`./assets/templates/${FORECAST_TEMPLATE_FILES[templateFormat]}`} download={FORECAST_TEMPLATE_FILES[templateFormat]}><DownloadIcon />{t('mapping.download')}</a></div>}
+                            {mode === 'template' && <div className="fc-source-template-note"><p>{t('mapping.template_note')}</p></div>}
                             <div className="fc-source-mapping">
                                 {(source.format === 'vertical' ? ['sku', 'date', 'value'] : ['sku', 'start', 'end']).map((key, index) => <div key={key}><label htmlFor={`fc-source-${key}`}>{t(`mapping.${(source.format === 'vertical' ? ['sku_col','date_col','quantity_col'] : ['sku_col','start_col','end_col'])[index]}`)}</label>
                                     <select id={`fc-source-${key}`} value={source.mapping[key]} disabled={mode === 'template'} onChange={e => changeMapping(key, e.target.value)}>
@@ -5403,9 +5553,9 @@
                             </div>
                             {reviewError && <div role="alert" className="fc-source-error">{reviewError}<label className="fc-prep-controls">Calendar<select aria-label="Correct calendar frequency" value={source.preparation?.frequency || ''} onChange={e=>updatePreparation({frequency:e.target.value,frequency_confirmed:false})}><option value="">Choose frequency</option>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v}</option>)}</select></label></div>}
                             {!review && !reviewError && <p role="status" className="fc-prep-help">Scanning quantities and calendar…</p>}
-                            {gapPreview && <MissingDataReview review={review} update={updatePreparation} filter={itemFilter} setFilter={value=>{setItemFilter(value);setPage(0);}} onlyMissing={onlyMissing} setOnlyMissing={value=>{setOnlyMissing(value);setPage(0);}} />}
-                            <div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid} onClick={()=>downloadPreparedPreview(review,source.file.name)}>Download prepared data</button></div>
-                            {saveMessage && <p role="status" className="fc-prep-help">{saveMessage}</p>}
+                            {gapPreview && <details className="fc-source-foldout" open={preparationOpen} onToggle={event=>setPreparationOpen(event.currentTarget.open)} data-attention={!info.valid}><summary>Missing data<span>{review.missing_count} gaps · {info.valid ? 'Ready to confirm' : 'Review required'}</span></summary><MissingDataReview review={review} update={updatePreparation} filter={itemFilter} setFilter={value=>{setItemFilter(value);setPage(0);}} onlyMissing={onlyMissing} setOnlyMissing={value=>{setOnlyMissing(value);setPage(0);}} /></details>}
+                            {mode === 'custom' && <details className="fc-source-foldout"><summary>Save &amp; download<span>Keep a private version or export prepared data</span></summary><div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid} onClick={()=>downloadPreparedPreview(review,source.file.name)}>Download prepared data</button></div>
+                            {saveMessage && <p role="status" className="fc-prep-help">{saveMessage}</p>}</details>}
                             <div className="fc-source-preview-heading"><h3>{t('mapping.preview')}</h3><span>{info.items} {t('mapping.items')} <span aria-hidden="true">·</span> {info.count} {t('mapping.months_detected')}</span></div>
                             {gapPreview ? <>
                                 <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label="Data Preview"><table className="fc-source-table fc-prep-table"><thead><tr>{['Item ID','Date','Original','Prepared','Method'].map(label=><th key={label}>{label}</th>)}</tr></thead><tbody>{previewRecords.slice(page*pageSize,(page+1)*pageSize).map((row,i)=><tr key={i}><td>{row.unique_id}</td><td>{row.ds}</td><td className={row.missing?'fc-prep-missing':''}>{row.original ?? (row.kind==='absent_period'?'Missing period':'Empty')}</td><td className={row.missing && row.prepared!==null?'fc-prep-estimate':''}>{row.prepared ?? 'Unresolved'}</td><td>{PREPARATION_METHODS[row.method] || (row.missing ? 'Unresolved' : 'Observed')}</td></tr>)}</tbody></table></div>
