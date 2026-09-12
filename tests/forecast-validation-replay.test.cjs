@@ -61,3 +61,19 @@ test('expanding validation on a suffix excludes older history from training',()=
     const replay=build(data);
     assert.deepEqual(replay.folds.map(f=>[f.start,f.end]),[[1,3],[1,4]]);
 });
+
+
+test('prepared replay preserves missing dates and excludes them from fold metrics',()=>{
+    const data=result(); data.preparation={method:'forward'};
+    data.forecast_data[1].actual_history=null;
+    data.forecast_data[4].actual_history=null;
+    data.validation_summary.all_forecasts=data.validation_forecasts.map(p=>({...p,actual:p.date.startsWith(dates[4])?null:p.actual}));
+    data.validation_forecasts=data.validation_summary.all_forecasts.filter(p=>p.actual!==null);
+    const replay=build(data);
+    assert.equal(replay.history.length,8);
+    assert.equal(replay.history[1].value,null);
+    assert.equal(replay.folds[0].points.length,2);
+    assert.equal(replay.folds[0].scoredCount,1);
+    assert.equal(replay.folds[0].metrics.mae,2);
+    assert.equal(replay.folds[1].metrics.mae,0);
+});

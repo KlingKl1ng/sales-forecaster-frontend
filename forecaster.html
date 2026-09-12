@@ -1213,14 +1213,6 @@
             overflow-wrap: normal;
             word-break: normal;
         }
-        .fc-forecast-values-table th:first-child,
-        .fc-forecast-values-table th[scope="row"] {
-            width: 5.75rem;
-            white-space: nowrap;
-        }
-        @media (min-width: 769px) {
-            .fc-forecast-values-table { table-layout: fixed; }
-        }
         @media (max-width: 768px) {
             .fc-evaluation-table,
             .fc-validation-table {
@@ -1228,8 +1220,6 @@
                 width: max-content;
                 min-width: 100%;
             }
-            .fc-forecast-values-table th:not(:first-child),
-            .fc-forecast-values-table td { min-width: 6.25rem; }
         }
 
         .scroller,
@@ -1652,6 +1642,139 @@
             cursor: pointer;
             flex-shrink: 0;
         }
+        .fc-source-overlay { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .fc-source-backdrop { position: absolute; inset: 0; background: rgb(2 6 23 / .62); backdrop-filter: blur(6px); }
+        .fc-source-dialog { --source-bg: #fff; --source-soft: #f8fafc; --source-line: #e2e8f0; --source-text: #1e293b; --source-muted: #64748b; position: relative; display: flex; flex-direction: column; width: min(100%, 1040px); height: min(820px, calc(100vh - 48px)); height: min(820px, calc(100dvh - 48px)); color: var(--source-text); background: var(--source-bg); border: 1px solid var(--source-line); border-radius: 18px; box-shadow: 0 28px 90px rgb(0 0 0 / .35); overflow: hidden; }
+        .dark .fc-source-dialog { --source-bg: #101827; --source-soft: #172132; --source-line: #2b374b; --source-text: #e2e8f0; --source-muted: #94a3b8; }
+        .fc-source-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 26px; border-bottom: 1px solid var(--source-line); gap: 16px; flex-shrink: 0; }
+        .fc-source-heading { display: flex; align-items: center; gap: 14px; }
+        .fc-source-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; color: #d68b00; background: rgb(245 158 11 / .12); flex-shrink: 0; }
+        .fc-source-heading h2 { font-size: 20px; font-weight: 700; letter-spacing: -.025em; }
+        .fc-source-heading p, .fc-source-upload p { font-size: 13px; color: var(--source-muted); margin-top: 4px; }
+        .fc-source-close { padding: 8px; color: var(--source-muted); border-radius: 8px; }
+        .fc-source-close:hover { background: var(--source-soft); }
+        .fc-source-body { display: flex; flex-direction: column; flex: 1; padding: 22px 26px 16px; overflow-y: auto; min-height: 0; }
+        .fc-source-body > * { flex-shrink: 0; }
+        .fc-source-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+        .fc-source-choice { display: flex; align-items: center; gap: 12px; text-align: left; padding: 16px; border: 1px solid var(--source-line); border-radius: 12px; background: var(--source-soft); transition: border-color .15s, background .15s; }
+        .fc-source-choice[aria-pressed="true"] { border-color: #f59e0b; background: rgb(245 158 11 / .08); }
+        .fc-source-choice:hover { border-color: #d99a30; }
+        .fc-source-choice-icon { color: var(--source-muted); flex-shrink: 0; }
+        .fc-source-choice[aria-pressed="true"] .fc-source-choice-icon { color: #d68b00; }
+        .fc-source-choice strong { display: block; font-size: 14px; font-weight: 650; }
+        .fc-source-choice small { display: block; font-size: 12px; color: var(--source-muted); margin-top: 4px; line-height: 1.5; }
+        .fc-source-radio { margin-left: auto; width: 16px; height: 16px; border: 1px solid var(--source-muted); border-radius: 50%; flex-shrink: 0; }
+        .fc-source-choice[aria-pressed="true"] .fc-source-radio { border: 5px solid #f59e0b; }
+        .fc-source-upload { width: 100%; min-width: 0; text-align: left; cursor: pointer; transition: border-color .15s, background .15s; display: flex; align-items: center; gap: 16px; border: 1px dashed var(--source-muted); padding: 24px; border-radius: 12px; background: var(--source-soft); margin-bottom: 20px; }
+        .fc-source-upload[data-empty="true"] { flex: 1 0 180px; flex-direction: column; justify-content: center; text-align: center; margin-bottom: 0; }
+        .fc-source-upload[data-empty="true"] > .fc-source-upload-copy { flex: 0; }
+        .fc-source-upload:not(:disabled):hover { border-color: #f59e0b; background: rgb(245 158 11 / .08); }
+        .fc-source-upload > svg { flex-shrink: 0; color: var(--source-muted); }
+        .fc-source-upload-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+        .fc-source-upload-copy > span { display: block; font-size: 13px; color: var(--source-muted); margin-top: 4px; }
+        .fc-source-upload strong { font-size: 14px; }
+        .fc-source-secondary { padding: 9px 14px; border: 1px solid var(--source-line); border-radius: 8px; background: var(--source-bg); font-size: 13px; font-weight: 600; flex-shrink: 0; }
+        .fc-source-secondary:hover { border-color: var(--source-muted); }
+        .fc-source-template-note { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 13px; color: var(--source-muted); margin-bottom: 18px; }
+        .fc-source-template-note a { display: flex; gap: 6px; align-items: center; color: #b77900; white-space: nowrap; text-decoration: underline; text-underline-offset: 3px; }
+        .dark .fc-source-template-note a { color: #fbbf24; }
+        .fc-source-template-note svg { width: 14px; height: 14px; }
+        .fc-source-mapping { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; margin: 18px 0 24px; }
+        .fc-source-mapping label { display: block; font-size: 12px; font-weight: 600; color: var(--source-muted); margin-bottom: 7px; }
+        .fc-source-mapping select { width: 100%; border: 1px solid var(--source-line); background: var(--source-soft); border-radius: 8px; padding: 10px; font-size: 14px; color: var(--source-text); }
+        .fc-source-mapping select:disabled {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: none;
+            background-color: var(--source-soft);
+            color: var(--source-muted);
+            -webkit-text-fill-color: var(--source-muted);
+            box-shadow: inset 0 2px 5px rgb(15 23 42 / 12%);
+            opacity: 1;
+            cursor: not-allowed;
+        }
+        .dark .fc-source-mapping select:disabled { box-shadow: inset 0 2px 5px rgb(0 0 0 / 25%); }
+        .fc-prep-panel { border: 1px solid rgb(245 158 11 / .4); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; background: rgb(245 158 11 / .04); max-height: 270px; overflow: auto; }
+        .fc-prep-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 13px; }
+        .fc-prep-heading h3, .fc-dataset-detail h4 { font-size: 14px; font-weight: 650; }
+        .fc-prep-heading > strong { color: #b77900; font-size: 12px; }
+        .dark .fc-prep-heading > strong { color: #fbbf24; }
+        .fc-prep-help, .fc-prep-heading small { color: var(--source-muted); font-size: 12px; line-height: 1.6; margin: 6px 0 10px; }
+        .fc-prep-controls, .fc-prep-save { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0; }
+        .fc-prep-controls label { font-size: 12px; color: var(--source-muted); }
+        .fc-prep-controls select, .fc-prep-controls input:not([type="checkbox"]), .fc-prep-save input { display: block; max-width: 100%; min-width: 0; padding: 8px 10px; border: 1px solid var(--source-line); background: var(--source-soft); border-radius: 8px; color: var(--source-text); font-size: 13px; }
+        .fc-prep-controls label select { margin-top: 5px; }
+        .fc-prep-check { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 1.5; cursor: pointer; }
+        .fc-prep-check input { width: 15px; height: 15px; accent-color: #f59e0b; flex-shrink: 0; }
+        .fc-prep-panel details { margin: 12px 0; font-size: 12px; }
+        .fc-prep-panel summary { cursor: pointer; font-weight: 600; }
+        .fc-prep-item { padding: 12px 0; border-bottom: 1px solid var(--source-line); }
+        .fc-prep-item p { color: var(--source-muted); margin: 5px 0; line-height: 1.6; }
+        .fc-prep-warning { padding: 10px; border-radius: 8px; background: rgb(245 158 11 / .1); font-size: 12px; margin: 10px 0; }
+        .fc-prep-save { margin: 0 0 16px; }
+        .fc-prep-save input { flex: 1 1 160px; }
+        .fc-source-dialog button:disabled { opacity: .5; cursor: not-allowed; }
+        .fc-source-dialog :is(button,select,input,summary):focus-visible { outline: 2px solid #f59e0b; outline-offset: 3px; }
+        .fc-prep-table th:nth-child(-n+2), .fc-prep-table td:nth-child(-n+2) { text-align: left; }
+        .fc-prep-table td.fc-prep-missing { color: #be123c; background: #fff1f2; font-style: italic; }
+        .fc-prep-table td.fc-prep-estimate { color: #92400e; background: #fef3c7; font-weight: 650; }
+        .dark .fc-prep-table td.fc-prep-missing { color: #fda4af; background: #351e2c; }
+        .dark .fc-prep-table td.fc-prep-estimate { color: #fcd34d; background: #3a2c19; }
+        .fc-dataset-library { min-height: 0; }
+        .fc-dataset-grid { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr); gap: 18px; margin-top: 18px; }
+        .fc-dataset-list { display: flex; flex-direction: column; gap: 8px; }
+        .fc-dataset-list button { padding: 12px; border: 1px solid var(--source-line); border-radius: 10px; text-align: left; background: var(--source-soft); overflow-wrap: anywhere; }
+        .fc-dataset-list button[aria-pressed="true"] { border-color: #f59e0b; }
+        .fc-dataset-list strong, .fc-dataset-version strong { display: block; font-size: 13px; }
+        .fc-dataset-list small, .fc-dataset-version small { display: block; font-size: 12px; color: var(--source-muted); margin-top: 4px; }
+        .fc-dataset-version { border: 1px solid var(--source-line); border-radius: 10px; padding: 14px; margin-top: 12px; }
+        .fc-prep-history { border-top: 1px solid var(--source-line); padding-top: 14px; font-size: 12px; overflow-wrap: anywhere; }
+        .fc-prep-history p { margin-top: 6px; }
+        @media (max-width: 700px) { .fc-dataset-grid { grid-template-columns: 1fr; } .fc-source-header { flex-wrap: wrap; } .fc-prep-panel { max-height: 300px; } }
+        .fc-source-format-row { display: flex; align-items: center; gap: 14px; margin: -6px 0 16px; }
+        .fc-source-format-row label { font-size: 13px; font-weight: 600; color: var(--source-muted); }
+        .fc-source-format-row select { min-width: 210px; max-width: 100%; border: 1px solid var(--source-line); background: var(--source-soft); color: var(--source-text); border-radius: 8px; padding: 9px 12px; font-size: 14px; }
+        .fc-source-table[data-format="vertical"] { width: 100%; table-layout: fixed; }
+        .fc-source-table[data-format="vertical"] th:nth-child(2), .fc-source-table[data-format="vertical"] td:nth-child(2) { text-align: left; }
+        @media (max-width: 640px) { .fc-source-format-row { align-items: stretch; flex-direction: column; gap: 6px; } }
+        .fc-source-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+        .fc-source-preview-heading h3 { font-size: 14px; font-weight: 650; }
+        .fc-source-preview-heading span { color: var(--source-muted); font-size: 12px; }
+        .fc-source-table-wrap { flex: 1 1 180px; min-height: 140px; overflow: auto; border: 1px solid var(--source-line); border-radius: 10px; }
+        .fc-source-table { min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+        .fc-source-table th, .fc-source-table td { padding: 9px 14px; border-bottom: 1px solid var(--source-line); }
+        .fc-source-table th { position: sticky; top: 0; z-index: 2; background: var(--source-soft); font-weight: 600; }
+        .fc-source-table td { background: var(--source-bg); }
+        .fc-source-table tr:nth-child(even) td { background: var(--source-soft); }
+        .fc-source-table tr:last-child td { border-bottom: 0; }
+        .fc-source-table .fc-source-id { text-align: left; font-weight: 600; }
+        .fc-source-table th:first-child, .fc-source-table td:first-child { position: sticky; left: 0; border-right: 1px solid var(--source-line); }
+        .fc-source-table th:first-child { z-index: 3; }
+        .fc-source-preview-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; color: var(--source-muted); }
+        .fc-source-preview-footer > div { display: flex; gap: 8px; }
+        .fc-source-preview-footer button { padding: 6px; border: 1px solid var(--source-line); border-radius: 6px; }
+        .fc-source-footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 26px; background: var(--source-soft); border-top: 1px solid var(--source-line); flex-shrink: 0; }
+        .fc-source-footer > p { font-size: 12px; color: var(--source-muted); }
+        .fc-source-footer > div { display: flex; gap: 10px; flex-shrink: 0; }
+        .fc-source-confirm { padding: 10px 18px; background: #f59e0b; border: 1px solid #f59e0b; border-radius: 8px; color: #1c1405; font-weight: 700; font-size: 13px; }
+        .fc-source-confirm:hover { background: #fbbf24; }
+        .fc-source-dialog button:disabled { opacity: .45; cursor: not-allowed; }
+        .fc-source-dialog :focus-visible { outline: 2px solid #f59e0b; outline-offset: 3px; }
+        .fc-source-message { padding: 40px 16px; text-align: center; color: var(--source-muted); font-size: 14px; }
+        .fc-source-error { padding: 12px; border: 1px solid rgb(239 68 68 / .35); border-radius: 8px; color: #dc2626; font-size: 13px; margin-bottom: 16px; }
+        .dark .fc-source-error { color: #fca5a5; }
+        @media (max-width: 640px) {
+            .fc-source-overlay { padding: 10px; }
+            .fc-source-dialog { height: min(820px, calc(100vh - 20px)); height: min(820px, calc(100dvh - 20px)); }
+            .fc-source-header, .fc-source-body, .fc-source-footer { padding: 16px; }
+            .fc-source-heading h2 { font-size: 18px; }
+            .fc-source-choices, .fc-source-mapping { grid-template-columns: 1fr; }
+            .fc-source-choice { padding: 12px; }
+            .fc-source-upload { flex-wrap: wrap; padding: 16px; }
+            .fc-source-template-note { align-items: flex-start; flex-direction: column; }
+            .fc-source-footer { flex-wrap: wrap; gap: 10px; }
+            .fc-source-footer > div { width: 100%; justify-content: flex-end; }
+        }
     </style>
 
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
@@ -1901,6 +2024,37 @@
                     about_text_2: "We specialize in Advanced Planning and Scheduling (APS) systems, bridging the gap between raw ERP data and actionable strategic insights."
                 },
                 mapping: {
+                    template_format: "Template format",
+                    invalid_vertical_mapping: "Select distinct item ID, date and quantity columns. Use valid dates and numeric quantities, one row per item and date, and the same complete, regular date range for every item (at least two periods).",
+                    vertical_format: "Vertical · dates in rows",
+                    horizontal_format: "Horizontal · dates in columns",
+                    date_col: "Date Column",
+                    quantity_col: "Quantity Column",
+                    source_title: "Choose your forecast data",
+                    source_subtitle: "Review the data and confirm the columns before continuing.",
+                    template_title: "Operartis template",
+                    template_hint: "Explore the included sample dataset.",
+                    custom_title: "Upload your own file",
+                    custom_hint: "Use your Excel or CSV data.",
+                    template_note: "This template contains sample data. Confirm to use it as your forecast input.",
+                    download: "Download template",
+                    upload_prompt: "Choose a file to preview",
+                    upload_formats: "Excel (.xlsx) or CSV · first worksheet",
+                    choose_file: "Choose file",
+                    replace_file: "Replace file",
+                    loading: "Reading your data…",
+                    empty_file: "This file has no headers or data rows.",
+                    read_error: "Could not read this file. Please choose a valid Excel or CSV file.",
+                    template_error: "The template could not be loaded. Try switching to Your own file and back.",
+                    select_column: "Select a column",
+                    invalid_mapping: "Choose an item ID column outside the period range and a consecutive, supported date range with at least one item.",
+                    items: "items",
+                    rows: "rows",
+                    preview_columns: "First 60 columns shown",
+                    previous: "Previous rows",
+                    next: "Next rows",
+                    confirm_hint: "Your input changes only when you confirm.",
+                    use_template: "Confirm & use template",
                     title: "Map Columns",
                     sku_col: "SKU/Item ID Column",
                     start_col: "First Period Column",
@@ -2187,6 +2341,37 @@
                     about_text_2: "Chúng tôi chuyên về các hệ thống Lập kế hoạch và Lên lịch trình cao cấp (APS), thu hẹp khoảng cách giữa dữ liệu ERP thô và thông tin chiến lược có thể được biến đổi thành hành động hỗ trợ đưa ra quyết định."
                 },
                 mapping: {
+                    template_format: "Định dạng mẫu",
+                    invalid_vertical_mapping: "Chọn các cột mã hàng, ngày và số lượng riêng biệt. Dùng ngày hợp lệ và số lượng dạng số, mỗi mã hàng và ngày chỉ có một dòng, cùng phạm vi ngày đầy đủ và đều đặn cho mọi mã hàng (ít nhất hai kỳ).",
+                    vertical_format: "Dọc · ngày theo dòng",
+                    horizontal_format: "Ngang · ngày theo cột",
+                    date_col: "Cột ngày",
+                    quantity_col: "Cột số lượng",
+                    source_title: "Chọn dữ liệu dự báo",
+                    source_subtitle: "Xem dữ liệu và xác nhận các cột trước khi tiếp tục.",
+                    template_title: "Mẫu Operartis",
+                    template_hint: "Khám phá bộ dữ liệu mẫu có sẵn.",
+                    custom_title: "Tải lên tệp của bạn",
+                    custom_hint: "Sử dụng dữ liệu Excel hoặc CSV.",
+                    template_note: "Mẫu này chứa dữ liệu minh họa. Xác nhận để dùng làm dữ liệu đầu vào dự báo.",
+                    download: "Tải xuống mẫu",
+                    upload_prompt: "Chọn tệp để xem trước",
+                    upload_formats: "Excel (.xlsx) hoặc CSV · trang tính đầu tiên",
+                    choose_file: "Chọn tệp",
+                    replace_file: "Thay tệp",
+                    loading: "Đang đọc dữ liệu…",
+                    empty_file: "Tệp không có tiêu đề hoặc dòng dữ liệu.",
+                    read_error: "Không thể đọc tệp. Hãy chọn tệp Excel hoặc CSV hợp lệ.",
+                    template_error: "Không thể tải mẫu. Hãy chuyển sang tệp của bạn rồi thử lại.",
+                    select_column: "Chọn một cột",
+                    invalid_mapping: "Chọn cột mã hàng ngoài phạm vi thời gian, các ngày liên tiếp được hỗ trợ và ít nhất một mã hàng.",
+                    items: "mã hàng",
+                    rows: "dòng",
+                    preview_columns: "Hiển thị 60 cột đầu tiên",
+                    previous: "Các dòng trước",
+                    next: "Các dòng tiếp theo",
+                    confirm_hint: "Dữ liệu đầu vào chỉ thay đổi khi bạn xác nhận.",
+                    use_template: "Xác nhận dùng mẫu",
                     title: "Chọn cột dữ liệu",
                     sku_col: "Cột mã hàng (SKU/Item ID)",
                     start_col: "Cột thời gian đầu tiên",
@@ -2473,6 +2658,37 @@
                     about_text_2: "Wir sind auf Advanced Planning and Scheduling (APS)-Systeme spezialisiert und schlagen die Brücke zwischen rohen ERP-Daten und umsetzbaren strategischen Erkenntnissen."
                 },
                 mapping: {
+                    template_format: "Vorlagenformat",
+                    invalid_vertical_mapping: "Wählen Sie unterschiedliche Spalten für Artikel-ID, Datum und Menge. Verwenden Sie gültige Datumswerte und numerische Mengen, eine Zeile pro Artikel und Datum sowie denselben vollständigen, regelmäßigen Zeitraum für alle Artikel (mindestens zwei Perioden).",
+                    vertical_format: "Vertikal · Datum in Zeilen",
+                    horizontal_format: "Horizontal · Datum in Spalten",
+                    date_col: "Datumsspalte",
+                    quantity_col: "Mengenspalte",
+                    source_title: "Prognosedaten auswählen",
+                    source_subtitle: "Prüfen Sie die Daten und bestätigen Sie die Spalten.",
+                    template_title: "Operartis-Vorlage",
+                    template_hint: "Enthaltenen Beispieldatensatz ansehen.",
+                    custom_title: "Eigene Datei hochladen",
+                    custom_hint: "Eigene Excel- oder CSV-Daten verwenden.",
+                    template_note: "Diese Vorlage enthält Beispieldaten. Bestätigen Sie, um sie als Prognoseeingabe zu verwenden.",
+                    download: "Vorlage herunterladen",
+                    upload_prompt: "Datei für die Vorschau auswählen",
+                    upload_formats: "Excel (.xlsx) oder CSV · erstes Tabellenblatt",
+                    choose_file: "Datei auswählen",
+                    replace_file: "Datei ersetzen",
+                    loading: "Daten werden gelesen…",
+                    empty_file: "Die Datei enthält keine Überschriften oder Datenzeilen.",
+                    read_error: "Die Datei konnte nicht gelesen werden. Wählen Sie eine gültige Excel- oder CSV-Datei.",
+                    template_error: "Die Vorlage konnte nicht geladen werden. Wechseln Sie zu Eigene Datei und zurück.",
+                    select_column: "Spalte auswählen",
+                    invalid_mapping: "Wählen Sie eine Artikel-ID außerhalb des Zeitraums und einen fortlaufenden, unterstützten Datumsbereich mit mindestens einem Artikel.",
+                    items: "Artikel",
+                    rows: "Zeilen",
+                    preview_columns: "Die ersten 60 Spalten werden angezeigt",
+                    previous: "Vorherige Zeilen",
+                    next: "Nächste Zeilen",
+                    confirm_hint: "Die Eingabe ändert sich erst nach Ihrer Bestätigung.",
+                    use_template: "Vorlage bestätigen",
                     title: "Spalten zuordnen",
                     sku_col: "SKU/Artikel-ID-Spalte",
                     start_col: "Erste Periodenspalte",
@@ -3213,19 +3429,21 @@
                 return Date.parse(iso);
             };
             const finite = value => typeof value === 'number' && Number.isFinite(value);
+            const preserveMissing = !!data.preparation;
             const historyMap = new Map();
             for (const point of [...(data.validation_data || []), ...(data.forecast_data || [])]) {
                 const value = point.actual_history ?? point.actual_train ?? point.actual_test;
                 const time = timestamp(point.date);
-                if (Number.isFinite(time) && finite(value)) historyMap.set(time, { date: point.date, value, time });
+                const isHistory = ['actual_history','actual_train','actual_test'].some(key => Object.hasOwn(point,key));
+                if (Number.isFinite(time) && (finite(value) || (preserveMissing && isHistory))) historyMap.set(time, { date: point.date, value: finite(value) ? value : null, time });
             }
             const history = [...historyMap.values()].sort((a, b) => a.time - b.time);
             const groups = new Map();
-            const pairs = data.validation_forecasts;
+            const pairs = data.validation_summary?.all_forecasts || data.validation_forecasts;
             if (!history.length || !Array.isArray(pairs) || !pairs.length) return null;
             for (const pair of pairs) {
                 const origin = timestamp(pair.origin), time = timestamp(pair.date);
-                if (!Number.isFinite(origin) || !Number.isFinite(time) || time <= origin || !finite(pair.actual) || !finite(pair.forecast) || !Number.isInteger(pair.lead) || pair.lead < 1) return null;
+                if (!Number.isFinite(origin) || !Number.isFinite(time) || time <= origin || !(finite(pair.actual) || (preserveMissing && pair.actual === null)) || !finite(pair.forecast) || !Number.isInteger(pair.lead) || pair.lead < 1) return null;
                 if (!groups.has(origin)) groups.set(origin, []);
                 groups.get(origin).push({ ...pair, time });
             }
@@ -3238,22 +3456,25 @@
             if (!Number.isInteger(summary.training_window) || summary.training_window < 1 || !Number.isInteger(summary.validation_period) || summary.validation_period < 1 || initialStart < 0) return null;
             const folds = [];
             let low = 0, high = 0;
-            history.forEach(point => { low = Math.min(low, point.value); high = Math.max(high, point.value); });
+            history.forEach(point => { if (finite(point.value)) { low = Math.min(low, point.value); high = Math.max(high, point.value); } });
             for (const [origin, points] of [...groups].sort(([a], [b]) => a - b)) {
                 points.sort((a, b) => a.lead - b.lead);
                 const end = positions.get(origin);
                 const start = method === 'rolling_window' ? end - summary.training_window + 1 : initialStart;
                 if (end == null || end < initialStart + summary.training_window - 1 || !Number.isInteger(start) || start < 0 || (summary.forecast_horizon != null && points.length !== summary.forecast_horizon)) return null;
                 if (points.some((p, i) => p.lead !== i + 1 || positions.get(p.time) !== end + i + 1)) return null;
-                let squared = 0, absolute = 0, percentage = 0, percentageCount = 0;
+                let squared = 0, absolute = 0, percentage = 0, percentageCount = 0, scoredCount = 0;
                 points.forEach(point => {
+                    low = Math.min(low, point.forecast); high = Math.max(high, point.forecast);
+                    if (!finite(point.actual)) return;
+                    scoredCount++;
                     const error = point.forecast - point.actual;
                     squared += error * error; absolute += Math.abs(error);
                     // Match backend metrics: zero actuals do not contribute to MAPE.
                     if (Math.abs(point.actual) > 1e-12) { percentage += Math.abs(error / point.actual) * 100; percentageCount++; }
                     low = Math.min(low, point.forecast, point.actual); high = Math.max(high, point.forecast, point.actual);
                 });
-                folds.push({ start, end, points, metrics: { rmse: Math.sqrt(squared / points.length), mae: absolute / points.length, mape: percentageCount ? percentage / percentageCount : null } });
+                folds.push({ start, end, points, scoredCount, metrics: { rmse: scoredCount ? Math.sqrt(squared / scoredCount) : null, mae: scoredCount ? absolute / scoredCount : null, mape: percentageCount ? percentage / percentageCount : null } });
             }
             const padding = (high - low || 1) * 0.08;
             return { history, folds, domain: [low < 0 ? low - padding : 0, high + padding] };
@@ -3521,6 +3742,7 @@
                         </div>)}
                     </div>
                 </div>
+                {summary.unscored_missing_pairs > 0 && <p className="text-amber-500">{summary.unscored_missing_pairs} missing test observations excluded from scoring.</p>}
                 <p className="font-semibold">{t('sidebar.validation_counts').replace('{count}', fmtNumber(summary.evaluations, 0, 0, t.numberLocale)).replace('{horizon}', fmtNumber(summary.forecast_horizon, 0, 0, t.numberLocale)).replace('{pairs}', fmtNumber(summary.scored_pairs, 0, 0, t.numberLocale))}</p>
                 <div className="mt-2 space-y-2">
                     {summary.scheme === 'fixed_horizon' && summary.evaluations < summary.max_evaluations && <p>{t('sidebar.validation_limited').replace('{max}', fmtNumber(summary.max_evaluations, 0, 0, t.numberLocale))}</p>}
@@ -3596,53 +3818,27 @@
         };
 
         const ForecastValuesTable = memo(({ data, t }) => {
-            const sectionRef = useRef(null);
-            const scrollRef = useRef(null);
             const forecasts = (data || []).filter(point => point.date && point.future_forecast != null);
-            const hasForecasts = forecasts.length > 0;
 
-            useEffect(() => {
-                const section = sectionRef.current;
-                const scroller = scrollRef.current;
-                if (!section || !scroller) return;
-                const handleWheel = (event) => {
-                    if (event.ctrlKey || event.metaKey) return;
-                    const maxScroll = scroller.scrollWidth - scroller.clientWidth;
-                    if (maxScroll <= 1) return;
-                    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-                    if (!delta) return;
-                    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? scroller.clientWidth : 1;
-                    // Consume the wheel even at either end so the surrounding
-                    // detail panel does not jump vertically while browsing values.
-                    event.preventDefault();
-                    event.stopPropagation();
-                    scroller.scrollLeft = Math.max(0, Math.min(maxScroll, scroller.scrollLeft + delta * unit));
-                };
-                section.addEventListener('wheel', handleWheel, { passive: false });
-                return () => section.removeEventListener('wheel', handleWheel);
-            }, [hasForecasts]);
-
-            if (!hasForecasts) return null;
+            if (!forecasts.length) return null;
             return (
-                <section ref={sectionRef} className="fc-forecast-values shrink-0 min-w-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300" aria-label={t('charts.forecast_values')}>
+                <section className="fc-forecast-values shrink-0 min-w-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300" aria-label={t('charts.forecast_values')}>
                     <h3 className="mb-2 font-semibold">{t('charts.forecast_values')}</h3>
-                    <div ref={scrollRef} className="min-w-0 scroller overflow-x-auto rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500" tabIndex={0} role="region" aria-label={t('charts.forecast_values')}>
+                    <div className="min-w-0 scroller overflow-x-auto rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500" tabIndex={0} role="region" aria-label={t('charts.forecast_values')}>
                         <table className="fc-forecast-values-table w-full border-separate border-spacing-0 text-right tabular-nums" aria-label={t('charts.forecast_values')}>
                             <thead>
                                 <tr>
-                                    <th scope="col" className="sticky left-0 z-10 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 text-left font-semibold">{t('charts.period')}</th>
-                                    {forecasts.map(point => (
-                                        <th scope="col" key={point.date} className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 font-semibold">{formatForecastDate(point.date, t.numberLocale)}</th>
-                                    ))}
+                                    <th scope="col" className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 text-left font-semibold">{t('charts.period')}</th>
+                                    <th scope="col" className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 font-semibold">{t('charts.future_fc')}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row" className="sticky left-0 z-10 bg-white dark:bg-slate-900 px-3 py-2 text-left font-semibold">{t('charts.future_fc')}</th>
-                                    {forecasts.map(point => (
-                                        <td key={point.date} className="px-3 py-2">{fmtNumber(point.future_forecast, 0, 6, t.numberLocale)}</td>
-                                    ))}
-                                </tr>
+                                {forecasts.map(point => (
+                                    <tr key={point.date}>
+                                        <th scope="row" className="px-3 py-2 text-left font-normal">{formatForecastDate(point.date, t.numberLocale)}</th>
+                                        <td className="px-3 py-2">{fmtNumber(point.future_forecast, 0, 6, t.numberLocale)}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -4847,134 +5043,389 @@
             );
         };
 
-        const MappingModal = ({ headers, isOpen, onClose, onConfirm, t }) => {
-            const [sku, setSku] = useState('');
-            const [startCol, setStartCol] = useState('');
-            const [endCol, setEndCol] = useState('');
+        const suggestForecastMapping = (headers) => {
+            const dates = headers.map((h, i) => Number.isFinite(parseForecastHeaderDate(h)) ? i : -1).filter(i => i >= 0);
+            const idIndex = headers.findIndex((h, i) => !dates.includes(i) && /sku|item|product|(^|[_\s])id($|[_\s])/i.test(h));
+            const fallback = headers.findIndex((_, i) => !dates.includes(i));
+            return { sku: headers[idIndex >= 0 ? idIndex : fallback] || '', start: headers[dates[0]] || '', end: headers[dates[dates.length - 1]] || '' };
+        };
 
-            // Calculate number of months between start and end columns
-            const monthCount = useMemo(() => {
-                if (!startCol || !endCol || !headers.length) return 0;
-                const startIdx = headers.indexOf(startCol);
-                const endIdx = headers.indexOf(endCol);
-                if (startIdx < 0 || endIdx < 0 || endIdx < startIdx) return 0;
-                return endIdx - startIdx + 1;
-            }, [startCol, endCol, headers]);
+        const FORECAST_TEMPLATE_FILES = {
+            vertical: 'Template-Vertical-Format.xlsx',
+            horizontal: 'Template-Horizontal-Format.xlsx',
+        };
+
+        const forecastSerialDate = (value, date1904 = false) => {
+            const parts = XLSX.SSF.parse_date_code(value, { date1904 });
+            return parts ? new Date(Date.UTC(parts.y, parts.m - 1, parts.d, parts.H, parts.M, parts.S, Math.round((parts.u || 0) * 1000))).toISOString().replace(/T00:00:00\.000Z$/, '') : '';
+        };
+
+        const suggestVerticalForecastMapping = ({ headers, rows }) => {
+            const names = headers.map(header => header.toLowerCase().replace(/[_\s-]+/g, ' ').trim());
+            const sample = rows.slice(0, 200);
+            const namedId = names.findIndex(name => /^(unique id|item id|product id|sku|sku id|item|product|id|code|item code|product code)$/.test(name));
+            let date = names.findIndex(name => /^(date|ds|period|time|timestamp|month|year|sales date|order date)$/.test(name));
+            if (date < 0) date = headers.findIndex((_, col) => col !== namedId && sample.length > 0 && sample.filter(row => {
+                const text = String(row[col] ?? '').trim();
+                return !/^\d+$/.test(text) && Number.isFinite(parseForecastHeaderDate(text));
+            }).length / sample.length >= 0.8);
+            let value = names.findIndex((name, col) => col !== date && /^(quantity|qty|value|y|sales|demand|units|volume|amount|sales quantity|sales qty)$/.test(name));
+            const sku = namedId >= 0 ? namedId : headers.findIndex((_, col) => col !== date && col !== value);
+            if (value < 0) value = headers.findIndex((_, col) => col !== date && col !== sku && sample.length > 0 && sample.every(row => String(row[col] ?? '').trim() !== '' && Number.isFinite(Number(row[col]))));
+            return { sku: headers[sku] || '', date: headers[date] || '', value: headers[value] || '' };
+        };
+
+        const readForecastUpload = (workbook, requestedFormat) => {
+            const horizontal = readForecastWorksheet(workbook);
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: '' });
+            const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+            const date1904 = !!workbook.Workbook?.WBProps?.date1904;
+            const rawRows = [];
+            const rows = horizontal.rows.flatMap((row, index) => {
+                const values = raw[index + 1] || [];
+                if (!values.some(value => String(value ?? '').trim() !== '')) return [];
+                rawRows.push(values);
+                return [horizontal.headers.map((_, col) => {
+                    const cell = sheet[XLSX.utils.encode_cell({ r: range.s.r + index + 1, c: range.s.c + col })];
+                    return cell?.t === 'n' && cell.z && XLSX.SSF.is_date(cell.z) ? forecastSerialDate(cell.v, date1904) : (row[col] ?? '');
+                })];
+            });
+            const data = { headers: horizontal.headers, rows, rawRows, date1904 };
+            const verticalMapping = suggestVerticalForecastMapping(data);
+            const dateHeaders = data.headers.filter(header => Number.isFinite(parseForecastHeaderDate(header)));
+            const detectedFormat = dateHeaders.length >= 2 ? 'horizontal' : verticalMapping.date ? 'vertical' : 'horizontal';
+            const format = requestedFormat || detectedFormat;
+            return { ...data, format, detectedFormat, mapping: format === 'vertical' ? verticalMapping : suggestForecastMapping(data.headers) };
+        };
+
+        const readVerticalForecastTemplate = (workbook) => {
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: '' });
+            const formatted = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+            const headers = (raw[0] || []).map(String);
+            if (headers.length !== 3 || headers[0] !== 'Item ID' || headers[1] !== 'Date' || headers[2] !== 'Quantity') throw new Error('Expected Item ID, Date and Quantity columns.');
+            const rows = raw.slice(1).map((row, i) => {
+                if (!row.some(value => value !== '')) return null;
+                let date = row[1];
+                if (typeof date === 'number') {
+                    const parts = XLSX.SSF.parse_date_code(date, { date1904: !!workbook.Workbook?.WBProps?.date1904 });
+                    date = parts ? new Date(Date.UTC(parts.y, parts.m - 1, parts.d, parts.H, parts.M, parts.S)).toISOString().replace(/T00:00:00\.000Z$/, '') : '';
+                }
+                return [String(formatted[i + 1]?.[0] ?? row[0]), String(date), row[2]];
+            }).filter(Boolean);
+            return { headers, rows };
+        };
+
+        // Preview validation only. Original files and mappings go to the backend,
+        // which owns canonical normalization and authoritative validation.
+        const inspectVerticalForecastSource = (source) => {
+            const headers = source.headers || ['Item ID', 'Date', 'Quantity'];
+            const mapping = source.mapping || { sku: headers[0], date: headers[1], value: headers[2] };
+            const indices = ['sku', 'date', 'value'].map(key => headers.indexOf(mapping[key]));
+            if (indices.some(index => index < 0) || new Set(indices).size !== 3 || new Set(headers).size !== headers.length) return null;
+            const [idIndex, dateIndex, valueIndex] = indices;
+            const items = new Map(), dates = new Set();
+            for (const [index, row] of source.rows.entries()) {
+                const rawId = row[idIndex];
+                let rawDate = row[dateIndex];
+                const rawValues = source.rawRows?.[index] || row;
+                if (typeof rawValues[dateIndex] === 'number' && !Number.isFinite(parseForecastHeaderDate(rawDate))) rawDate = forecastSerialDate(rawValues[dateIndex], source.date1904);
+                const rawQuantity = rawValues[valueIndex];
+                const quantity = typeof rawQuantity === 'number' ? rawQuantity : typeof rawQuantity === 'string' && rawQuantity.trim() !== '' ? Number(rawQuantity) : NaN;
+                const id = String(rawId ?? '').trim();
+                const time = parseForecastHeaderDate(rawDate);
+                if (!id || !Number.isFinite(time) || typeof quantity !== 'number' || !Number.isFinite(quantity)) return null;
+                const date = new Date(time).toISOString().replace(/T00:00:00\.000Z$/, '');
+                if (!items.has(id)) items.set(id, new Map());
+                const series = items.get(id);
+                if (series.has(date)) return null;
+                series.set(date, quantity);
+                dates.add(date);
+            }
+            const periods = Array.from(dates).sort();
+            if (!items.size || inferFrequencyFromHeaders(periods) === 'unsupported' || Array.from(items.values()).some(series => series.size !== periods.length)) return null;
+            return { valid: true, count: periods.length, items: items.size, frequency: inferFrequencyFromHeaders(periods) };
+        };
+
+        const appendForecastSourceForm = (form, source) => {
+            const { file, headers, mapping } = source;
+            form.append('file', file);
+            form.append('data_format', source.format || 'horizontal');
+            if (source.preparation) form.append('preparation', JSON.stringify(source.preparation));
+            if (source.versionId) form.append('dataset_version_id', source.versionId);
+            form.append('sku_col_idx', headers.indexOf(mapping.sku));
+            if (source.format === 'vertical') {
+                form.append('date_col_idx', headers.indexOf(mapping.date));
+                form.append('quantity_col_idx', headers.indexOf(mapping.value));
+            } else {
+                form.append('start_col_idx', headers.indexOf(mapping.start));
+                form.append('end_col_idx', headers.indexOf(mapping.end));
+            }
+        };
+
+        const inspectForecastMapping = (source) => {
+            if (!source) return { valid: false, count: 0, items: 0 };
+            if (source.format === 'vertical') {
+                return inspectVerticalForecastSource(source) || { valid: false, count: 0, items: 0 };
+            }
+            const { headers, rows, mapping } = source;
+            const sku = headers.indexOf(mapping.sku), start = headers.indexOf(mapping.start), end = headers.indexOf(mapping.end);
+            const count = start >= 0 && end >= start ? end - start + 1 : 0;
+            const items = new Set(rows.map(row => String(row[sku] ?? '').trim()).filter(Boolean)).size;
+            const frequency = inferFrequencyFromHeaders(count ? headers.slice(start, end + 1) : []);
+            const valid = sku >= 0 && count > 0 && (sku < start || sku > end) && items > 0 && frequency !== 'unsupported';
+            return { valid, count, items, frequency };
+        };
+
+        const PREPARATION_METHODS = {none:'Leave unresolved', forward:'Forward Fill', backward:'Backward Fill', interpolation:'Interpolation', seasonal:'Seasonal Imputation', zero:'Zero Imputation'};
+        const preparationMapping = source => {
+            const mapping = {data_format:source.format || 'horizontal', sku_col_idx:source.headers.indexOf(source.mapping.sku)};
+            if (source.format === 'vertical') { mapping.date_col_idx = source.headers.indexOf(source.mapping.date); mapping.quantity_col_idx = source.headers.indexOf(source.mapping.value); }
+            else { mapping.start_col_idx = source.headers.indexOf(source.mapping.start); mapping.end_col_idx = source.headers.indexOf(source.mapping.end); }
+            return mapping;
+        };
+        const datasetRequest = async (baseUrl, path, options = {}) => {
+            const response = await fetch(`${baseUrl}${path}`, options);
+            if (!response.ok) throw new Error(await readResponseError(response, 'Could not complete this request.'));
+            return response;
+        };
+        const downloadPreparedPreview = (review, filename) => {
+            const data = [['Item ID','Date','Quantity','Original Quantity','Imputed','Method','Missing type'], ...review.records.map(r=>[r.unique_id,r.ds,r.prepared,r.original,r.missing,r.method,r.kind])];
+            const quote = value => '"' + String(value ?? '').replace(/"/g,'""') + '"';
+            const csv = data.map(row=>row.map((value,index)=>quote(index === 0 && /^[=+@-]/.test(String(value)) ? "'"+value : value)).join(',')).join('\r\n');
+            window.OperartisSecurity.downloadBlob(new Blob(['\uFEFF',csv],{type:'text/csv'}),filename.replace(/\.[^.]+$/,'')+'-prepared.csv');
+        };
+        const DatasetLibrary = ({baseUrl,onOpen}) => {
+            const [datasets,setDatasets] = useState([]), [detail,setDetail] = useState(null), [history,setHistory] = useState(null);
+            const [error,setError] = useState(''), [busy,setBusy] = useState(false), [rename,setRename] = useState(''), [deleteId,setDeleteId] = useState(null);
+            const refresh = async () => setDatasets((await (await datasetRequest(baseUrl,'/datasets')).json()).datasets);
+            useEffect(()=>{refresh().catch(e=>setError(e.message));},[]);
+            const action = async fn => {setBusy(true);setError('');try {await fn();}catch(e){setError(e.message);}finally{setBusy(false);}};
+            const select = item => action(async()=>{const result=await (await datasetRequest(baseUrl,`/datasets/${item.id}/versions`)).json();setDetail(result);setRename(result.name);setHistory(null);setDeleteId(null);});
+            const download = (version,kind) => action(async()=>{const response=await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/${kind}`);window.OperartisSecurity.downloadBlob(await response.blob(),kind==='original'?detail.filename:detail.name+'-prepared.csv');});
+            return <section className="fc-dataset-library" aria-label="My datasets">
+                <div className="fc-prep-heading"><h3>My datasets</h3><small>Private to your account · 100 MB library · 50 datasets</small></div>
+                <p className="fc-prep-help">Reopen a saved version to preserve original observations and handling rules. Prepared downloads include estimate flags.</p>
+                {error && <p role="alert" className="fc-source-error">{error}</p>}
+                {!datasets.length && <p>No saved datasets yet. Upload data, review it, then save a version.</p>}
+                <div className="fc-dataset-grid"><div className="fc-dataset-list">{datasets.map(item=><button type="button" key={item.id} disabled={busy} aria-pressed={detail?.id===item.id} onClick={()=>select(item)}><strong>{item.name}</strong><small>{item.filename}</small></button>)}</div>
+                {detail && <div className="fc-dataset-detail">
+                    <div className="fc-prep-controls"><input aria-label="Dataset name" value={rename} maxLength={120} onChange={e=>setRename(e.target.value)} /><button className="fc-source-secondary" disabled={busy || !rename.trim()} onClick={()=>action(async()=>{await datasetRequest(baseUrl,`/datasets/${detail.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:rename})});setDetail({...detail,name:rename});await refresh();})}>Rename</button><button className="fc-source-secondary" disabled={busy} onClick={()=>setDeleteId(detail.id)}>Delete</button></div>
+                    {deleteId && <div className="fc-prep-warning" role="alert">Delete this dataset, its original file and all saved versions? Existing forecast reports remain available.<div><button className="fc-source-secondary" onClick={()=>setDeleteId(null)}>Keep dataset</button> <button className="fc-source-secondary" disabled={busy} onClick={()=>action(async()=>{await datasetRequest(baseUrl,`/datasets/${deleteId}`,{method:'DELETE'});setDetail(null);setDeleteId(null);await refresh();})}>Delete dataset permanently</button></div></div>}
+                    <h4>Version history</h4>{detail.versions.map((version,i)=><article key={version.id} className="fc-dataset-version"><div><strong>Version {detail.versions.length-i}</strong><small>{new Date(version.created_at+'Z').toLocaleString()} · {version.item_count} items · {version.missing_count} estimated values</small></div>
+                        <div className="fc-prep-controls"><button className="fc-source-confirm" disabled={busy} onClick={()=>action(()=>onOpen(detail,version))}>Open version</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'original')}>Original file</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'prepared')}>Prepared data</button><button className="fc-source-secondary" disabled={busy} onClick={()=>action(async()=>setHistory(await (await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/history`)).json()))}>Changes</button></div>
+                        {!!version.forecasts.length && <p className="fc-prep-help">Linked forecasts: {version.forecasts.map(job=>`${job.id.slice(0,8)} (${job.status})`).join(', ')}</p>}
+                    </article>)}
+                    {history && <div className="fc-prep-history"><h4>Recorded changes ({history.changes.length})</h4><p className="fc-prep-help">Frequency: {history.settings.preparation.frequency || 'Detected from source'}</p>{history.changes.map((row,i)=><p key={i}>{row.unique_id} · {row.ds} · missing → {row.prepared ?? 'unresolved'} · {PREPARATION_METHODS[row.method] || 'No change'}</p>)}</div>}
+                </div>}</div>
+            </section>;
+        };
+        const MissingDataReview = ({review,update,filter,setFilter,onlyMissing,setOnlyMissing}) => {
+            const policy=review.policy, affected=review.items.filter(item=>item.missing);
+            return <section className="fc-prep-panel" aria-label="Missing data">
+                <div className="fc-prep-heading"><h3>Missing data</h3><strong>{review.missing_count} gaps across {affected.length} {affected.length===1?'item':'items'}</strong></div>
+                <p className="fc-prep-help">{review.empty_count} empty quantities · {review.absent_periods} absent {review.absent_periods===1?'period':'periods'} · {review.unresolved} unresolved. Zeros remain unchanged.</p>
+                <div className="fc-prep-controls"><label>Frequency<select aria-label="Missing data frequency" value={policy.frequency} onChange={e=>update({frequency:e.target.value,frequency_confirmed:false})}>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v.replace('_',' ')}</option>)}</select></label><label className="fc-prep-check"><input type="checkbox" checked={policy.frequency_confirmed} onChange={e=>update({frequency_confirmed:e.target.checked})}/>I confirm this frequency</label><label>Default handling<select aria-label="Default missing data handling" value={policy.method} onChange={e=>update({method:e.target.value,overrides:{}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select></label></div>
+                {(policy.method==='zero' || Object.values(policy.overrides).includes('zero')) && <label className="fc-prep-check fc-prep-warning"><input type="checkbox" checked={policy.zero_confirmed} onChange={e=>update({zero_confirmed:e.target.checked})}/>I confirm these missing quantities mean no activity.</label>}
+                <details><summary>Review suggestions and per-item handling ({affected.length})</summary><div className="fc-prep-items">{affected.map(item=><div className="fc-prep-item" key={item.id}><strong>{item.id} · {item.missing} missing · longest gap {item.longest_gap}</strong><p>{item.reason}</p><div className="fc-prep-controls"><select aria-label={`Handling for ${item.id}`} disabled={item.entirely_missing} value={item.method} onChange={e=>update({overrides:{...policy.overrides,[item.id]:e.target.value}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select>{item.suggested!=='none' && <button type="button" className="fc-source-secondary" onClick={()=>update({overrides:{...policy.overrides,[item.id]:item.suggested}})}>Use suggested {PREPARATION_METHODS[item.suggested]}</button>}</div>{item.entirely_missing?<p className="fc-source-error">This entire series is missing. Correct the original data.</p>:item.review_required && <label className="fc-prep-check"><input type="checkbox" checked={policy.reviewed_items.includes(item.id)} onChange={e=>update({reviewed_items:e.target.checked?[...policy.reviewed_items,item.id]:policy.reviewed_items.filter(id=>id!==item.id)})}/>I reviewed this long or boundary gap, including whether it predates the item’s launch.</label>}{item.error && <p className="fc-source-error">{item.error}</p>}</div>)}</div></details>
+                <p className="fc-prep-help">Interpolation needs values on both sides. Seasonal filling uses earlier matching cycles. Validation reapplies your rule inside each training window; some boundary gaps may still require correction.</p>
+                <div className="fc-prep-controls"><label>Preview item<select aria-label="Preview item" value={filter} onChange={e=>setFilter(e.target.value)}><option value="">All items</option>{affected.map(item=><option key={item.id} value={item.id}>{item.id}</option>)}</select></label><label className="fc-prep-check"><input type="checkbox" checked={onlyMissing} onChange={e=>setOnlyMissing(e.target.checked)}/>Only missing values</label><button className="fc-source-secondary" onClick={()=>update({method:'none',overrides:{},zero_confirmed:false,reviewed_items:[]})}>Reset handling</button></div>
+            </section>;
+        };
+
+        const MappingModal = ({ initialSource, onClose, onConfirm, t, baseUrl }) => {
+            const [mode, setMode] = useState(initialSource?.mode || 'template');
+            const [templateFormat, setTemplateFormat] = useState(initialSource?.format || 'vertical');
+            const [sources, setSources] = useState(() => initialSource ? { [initialSource.mode === 'template' ? `template-${initialSource.format || 'horizontal'}` : 'custom']: initialSource } : {});
+            const sourceKey = mode === 'template' ? `template-${templateFormat}` : 'custom';
+            const [busy, setBusy] = useState(null);
+            const [errors, setErrors] = useState({});
+            const [page, setPage] = useState(0);
+            const dialogRef = useRef(null);
+            const inputRef = useRef(null);
+            const uploadGeneration = useRef(0);
+            const source = sources[sourceKey];
+            const [reviewState, setReviewState] = useState(null), [reviewError, setReviewError] = useState('');
+            const [libraryOpen, setLibraryOpen] = useState(false), [datasetName, setDatasetName] = useState(''), [saveMessage, setSaveMessage] = useState(''), [saving, setSaving] = useState(false);
+            const [itemFilter,setItemFilter] = useState(''), [onlyMissing,setOnlyMissing] = useState(false);
+            const signature = source ? JSON.stringify([source.mapping,source.preparation,source.format]) : '';
+            const review = reviewState?.file === source?.file && reviewState?.signature === signature ? reviewState.data : null;
+            const info = review ? {valid:review.valid,count:review.period_count,items:review.item_count,frequency:review.frequency} : {valid:false,count:0,items:0};
+            const loading = busy === sourceKey;
+            useEffect(()=>{
+                if (!source) return;
+                const controller = new AbortController();
+                setReviewError('');setPage(0);
+                const form = new FormData();form.append('file',source.file);form.append('mapping',JSON.stringify(preparationMapping(source)));form.append('preparation',JSON.stringify(source.preparation || {}));
+                datasetRequest(baseUrl,'/data/preview',{method:'POST',body:form,signal:controller.signal}).then(r=>r.json()).then(data=>{if(!controller.signal.aborted)setReviewState({file:source.file,signature,data});}).catch(e=>{if(!controller.signal.aborted)setReviewError(e.message);});
+                return ()=>controller.abort();
+            },[source?.file,signature,baseUrl]);
+            const updatePreparation = patch => setSources(prev=>({...prev,[sourceKey]:{...prev[sourceKey],versionId:null,preparation:{...(review?.policy || prev[sourceKey].preparation || {}),...patch}}}));
+            const readySource = () => ({...source,preparation:review?.policy || source.preparation,analysis:info,mode});
+            const saveDataset = async () => {
+                setSaving(true);setSaveMessage('');
+                try {
+                    let response;
+                    if(source.datasetId) response=await datasetRequest(baseUrl,`/datasets/${source.datasetId}/versions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mapping:preparationMapping(source),preparation:review.policy})});
+                    else {const form=new FormData();form.append('file',source.file);form.append('name',datasetName.trim() || source.file.name);form.append('mapping',JSON.stringify(preparationMapping(source)));form.append('preparation',JSON.stringify(review.policy));response=await datasetRequest(baseUrl,'/datasets',{method:'POST',body:form});}
+                    const saved=await response.json();setSources(prev=>prev[sourceKey]?.file!==source.file || JSON.stringify([prev[sourceKey].mapping,prev[sourceKey].preparation,prev[sourceKey].format])!==signature ? prev : ({...prev,[sourceKey]:{...prev[sourceKey],datasetId:saved.id,versionId:saved.version.id,preparation:saved.version.settings.preparation}}));setSaveMessage('Saved to your private library.');
+                } catch(e){setSaveMessage(e.message);}finally{setSaving(false);}
+            };
+            const openDataset = async (dataset,version) => {
+                const response=await datasetRequest(baseUrl,`/datasets/${dataset.id}/versions/${version.id}/original`);
+                const draft=await readSource(new File([await response.blob()],dataset.filename),version.settings.data_format);
+                const config=version.settings;
+                draft.mapping=draft.format==='vertical'?{sku:draft.headers[config.sku_col_idx],date:draft.headers[config.date_col_idx],value:draft.headers[config.quantity_col_idx]}:{sku:draft.headers[config.sku_col_idx],start:draft.headers[config.start_col_idx],end:draft.headers[config.end_col_idx]};
+                setSources(prev=>({...prev,custom:{...draft,preparation:config.preparation,datasetId:dataset.id,versionId:version.id}}));setDatasetName(dataset.name);setMode('custom');setLibraryOpen(false);setPage(0);setItemFilter('');setOnlyMissing(false);
+            };
+            const closeRef = useRef(onClose);
+            closeRef.current = onClose;
 
             useEffect(() => {
-                if (isOpen && headers.length) {
-                    console.log('MappingModal headers:', headers.slice(0, 5), '...');
+                const previousFocus = document.activeElement;
+                const dialog = dialogRef.current;
+                dialog.querySelector('[aria-pressed="true"]')?.focus();
+                const onKey = event => {
+                    if (event.key === 'Escape') { event.preventDefault(); closeRef.current(); }
+                    if (event.key !== 'Tab') return;
+                    const controls = Array.from(dialog.querySelectorAll('button:not(:disabled), input:not(:disabled), summary, a[href], select:not(:disabled), [tabindex="0"]')).filter(el => el.getClientRects().length);
+                    const first = controls[0], last = controls[controls.length - 1];
+                    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+                    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+                };
+                dialog.addEventListener('keydown', onKey);
+                return () => {
+                    ++uploadGeneration.current;
+                    dialog.removeEventListener('keydown', onKey);
+                    previousFocus?.focus();
+                };
+            }, []);
 
-                    // Auto-detect date/month columns FIRST
-                    // Check for text month patterns OR datetime format patterns
-                    const monthPatterns = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-                    const datePatterns = [/^\d{4}-\d{2}-\d{2}/, /^\d{4}\/\d{2}\/\d{2}/, /^\d{2}[-\/]\d{2}[-\/]\d{4}/];
-
-                    const dateIndices = headers.map((h, i) => {
-                        const headerStr = String(h);
-                        const headerLower = headerStr.toLowerCase();
-                        // Check text month patterns (case insensitive)
-                        if (monthPatterns.some(p => headerLower.includes(p))) return i;
-                        // Check datetime patterns (YYYY-MM-DD, etc.) on original string
-                        if (datePatterns.some(p => p.test(headerStr))) return i;
-                        // Check if it looks like a date string (contains year numbers)
-                        if (/20\d{2}/.test(headerStr) || /19\d{2}/.test(headerStr)) return i;
-                        return -1;
-                    }).filter(i => i >= 0);
-
-                    console.log('Detected date column indices:', dateIndices);
-
-                    // Auto-detect SKU column (first non-date column that matches patterns)
-                    const findSku = () => {
-                        const patterns = ['sku', 'id', 'item', 'product', 'unique_id', 'item_id'];
-                        for (let i = 0; i < headers.length; i++) {
-                            // Skip if this is a detected date column
-                            if (dateIndices.includes(i)) continue;
-                            const headerLower = String(headers[i]).toLowerCase();
-                            if (patterns.some(p => headerLower.includes(p))) {
-                                return headers[i];
-                            }
-                        }
-                        // Fallback: first non-date column
-                        for (let i = 0; i < headers.length; i++) {
-                            if (!dateIndices.includes(i)) return headers[i];
-                        }
-                        return headers[0];
-                    };
-
-                    // Always auto-suggest when modal opens (user can still change if needed)
-                    setSku(findSku());
-                    if (dateIndices.length > 0) {
-                        setStartCol(headers[dateIndices[0]]);
-                        setEndCol(headers[dateIndices[dateIndices.length - 1]]);
-                    }
-                }
-            }, [isOpen, headers]);
-
-            const handleConfirm = () => {
-                onConfirm(sku, startCol, endCol);
+            const readSource = async (file, format) => {
+                window.OperartisSecurity.validateUploadFile(file, { allowedExtensions: ['.xlsx', '.csv'] });
+                const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: false, cellNF: true, raw: true });
+                window.OperartisSecurity.validateWorkbook(workbook);
+                const data = readForecastUpload(workbook, format);
+                if (!data.headers.length || !data.rows.length) throw new Error(t('mapping.empty_file'));
+                return { file, ...data };
             };
 
-            if (!isOpen) return null;
+            useEffect(() => {
+                if (mode !== 'template' || sources[sourceKey]) return;
+                const controller = new AbortController();
+                setBusy(sourceKey);
+                setErrors(prev => ({ ...prev, [sourceKey]: null }));
+                (async () => {
+                    try {
+                        const response = await fetch(`./assets/templates/${FORECAST_TEMPLATE_FILES[templateFormat]}`, { signal: controller.signal });
+                        if (!response.ok) throw new Error(t('mapping.template_error'));
+                        const file = new File([await response.blob()], FORECAST_TEMPLATE_FILES[templateFormat], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                        const draft = await readSource(file, templateFormat);
+                        if (!controller.signal.aborted) setSources(prev => ({ ...prev, [sourceKey]: draft }));
+                    } catch (error) {
+                        if (!controller.signal.aborted) setErrors(prev => ({ ...prev, [sourceKey]: error.message || t('mapping.template_error') }));
+                    } finally {
+                        if (!controller.signal.aborted) setBusy(prev => prev === sourceKey ? null : prev);
+                    }
+                })();
+                return () => { controller.abort(); };
+            }, [mode, templateFormat]);
 
-            // Filter headers for month selection (exclude SKU column and other non-numeric columns)
-            const potentialMonthCols = headers;
+            const upload = async event => {
+                const file = event.target.files[0];
+                event.target.value = '';
+                if (!file) return;
+                const generation = ++uploadGeneration.current;
+                setBusy('custom');
+                setErrors(prev => ({ ...prev, custom: null }));
+                // Keep the current committed input outside this dialog unchanged.
+                setSources(prev => ({ ...prev, custom: null }));
+                try {
+                    const draft = await readSource(file);
+                    if (generation === uploadGeneration.current) { setSources(prev => ({ ...prev, custom: draft })); setPage(0); }
+                } catch (error) {
+                    if (generation === uploadGeneration.current) setErrors(prev => ({ ...prev, custom: error.message || t('mapping.read_error') }));
+                } finally {
+                    if (generation === uploadGeneration.current) setBusy(prev => prev === 'custom' ? null : prev);
+                }
+            };
+            const changeMapping = (key, value) => setSources(prev => ({ ...prev, [sourceKey]: { ...prev[sourceKey], versionId:null, preparation:undefined, mapping: { ...prev[sourceKey].mapping, [key]: value } } }));
+            const chooseMode = value => { setMode(value); setPage(0); };
+            const pageSize = 20;
+            const gapPreview = !!review?.missing_count;
+            const previewRecords = review?.records.filter(row=>(!itemFilter || row.unique_id===itemFilter) && (!onlyMissing || row.missing)) || [];
+            const visibleRows = source?.rows.slice(page * pageSize, (page + 1) * pageSize) || [];
+            const visibleHeaders = source?.headers.slice(0, 60) || [];
 
-            return (
-                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm modal-backdrop transition-opacity" onClick={onClose}></div>
-                    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-xl shadow-2xl w-full max-w-md border border-white/20 dark:border-white/10 flex flex-col relative animate-slide-up z-10 ring-1 ring-black/5 dark:ring-white/5">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wide">{t('mapping.title')}</h2>
-                            <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><XIcon /></button>
+            return <div className="fc-source-overlay">
+                <div className="fc-source-backdrop" onClick={onClose} />
+                <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="fc-source-title" className="fc-source-dialog">
+                    <header className="fc-source-header">
+                        <div className="fc-source-heading"><span className="fc-source-icon"><ColumnsIcon /></span><div><h2 id="fc-source-title">{t('mapping.source_title')}</h2><p>{t('mapping.source_subtitle')}</p></div></div>
+                        <button type="button" className="fc-source-secondary" onClick={()=>setLibraryOpen(value=>!value)}>{libraryOpen ? "Back to upload" : "My datasets"}</button>
+                        <button type="button" className="fc-source-close" onClick={onClose} aria-label={t('mapping.cancel')}><XIcon /></button>
+                    </header>
+                    <div className="fc-source-body scroller">
+                        {libraryOpen ? <DatasetLibrary baseUrl={baseUrl} onOpen={openDataset} /> : <>
+                        <div className="fc-source-choices" role="group" aria-label={t('mapping.source_title')}>
+                            {['template', 'custom'].map(value => <button key={value} type="button" aria-pressed={mode === value} className="fc-source-choice" onClick={() => chooseMode(value)}>
+                                <span className="fc-source-choice-icon">{value === 'template' ? <ColumnsIcon /> : <UploadIcon />}</span>
+                                <span><strong>{t(`mapping.${value}_title`)}</strong><small>{t(`mapping.${value}_hint`)}</small></span>
+                                <span className="fc-source-radio" aria-hidden="true" />
+                            </button>)}
                         </div>
-                        <div className="p-4 space-y-4">
-                            {/* SKU Column */}
-                            <div>
-                                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.sku_col')}</label>
-                                <select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={sku} onChange={e => setSku(e.target.value)}>
-                                    {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                </select>
-                            </div>
-
-                            {/* Month Range Selection */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.start_col')}</label>
-                                    <select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={startCol} onChange={e => setStartCol(e.target.value)}>
-                                        {potentialMonthCols.map(h => <option key={h} value={h}>{h}</option>)}
+                        {mode === 'template' && <div className="fc-source-format-row">
+                            <label htmlFor="fc-template-format">{t('mapping.template_format')}</label>
+                            <select id="fc-template-format" value={templateFormat} onChange={event => { setTemplateFormat(event.target.value); setPage(0); }}>
+                                <option value="vertical">{t('mapping.vertical_format')}</option>
+                                <option value="horizontal">{t('mapping.horizontal_format')}</option>
+                            </select>
+                        </div>}
+                        {mode === 'custom' && <>
+                            <input ref={inputRef} type="file" accept=".xlsx,.csv" hidden onChange={upload} aria-label={t('mapping.choose_file')} />
+                            <button type="button" className="fc-source-upload" data-empty={!source && !loading ? "true" : "false"}
+                                disabled={loading} onClick={() => inputRef.current?.click()} aria-label={t(source ? 'mapping.replace_file' : 'mapping.choose_file')}>
+                                <UploadIcon /><span className="fc-source-upload-copy"><strong>{source?.file.name || t('mapping.upload_prompt')}</strong><span>{t('mapping.upload_formats')}</span></span>
+                            </button>
+                        </>}
+                        {loading && <div role="status" className="fc-source-message">{t('mapping.loading')}</div>}
+                        {errors[sourceKey] && <p role="alert" className="fc-source-error">{errors[sourceKey]}</p>}
+                        {source && !loading && <>
+                            {mode === 'template' && <div className="fc-source-template-note"><p>{t('mapping.template_note')}</p><a href={`./assets/templates/${FORECAST_TEMPLATE_FILES[templateFormat]}`} download={FORECAST_TEMPLATE_FILES[templateFormat]}><DownloadIcon />{t('mapping.download')}</a></div>}
+                            <div className="fc-source-mapping">
+                                {(source.format === 'vertical' ? ['sku', 'date', 'value'] : ['sku', 'start', 'end']).map((key, index) => <div key={key}><label htmlFor={`fc-source-${key}`}>{t(`mapping.${(source.format === 'vertical' ? ['sku_col','date_col','quantity_col'] : ['sku_col','start_col','end_col'])[index]}`)}</label>
+                                    <select id={`fc-source-${key}`} value={source.mapping[key]} disabled={mode === 'template'} onChange={e => changeMapping(key, e.target.value)}>
+                                        <option value="">{t('mapping.select_column')}</option>
+                                        {source.headers.map((header, i) => <option key={i} value={header}>{header}</option>)}
                                     </select>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t('mapping.end_col')}</label>
-                                    <select className="w-full text-xs p-2 border rounded bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-brand-gold transition-colors" value={endCol} onChange={e => setEndCol(e.target.value)}>
-                                        {potentialMonthCols.map(h => <option key={h} value={h}>{h}</option>)}
-                                    </select>
-                                </div>
+                                </div>)}
                             </div>
-
-                            {/* Preview Info */}
-                            {monthCount > 0 && (
-                                <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                                            {monthCount} {t('mapping.months_detected')}
-                                        </span>
-                                    </div>
-                                    <div className="mt-2 text-[10px] text-emerald-600 dark:text-emerald-500 font-mono">
-                                        {startCol} → {endCol}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
-                            <button onClick={onClose} className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700">{t('mapping.cancel')}</button>
-                            <button onClick={handleConfirm} disabled={!sku || !startCol || !endCol || monthCount < 1} className="px-3 py-1.5 bg-brand-gold text-white text-xs font-bold rounded hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{t('mapping.confirm')}</button>
-                        </div>
+                            {reviewError && <div role="alert" className="fc-source-error">{reviewError}<label className="fc-prep-controls">Calendar<select aria-label="Correct calendar frequency" value={source.preparation?.frequency || ''} onChange={e=>updatePreparation({frequency:e.target.value,frequency_confirmed:false})}><option value="">Choose frequency</option>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v}</option>)}</select></label></div>}
+                            {!review && !reviewError && <p role="status" className="fc-prep-help">Scanning quantities and calendar…</p>}
+                            {gapPreview && <MissingDataReview review={review} update={updatePreparation} filter={itemFilter} setFilter={value=>{setItemFilter(value);setPage(0);}} onlyMissing={onlyMissing} setOnlyMissing={value=>{setOnlyMissing(value);setPage(0);}} />}
+                            <div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid} onClick={()=>downloadPreparedPreview(review,source.file.name)}>Download prepared data</button></div>
+                            {saveMessage && <p role="status" className="fc-prep-help">{saveMessage}</p>}
+                            <div className="fc-source-preview-heading"><h3>{t('mapping.preview')}</h3><span>{info.items} {t('mapping.items')} <span aria-hidden="true">·</span> {info.count} {t('mapping.months_detected')}</span></div>
+                            {gapPreview ? <>
+                                <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label="Data Preview"><table className="fc-source-table fc-prep-table"><thead><tr>{['Item ID','Date','Original','Prepared','Method'].map(label=><th key={label}>{label}</th>)}</tr></thead><tbody>{previewRecords.slice(page*pageSize,(page+1)*pageSize).map((row,i)=><tr key={i}><td>{row.unique_id}</td><td>{row.ds}</td><td className={row.missing?'fc-prep-missing':''}>{row.original ?? (row.kind==='absent_period'?'Missing period':'Empty')}</td><td className={row.missing && row.prepared!==null?'fc-prep-estimate':''}>{row.prepared ?? 'Unresolved'}</td><td>{PREPARATION_METHODS[row.method] || (row.missing ? 'Unresolved' : 'Observed')}</td></tr>)}</tbody></table></div>
+                                <div className="fc-source-preview-footer"><span>{previewRecords.length ? page*pageSize+1 : 0}–{Math.min((page+1)*pageSize,previewRecords.length)} / {previewRecords.length} rows · Amber = estimated</span><div><button disabled={page===0} aria-label="Previous rows" onClick={()=>setPage(p=>p-1)}><ChevronLeftIcon/></button><button disabled={(page+1)*pageSize>=previewRecords.length} aria-label="Next rows" onClick={()=>setPage(p=>p+1)}><ChevronRightIcon/></button></div></div>
+                            </> : <>
+                            <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label={t('mapping.preview')}>
+                                <table className="fc-source-table" data-format={source.format || "horizontal"}><thead><tr>{visibleHeaders.map((header, i) => <th key={i} scope="col" className={header === source.mapping.sku ? 'fc-source-id' : ''}>{header}</th>)}</tr></thead>
+                                    <tbody>{visibleRows.map((row, ri) => <tr key={page * pageSize + ri}>{visibleHeaders.map((header, ci) => <td key={ci} className={header === source.mapping.sku ? 'fc-source-id' : ''}>{String(row[ci] ?? '')}</td>)}</tr>)}</tbody>
+                                </table>
+                            </div>
+                            <div className="fc-source-preview-footer"><span>{page * pageSize + 1}–{Math.min((page + 1) * pageSize, source.rows.length)} / {source.rows.length} {t('mapping.rows')}{source.headers.length > 60 ? ` · ${t('mapping.preview_columns')}` : ''}</span>
+                                {source.rows.length > pageSize && <div><button type="button" disabled={page === 0} onClick={() => setPage(p => p - 1)} aria-label={t('mapping.previous')}><ChevronLeftIcon /></button><button type="button" disabled={(page + 1) * pageSize >= source.rows.length} onClick={() => setPage(p => p + 1)} aria-label={t('mapping.next')}><ChevronRightIcon /></button></div>}
+                            </div>
+                            </>}
+                        </>}
+                        </>}
                     </div>
+                    <footer className="fc-source-footer"><p>{libraryOpen ? 'Private files and version history' : t('mapping.confirm_hint')}</p><div><button type="button" className="fc-source-secondary" onClick={onClose}>{t('mapping.cancel')}</button><button type="button" className="fc-source-confirm" disabled={libraryOpen || !source || loading || !info.valid || saving || !!errors[sourceKey]} onClick={() => { if (source && !loading && info.valid && !errors[sourceKey]) onConfirm(source.mapping.sku, source.mapping.start, source.mapping.end, readySource()); }}>{t(mode === 'template' ? 'mapping.use_template' : 'mapping.confirm')}</button></div></footer>
                 </div>
-            );
+            </div>;
         };
 
 
@@ -5379,7 +5830,13 @@
                 return () => clearTimeout(id);
             }, [isSidebarCollapsed]);
 
-            const fileInputRef = useRef(null);
+            const [mappingSource, setMappingSource] = useState(null);
+            const [confirmedInputSource, setConfirmedInputSource] = useState(null);
+            const openSourceDialog = (edit = false) => {
+                if (isRunning) return;
+                setMappingSource(edit ? confirmedInputSource : null);
+                setIsMappingModalOpen(true);
+            };
 
             // --- EFFECTS ---
             useEffect(() => {
@@ -5692,76 +6149,25 @@
             }, [isPolling, jobId, BASE_URL, jobModelType, jobSelectedModels]);
 
             // --- HANDLERS ---
-            const handleFileChange = (e) => {
-                const f = e.target.files[0];
-                if (!f) return;
-                try {
-                    window.OperartisSecurity.validateUploadFile(f, { allowedExtensions: ['.xlsx', '.csv'] });
-                } catch (err) {
-                    setError(err.message);
-                    e.target.value = null;
-                    return;
-                }
-                ++runGenerationRef.current;
-                setFile(f);
-                setError(null);
-                setJobId(null);
-                setCompletedJobIds([]);
-                setIsPolling(false);
-                setJobStatus(null);
-                setJobModelType(null);
-                setExecutionBackend(null);
-                setJobProgress({ completed: 0, total: 0, queuePosition: 0 });
-                setIsCancelling(false);
-                setAvailableCols([]);
-                setSheetRows([]);
-                setMappedSkus([]);
-                setItemTabs([]);
-                setSelectedSkus([]);
-                setRunningSkus([]);
-                setSkuValidationMethods({});
-                setBatchResults(null);
-                setSkuCol("");
-                setStartCol("");
-                setEndCol("");
-                setSkuColIdx(-1);
-                setStartColIdx(-1);
-                setEndColIdx(-1);
-                setInferredFrequency("monthly");
-                setTotalTimeSeries(0);
-                setActiveTab("overview");
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    try {
-                        const wb = XLSX.read(evt.target.result, { type: 'binary', cellDates: false, cellNF: true, raw: true });
-                        window.OperartisSecurity.validateWorkbook(wb);
-                        const { headers, rows } = readForecastWorksheet(wb);
-
-                        if (headers && headers.length > 0) {
-                            setAvailableCols(headers);
-                            setSheetRows(rows);
-                            setIsMappingModalOpen(true);
-                        } else {
-                            setError("No headers found in file.");
-                        }
-                    } catch (err) {
-                        console.error('File parse error:', err);
-                        setError("Failed to parse file headers");
-                    }
-                };
-                reader.readAsBinaryString(f);
-            };
-
-            const handleMappingConfirm = (sku, start, end) => {
+            const handleMappingConfirm = (sku, start, end, source) => {
+                if (isRunning || !source || !(source.analysis || inspectForecastMapping(source)).valid) return;
+                const { headers, rows, mapping } = source;
+                sku = mapping.sku;
+                start = mapping.start || mapping.date;
+                end = mapping.end || mapping.value;
+                setFile(source.file);
+                setAvailableCols(headers);
+                setSheetRows(rows);
+                setConfirmedInputSource(source);
                 setSkuCol(sku);
                 setStartCol(start);
                 setEndCol(end);
                 setIsMappingModalOpen(false);
 
                 // Calculate and store column indices immediately
-                const skuIdx = availableCols.indexOf(sku);
-                const startIdx = availableCols.indexOf(start);
-                const endIdx = availableCols.indexOf(end);
+                const skuIdx = headers.indexOf(sku);
+                const startIdx = headers.indexOf(start);
+                const endIdx = headers.indexOf(end);
 
                 setSkuColIdx(skuIdx);
                 setStartColIdx(startIdx);
@@ -5773,7 +6179,7 @@
                 const seen = new Set();
                 const skus = [];
                 if (skuIdx >= 0) {
-                    for (const row of sheetRows) {
+                    for (const row of rows) {
                         if (!row || row[skuIdx] == null || row[skuIdx] === '') continue;
                         const value = String(row[skuIdx]).trim();
                         if (!value || seen.has(value)) continue;
@@ -5800,12 +6206,7 @@
                 setJobProgress({ completed: 0, total: 0, queuePosition: 0 });
                 setIsCancelling(false);
 
-                // Calculate total time series from column range
-                const total = endIdx - startIdx + 1;
-                const dateHeaders = startIdx >= 0 && endIdx >= startIdx
-                    ? availableCols.slice(startIdx, endIdx + 1)
-                    : [];
-                const frequency = inferFrequencyFromHeaders(dateHeaders);
+                const { count: total, frequency } = source.analysis || inspectForecastMapping(source);
                 const profile = (forecastCapabilities.frequencyProfiles || parseFrequencyProfiles())[frequency]
                     || {};
                 setInferredFrequency(frequency);
@@ -5908,11 +6309,7 @@
                 console.log('Execute with indices:', { skuColIdx, startColIdx, endColIdx, selectedSkus, skusToRun });
 
                 const fd = new FormData();
-                fd.append('file', file);
-                fd.append('sku_col_idx', skuColIdx);
-                fd.append('start_col_idx', startColIdx);
-                fd.append('end_col_idx', endColIdx);
-                fd.append('data_format', 'horizontal');
+                appendForecastSourceForm(fd, confirmedInputSource);
                 fd.append('model_type', selectedModelType);
                 fd.append('selected_models', JSON.stringify(orderedSelectedModels(selectedModels)));
                 fd.append('validation_method', validationMethod);
@@ -6078,13 +6475,9 @@
                 // Use fast export if cached results are available
                 if (batchResults && batchResults.length > 0) {
                     const fd = new FormData();
-                    fd.append('file', file);
+                    appendForecastSourceForm(fd, confirmedInputSource);
                     fd.append('validation_method', validationMethod);
                     fd.append('forecast_steps', parseInt(forecastSteps) || 6);
-                    fd.append('sku_col_idx', skuColIdx);
-                    fd.append('start_col_idx', startColIdx);
-                    fd.append('end_col_idx', endColIdx);
-                    fd.append('data_format', 'horizontal');
                     fd.append('cached_results', JSON.stringify(batchResults));
                     fd.append('job_id', jobId || '');
                     fd.append('job_ids', JSON.stringify(completedJobIds));
@@ -6115,7 +6508,7 @@
                         return;
                     }
                     const fd = new FormData();
-                    fd.append('file', file);
+                    appendForecastSourceForm(fd, confirmedInputSource);
                     fd.append('model_type', exportModelType);
                     fd.append('selected_models', JSON.stringify(exportSelected));
                     fd.append('validation_method', validationMethod);
@@ -6124,10 +6517,6 @@
                     fd.append('train_horizon', parseInt(trainHorizon) || 24);
                     fd.append('test_horizon', parseInt(testHorizon) || 6);
                     fd.append('forecast_steps', parseInt(forecastSteps) || 6);
-                    fd.append('sku_col_idx', skuColIdx);
-                    fd.append('start_col_idx', startColIdx);
-                    fd.append('end_col_idx', endColIdx);
-                    fd.append('data_format', 'horizontal');
 
                     try {
                         const res = await fetch(`${BASE_URL}/export`, { method: 'POST', body: fd });
@@ -6170,7 +6559,9 @@
                 setOverviewSearchQuery("");
                 setActiveTab("overview");
                 setSkuValidationMethods({});
-                if (fileInputRef.current) fileInputRef.current.value = "";
+                setMappingSource(null);
+                setConfirmedInputSource(null);
+                setIsMappingModalOpen(false);
             };
 
             const handleSkuSelect = (sku) => {
@@ -6374,7 +6765,7 @@
 
             return (
                 <div className="flex h-full min-h-0 bg-slate-50 dark:bg-slate-950 overflow-hidden relative w-full transition-colors duration-300 mobile-landscape-root">
-                    <MappingModal headers={availableCols} isOpen={isMappingModalOpen} onClose={() => setIsMappingModalOpen(false)} onConfirm={handleMappingConfirm} t={t} />
+                    {isMappingModalOpen && <MappingModal baseUrl={BASE_URL} initialSource={mappingSource} onClose={() => setIsMappingModalOpen(false)} onConfirm={handleMappingConfirm} t={t} />}
                     <AlertModal
                         isOpen={!!alertMessage}
                         message={alertMessage || ''}
@@ -6399,7 +6790,6 @@
 
                     {/* SIDEBAR */}
                     <div className={`fc-sidebar-shell ${isFullScreen ? 'hidden' : ''} fixed lg:relative inset-y-0 left-0 z-50 w-64 ${isSidebarCollapsed ? 'lg:w-[76px]' : 'lg:w-64'} transform transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-                        <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx,.csv" onChange={handleFileChange} />
                         <button
                             onClick={() => setIsSidebarCollapsed(prev => !prev)}
                             className="fc-sidebar-toggle hidden lg:flex items-center justify-center h-6 w-6 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-gold hover:border-brand-gold shadow-md transition-colors"
@@ -6435,7 +6825,7 @@
                             </button>
                             <button
                                 type="button"
-                                onClick={() => fileInputRef.current?.click()}
+                                onClick={() => openSourceDialog()}
                                 disabled={isRunning}
                                 className={`relative flex items-center justify-center h-11 w-11 rounded-xl border transition-all disabled:cursor-not-allowed disabled:opacity-60 ${file ? (skuCol && startCol && endCol ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500' : 'border-brand-gold/40 bg-amber-500/10 text-brand-gold') : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold'}`}
                                 title={file ? file.name : t('sidebar.upload_label')}
@@ -6445,7 +6835,7 @@
                             </button>
                             {file && (
                                 <button
-                                    onClick={() => setIsMappingModalOpen(true)}
+                                    onClick={() => openSourceDialog(true)}
                                     disabled={isRunning}
                                     className="flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-gold hover:border-brand-gold transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                     title={t('sidebar.edit_mapping')}
@@ -6490,14 +6880,14 @@
                             <div>
                                 <h3 className="text-xxs font-bold text-brand-gold uppercase tracking-widest mb-2 flex items-center gap-2">{t('sidebar.source_data')}<span className="h-px flex-1 bg-gradient-to-r from-brand-gold to-transparent"></span></h3>
                                 <div className={`relative bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl px-3 py-6 text-center transition-colors group min-w-0 overflow-hidden ${!file ? 'hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer' : ''}`}>
-                                    <div onClick={() => !file && fileInputRef.current?.click()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : "min-w-0 w-full"}>
+                                    <div role={!file ? 'button' : undefined} tabIndex={!file ? 0 : undefined} aria-label={!file ? t('sidebar.upload_label') : undefined} onKeyDown={e => { if (!file && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openSourceDialog(); } }} onClick={() => !file && openSourceDialog()} className={!file ? "cursor-pointer flex flex-col items-center justify-center gap-2" : "min-w-0 w-full"}>
                                         {file ? (
                                             <div className="flex flex-col items-center gap-1 min-w-0 w-full max-w-full">
-                                                <div onClick={() => !isRunning && fileInputRef.current?.click()} title={file.name} className={`text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 mb-1 w-full min-w-0 max-w-full ${isRunning ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:underline'}`}>{file.name}</div>
+                                                <div onClick={() => !isRunning && openSourceDialog()} title={file.name} className={`text-xs font-bold text-slate-700 dark:text-slate-200 truncate px-2 mb-1 w-full min-w-0 max-w-full ${isRunning ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:underline'}`}>{file.name}</div>
                                                 <div className="text-[10px] text-emerald-500 font-bold uppercase">{skuCol && startCol && endCol ? t('sidebar.uploaded_mapped') : t('sidebar.action_required')}</div>
                                                 <div className="flex gap-2 mt-2 justify-center">
                                                     <button
-                                                        onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                                                        onClick={(e) => { e.stopPropagation(); openSourceDialog(); }}
                                                         disabled={isRunning}
                                                         className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                                         title={t('sidebar.reupload_file')}
@@ -6505,7 +6895,7 @@
                                                         <UploadIcon width="14" height="14" />
                                                     </button>
                                                     <button
-                                                        onClick={(e) => { e.stopPropagation(); setIsMappingModalOpen(true); }}
+                                                        onClick={(e) => { e.stopPropagation(); openSourceDialog(true); }}
                                                         disabled={isRunning}
                                                         className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-brand-gold hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-60"
                                                         title={t('sidebar.edit_mapping')}
