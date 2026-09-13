@@ -2038,8 +2038,124 @@
             .fc-source-footer > div { width: auto; margin-left: auto; }
             .fc-source-foldout > summary span { display: inline; margin-left: 5px; }
         }
+        /* Touch layouts keep actions fixed while only the workspace scrolls. */
+        @media (max-width: 1100px), (pointer: coarse) {
+            .fc-source-dialog .fc-source-body :is(input:not([type="checkbox"]):not([type="file"]), select) { font-size: 16px; min-height: 44px; }
+            .fc-source-dialog .fc-source-body.scroller :is(.fc-source-format-row select, .fc-source-mapping select, .fc-preview-filters select) { height: 36px; min-height: 36px; padding: 6px 9px; font-size: 14px; line-height: 20px; }
+            .fc-source-dialog .fc-source-body.scroller .fc-preview-search input { height: 34px; min-height: 34px; padding: 6px 9px; font-size: 14px; line-height: 20px; }
+            .fc-source-dialog :is(.fc-source-secondary, .fc-source-confirm, .fc-source-close, .fc-source-choice, .fc-calendar-nav button, .fc-calendar-week button, .fc-source-preview-footer button) { min-height: 44px; }
+            .fc-source-close, .fc-source-preview-footer button { min-width: 44px; display: inline-grid; place-items: center; }
+            .fc-source-dialog .fc-prep-check { min-height: 44px; }
+            .fc-source-dialog .fc-prep-check input { width: 18px; height: 18px; }
+            .fc-preview-search button { min-width: 36px; min-height: 34px; height: 34px; padding: 0 9px; }
+            .fc-calendar-switch { min-height: 44px; }
+            .fc-source-body { overscroll-behavior: contain; }
+            .fc-source-table td:first-child { z-index: 1; }
+        }
+        @media (min-width: 641px) and (max-width: 1100px) {
+            .fc-source-overlay { padding: 24px; }
+            .fc-source-dialog { width: min(100%, 1000px); height: calc(100dvh - 48px); max-height: 1100px; }
+            .fc-source-header, .fc-source-body { padding: 16px 20px; }
+            .fc-source-header { flex-wrap: nowrap; }
+            .fc-source-heading h2 { font-size: 19px; }
+            .fc-source-footer { padding: 14px 20px max(14px, env(safe-area-inset-bottom)); }
+            .fc-source-preview-heading { gap: 12px; }
+            .fc-source-foldout > summary { padding: 13px 12px; }
+            .fc-calendar-entry { grid-template-columns: repeat(2, minmax(0,1fr)); }
+            .fc-calendar-entry-reason { grid-column: auto; }
+            .fc-calendar-coverage { grid-template-columns: repeat(2, minmax(0,1fr)); }
+            .fc-calendar-coverage > label:last-child { grid-column: span 2; }
+            .fc-missing-setup { grid-template-columns: repeat(2, minmax(0,1fr)); }
+            .fc-missing-confirm { grid-column: span 2; padding-top: 0; }
+        }
+        @media (max-width: 640px) {
+            .fc-source-overlay { padding: 0; }
+            .fc-source-dialog { width: 100%; height: 100vh; height: 100dvh; max-height: none; border: 0; border-radius: 0; }
+            .fc-source-header { display: grid; grid-template-columns: minmax(0,1fr) auto 44px; gap: 8px; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left)); }
+            .fc-source-heading h2 { font-size: 17px; line-height: 1.3; }
+            .fc-source-heading p, .fc-source-icon { display: none; }
+            .fc-source-header > .fc-source-secondary { padding: 8px 10px; font-size: 12px; }
+            .fc-source-close { padding: 10px; }
+            .fc-source-body { padding: 16px max(16px, env(safe-area-inset-right)) 20px max(16px, env(safe-area-inset-left)); }
+            .fc-source-toolbar { gap: 10px; margin-bottom: 12px; }
+            .fc-source-choices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; gap: 4px; }
+            .fc-source-choice { min-width: 0; gap: 6px; padding: 8px 6px; }
+            .fc-source-choice strong { white-space: normal; font-size: 12px; line-height: 1.4; }
+            .fc-source-upload-entry { width: 100%; flex-basis: 100%; }
+            .fc-source-remove-upload { width: 44px; height: 44px; right: 0; }
+            .fc-source-upload-entry > .fc-source-upload { min-height: 44px; padding-right: 48px; }
+            .fc-source-format-row { width: 100%; flex-basis: 100%; }
+            .fc-source-format-row select { width: 100%; max-width: 100%; }
+            .fc-source-download { min-height: 36px; align-items: center; margin-left: 0; }
+            .fc-source-template-note { font-size: 12px; line-height: 1.5; }
+            .fc-source-mapping { grid-template-columns: 1fr; gap: 10px; margin: 4px 0 16px; }
+            .fc-source-mapping > div { display: grid; grid-template-columns: 105px minmax(0,1fr); align-items: center; gap: 12px; }
+            .fc-source-mapping label { min-height: 0; margin: 0; font-size: 12px; line-height: 1.4; }
+            .fc-source-foldout { border-radius: 12px; margin-bottom: 10px; }
+            .fc-source-foldout > summary { padding: 13px 12px; line-height: 1.5; }
+            .fc-source-foldout > summary span { display: block; margin: 3px 0 0 13px; }
+            .fc-source-preview-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px 12px; margin: 8px 0 10px; }
+            .fc-source-preview-heading h3 { font-size: 14px; }
+            .fc-preview-filters { grid-column: 2; }
+            .fc-preview-search { grid-column: 1 / -1; width: 100%; min-width: 0; }
+            .fc-source-preview-heading > span { grid-column: 1 / -1; font-size: 11px; }
+            .fc-source-table-wrap { flex: 0 0 auto; height: clamp(320px, 52dvh, 460px); min-height: 0; border-radius: 12px; }
+            .fc-source-table th, .fc-source-table td { padding: 10px 12px; }
+            .fc-source-table[data-format="vertical"] { table-layout: auto; }
+            .fc-source-preview-footer { gap: 12px; align-items: flex-start; line-height: 1.6; }
+            .fc-source-preview-footer > span { min-width: 0; }
+            .fc-source-preview-footer > div { flex-shrink: 0; }
+            .fc-source-footer { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 12px max(16px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+            .fc-source-footer > p { font-size: 11px; line-height: 1.4; }
+            .fc-source-footer > div { display: grid; grid-template-columns: minmax(80px,1fr) minmax(0,2fr); width: 100%; margin: 0; gap: 10px; }
+            .fc-source-footer button { min-height: 46px; padding: 10px 8px; font-size: 13px; }
+            .fc-calendar-body, .fc-source-foldout .fc-missing-workspace { padding: 12px; }
+            .fc-calendar-nav { gap: 0; }
+            .fc-calendar-nav button { flex: 1; padding: 10px 5px; font-size: 11px; }
+            .fc-calendar-week { gap: 4px; }
+            .fc-calendar-week button { padding: 10px 2px; }
+            .fc-calendar-entry, .fc-calendar-holiday-fields { grid-template-columns: minmax(0,1fr); }
+            .fc-calendar-entry-reason { grid-column: auto; }
+            .fc-calendar-coverage { grid-template-columns: minmax(0,1fr); }
+            .fc-calendar-coverage label:last-child { grid-column: auto; }
+            .fc-calendar-actions { align-items: stretch; }
+            .fc-calendar-actions > div { width: 100%; }
+            .fc-calendar-actions > div:last-child > button { flex: 1; }
+            .fc-calendar-section-heading { flex-wrap: wrap; gap: 8px; }
+            .fc-source-foldout .fc-missing-setup { grid-template-columns: minmax(0,1fr); }
+            .fc-missing-confirm { grid-column: auto; }
+            .fc-missing-overview { flex-wrap: wrap; gap: 12px; }
+            .fc-missing-progress { width: 100%; }
+            .fc-missing-item-heading { flex-wrap: wrap; gap: 6px; }
+            .fc-source-foldout .fc-prep-save { display: grid; grid-template-columns: minmax(0,1fr); padding: 12px; }
+            .fc-prep-save input { width: 100%; }
+        }
+        @media (max-width: 380px) {
+            .fc-source-header { gap: 4px; }
+            .fc-source-heading h2 { font-size: 16px; }
+            .fc-source-header > .fc-source-secondary { padding: 8px; font-size: 11px; }
+            .fc-calendar-week { grid-template-columns: repeat(4,minmax(0,1fr)); }
+        }
+        @media (max-height: 540px) and (max-width: 1100px) {
+            .fc-source-overlay { padding: 0; }
+            .fc-source-dialog { height: 100dvh; max-height: none; border-radius: 0; width: 100%; }
+            .fc-source-header { padding-top: max(6px,env(safe-area-inset-top)); padding-bottom: 6px; }
+            .fc-source-heading p, .fc-source-footer > p { display: none; }
+            .fc-source-footer { padding-top: 8px; padding-bottom: max(8px,env(safe-area-inset-bottom)); }
+            .fc-source-table-wrap { flex: 0 0 260px; min-height: 260px; }
+        }
+        .fc-local-date { display: block; margin-top: 5px; }
+        .fc-local-date-control { display: block; position: relative; }
+        .fc-calendar-fields .fc-local-date-control > input { margin-top: 0; padding-right: 42px; }
+        .fc-local-date-picker { position: absolute; right: 0; top: 0; bottom: 0; width: 36px; display: grid; place-items: center; color: var(--source-muted); }
+        .fc-calendar-fields .fc-local-date-picker input { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; opacity: 0; cursor: pointer; margin: 0; padding: 0; }
+        .fc-local-date-picker:focus-within { outline: 2px solid #f59e0b; border-radius: 6px; }
+        .fc-local-date small { display: block; margin-top: 4px; color: #be123c; font-size: 11px; font-weight: 400; }
+        .dark .fc-local-date small { color: #fda4af; }
     </style>
 
+    <script src="./operartis-format.js"></script>
+    <script src="./forecast-dialog-i18n.js"></script>
     <script src="./operartis-theme.js?v=20260623-theme-sync"></script>
     <script src="./operartis-lang.js"></script>
     <script src="./operartis-security.js"></script>
@@ -2404,6 +2520,9 @@
                 charts: {
                     act_train: "Actual (Train)",
                     act_test: "Actual (Test)",
+                    est_train: "Estimation (Train)",
+                    est_test: "Estimation (Test)",
+                    estimation: "Estimation",
                     fitted: "Fit (Train)",
                     val_fc: "Forecast (Validation)",
                     history: "Actual",
@@ -2721,6 +2840,9 @@
                 charts: {
                     act_train: "Thực tế (Huấn luyện)",
                     act_test: "Thực tế (Kiểm tra)",
+                    est_train: "Ước tính (Huấn luyện)",
+                    est_test: "Ước tính (Kiểm tra)",
+                    estimation: "Ước tính",
                     fitted: "Khớp (Huấn luyện)",
                     val_fc: "Dự báo (Kiểm định)",
                     history: "Thực tế",
@@ -3038,6 +3160,9 @@
                 charts: {
                     act_train: "Ist (Training)",
                     act_test: "Ist (Test)",
+                    est_train: "Schätzung (Training)",
+                    est_test: "Schätzung (Test)",
+                    estimation: "Schätzung",
                     fitted: "Angepasst (Training)",
                     val_fc: "Prognose (Validierung)",
                     history: "Ist",
@@ -3579,6 +3704,36 @@
             return date + time.replace(/^T/, ' ');
         };
 
+        const calendarDatePattern = locale => locale === 'vi-VN' ? 'DD/MM/YYYY' : locale === 'de-DE' ? 'DD.MM.YYYY' : 'YYYY-MM-DD';
+        const parseCalendarDateInput = (value, locale = 'en-US') => {
+            const text = String(value || '').trim();
+            if (!text) return '';
+            const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            const local = !iso && text.match(locale === 'vi-VN' ? /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/ : locale === 'de-DE' ? /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/ : /$^/);
+            if (!iso && !local) return null;
+            const [year,month,day] = iso ? iso.slice(1).map(Number) : [Number(local[3]),Number(local[2]),Number(local[1])];
+            const leap = year%4===0 && (year%100!==0 || year%400===0);
+            const days=[31,leap?29:28,31,30,31,30,31,31,30,31,30,31];
+            if(year<1 || month<1 || month>12 || day<1 || day>days[month-1]) return null;
+            return `${String(year).padStart(4,'0')}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        };
+        const formatCalendarMessage = (message,locale) => String(message || '').replace(/\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?)?\b/g,date=>formatForecastDate(date,locale));
+        const formatSourcePreviewCell = (value,index,source,locale) => source?.format==='vertical' && index===source.headers.indexOf(source.mapping.date) ? formatForecastDate(value,locale) : String(value ?? '');
+        // Horizontal columns can represent whole months rather than individual dates.
+        // Reuse the import parser's year rules, but format only the display label.
+        const formatForecastHeader = (value, locale = 'en-US') => {
+            const text = String(value ?? '').trim();
+            if (/^\d{4}-\d{2}$/.test(text) || /^[a-z]+[\s/-]+(?:\d{2}|\d{4})$/i.test(text)) {
+                const timestamp = parseForecastHeaderDate(text);
+                if (Number.isFinite(timestamp)) {
+                    const date = new Date(timestamp);
+                    const year = String(date.getUTCFullYear()).padStart(4, '0');
+                    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+                    return locale === 'vi-VN' ? `${month}/${year}` : locale === 'de-DE' ? `${month}.${year}` : `${year}-${month}`;
+                }
+            }
+            return formatForecastDate(value, locale);
+        };
         const formatChartAxis = (value, locale = 'en-US', compact = false) => new Intl.NumberFormat(locale, {
             notation: Math.abs(value) > 0 && Math.abs(value) < 0.01 ? 'scientific' : compact && Math.abs(value) >= 10000 ? 'compact' : 'standard',
             maximumFractionDigits: 2,
@@ -3698,7 +3853,7 @@
                 const value = point.actual_history ?? point.actual_train ?? point.actual_test;
                 const time = timestamp(point.date);
                 const isHistory = ['actual_history','actual_train','actual_test'].some(key => Object.hasOwn(point,key));
-                if (Number.isFinite(time) && (finite(value) || (preserveMissing && isHistory))) historyMap.set(time, { date: point.date, value: finite(value) ? value : null, time });
+                if (Number.isFinite(time) && (finite(value) || (preserveMissing && isHistory))) historyMap.set(time, { date: point.date, value: finite(value) ? value : null, time, prepared_actual: point.prepared_actual, preparation_method: point.preparation_method, closed: point.closed });
             }
             const history = [...historyMap.values()].sort((a, b) => a.time - b.time);
             const groups = new Map();
@@ -3719,7 +3874,7 @@
             if (!Number.isInteger(summary.training_window) || summary.training_window < 1 || !Number.isInteger(summary.validation_period) || summary.validation_period < 1 || initialStart < 0) return null;
             const folds = [];
             let low = 0, high = 0;
-            history.forEach(point => { if (finite(point.value)) { low = Math.min(low, point.value); high = Math.max(high, point.value); } });
+            history.forEach(point => { for (const value of [point.value, point.prepared_actual]) if (finite(value)) { low = Math.min(low, value); high = Math.max(high, value); } });
             for (const [origin, points] of [...groups].sort(([a], [b]) => a - b)) {
                 points.sort((a, b) => a.lead - b.lead);
                 const end = positions.get(origin);
@@ -3742,6 +3897,17 @@
             const padding = (high - low || 1) * 0.08;
             return { history, folds, domain: [low < 0 ? low - padding : 0, high + padding] };
         };
+
+        const buildReplayChartData = (history, fold, phase) => preparedActualChartData(history.map((point, i) => {
+            const target = fold.points[i - fold.end - 1];
+            return { date: point.date, position: i,
+                prepared_actual: point.prepared_actual, preparation_method: point.preparation_method, closed: point.closed,
+                ...(i >= fold.start && i <= fold.end ? { training: point.value } : {}),
+                forecast: phase >= 1 && target ? target.forecast : null,
+                // Closed-day display values come from calendar-adjusted history;
+                // raw fold targets remain untouched for accuracy calculations.
+                ...(phase >= 2 && target ? { actual: target.closed ? point.value : target.actual } : {}) };
+        }), ['training', 'actual']);
 
         const ReplayWindowLabel = ({ viewBox, labels, fill, background }) => {
             if (!viewBox) return null;
@@ -3820,13 +3986,7 @@
             const chartMaxX = Math.max(history.length - 1, forecastX2);
             const forecastRangeStart = history[forecastStart]?.date || history[targetEnd]?.date || '';
             const forecastRangeEnd = history[targetEnd]?.date || forecastRangeStart;
-            const chartData = history.map((point, i) => {
-                const target = fold.points[i - fold.end - 1];
-                return { date: point.date, position: i,
-                    training: i >= fold.start && i <= fold.end ? point.value : null,
-                    forecast: phase >= 1 && target ? target.forecast : null,
-                    actual: phase >= 2 && target ? target.actual : null };
-            });
+            const chartData = buildReplayChartData(history, fold, phase);
             const selectFold = next => { setPlaying(false); setIndex(next); setPhase(2); };
             const stage = t(`sidebar.replay_stage_${phase}`);
             const control = 'w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500';
@@ -3878,8 +4038,9 @@
                                 <ReferenceLine x={fold.end} stroke="#94a3b8" strokeDasharray="4 4" />
                                 <Line type="linear" dataKey="training" name={t('charts.act_train')} stroke="#64748b" strokeWidth={2} dot={false} isAnimationActive={false} />
                                 {/* Line animation hides dots until completion; a single point must stay visible across phases. */}
-                                <Line type="linear" dataKey="forecast" name={t('charts.val_fc')} stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 4" dot={singleForecast ? chartPointStyle('#f59e0b') : false} isAnimationActive={!singleForecast && !reducedMotion && playing} animationDuration={400 / speed} />
                                 <Line type="linear" dataKey="actual" name={t('charts.act_test')} stroke="#10b981" strokeWidth={2} dot={singleForecast ? chartPointStyle('#10b981') : false} isAnimationActive={!singleForecast && !reducedMotion && playing} animationDuration={400 / speed} />
+                                {/* Draw forecast last so its dashed line remains visible over actuals. */}
+                                <Line type="linear" dataKey="forecast" name={t('charts.val_fc')} stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 4" dot={singleForecast ? chartPointStyle('#f59e0b') : false} isAnimationActive={!singleForecast && !reducedMotion && playing} animationDuration={400 / speed} />
                             </ComposedChart>
                         </ResponsiveContainer>
                     </div>
@@ -4055,7 +4216,7 @@
             const defaultValueClassName = 'font-medium text-slate-700 dark:text-slate-200 break-words';
             return <section className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-[13px] leading-5 text-slate-600 dark:text-slate-300" aria-label={t('sidebar.detail_process')}>
                 <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-2">{t('sidebar.detail_process')}</h3>
-                {data.preparation?.operating_calendar?.enabled && <p className="mb-2">Expected sales · {futureCount} calendar days. Confirmed closures forecast zero. Calendar coverage ends {data.preparation.operating_calendar.end}.</p>}
+                {data.preparation?.operating_calendar?.enabled && <p className="mb-2">Expected sales · {futureCount} calendar days. Confirmed closures forecast zero. Calendar coverage ends {formatForecastDate(data.preparation.operating_calendar.end,t.numberLocale)}.</p>}
                 <dl className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
                     {fields.map(({ label, value, valueClassName }) => <div className="min-w-0" key={label}>
                         <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
@@ -5028,6 +5189,24 @@
             return split > 0 ? name.slice(0, split) : name;
         };
 
+        // Display prepared values in Actual without changing observations used by metrics.
+        const preparedActualChartData = (rows, keys = ['actual_train', 'actual_test', 'actual_history']) => rows?.map(point => {
+            if (point.closed || !Number.isFinite(point.prepared_actual)) return point;
+            const prepared_actual_keys = keys.filter(key => Object.hasOwn(point, key) && point[key] == null);
+            if (!prepared_actual_keys.length) return point;
+            return { ...point, ...Object.fromEntries(prepared_actual_keys.map(key => [key, point.prepared_actual])), prepared_actual_keys };
+        });
+
+        const chartTooltipEntryLabel = (entry, compact, locale = 'en-US') => {
+            let name = entry.name;
+            if (entry.payload?.prepared_actual_keys?.includes(entry.dataKey)) {
+                const key = { actual_train: 'est_train', training: 'est_train', actual_test: 'est_test', actual: 'est_test', actual_history: 'estimation' }[entry.dataKey];
+                const language = locale.startsWith('vi') ? 'vi' : locale.startsWith('de') ? 'de' : 'en';
+                if (key) name = TRANSLATIONS[language].charts[key];
+            }
+            return chartTooltipLabel(name, compact);
+        };
+
         const CompactChartTooltip = ({ active, payload, label, isDark, compact, locale }) => {
             if (!active || !payload?.length) return null;
             const items = payload.filter(entry => entry?.value != null && entry.value !== '' && !Number.isNaN(Number(entry.value)));
@@ -5041,7 +5220,7 @@
                         {items.map(entry => (
                             <li key={entry.dataKey || entry.name} className="fc-chart-tooltip-item">
                                 <span className="fc-chart-tooltip-swatch" style={{ backgroundColor: entry.color }} aria-hidden="true" />
-                                <span className="fc-chart-tooltip-name">{chartTooltipLabel(entry.name, compact)}</span>
+                                <span className="fc-chart-tooltip-name">{chartTooltipEntryLabel(entry, compact, locale)}</span>
                                 <span className="fc-chart-tooltip-value">{fmtNumber(entry.value, 0, 2, locale)}</span>
                             </li>
                         ))}
@@ -5082,11 +5261,12 @@
             ? chartPointStyle(color)
             : false;
 
-        const BacktestChart = ({ data, syncId, isDark, t, zoomState }) => {
+        const BacktestChart = ({ data: sourceData, syncId, isDark, t, zoomState }) => {
+            const data = useMemo(() => preparedActualChartData(sourceData), [sourceData]);
             if (!data) return null;
 
             const { zoomDomain, containerRef, handlers, isDragging, zoomIn, zoomOut } = useChartZoom(data.length, zoomState);
-            const visibleData = data.slice(zoomDomain.start, zoomDomain.end + 1);
+            const visibleData = useMemo(() => data.slice(zoomDomain.start, zoomDomain.end + 1), [data, zoomDomain.start, zoomDomain.end]);
             const isZoomed = zoomDomain.start > 0 || zoomDomain.end < data.length - 1;
 
             return (
@@ -5167,8 +5347,10 @@
             );
         };
 
+        // Preserve chart interaction when polling adds other IDs. Completed results and
+        // the translator retain their references; new data, language or theme still rerenders.
         // Both charts use the forecast timeline, including empty validation slots for future dates.
-        const SynchronizedForecastCharts = ({ validationData, forecastData, isDark, t }) => {
+        const SynchronizedForecastCharts = memo(({ validationData, forecastData, isDark, t }) => {
             const dataLength = forecastData?.length || 0;
             const zoomState = useState({ start: 0, end: dataLength - 1 });
             const [, setZoomDomain] = zoomState;
@@ -5190,13 +5372,14 @@
                     </div>
                 </div>
             );
-        };
+        });
 
-        const ForecastChart = ({ data, syncId, isDark, t, zoomState }) => {
+        const ForecastChart = ({ data: sourceData, syncId, isDark, t, zoomState }) => {
+            const data = useMemo(() => preparedActualChartData(sourceData), [sourceData]);
             if (!data) return null;
 
             const { zoomDomain, containerRef, handlers, isDragging, zoomIn, zoomOut } = useChartZoom(data.length, zoomState);
-            const visibleData = data.slice(zoomDomain.start, zoomDomain.end + 1);
+            const visibleData = useMemo(() => data.slice(zoomDomain.start, zoomDomain.end + 1), [data, zoomDomain.start, zoomDomain.end]);
             const isZoomed = zoomDomain.start > 0 || zoomDomain.end < data.length - 1;
 
             return (
@@ -5461,7 +5644,30 @@
             const csv = data.map(row=>row.map((value,index)=>quote(index === 0 && /^[=+@-]/.test(String(value)) ? "'"+value : value)).join(',')).join('\r\n');
             window.OperartisSecurity.downloadBlob(new Blob(['\uFEFF',csv],{type:'text/csv'}),filename.replace(/\.[^.]+$/,'')+'-prepared.csv');
         };
-        const DatasetLibrary = ({baseUrl,onOpen}) => {
+        const LocalizedDateInput = ({label,value,locale='en-US',onChange,onValidityChange}) => {
+            const tr=value=>window.ForecastDialogI18n.translate(value,locale);
+            const [text,setText] = useState(()=>formatForecastDate(value,locale));
+            const [touched,setTouched] = useState(false);
+            const lastEmitted=useRef(value), previousLocale=useRef(locale);
+            useEffect(()=>{
+                if(value!==lastEmitted.current || locale!==previousLocale.current) {setText(formatForecastDate(value,locale));setTouched(false);onValidityChange?.(false);}
+                lastEmitted.current=value;previousLocale.current=locale;
+            },[value,locale]);
+            const invalid=parseCalendarDateInput(text,locale)===null;
+            const message=locale==='de-DE'?`Gültiges Datum eingeben (${calendarDatePattern(locale)}).`:locale==='vi-VN'?`Nhập ngày hợp lệ (${calendarDatePattern(locale)}).`:`Enter a valid date (${calendarDatePattern(locale)}).`;
+            const edit = next => {
+                setText(next);const parsed=parseCalendarDateInput(next,locale);
+                lastEmitted.current=parsed ?? '';onValidityChange?.(parsed===null);onChange(parsed ?? '');
+            };
+            return <span className="fc-local-date"><span className="fc-local-date-control">
+                <input type="text" aria-label={tr(label)} placeholder={tr(calendarDatePattern(locale))} autoComplete="off" spellCheck={false} value={text} aria-invalid={invalid || undefined} onChange={e=>edit(e.target.value)} onBlur={()=>{setTouched(true);if(!invalid)setText(formatForecastDate(value,locale));}}/>
+                <span className="fc-local-date-picker"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg><input type="date" aria-label={tr(`${label} calendar picker`)} lang={locale==='en-US'?'en-CA':locale} value={value || ''} onClick={e=>{try{e.currentTarget.showPicker?.();}catch{}}} onChange={e=>{edit(e.target.value);setText(formatForecastDate(e.target.value,locale));setTouched(false);}}/></span>
+                </span>{invalid && touched && <small role="alert">{message}</small>}
+            </span>;
+        };
+
+        const DatasetLibrary = ({baseUrl,onOpen,locale='en-US'}) => {
+            const tr=value=>window.ForecastDialogI18n.translate(value,locale);
             const [datasets,setDatasets] = useState([]), [detail,setDetail] = useState(null), [history,setHistory] = useState(null);
             const [error,setError] = useState(''), [busy,setBusy] = useState(false), [rename,setRename] = useState(''), [deleteId,setDeleteId] = useState(null);
             const [menuId,setMenuId] = useState(null), [editId,setEditId] = useState(null);
@@ -5494,35 +5700,35 @@
             const action = async fn => {setBusy(true);setError('');try {await fn();}catch(e){setError(e.message);}finally{setBusy(false);}};
             const select = item => action(async()=>{const result=await (await datasetRequest(baseUrl,`/datasets/${item.id}/versions`)).json();setDetail(result);setHistory(null);setDeleteId(null);setEditId(null);setMenuId(null);});
             const download = (version,kind) => action(async()=>{const response=await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/${kind}`);window.OperartisSecurity.downloadBlob(await response.blob(),kind==='original'?detail.filename:detail.name+'-prepared.csv');});
-            return <section className="fc-dataset-library" aria-label="My datasets">
-                <div className="fc-prep-heading"><h3>My datasets</h3><small>Private to your account · 100 MB library · 50 datasets</small></div>
-                <p className="fc-prep-help">Reopen a saved version to preserve original observations and handling rules. Prepared downloads include estimate flags.</p>
-                {error && <p role="alert" className="fc-source-error">{error}</p>}
-                <div className="fc-dataset-grid"><div className="fc-dataset-list">{!datasets.length && <p className="fc-dataset-empty-state">{loadingLibrary ? 'Loading datasets…' : 'No saved datasets yet. Upload data, review it, then save a version.'}</p>}{datasets.map(item=><div className="fc-dataset-card" data-selected={detail?.id===item.id} key={item.id}>
+            return <section className="fc-dataset-library" aria-label={tr("My datasets")}>
+                <div className="fc-prep-heading"><h3>{tr("My datasets")}</h3><small>{tr("Private to your account · 100 MB library · 50 datasets")}</small></div>
+                <p className="fc-prep-help">{tr("Reopen a saved version to preserve original observations and handling rules. Prepared downloads include estimate flags.")}</p>
+                {error && <p role="alert" className="fc-source-error">{tr(error)}</p>}
+                <div className="fc-dataset-grid"><div className="fc-dataset-list">{!datasets.length && <p className="fc-dataset-empty-state">{loadingLibrary ? tr('Loading datasets…') : tr('No saved datasets yet. Upload data, review it, then save a version.')}</p>}{datasets.map(item=><div className="fc-dataset-card" data-selected={detail?.id===item.id} key={item.id}>
                     <div className="fc-dataset-card-row">
                         <button type="button" className="fc-dataset-select" disabled={busy} aria-pressed={detail?.id===item.id} onClick={()=>select(item)}><strong>{item.name}</strong><small>{item.filename}</small></button>
                         <div className="fc-dataset-card-menu" onKeyDownCapture={event=>{if(event.key==='Escape' && menuId===item.id){event.preventDefault();event.stopPropagation();setMenuId(null);actionButtons.current.get(item.id)?.focus();}}}>
-                            <button type="button" className="fc-dataset-more" ref={el=>{if(el)actionButtons.current.set(item.id,el);else actionButtons.current.delete(item.id);}} aria-label={`Actions for ${item.name}`} aria-expanded={menuId===item.id} aria-controls={`dataset-actions-${item.id}`} disabled={busy} onClick={()=>setMenuId(current=>current===item.id?null:item.id)}><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
-                            {menuId===item.id && <div className="fc-dataset-menu-panel" id={`dataset-actions-${item.id}`} role="group" aria-label={`Dataset actions for ${item.name}`}>
-                                <button type="button" onClick={()=>{setRename(item.name);setEditId(item.id);setDeleteId(null);setMenuId(null);}}>Rename</button>
-                                <button type="button" className="fc-dataset-delete-action" onClick={()=>{setDeleteId(item.id);setEditId(null);setMenuId(null);}}>Delete</button>
+                            <button type="button" className="fc-dataset-more" ref={el=>{if(el)actionButtons.current.set(item.id,el);else actionButtons.current.delete(item.id);}} aria-label={tr(`Actions for ${item.name}`)} aria-expanded={menuId===item.id} aria-controls={`dataset-actions-${item.id}`} disabled={busy} onClick={()=>setMenuId(current=>current===item.id?null:item.id)}><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+                            {menuId===item.id && <div className="fc-dataset-menu-panel" id={`dataset-actions-${item.id}`} role="group" aria-label={tr(`Dataset actions for ${item.name}`)}>
+                                <button type="button" onClick={()=>{setRename(item.name);setEditId(item.id);setDeleteId(null);setMenuId(null);}}>{tr("Rename")}</button>
+                                <button type="button" className="fc-dataset-delete-action" onClick={()=>{setDeleteId(item.id);setEditId(null);setMenuId(null);}}>{tr("Delete")}</button>
                             </div>}
                         </div>
                     </div>
                     {editId===item.id && <form className="fc-dataset-inline-edit" onKeyDownCapture={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();setEditId(null);actionButtons.current.get(item.id)?.focus();}}} onSubmit={event=>{event.preventDefault();if(busy || !rename.trim())return;const name=rename.trim();action(async()=>{await datasetRequest(baseUrl,`/datasets/${item.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});setDetail(current=>current?.id===item.id?{...current,name}:current);setEditId(null);await refresh();actionButtons.current.get(item.id)?.focus();});}}>
-                        <label htmlFor={`dataset-name-${item.id}`}>Dataset name</label><input id={`dataset-name-${item.id}`} autoFocus value={rename} maxLength={120} disabled={busy} onChange={event=>setRename(event.target.value)} />
-                        <div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>{setEditId(null);actionButtons.current.get(item.id)?.focus();}}>Cancel rename</button><button type="submit" className="fc-source-confirm" disabled={busy || !rename.trim()}>Save name</button></div>
+                        <label htmlFor={`dataset-name-${item.id}`}>{tr("Dataset name")}</label><input id={`dataset-name-${item.id}`} autoFocus value={rename} maxLength={120} disabled={busy} onChange={event=>setRename(event.target.value)} />
+                        <div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>{setEditId(null);actionButtons.current.get(item.id)?.focus();}}>{tr("Cancel rename")}</button><button type="submit" className="fc-source-confirm" disabled={busy || !rename.trim()}>{tr("Save name")}</button></div>
                     </form>}
-                    {deleteId===item.id && <div className="fc-dataset-inline-delete" role="alert"><strong>Delete “{item.name}”?</strong><p>This removes the original file and all versions. Existing forecast reports remain available.</p><div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>{setDeleteId(null);actionButtons.current.get(item.id)?.focus();}}>Keep dataset</button><button type="button" className="fc-source-secondary fc-dataset-delete-action" disabled={busy} onClick={()=>action(async()=>{await datasetRequest(baseUrl,`/datasets/${item.id}`,{method:'DELETE'});if(detail?.id===item.id){setDetail(null);setHistory(null);}setDeleteId(null);await refresh();})}>Delete permanently</button></div></div>}
+                    {deleteId===item.id && <div className="fc-dataset-inline-delete" role="alert"><strong>{tr(`Delete “${item.name}”?`)}</strong><p>{tr("This removes the original file and all versions. Existing forecast reports remain available.")}</p><div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>{setDeleteId(null);actionButtons.current.get(item.id)?.focus();}}>{tr("Keep dataset")}</button><button type="button" className="fc-source-secondary fc-dataset-delete-action" disabled={busy} onClick={()=>action(async()=>{await datasetRequest(baseUrl,`/datasets/${item.id}`,{method:'DELETE'});if(detail?.id===item.id){setDetail(null);setHistory(null);}setDeleteId(null);await refresh();})}>{tr("Delete permanently")}</button></div></div>}
                 </div>)}</div>
-                <div className="fc-dataset-detail" role="region" aria-label="Version history">
-                    <h4>Version history</h4>
-                    {!detail && <p className="fc-dataset-empty-state" role="status">{loadingLibrary ? 'Loading version history…' : datasets.length ? 'Select a dataset to view its saved versions.' : 'Saved versions will appear here.'}</p>}
-                    {detail?.versions.map((version,i)=><article key={version.id} className="fc-dataset-version"><div><strong>Version {detail.versions.length-i}</strong><small>{new Date(version.created_at+'Z').toLocaleString()} · {version.item_count} items · {version.missing_count} estimated values</small></div>
-                        <div className="fc-prep-controls"><button className="fc-source-confirm" disabled={busy} onClick={()=>action(()=>onOpen(detail,version))}>Open version</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'original')}>Original file</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'prepared')}>Prepared data</button><button className="fc-source-secondary" disabled={busy} onClick={()=>action(async()=>setHistory(await (await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/history`)).json()))}>Changes</button></div>
-                        {!!version.forecasts.length && <p className="fc-prep-help">Linked forecasts: {version.forecasts.map(job=>`${job.id.slice(0,8)} (${job.status})`).join(', ')}</p>}
+                <div className="fc-dataset-detail" role="region" aria-label={tr("Version history")}>
+                    <h4>{tr("Version history")}</h4>
+                    {!detail && <p className="fc-dataset-empty-state" role="status">{loadingLibrary ? tr('Loading version history…') : datasets.length ? tr('Select a dataset to view its saved versions.') : tr('Saved versions will appear here.')}</p>}
+                    {detail?.versions.map((version,i)=><article key={version.id} className="fc-dataset-version"><div><strong>{tr("Version")} {detail.versions.length-i}</strong><small>{window.OperartisFormat.forLanguage(locale.split('-')[0]).dateTime(version.created_at)} · {version.item_count} {tr("items ·")} {version.missing_count} {tr("estimated values")}</small></div>
+                        <div className="fc-prep-controls"><button className="fc-source-confirm" disabled={busy} onClick={()=>action(()=>onOpen(detail,version))}>{tr("Open version")}</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'original')}>{tr("Original file")}</button><button className="fc-source-secondary" disabled={busy} onClick={()=>download(version,'prepared')}>{tr("Prepared data")}</button><button className="fc-source-secondary" disabled={busy} onClick={()=>action(async()=>setHistory(await (await datasetRequest(baseUrl,`/datasets/${detail.id}/versions/${version.id}/history`)).json()))}>{tr("Changes")}</button></div>
+                        {!!version.forecasts.length && <p className="fc-prep-help">{tr("Linked forecasts:")} {version.forecasts.map(job=>`${job.id.slice(0,8)} (${tr(job.status)})`).join(', ')}</p>}
                     </article>)}
-                    {history && <div className="fc-prep-history"><h4>Recorded changes ({history.changes.length})</h4><p className="fc-prep-help">Frequency: {history.settings.preparation.frequency || 'Detected from source'}</p>{history.changes.map((row,i)=><p key={i}>{row.unique_id} · {row.ds} · {row.calendar_conflict_resolved?'Calendar conflict resolved':row.closed?'Closed':'Missing'} → {row.prepared ?? 'unresolved'} · {row.calendar_conflict_resolved?(row.closed ? 'Closed exception applied; original sales retained in source' : 'Original sales retained'):row.closed?'Operating calendar':PREPARATION_METHODS[row.method] || 'No change'}</p>)}</div>}
+                    {history && <div className="fc-prep-history"><h4>{tr("Recorded changes (")}{history.changes.length})</h4><p className="fc-prep-help">{tr("Frequency:")} {tr(history.settings.preparation.frequency?.replace('_',' ') || 'Detected from source')}</p>{history.changes.map((row,i)=><p key={i}>{row.unique_id} · {formatForecastDate(row.ds,locale)} · {row.calendar_conflict_resolved?tr('Calendar conflict resolved'):row.closed?tr('Closed'):tr('Missing')} → {row.prepared ?? tr('unresolved')} · {row.calendar_conflict_resolved?(row.closed ? tr('Closed exception applied; original sales retained in source') : tr('Original sales retained')):row.closed?tr('Operating calendar'):tr(PREPARATION_METHODS[row.method] || 'No change')}</p>)}</div>}
                 </div></div>
             </section>;
         };
@@ -5541,18 +5747,19 @@
                 otherErrors: (review?.calendar_errors || []).filter(message=>!groupedErrors.has(message)),
             };
         };
-        const CalendarConflictSummary = ({review}) => {
+        const CalendarConflictSummary = ({review,locale='en-US'}) => {
+            const tr=value=>window.ForecastDialogI18n.translate(value,locale);
             const conflicts = groupCalendarConflicts(review);
             return <>
-                {!!conflicts.dates.length && <section className="fc-source-error fc-calendar-conflicts" aria-label="Calendar conflicts">
-                    <strong role="alert">Sales recorded on closed dates: {conflicts.dates.length} {conflicts.dates.length===1?'date':'dates'} · {conflicts.itemCount} {conflicts.itemCount===1?'ID':'IDs'}</strong>
-                    <p>Apply an Open exception to retain sales, or a Closed exception to set prepared sales to zero. Original values are preserved. Expand a date to see affected IDs.</p>
+                {!!conflicts.dates.length && <section className="fc-source-error fc-calendar-conflicts" aria-label={tr("Calendar conflicts")}>
+                    <strong role="alert">{tr("Sales recorded on closed dates:")} {conflicts.dates.length} {conflicts.dates.length===1?tr('date'):tr('dates')} · {conflicts.itemCount} {conflicts.itemCount===1?tr('ID'):tr('IDs')}</strong>
+                    <p>{tr("Apply an Open exception to retain sales, or a Closed exception to set prepared sales to zero. Original values are preserved. Expand a date to see affected IDs.")}</p>
                     <div className="fc-calendar-conflict-dates">{conflicts.dates.map(group=><details key={group.date}>
-                        <summary>{group.date} · {group.ids.length} {group.ids.length===1?'ID':'IDs'}</summary>
+                        <summary>{formatForecastDate(group.date,locale)} · {group.ids.length} {group.ids.length===1?tr('ID'):tr('IDs')}</summary>
                         <p>{group.ids.join(', ')}</p>
                     </details>)}</div>
                 </section>}
-                {conflicts.otherErrors.map((message,i)=><p key={i} className="fc-source-error" role="alert">{message}</p>)}
+                {conflicts.otherErrors.map((message,i)=><p key={i} className="fc-source-error" role="alert">{tr(formatCalendarMessage(message,locale))}</p>)}
             </>;
         };
         const findCalendarExceptionConflicts = (exceptions) => {
@@ -5570,7 +5777,8 @@
             }
             return conflicts;
         };
-        const OperatingCalendarEditor = ({calendar,review,baseUrl,update,onDirty}) => {
+        const OperatingCalendarEditor = ({calendar,review,baseUrl,update,onDirty,locale='en-US'}) => {
+            const tr=value=>window.ForecastDialogI18n.translate(value,locale);
             const defaults = {enabled:false,start:'',end:'',weekdays:[0,1,2,3,4],ids:[],exceptions:[]};
             const [draft,setDraft] = useState(()=>({...defaults,...calendar}));
             const [scope,setScope] = useState((calendar?.ids||[]).join(', '));
@@ -5582,11 +5790,15 @@
             const conflictNoticeRef = useRef(null);
             useEffect(()=>{if(exceptionConflicts.length) conflictNoticeRef.current?.focus();},[exceptionConflicts]);
             const fileRef=useRef(null);
-            const weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+            const weekdays=locale==='de-DE'?['Mo','Di','Mi','Do','Fr','Sa','So']:locale==='vi-VN'?['T2','T3','T4','T5','T6','T7','CN']:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+            const [dateErrors,setDateErrors]=useState({});
+            const [dateReset,setDateReset]=useState(0);
+            const dateValidity=(key,invalid)=>setDateErrors(prev=>prev[key]===invalid?prev:{...prev,[key]:invalid});
             useEffect(()=>{if (!dirty) {setDraft({...defaults,...calendar});setScope((calendar?.ids||[]).join(', '));}},[JSON.stringify(calendar)]);
             const change = patch => {setDraft(prev=>({...prev,...patch}));setDirty(true);onDirty(true);setError('');setExceptionConflicts([]);};
             const add = row => change({exceptions:[...draft.exceptions,row]});
             const apply = () => {
+                if(draft.enabled && (dateErrors.start || dateErrors.end)) {setError('Correct the calendar coverage dates.');return;}
                 const conflicts = draft.enabled ? findCalendarExceptionConflicts(draft.exceptions) : [];
                 if(conflicts.length) {setExceptionConflicts(conflicts);setCalendarView('exceptions');return;}
                 setExceptionConflicts([]);
@@ -5606,44 +5818,44 @@
             };
             const applied=calendar?.enabled;
             return <details className="fc-source-foldout fc-calendar">
-                <summary>Operating calendar<span className="fc-calendar-summary-state" data-dirty={dirty}>{dirty?'Unapplied changes':applied?`${calendar.weekdays.map(d=>weekdays[d]).join(', ')} · ${calendar.exceptions.length} ${calendar.exceptions.length===1?'exception':'exceptions'}`:'Optional · set your opening days'}</span></summary>
+                <summary>{tr("Operating calendar")}<span className="fc-calendar-summary-state" data-dirty={dirty}>{dirty?tr('Unapplied changes'):applied?`${calendar.weekdays.map(d=>weekdays[d]).join(', ')} · ${tr(`${calendar.exceptions.length} ${calendar.exceptions.length===1?'exception':'exceptions'}`)}`:tr('Optional · set your opening days')}</span></summary>
                 <div className="fc-calendar-body">
                     <div className="fc-calendar-intro">
-                        <div><strong>Forecast around your opening days</strong><p>Keep your weekly routine and one-off changes in one place.</p></div>
-                        <label className="fc-calendar-switch"><input type="checkbox" aria-label="Use an operating calendar" checked={draft.enabled} onChange={e=>{const days=(review?.records||[]).map(r=>r.ds).sort();change({enabled:e.target.checked,...(e.target.checked && !draft.start && days.length ? {start:days[0].slice(0,10),end:`${Number(days[days.length-1].slice(0,4))+1}-12-31`}:{})});}}/><span aria-hidden="true"/><strong>{draft.enabled?'Enabled':'Enable calendar'}</strong></label>
+                        <div><strong>{tr("Forecast around your opening days")}</strong><p>{tr("Keep your weekly routine and one-off changes in one place.")}</p></div>
+                        <label className="fc-calendar-switch"><input type="checkbox" aria-label={tr("Use an operating calendar")} checked={draft.enabled} onChange={e=>{const days=(review?.records||[]).map(r=>r.ds).sort();change({enabled:e.target.checked,...(e.target.checked && !draft.start && days.length ? {start:days[0].slice(0,10),end:`${Number(days[days.length-1].slice(0,4))+1}-12-31`}:{})});}}/><span aria-hidden="true"/><strong>{draft.enabled?tr('Enabled'):tr('Enable calendar')}</strong></label>
                     </div>
                     {draft.enabled ? <>
-                        <nav className="fc-calendar-nav" aria-label="Calendar sections">{[['schedule','Weekly schedule'],['exceptions',`Exceptions (${draft.exceptions.length})`],['holidays','Public holidays']].map(([key,label])=><button key={key} type="button" aria-pressed={calendarView===key} onClick={()=>setCalendarView(key)}>{label}</button>)}</nav>
+                        <nav className="fc-calendar-nav" aria-label={tr("Calendar sections")}>{[['schedule','Weekly schedule'],['exceptions',`Exceptions (${draft.exceptions.length})`],['holidays','Public holidays']].map(([key,label])=><button key={key} type="button" aria-pressed={calendarView===key} onClick={()=>setCalendarView(key)}>{tr(label)}</button>)}</nav>
                         <div className="fc-calendar-panel" hidden={calendarView!=='schedule'}>
-                            <div className="fc-calendar-section-heading"><div><h4>Your regular week</h4><p>Select the days you are usually open.</p></div><span className="fc-calendar-muted">{draft.weekdays.length} open · {7-draft.weekdays.length} closed</span></div>
-                            <div className="fc-calendar-week" role="group" aria-label="Opening weekdays">{weekdays.map((day,i)=><button type="button" key={day} aria-label={`${day}: ${draft.weekdays.includes(i)?'open':'closed'}`} aria-pressed={draft.weekdays.includes(i)} onClick={()=>change({weekdays:draft.weekdays.includes(i)?draft.weekdays.filter(d=>d!==i):[...draft.weekdays,i].sort()})}><strong>{day}</strong><span>{draft.weekdays.includes(i)?'Open':'Closed'}</span></button>)}</div>
-                            <div className="fc-calendar-fields fc-calendar-coverage"><label>Coverage starts<input aria-label="Calendar coverage start" type="date" value={draft.start||''} onChange={e=>change({start:e.target.value})}/></label><label>Coverage ends<input aria-label="Calendar coverage end" type="date" value={draft.end||''} onChange={e=>change({end:e.target.value})}/></label><label>Applies to IDs<input aria-label="Calendar item IDs" placeholder="All IDs, or comma-separated IDs" value={scope} onChange={e=>{setScope(e.target.value);change({});}}/></label></div>
-                            <p className="fc-calendar-note">Include your historical data and forecast horizon. Closed days show zero expected sales. Available for statistical models; deselect MLP.</p>
+                            <div className="fc-calendar-section-heading"><div><h4>{tr("Your regular week")}</h4><p>{tr("Select the days you are usually open.")}</p></div><span className="fc-calendar-muted">{draft.weekdays.length} {tr("open ·")} {7-draft.weekdays.length} {tr("closed")}</span></div>
+                            <div className="fc-calendar-week" role="group" aria-label={tr("Opening weekdays")}>{weekdays.map((day,i)=><button type="button" key={day} aria-label={tr(`${day}: ${draft.weekdays.includes(i)?'open':'closed'}`)} aria-pressed={draft.weekdays.includes(i)} onClick={()=>change({weekdays:draft.weekdays.includes(i)?draft.weekdays.filter(d=>d!==i):[...draft.weekdays,i].sort()})}><strong>{day}</strong><span>{draft.weekdays.includes(i)?tr('Open'):tr('Closed')}</span></button>)}</div>
+                            <div className="fc-calendar-fields fc-calendar-coverage"><label>{tr("Coverage starts")}<LocalizedDateInput key={`start-${dateReset}`} label={tr("Calendar coverage start")} locale={locale} value={draft.start||''} onChange={next=>change({start:next})} onValidityChange={invalid=>dateValidity('start',invalid)}/></label><label>{tr("Coverage ends")}<LocalizedDateInput key={`end-${dateReset}`} label={tr("Calendar coverage end")} locale={locale} value={draft.end||''} onChange={next=>change({end:next})} onValidityChange={invalid=>dateValidity('end',invalid)}/></label><label>{tr("Applies to IDs")}<input aria-label={tr("Calendar item IDs")} placeholder={tr("All IDs, or comma-separated IDs")} value={scope} onChange={e=>{setScope(e.target.value);change({});}}/></label></div>
+                            <p className="fc-calendar-note">{tr("Include your historical data and forecast horizon. Closed days show zero expected sales. Available for statistical models; deselect MLP.")}</p>
                         </div>
                         <div className="fc-calendar-panel" hidden={calendarView!=='exceptions'}>
-                            <div className="fc-calendar-section-heading"><div><h4>Closures & extra opening days</h4><p>Exceptions override your regular week.</p></div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>fileRef.current?.click()}>Import calendar</button></div>
-                            {!!exceptionConflicts.length && <div ref={conflictNoticeRef} tabIndex={-1} className="fc-source-error fc-calendar-exception-warning" role="alert"><strong>Calendar exceptions conflict</strong><p>Exceptions repeat or contradict each other for the same dates and IDs. Remove or correct one of the highlighted exceptions, then apply again.</p><ul>{exceptionConflicts.map((conflict,i)=><li key={i}>Exceptions {conflict.indices.map(index=>index+1).join(' & ')} · {conflict.start}{conflict.end!==conflict.start?` – ${conflict.end}`:''} · {conflict.ids.join(', ')||'All calendar IDs'}</li>)}</ul></div>}
+                            <div className="fc-calendar-section-heading"><div><h4>{tr("Closures & extra opening days")}</h4><p>{tr("Exceptions override your regular week.")}</p></div><button type="button" className="fc-source-secondary" disabled={busy} onClick={()=>fileRef.current?.click()}>{tr("Import calendar")}</button></div>
+                            {!!exceptionConflicts.length && <div ref={conflictNoticeRef} tabIndex={-1} className="fc-source-error fc-calendar-exception-warning" role="alert"><strong>{tr("Calendar exceptions conflict")}</strong><p>{tr("Exceptions repeat or contradict each other for the same dates and IDs. Remove or correct one of the highlighted exceptions, then apply again.")}</p><ul>{exceptionConflicts.map((conflict,i)=><li key={i}>{tr("Exceptions")} {conflict.indices.map(index=>index+1).join(' & ')} · {formatForecastDate(conflict.start,locale)}{conflict.end!==conflict.start?` – ${formatForecastDate(conflict.end,locale)}`:''} · {conflict.ids.join(', ')||tr('All calendar IDs')}</li>)}</ul></div>}
                             <input ref={fileRef} type="file" accept=".xlsx,.csv" hidden onChange={importFile}/>
-                            <div className="fc-calendar-fields fc-calendar-entry"><label>From<input aria-label="Exception start" type="date" value={entry.start} onChange={e=>setEntry({...entry,start:e.target.value})}/></label><label>Through<input aria-label="Exception end" type="date" value={entry.end} onChange={e=>setEntry({...entry,end:e.target.value})}/></label><label>Status<select aria-label="Exception status" value={entry.status} onChange={e=>setEntry({...entry,status:e.target.value})}><option value="closed">Closed</option><option value="open">Open</option></select></label><label>Applies to<input aria-label="Exception item IDs" placeholder="All calendar IDs" value={entry.ids} onChange={e=>setEntry({...entry,ids:e.target.value})}/></label><label className="fc-calendar-entry-reason">Reason <span>(optional)</span><input aria-label="Exception label" placeholder="e.g. Extra Saturday opening" maxLength={120} value={entry.label} onChange={e=>setEntry({...entry,label:e.target.value})}/></label><button className="fc-source-secondary fc-calendar-add" type="button" disabled={!entry.start || (entry.end && entry.end<entry.start) || draft.exceptions.length>=200} onClick={()=>{add({...entry,end:entry.end||entry.start,ids:entry.ids.split(',').map(v=>v.trim()).filter(Boolean)});setEntry({start:'',end:'',status:'closed',ids:'',label:''});}}>+ Add exception</button></div>
-                            <p className="fc-calendar-note">Closed sets prepared sales to zero; Open retains recorded sales. Original values stay unchanged.</p>
-                            <div className="fc-calendar-exceptions">{!draft.exceptions.length && <p className="fc-calendar-empty">No exceptions yet. Add a date above or import your calendar.</p>}{draft.exceptions.map((row,i)=><div className="fc-calendar-event" data-conflict={exceptionConflicts.some(conflict=>conflict.indices.includes(i))} key={i}><span className="fc-calendar-day-status" data-status={row.status}>{row.status==='open'?'Open':'Closed'}</span><div className="fc-calendar-event-copy"><strong>{row.start}{row.end!==row.start?` – ${row.end}`:''}</strong><span>{row.label?`${row.label} · `:''}{row.ids.join(', ')||'All calendar IDs'}</span></div><button type="button" className="fc-source-secondary" aria-label={`Remove exception ${i+1}`} onClick={()=>change({exceptions:draft.exceptions.filter((_,j)=>j!==i)})}>Remove</button></div>)}</div>
-                            <details className="fc-calendar-import-help"><summary>Import file format</summary><p>Excel or CSV, first sheet: Start Date, End Date, Status (open/closed). Optional: Item ID, Label. Imported exceptions are added to your list.</p></details>
+                            <div className="fc-calendar-fields fc-calendar-entry"><label>{tr("From")}<LocalizedDateInput key={`entryStart-${dateReset}`} label={tr("Exception start")} locale={locale} value={entry.start} onChange={next=>setEntry({...entry,start:next})} onValidityChange={invalid=>dateValidity('entryStart',invalid)}/></label><label>{tr("Through")}<LocalizedDateInput key={`entryEnd-${dateReset}`} label={tr("Exception end")} locale={locale} value={entry.end} onChange={next=>setEntry({...entry,end:next})} onValidityChange={invalid=>dateValidity('entryEnd',invalid)}/></label><label>{tr("Status")}<select aria-label={tr("Exception status")} value={entry.status} onChange={e=>setEntry({...entry,status:e.target.value})}><option value="closed">{tr("Closed")}</option><option value="open">{tr("Open")}</option></select></label><label>{tr("Applies to")}<input aria-label={tr("Exception item IDs")} placeholder={tr("All calendar IDs")} value={entry.ids} onChange={e=>setEntry({...entry,ids:e.target.value})}/></label><label className="fc-calendar-entry-reason">{tr("Reason")} <span>{tr("(optional)")}</span><input aria-label={tr("Exception label")} placeholder={tr("e.g. Extra Saturday opening")} maxLength={120} value={entry.label} onChange={e=>setEntry({...entry,label:e.target.value})}/></label><button className="fc-source-secondary fc-calendar-add" type="button" disabled={dateErrors.entryStart || dateErrors.entryEnd || !entry.start || (entry.end && entry.end<entry.start) || draft.exceptions.length>=200} onClick={()=>{add({...entry,end:entry.end||entry.start,ids:entry.ids.split(',').map(v=>v.trim()).filter(Boolean)});setEntry({start:'',end:'',status:'closed',ids:'',label:''});setDateErrors({});setDateReset(n=>n+1);}}>{tr("+ Add exception")}</button></div>
+                            <p className="fc-calendar-note">{tr("Closed sets prepared sales to zero; Open retains recorded sales. Original values stay unchanged.")}</p>
+                            <div className="fc-calendar-exceptions">{!draft.exceptions.length && <p className="fc-calendar-empty">{tr("No exceptions yet. Add a date above or import your calendar.")}</p>}{draft.exceptions.map((row,i)=><div className="fc-calendar-event" data-conflict={exceptionConflicts.some(conflict=>conflict.indices.includes(i))} key={i}><span className="fc-calendar-day-status" data-status={row.status}>{row.status==='open'?tr('Open'):tr('Closed')}</span><div className="fc-calendar-event-copy"><strong>{formatForecastDate(row.start,locale)}{row.end!==row.start?` – ${formatForecastDate(row.end,locale)}`:''}</strong><span>{row.label?`${row.label} · `:''}{row.ids.join(', ')||tr('All calendar IDs')}</span></div><button type="button" className="fc-source-secondary" aria-label={tr(`Remove exception ${i+1}`)} onClick={()=>change({exceptions:draft.exceptions.filter((_,j)=>j!==i)})}>{tr("Remove")}</button></div>)}</div>
+                            <details className="fc-calendar-import-help"><summary>{tr("Import file format")}</summary><p>{tr("Excel or CSV, first sheet: Start Date, End Date, Status (open/closed). Optional: Item ID, Label. Imported exceptions are added to your list.")}</p></details>
                         </div>
                         <div className="fc-calendar-panel" hidden={calendarView!=='holidays'}>
-                            <div className="fc-calendar-section-heading"><div><h4>Find public holidays</h4><p>Choose only the holidays when your business closes.</p></div></div>
-                            <div className="fc-calendar-fields fc-calendar-holiday-fields"><label>Country<select aria-label="Holiday country" value={country} onChange={e=>{setCountry(e.target.value);setHolidays([]);}}>{[['DE','Germany'],['VN','Vietnam'],['US','United States'],['GB','United Kingdom'],['FR','France'],['AU','Australia'],['CA','Canada']].map(([code,name])=><option key={code} value={code}>{name}</option>)}</select></label><label>Region code <span>(optional)</span><input aria-label="Holiday region" placeholder="e.g. BE" value={subdivision} onChange={e=>{setSubdivision(e.target.value);setHolidays([]);}}/></label><button type="button" className="fc-source-secondary" disabled={busy} onClick={loadHolidays}>{busy?'Loading…':'Find holidays'}</button></div>
-                            <p className="fc-calendar-note">Suggestions use your calendar coverage. Adding a holiday creates a Closed exception.</p>
-                            <div className="fc-calendar-exceptions">{!holidays.length && <p className="fc-calendar-empty">Holiday suggestions will appear here.</p>}{holidays.map(row=><div className="fc-calendar-event" key={row.date}><div className="fc-calendar-event-copy"><strong>{row.label}</strong><span>{row.date}</span></div><button type="button" className="fc-source-secondary" disabled={draft.exceptions.some(e=>e.start===row.date && e.end===row.date && e.status==='closed' && !e.ids.length)} onClick={()=>add({start:row.date,end:row.date,status:'closed',ids:[],label:row.label.slice(0,120)})}>{draft.exceptions.some(e=>e.start===row.date && e.end===row.date && e.status==='closed' && !e.ids.length)?'Added':'Add closure'}</button></div>)}</div>
+                            <div className="fc-calendar-section-heading"><div><h4>{tr("Find public holidays")}</h4><p>{tr("Choose only the holidays when your business closes.")}</p></div></div>
+                            <div className="fc-calendar-fields fc-calendar-holiday-fields"><label>{tr("Country")}<select aria-label={tr("Holiday country")} value={country} onChange={e=>{setCountry(e.target.value);setHolidays([]);}}>{[['DE','Germany'],['VN','Vietnam'],['US','United States'],['GB','United Kingdom'],['FR','France'],['AU','Australia'],['CA','Canada']].map(([code,name])=><option key={code} value={code}>{tr(name)}</option>)}</select></label><label>{tr("Region code")} <span>{tr("(optional)")}</span><input aria-label={tr("Holiday region")} placeholder={tr("e.g. BE")} value={subdivision} onChange={e=>{setSubdivision(e.target.value);setHolidays([]);}}/></label><button type="button" className="fc-source-secondary" disabled={busy} onClick={loadHolidays}>{busy?tr('Loading…'):tr('Find holidays')}</button></div>
+                            <p className="fc-calendar-note">{tr("Suggestions use your calendar coverage. Adding a holiday creates a Closed exception.")}</p>
+                            <div className="fc-calendar-exceptions">{!holidays.length && <p className="fc-calendar-empty">{tr("Holiday suggestions will appear here.")}</p>}{holidays.map(row=><div className="fc-calendar-event" key={row.date}><div className="fc-calendar-event-copy"><strong>{row.label}</strong><span>{formatForecastDate(row.date,locale)}</span></div><button type="button" className="fc-source-secondary" disabled={draft.exceptions.some(e=>e.start===row.date && e.end===row.date && e.status==='closed' && !e.ids.length)} onClick={()=>add({start:row.date,end:row.date,status:'closed',ids:[],label:row.label.slice(0,120)})}>{draft.exceptions.some(e=>e.start===row.date && e.end===row.date && e.status==='closed' && !e.ids.length)?tr('Added'):tr('Add closure')}</button></div>)}</div>
                         </div>
-                    </> : <p className="fc-calendar-note">Enable the calendar to distinguish scheduled closures from missing data, and show zero expected sales on closed days.</p>}
-                    {error && <p className="fc-source-error" role="alert">{error}</p>}
-                    <CalendarConflictSummary review={review} />
-                    <div className="fc-calendar-actions"><div className="fc-calendar-action-status" role="status">{dirty?<><strong>Changes ready to apply</strong><span>Your preview updates after applying.</span></>:applied?<><strong>{review?.closed_count||0} closed item-days · {review?.conflict_count||0} conflicts</strong><span>{calendar.start} – {calendar.end}</span></>:<span>No calendar applied</span>}</div><div>{dirty && <button type="button" className="fc-source-secondary" onClick={()=>{setDraft({...defaults,...calendar});setScope((calendar?.ids||[]).join(', '));setDirty(false);onDirty(false);setError('');setExceptionConflicts([]);}}>Discard changes</button>}<button type="button" className="fc-source-confirm" disabled={!dirty || busy} onClick={apply}>Apply calendar</button></div></div>
+                    </> : <p className="fc-calendar-note">{tr("Enable the calendar to distinguish scheduled closures from missing data, and show zero expected sales on closed days.")}</p>}
+                    {error && <p className="fc-source-error" role="alert">{tr(formatCalendarMessage(error,locale))}</p>}
+                    <CalendarConflictSummary review={review} locale={locale} />
+                    <div className="fc-calendar-actions"><div className="fc-calendar-action-status" role="status">{dirty?<><strong>{tr("Changes ready to apply")}</strong><span>{tr("Your preview updates after applying.")}</span></>:applied?<><strong>{review?.closed_count||0} {tr("closed item-days ·")} {review?.conflict_count||0} {tr("conflicts")}</strong><span>{formatForecastDate(calendar.start,locale)} – {formatForecastDate(calendar.end,locale)}</span></>:<span>{tr("No calendar applied")}</span>}</div><div>{dirty && <button type="button" className="fc-source-secondary" onClick={()=>{setDraft({...defaults,...calendar});setDateErrors({});setDateReset(n=>n+1);setScope((calendar?.ids||[]).join(', '));setDirty(false);onDirty(false);setError('');setExceptionConflicts([]);}}>{tr("Discard changes")}</button>}<button type="button" className="fc-source-confirm" disabled={!dirty || busy} onClick={apply}>{tr("Apply calendar")}</button></div></div>
                 </div>
             </details>;
         };
 
-        const PreparationFrequency = ({frequency,automatic,detectedFrequency,detectionFailed,update}) => <label>Frequency<select aria-label="Missing data frequency" value={automatic ? '' : frequency} onChange={e=>update({frequency:e.target.value || null,frequency_confirmed:false})}><option value="">Detect automatically</option>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{v.replace('_',' ')}</option>)}</select>{automatic && <span className="fc-prep-auto-frequency" role="status">{detectedFrequency ? `${detectedFrequency.replace('_',' ')} (auto)` : detectionFailed ? 'Not detected' : 'Detecting…'}</span>}</label>;
+        const PreparationFrequency = ({frequency,automatic,detectedFrequency,detectionFailed,update,locale='en-US'}) => { const tr=value=>window.ForecastDialogI18n.translate(value,locale); return <label>{tr("Frequency")}<select aria-label={tr("Missing data frequency")} value={automatic ? '' : frequency} onChange={e=>update({frequency:e.target.value || null,frequency_confirmed:false})}><option value="">{tr("Detect automatically")}</option>{['hourly','daily','business_daily','weekly','monthly','quarterly','yearly'].map(v=><option key={v} value={v}>{tr(v.replace('_',' '))}</option>)}</select>{automatic && <span className="fc-prep-auto-frequency" role="status">{detectedFrequency ? tr(`${tr(detectedFrequency.replace('_',' '))} (auto)`) : detectionFailed ? tr('Not detected') : tr('Detecting…')}</span>}</label>; };
         const missingHandlingStatus = (review, current, error) => {
             if (review?.conflict_count) return {readyToConfirm:false,tone:'warning',summary:'Resolve calendar conflicts first',items:'Calendar review required'};
             if (error) return {readyToConfirm:false,tone:'warning',summary:'Resolve the scan error first',items:'Review paused'};
@@ -5673,52 +5885,54 @@
             row.prepared ?? (row.conflict ? 'Conflict' : 'Unresolved'),
             row.conflict ? 'Calendar conflict' : row.calendar_conflict_resolved ? (row.closed ? 'Closed · conflict resolved' : 'Observed · conflict resolved') : row.closed ? (row.original == null ? 'No record · closed' : 'Closed') : PREPARATION_METHODS[row.method] || (row.missing ? 'Unresolved' : 'Observed')
         ];
-        const normalizePreviewSearch = value => String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        const normalizePreviewSearch = value => String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase();
         const previewSearchTerms = query => Array.from(query.matchAll(/"([^"]*)"|(\S+)/g), match=>normalizePreviewSearch(match[1] ?? match[2]).trim()).filter(Boolean);
         const indexPreviewRows = (rows, cells) => rows.map(row=>({row, values:cells(row).map(normalizePreviewSearch)}));
         const searchPreviewRows = (index, terms) => index.filter(({values})=>terms.every(term=>values.some(value=>value.includes(term)))).map(({row})=>row);
         const rawPreviewItemIds = (rows, itemColumn) => itemColumn < 0 ? [] : [...new Set(rows.map(row=>String(row[itemColumn] ?? '')).filter(Boolean))];
         const filterRawPreviewItems = (rows, itemColumn, itemId) => !itemId || itemColumn < 0 ? rows : rows.filter(row=>String(row[itemColumn] ?? '')===itemId);
-        const MissingDataReview = ({review,update,frequencyAuto,detectedFrequency,detectionFailed,handlingLocked,handlingStatus}) => {
+        const MissingDataReview = ({review,update,locale='en-US',frequencyAuto,detectedFrequency,detectionFailed,handlingLocked,handlingStatus}) => {
+            const tr=value=>window.ForecastDialogI18n.translate(value,locale);
             const policy=review.policy, affected=review.items.filter(item=>item.missing || item.conflicts);
             const [view,setView] = useState('handling');
             const handled=Math.max(0,review.missing_count-review.unresolved);
             const progress=review.missing_count?Math.min(100,handled/review.missing_count*100):0;
-            return <section className="fc-prep-panel fc-missing-workspace" aria-label="Missing data">
+            return <section className="fc-prep-panel fc-missing-workspace" aria-label={tr("Missing data")}>
                 <div className="fc-missing-overview">
-                    <div><h3>Prepare missing values</h3><p>{review.missing_count} gaps across {affected.length} {affected.length===1?'item':'items'} · Original zeros stay unchanged.</p></div>
-                    <div className="fc-missing-progress"><span><strong>{handled} / {review.missing_count}</strong> gaps filled</span><div role="progressbar" aria-label="Missing values filled" aria-valuenow={handled} aria-valuemin={0} aria-valuemax={review.missing_count || 1}><i style={{width:`${progress}%`}}/></div></div>
+                    <div><h3>{tr("Prepare missing values")}</h3><p>{review.missing_count} {tr("gaps across")} {affected.length} {affected.length===1?tr('item'):tr('items')} {tr("· Original zeros stay unchanged.")}</p></div>
+                    <div className="fc-missing-progress"><span><strong>{handled} / {review.missing_count}</strong> {tr("gaps filled")}</span><div role="progressbar" aria-label={tr("Missing values filled")} aria-valuenow={handled} aria-valuemin={0} aria-valuemax={review.missing_count || 1}><i style={{width:`${progress}%`}}/></div></div>
                 </div>
-                <div className="fc-missing-counts"><span><strong>{review.empty_count}</strong> empty {review.empty_count===1?'quantity':'quantities'}</span><span><strong>{review.absent_periods}</strong> missing {review.absent_periods===1?'period':'periods'}</span><span className="fc-missing-attention" data-complete={handlingStatus.readyToConfirm}><strong>{review.unresolved}</strong> unresolved</span></div>
-                {handlingLocked && <p className="fc-missing-lock" role="status">Choose a valid frequency and resolve the scan error to continue handling missing values.</p>}
-                <nav className="fc-calendar-nav fc-missing-nav" aria-label="Missing data sections"><button type="button" aria-pressed={view==='handling'} onClick={()=>setView('handling')}>Handling setup</button><button type="button" aria-pressed={view==='items'} onClick={()=>setView('items')}>Review items ({affected.length})</button><span className="fc-missing-review-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.items}</span></nav>
+                <div className="fc-missing-counts"><span>{tr(`${review.empty_count} empty ${review.empty_count===1?'quantity':'quantities'}`)}</span><span>{tr(`${review.absent_periods} missing ${review.absent_periods===1?'period':'periods'}`)}</span><span className="fc-missing-attention" data-complete={handlingStatus.readyToConfirm}><strong>{review.unresolved}</strong> {tr("unresolved")}</span></div>
+                {handlingLocked && <p className="fc-missing-lock" role="status">{tr("Choose a valid frequency and resolve the scan error to continue handling missing values.")}</p>}
+                <nav className="fc-calendar-nav fc-missing-nav" aria-label={tr("Missing data sections")}><button type="button" aria-pressed={view==='handling'} onClick={()=>setView('handling')}>{tr("Handling setup")}</button><button type="button" aria-pressed={view==='items'} onClick={()=>setView('items')}>{tr("Review items (")}{affected.length})</button><span className="fc-missing-review-status" data-tone={handlingStatus.tone} role="status">{tr(handlingStatus.items)}</span></nav>
                 <div className="fc-missing-tab" hidden={view!=='handling'}>
                     <div className="fc-missing-setup">
-                        <div className="fc-missing-frequency"><PreparationFrequency frequency={policy.frequency} automatic={frequencyAuto} detectedFrequency={detectedFrequency} detectionFailed={detectionFailed} update={update}/><p>The interval between observations.</p></div>
-                        <fieldset className="fc-prep-dependent fc-missing-default" disabled={handlingLocked}><label>Default handling<select aria-label="Default missing data handling" value={policy.auto_suggest ? 'auto' : policy.method} onChange={e=>update(e.target.value==='auto' ? {auto_suggest:true,method:'none'} : {auto_suggest:false,suggested_methods:{},method:e.target.value,overrides:{}})}><option value="auto">Auto Suggestion</option>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select></label><p>Set a method, then fine-tune each item.</p></fieldset>
-                        <fieldset className="fc-prep-dependent fc-missing-confirm" disabled={handlingLocked}><label className="fc-prep-check fc-prep-final-check" title={handlingStatus.readyToConfirm ? 'Confirm the frequency and review the prepared values.' : 'Resolve all gaps and required item reviews first.'}><input type="checkbox" disabled={!handlingStatus.readyToConfirm} checked={policy.frequency_confirmed} onChange={e=>update({frequency_confirmed:e.target.checked})}/>I confirm the frequency and all missing-data handling</label><p>{handlingStatus.readyToConfirm ? 'Review your preview, then confirm.' : 'Available after all gaps and item reviews are resolved.'}</p></fieldset>
+                        <div className="fc-missing-frequency"><PreparationFrequency locale={locale} frequency={policy.frequency} automatic={frequencyAuto} detectedFrequency={detectedFrequency} detectionFailed={detectionFailed} update={update}/><p>{tr("The interval between observations.")}</p></div>
+                        <fieldset className="fc-prep-dependent fc-missing-default" disabled={handlingLocked}><label>{tr("Default handling")}<select aria-label={tr("Default missing data handling")} value={policy.auto_suggest ? 'auto' : policy.method} onChange={e=>update(e.target.value==='auto' ? {auto_suggest:true,method:'none'} : {auto_suggest:false,suggested_methods:{},method:e.target.value,overrides:{}})}><option value="auto">{tr("Auto Suggestion")}</option>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{tr(label)}</option>)}</select></label><p>{tr("Set a method, then fine-tune each item.")}</p></fieldset>
+                        <fieldset className="fc-prep-dependent fc-missing-confirm" disabled={handlingLocked}><label className="fc-prep-check fc-prep-final-check" title={tr(handlingStatus.readyToConfirm ? 'Confirm the frequency and review the prepared values.' : 'Resolve all gaps and required item reviews first.')}><input type="checkbox" disabled={!handlingStatus.readyToConfirm} checked={policy.frequency_confirmed} onChange={e=>update({frequency_confirmed:e.target.checked})}/>{tr("I confirm the frequency and all missing-data handling")}</label><p>{handlingStatus.readyToConfirm ? tr('Review your preview, then confirm.') : tr('Available after all gaps and item reviews are resolved.')}</p></fieldset>
                     </div>
-                    {policy.auto_suggest && <p className="fc-missing-guidance">Auto Suggestion uses each item’s recommended method and keeps manual overrides. Items without a recommendation remain unresolved.</p>}
-                    <details className="fc-missing-help"><summary>How handling works</summary><p>Interpolation needs values on both sides. Seasonal filling uses earlier matching cycles. Validation reapplies your rule inside each training window; some boundary gaps may still require correction. Review prepared values before confirming.</p></details>
+                    {policy.auto_suggest && <p className="fc-missing-guidance">{tr("Auto Suggestion uses each item’s recommended method and keeps manual overrides. Items without a recommendation remain unresolved.")}</p>}
+                    <details className="fc-missing-help"><summary>{tr("How handling works")}</summary><p>{tr("Interpolation needs values on both sides. Seasonal filling uses earlier matching cycles. Validation reapplies your rule inside each training window; some boundary gaps may still require correction. Review prepared values before confirming.")}</p></details>
                 </div>
                 <div className="fc-missing-tab" hidden={view!=='items'}>
                     <fieldset className="fc-prep-dependent" disabled={handlingLocked}><div className="fc-prep-items fc-missing-items">{affected.map(item=>{
                         const needsReview=item.review_required && !policy.reviewed_items.includes(item.id);
                         const status=item.conflicts?'Calendar conflict':item.error?'Needs attention':item.unresolved?`${item.unresolved} unresolved`:needsReview?'Review required':'Handled';
                         return <article className="fc-prep-item" key={item.id}>
-                            <div className="fc-missing-item-heading"><div><strong>{item.id}</strong><span>{item.missing} missing · longest gap {item.longest_gap}</span></div><span className="fc-missing-item-status" data-complete={status==='Handled'}>{status}</span></div>
-                            <p>{item.reason}</p>
-                            <div className="fc-prep-controls"><label className="fc-missing-item-method">Handling<select aria-label={`Handling for ${item.id}`} disabled={item.entirely_missing} value={item.method} onChange={e=>update({overrides:{...policy.overrides,[item.id]:e.target.value}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{label}</option>)}</select></label>{item.suggested!=='none' && <button type="button" className="fc-source-secondary" onClick={()=>update({overrides:{...policy.overrides,[item.id]:item.suggested}})}>Use suggested {PREPARATION_METHODS[item.suggested]}</button>}</div>
-                            {item.entirely_missing?<p className="fc-source-error">This entire series is missing. Correct the original data.</p>:item.review_required && <label className="fc-prep-check"><input type="checkbox" checked={policy.reviewed_items.includes(item.id)} onChange={e=>update({reviewed_items:e.target.checked?[...policy.reviewed_items,item.id]:policy.reviewed_items.filter(id=>id!==item.id)})}/>I reviewed this long or boundary gap, including whether it predates the item’s launch.</label>}
-                            {item.error && <p className="fc-source-error">{item.error}</p>}
+                            <div className="fc-missing-item-heading"><div><strong>{item.id}</strong><span>{item.missing} {tr("missing · longest gap")} {item.longest_gap}</span></div><span className="fc-missing-item-status" data-complete={status==='Handled'}>{tr(status)}</span></div>
+                            <p>{tr(item.reason)}</p>
+                            <div className="fc-prep-controls"><label className="fc-missing-item-method">{tr("Handling")}<select aria-label={tr(`Handling for ${item.id}`)} disabled={item.entirely_missing} value={item.method} onChange={e=>update({overrides:{...policy.overrides,[item.id]:e.target.value}})}>{Object.entries(PREPARATION_METHODS).map(([v,label])=><option key={v} value={v}>{tr(label)}</option>)}</select></label>{item.suggested!=='none' && <button type="button" className="fc-source-secondary" onClick={()=>update({overrides:{...policy.overrides,[item.id]:item.suggested}})}>{tr("Use suggested")} {tr(PREPARATION_METHODS[item.suggested])}</button>}</div>
+                            {item.entirely_missing?<p className="fc-source-error">{tr("This entire series is missing. Correct the original data.")}</p>:item.review_required && <label className="fc-prep-check"><input type="checkbox" checked={policy.reviewed_items.includes(item.id)} onChange={e=>update({reviewed_items:e.target.checked?[...policy.reviewed_items,item.id]:policy.reviewed_items.filter(id=>id!==item.id)})}/>{tr("I reviewed this long or boundary gap, including whether it predates the item’s launch.")}</label>}
+                            {item.error && <p className="fc-source-error">{tr(formatCalendarMessage(item.error,locale))}</p>}
                         </article>;
                     })}</div></fieldset>
                 </div>
-                <fieldset className="fc-prep-dependent fc-missing-preview-controls" disabled={handlingLocked}><button type="button" className="fc-source-secondary" onClick={()=>update({method:'none',auto_suggest:false,suggested_methods:{},overrides:{},zero_confirmed:false,reviewed_items:[]})}>Reset handling</button></fieldset>
+                <fieldset className="fc-prep-dependent fc-missing-preview-controls" disabled={handlingLocked}><button type="button" className="fc-source-secondary" onClick={()=>update({method:'none',auto_suggest:false,suggested_methods:{},overrides:{},zero_confirmed:false,reviewed_items:[]})}>{tr("Reset handling")}</button></fieldset>
             </section>;
         };
 
         const MappingModal = ({ initialSource, onClose, onConfirm, t, baseUrl }) => {
+            const locale=t.numberLocale; const tr=value=>window.ForecastDialogI18n.translate(value,locale);
             const [mode, setMode] = useState(initialSource?.mode || 'template');
             const [templateFormat, setTemplateFormat] = useState(initialSource?.format || 'vertical');
             const [sources, setSources] = useState(() => initialSource ? { [initialSource.mode === 'template' ? `template-${initialSource.format || 'horizontal'}` : 'custom']: initialSource } : {});
@@ -5872,8 +6086,8 @@
             const gapPreview = !!(review?.missing_count || review?.conflict_count);
             const preparedPreview = gapPreview || !!review?.policy?.operating_calendar?.enabled;
             const searchTerms = useMemo(()=>previewSearchTerms(previewQuery),[previewQuery]);
-            const preparedSearchIndex = useMemo(()=>indexPreviewRows(review?.records || [],preparationPreviewCells),[review?.records]);
-            const rawSearchIndex = useMemo(()=>indexPreviewRows(source?.rows || [],row=>row.slice(0,60)),[source?.rows]);
+            const preparedSearchIndex = useMemo(()=>indexPreviewRows(review?.records || [],row=>[...preparationPreviewCells(row),...preparationPreviewCells(row).slice(2).map(tr),formatForecastDate(row.ds,t.numberLocale)]),[review?.records,t.numberLocale]);
+            const rawSearchIndex = useMemo(()=>indexPreviewRows(source?.rows || [],row=>[...row.slice(0,60),...row.slice(0,60).map((value,index)=>formatSourcePreviewCell(value,index,source,t.numberLocale))]),[source?.rows,source?.mapping.date,t.numberLocale]);
             const searchedRecords = useMemo(()=>searchPreviewRows(preparedSearchIndex,searchTerms),[preparedSearchIndex,searchTerms]);
             const previewRecords = filterPreparationRecords({...review,records:searchedRecords}, itemFilter, false, false);
             const itemColumn = source?.headers.indexOf(source?.mapping.sku) ?? -1;
@@ -5891,8 +6105,12 @@
             };
             const visibleRows = rawPreviewRows.slice(page * pageSize, (page + 1) * pageSize);
             const visibleHeaders = source?.headers.slice(0, 60) || [];
+            const displayHeader = header => {
+                const label = source?.format === 'horizontal' ? formatForecastHeader(header, locale) : header;
+                return mode === 'template' ? tr(label) : label;
+            };
             const uploadControl = <button type="button" className="fc-source-upload" data-empty={!source && !loading ? "true" : "false"}
-                                disabled={loading} onClick={() => inputRef.current?.click()} title={`${source?.file.name || t('mapping.upload_prompt')} · ${t('mapping.upload_formats')}`} aria-label={t(source ? 'mapping.replace_file' : 'mapping.choose_file')}>
+                                disabled={loading} onClick={() => inputRef.current?.click()} title={`${source?.file.name || t('mapping.upload_prompt')} · ${t('mapping.upload_formats')}`} aria-label={tr(t(source ? 'mapping.replace_file' : 'mapping.choose_file'))}>
                                 <UploadIcon /><span className="fc-source-upload-copy"><strong>{source?.file.name || t('mapping.upload_prompt')}</strong><span>{t('mapping.upload_formats')}</span></span>
                             </button>;
 
@@ -5902,13 +6120,13 @@
                 <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="fc-source-title" className="fc-source-dialog">
                     <header className="fc-source-header">
                         <div className="fc-source-heading"><span className="fc-source-icon"><ColumnsIcon /></span><div><h2 id="fc-source-title">{t('mapping.source_title')}</h2><p>{t('mapping.source_subtitle')}</p></div></div>
-                        <button type="button" className="fc-source-secondary" onClick={()=>setLibraryOpen(value=>!value)}>{libraryOpen ? "Back to upload" : "My datasets"}</button>
-                        <button type="button" className="fc-source-close" onClick={onClose} aria-label={t('mapping.cancel')}><XIcon /></button>
+                        <button type="button" className="fc-source-secondary" onClick={()=>setLibraryOpen(value=>!value)}>{libraryOpen ? tr("Back to upload") : tr("My datasets")}</button>
+                        <button type="button" className="fc-source-close" onClick={onClose} aria-label={tr(t('mapping.cancel'))}><XIcon /></button>
                     </header>
                     <div className="fc-source-body scroller">
-                        {libraryOpen ? <DatasetLibrary baseUrl={baseUrl} onOpen={openDataset} /> : <>
+                        {libraryOpen ? <DatasetLibrary baseUrl={baseUrl} onOpen={openDataset} locale={t.numberLocale} /> : <>
                         <div className="fc-source-toolbar">
-                        <div className="fc-source-choices" role="group" aria-label={t('mapping.source_title')}>
+                        <div className="fc-source-choices" role="group" aria-label={tr(t('mapping.source_title'))}>
                             {['template', 'custom'].map(value => <button key={value} type="button" aria-pressed={mode === value} className="fc-source-choice" onClick={() => chooseMode(value)}>
                                 <span className="fc-source-choice-icon">{value === 'template' ? <ColumnsIcon /> : <UploadIcon />}</span>
                                 <span><strong>{t(`mapping.${value}_title`)}</strong><small>{t(`mapping.${value}_hint`)}</small></span>
@@ -5923,50 +6141,50 @@
                             </select>
                             <a className="fc-source-download" href={`./assets/templates/${FORECAST_TEMPLATE_FILES[templateFormat]}`} download={FORECAST_TEMPLATE_FILES[templateFormat]}><DownloadIcon />{t('mapping.download')}</a>
                         </div>}
-                        {mode === 'custom' && source && <div className="fc-source-upload-entry">{uploadControl}<button type="button" className="fc-source-remove-upload" aria-label="Remove uploaded file" title="Remove uploaded file" disabled={saving} onClick={clearUpload}><XIcon /></button></div>}
+                        {mode === 'custom' && source && <div className="fc-source-upload-entry">{uploadControl}<button type="button" className="fc-source-remove-upload" aria-label={tr("Remove uploaded file")} title={tr("Remove uploaded file")} disabled={saving} onClick={clearUpload}><XIcon /></button></div>}
                         </div>
                         {mode === 'custom' && <>
-                            <input ref={inputRef} type="file" accept=".xlsx,.csv" hidden onChange={upload} aria-label={t('mapping.choose_file')} />
+                            <input ref={inputRef} type="file" accept=".xlsx,.csv" hidden onChange={upload} aria-label={tr(t('mapping.choose_file'))} />
                             {!source && uploadControl}
                         </>}
                         {loading && <div role="status" className="fc-source-message">{t('mapping.loading')}</div>}
-                        {errors[sourceKey] && <p role="alert" className="fc-source-error">{errors[sourceKey]}</p>}
+                        {errors[sourceKey] && <p role="alert" className="fc-source-error">{tr(errors[sourceKey])}</p>}
                         {source && !loading && <>
                             {mode === 'template' && <div className="fc-source-template-note"><p>{t('mapping.template_note')}</p></div>}
                             <div className="fc-source-mapping">
                                 {(source.format === 'vertical' ? ['sku', 'date', 'value'] : ['sku', 'start', 'end']).map((key, index) => <div key={key}><label htmlFor={`fc-source-${key}`}>{t(`mapping.${(source.format === 'vertical' ? ['sku_col','date_col','quantity_col'] : ['sku_col','start_col','end_col'])[index]}`)}</label>
                                     <select id={`fc-source-${key}`} value={source.mapping[key]} disabled={mode === 'template'} onChange={e => changeMapping(key, e.target.value)}>
                                         <option value="">{t('mapping.select_column')}</option>
-                                        {source.headers.map((header, i) => <option key={i} value={header}>{header}</option>)}
+                                        {source.headers.map((header, i) => <option key={i} value={header}>{displayHeader(header)}</option>)}
                                     </select>
                                 </div>)}
                             </div>
-                            {reviewError && <div role="alert" className="fc-source-error">{reviewError}</div>}
-                            {mode==='custom' && <OperatingCalendarEditor key={sourceKey+source.file.name+source.file.lastModified} calendar={source.preparation?.operating_calendar} review={review} baseUrl={baseUrl} update={updatePreparation} onDirty={setCalendarDirty}/>}
-                            {!review && reviewError && /calendar|frequency/i.test(reviewError) && <section className="fc-prep-panel" aria-label="Calendar settings"><div className="fc-prep-controls"><PreparationFrequency frequency={source.preparation?.frequency} automatic={source.preparation?.frequency == null} detectionFailed={!!reviewError} update={updatePreparation}/></div></section>}
-                            {!review && !reviewError && <p role="status" className="fc-prep-help">Scanning quantities and calendar…</p>}
-                            {gapPreview && <details className="fc-source-foldout" open={preparationOpen} onToggle={event=>setPreparationOpen(event.currentTarget.open)} data-attention={!info.valid}><summary>Missing data<span className="fc-prep-status" data-tone={handlingStatus.tone} role="status">{handlingStatus.summary}</span></summary><MissingDataReview review={displayReview} handlingStatus={handlingStatus} handlingLocked={handlingLocked} frequencyAuto={source.preparation?.frequency == null} detectedFrequency={detectedFrequency} detectionFailed={!!reviewError} update={updatePreparation} /></details>}
-                            {mode === 'custom' && <details className="fc-source-foldout"><summary>Save &amp; download<span>Keep a private version or export prepared data</span></summary><div className="fc-prep-save"><input aria-label="Save dataset as" disabled={!!source.datasetId} title={source.datasetId ? "Rename this dataset in My datasets" : undefined} maxLength={120} placeholder="Dataset name (optional)" value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty || saving} onClick={saveDataset}>{source.datasetId?'Save new version':'Save to My datasets'}</button><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty} onClick={()=>downloadPreparedPreview(review,source.file.name)}>Download prepared data</button></div>
-                            {saveMessage && <p role="status" className="fc-prep-help">{saveMessage}</p>}</details>}
-                            <div className="fc-source-preview-heading"><h3>{t('mapping.preview')}</h3>{previewItemIds.length > 0 && <fieldset className="fc-prep-dependent fc-preview-filters" aria-label="Data Preview filters"><div className="fc-prep-controls"><label><select aria-label="Preview item" value={itemFilter} onChange={e=>{setItemFilter(e.target.value);setPage(0);}}><option value="">All items</option>{previewItemIds.map(id=><option key={id} value={id}>{id}</option>)}</select></label></div></fieldset>}<div className="fc-preview-search"><input type="search" aria-label="Search Data Preview" placeholder="Search preview…" value={previewQuery} onChange={e=>changePreviewQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Escape' && previewQuery){e.preventDefault();e.stopPropagation();changePreviewQuery('');}}}/>{previewQuery && <button type="button" aria-label="Clear preview search" onClick={()=>changePreviewQuery('')}>×</button>}</div><span>{info.items} {t('mapping.items')} <span aria-hidden="true">·</span> {info.count} {t('mapping.months_detected')}</span></div>
-                            {searchTerms.length > 0 && <p className="fc-preview-search-results" role="status">{previewRowCount} of {unsearchedRowCount} rows match within the current filters.</p>}
+                            {reviewError && <div role="alert" className="fc-source-error">{tr(formatCalendarMessage(reviewError,t.numberLocale))}</div>}
+                            {mode==='custom' && <OperatingCalendarEditor key={sourceKey+source.file.name+source.file.lastModified} calendar={source.preparation?.operating_calendar} review={review} baseUrl={baseUrl} update={updatePreparation} onDirty={setCalendarDirty} locale={t.numberLocale}/>}
+                            {!review && reviewError && /calendar|frequency/i.test(reviewError) && <section className="fc-prep-panel" aria-label={tr("Calendar settings")}><div className="fc-prep-controls"><PreparationFrequency locale={locale} frequency={source.preparation?.frequency} automatic={source.preparation?.frequency == null} detectionFailed={!!reviewError} update={updatePreparation}/></div></section>}
+                            {!review && !reviewError && <p role="status" className="fc-prep-help">{tr("Scanning quantities and calendar…")}</p>}
+                            {gapPreview && <details className="fc-source-foldout" open={preparationOpen} onToggle={event=>setPreparationOpen(event.currentTarget.open)} data-attention={!info.valid}><summary>{tr("Missing data")}<span className="fc-prep-status" data-tone={handlingStatus.tone} role="status">{tr(handlingStatus.summary)}</span></summary><MissingDataReview locale={t.numberLocale} review={displayReview} handlingStatus={handlingStatus} handlingLocked={handlingLocked} frequencyAuto={source.preparation?.frequency == null} detectedFrequency={detectedFrequency} detectionFailed={!!reviewError} update={updatePreparation} /></details>}
+                            {mode === 'custom' && <details className="fc-source-foldout"><summary>{tr("Save & download")}<span>{tr("Keep a private version or export prepared data")}</span></summary><div className="fc-prep-save"><input aria-label={tr("Save dataset as")} disabled={!!source.datasetId} title={tr(source.datasetId ? "Rename this dataset in My datasets" : undefined)} maxLength={120} placeholder={tr("Dataset name (optional)")} value={datasetName} onChange={e=>setDatasetName(e.target.value)} /><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty || saving} onClick={saveDataset}>{source.datasetId?tr('Save new version'):tr('Save to My datasets')}</button><button type="button" className="fc-source-secondary" disabled={!info.valid || calendarDirty} onClick={()=>downloadPreparedPreview(review,source.file.name)}>{tr("Download prepared data")}</button></div>
+                            {saveMessage && <p role="status" className="fc-prep-help">{tr(saveMessage)}</p>}</details>}
+                            <div className="fc-source-preview-heading"><h3>{t('mapping.preview')}</h3>{previewItemIds.length > 0 && <fieldset className="fc-prep-dependent fc-preview-filters" aria-label={tr("Data Preview filters")}><div className="fc-prep-controls"><label><select aria-label={tr("Preview item")} value={itemFilter} onChange={e=>{setItemFilter(e.target.value);setPage(0);}}><option value="">{tr("All items")}</option>{previewItemIds.map(id=><option key={id} value={id}>{id}</option>)}</select></label></div></fieldset>}<div className="fc-preview-search"><input type="search" aria-label={tr("Search Data Preview")} placeholder={tr("Search preview…")} value={previewQuery} onChange={e=>changePreviewQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Escape' && previewQuery){e.preventDefault();e.stopPropagation();changePreviewQuery('');}}}/>{previewQuery && <button type="button" aria-label={tr("Clear preview search")} onClick={()=>changePreviewQuery('')}>×</button>}</div><span>{info.items} {t('mapping.items')} <span aria-hidden="true">·</span> {info.count} {t('mapping.months_detected')}</span></div>
+                            {searchTerms.length > 0 && <p className="fc-preview-search-results" role="status">{previewRowCount} {tr("of")} {unsearchedRowCount} {tr("rows match within the current filters.")}</p>}
                             {preparedPreview ? <>
-                                <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label="Data Preview"><table className="fc-source-table fc-prep-table"><thead><tr><th>Item ID</th><th>Date</th><th>Original</th><th>Prepared</th><th>Method</th></tr></thead><tbody>{!previewRecords.length && <tr><td colSpan={5} className="fc-preview-empty">No rows match. Try another search or adjust the preview filters.</td></tr>}{previewRecords.slice(page*pageSize,(page+1)*pageSize).map((row,i)=><tr key={i} className={row.conflict ? 'fc-prep-conflict' : row.prepared == null ? 'fc-prep-unresolved' : row.closed ? 'fc-prep-closed' : undefined}><td>{row.unique_id}</td><td>{row.ds}</td><td className={row.original == null ? 'fc-prep-missing' : ''}>{preparationPreviewCells(row)[2]}</td><td className={row.missing && row.prepared!==null?'fc-prep-estimate':''}>{preparationPreviewCells(row)[3]}</td><td className={row.calendar_conflict_resolved && !row.conflict ? 'fc-prep-resolved' : undefined} title={row.calendar_conflict_resolved && !row.conflict ? (row.closed ? 'Closed exception applied. Prepared sales set to zero; original sales retained in Original.' : 'Previously marked closed. Calendar corrected; original sales retained.') : undefined}>{preparationPreviewCells(row)[4]}</td></tr>)}</tbody></table></div>
-                                <div className="fc-source-preview-footer"><span>{previewRecords.length ? page*pageSize+1 : 0}–{Math.min((page+1)*pageSize,previewRecords.length)} / {previewRecords.length} rows · Amber = prepared value{review?.closed_count > 0 && ' · Green = calendar applied'}{(review?.unresolved > 0 || review?.conflict_count > 0) && ' · Red = unresolved or conflict'}</span><div><button disabled={page===0} aria-label="Previous rows" onClick={()=>setPage(p=>p-1)}><ChevronLeftIcon/></button><button disabled={(page+1)*pageSize>=previewRecords.length} aria-label="Next rows" onClick={()=>setPage(p=>p+1)}><ChevronRightIcon/></button></div></div>
+                                <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label={tr("Data Preview")}><table className="fc-source-table fc-prep-table"><thead><tr><th>{tr("Item ID")}</th><th>{tr("Date")}</th><th>{tr("Original")}</th><th>{tr("Prepared")}</th><th>{tr("Method")}</th></tr></thead><tbody>{!previewRecords.length && <tr><td colSpan={5} className="fc-preview-empty">{tr("No rows match. Try another search or adjust the preview filters.")}</td></tr>}{previewRecords.slice(page*pageSize,(page+1)*pageSize).map((row,i)=><tr key={i} className={row.conflict ? 'fc-prep-conflict' : row.prepared == null ? 'fc-prep-unresolved' : row.closed ? 'fc-prep-closed' : undefined}><td>{row.unique_id}</td><td>{formatForecastDate(row.ds,t.numberLocale)}</td><td className={row.original == null ? 'fc-prep-missing' : ''}>{tr(preparationPreviewCells(row)[2])}</td><td className={row.missing && row.prepared!==null?'fc-prep-estimate':''}>{tr(preparationPreviewCells(row)[3])}</td><td className={!row.conflict && (row.calendar_conflict_resolved || (row.missing && row.prepared != null && row.method && row.method !== 'none')) ? 'fc-prep-resolved' : undefined} title={tr(row.calendar_conflict_resolved && !row.conflict ? (row.closed ? 'Closed exception applied. Prepared sales set to zero; original sales retained in Original.' : 'Previously marked closed. Calendar corrected; original sales retained.') : undefined)}>{tr(preparationPreviewCells(row)[4])}</td></tr>)}</tbody></table></div>
+                                <div className="fc-source-preview-footer"><span>{previewRecords.length ? page*pageSize+1 : 0}–{Math.min((page+1)*pageSize,previewRecords.length)} / {previewRecords.length} {tr("rows · Amber = prepared value")}{tr(' · Green = applied method or calendar')}{(review?.unresolved > 0 || review?.conflict_count > 0) && tr(' · Red = unresolved or conflict')}</span><div><button disabled={page===0} aria-label={tr("Previous rows")} onClick={()=>setPage(p=>p-1)}><ChevronLeftIcon/></button><button disabled={(page+1)*pageSize>=previewRecords.length} aria-label={tr("Next rows")} onClick={()=>setPage(p=>p+1)}><ChevronRightIcon/></button></div></div>
                             </> : <>
-                            <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label={t('mapping.preview')}>
-                                <table className="fc-source-table" data-format={source.format || "horizontal"}><thead><tr>{visibleHeaders.map((header, i) => <th key={i} scope="col" className={header === source.mapping.sku ? 'fc-source-id' : ''}>{header}</th>)}</tr></thead>
-                                    <tbody>{!visibleRows.length && <tr><td colSpan={visibleHeaders.length || 1} className="fc-preview-empty">No rows match. Try another search.</td></tr>}{visibleRows.map((row, ri) => <tr key={page * pageSize + ri}>{visibleHeaders.map((header, ci) => <td key={ci} className={header === source.mapping.sku ? 'fc-source-id' : ''}>{String(row[ci] ?? '')}</td>)}</tr>)}</tbody>
+                            <div className="fc-source-table-wrap scroller" tabIndex={0} role="region" aria-label={tr(t('mapping.preview'))}>
+                                <table className="fc-source-table" data-format={source.format || "horizontal"}><thead><tr>{visibleHeaders.map((header, i) => <th key={i} scope="col" className={header === source.mapping.sku ? 'fc-source-id' : ''}>{displayHeader(header)}</th>)}</tr></thead>
+                                    <tbody>{!visibleRows.length && <tr><td colSpan={visibleHeaders.length || 1} className="fc-preview-empty">{tr("No rows match. Try another search.")}</td></tr>}{visibleRows.map((row, ri) => <tr key={page * pageSize + ri}>{visibleHeaders.map((header, ci) => <td key={ci} className={header === source.mapping.sku ? 'fc-source-id' : ''}>{formatSourcePreviewCell(row[ci],ci,source,t.numberLocale)}</td>)}</tr>)}</tbody>
                                 </table>
                             </div>
                             <div className="fc-source-preview-footer"><span>{rawPreviewRows.length ? page * pageSize + 1 : 0}–{Math.min((page + 1) * pageSize, rawPreviewRows.length)} / {rawPreviewRows.length} {t('mapping.rows')}{source.headers.length > 60 ? ` · ${t('mapping.preview_columns')}` : ''}</span>
-                                {rawPreviewRows.length > pageSize && <div><button type="button" disabled={page === 0} onClick={() => setPage(p => p - 1)} aria-label={t('mapping.previous')}><ChevronLeftIcon /></button><button type="button" disabled={(page + 1) * pageSize >= rawPreviewRows.length} onClick={() => setPage(p => p + 1)} aria-label={t('mapping.next')}><ChevronRightIcon /></button></div>}
+                                {rawPreviewRows.length > pageSize && <div><button type="button" disabled={page === 0} onClick={() => setPage(p => p - 1)} aria-label={tr(t('mapping.previous'))}><ChevronLeftIcon /></button><button type="button" disabled={(page + 1) * pageSize >= rawPreviewRows.length} onClick={() => setPage(p => p + 1)} aria-label={tr(t('mapping.next'))}><ChevronRightIcon /></button></div>}
                             </div>
                             </>}
                         </>}
                         </>}
                     </div>
-                    <footer className="fc-source-footer"><p>{libraryOpen ? 'Private files and version history' : t('mapping.confirm_hint')}</p><div><button type="button" className="fc-source-secondary" onClick={onClose}>{t('mapping.cancel')}</button><button type="button" className="fc-source-confirm" disabled={libraryOpen || !source || loading || !info.valid || calendarDirty || saving || !!errors[sourceKey]} onClick={() => { if (source && !loading && info.valid && !errors[sourceKey]) onConfirm(source.mapping.sku, source.mapping.start, source.mapping.end, readySource()); }}>{t(mode === 'template' ? 'mapping.use_template' : 'mapping.confirm')}</button></div></footer>
+                    <footer className="fc-source-footer"><p>{libraryOpen ? tr('Private files and version history') : t('mapping.confirm_hint')}</p><div><button type="button" className="fc-source-secondary" onClick={onClose}>{t('mapping.cancel')}</button><button type="button" className="fc-source-confirm" disabled={libraryOpen || !source || loading || !info.valid || calendarDirty || saving || !!errors[sourceKey]} onClick={() => { if (source && !loading && info.valid && !errors[sourceKey]) onConfirm(source.mapping.sku, source.mapping.start, source.mapping.end, readySource()); }}>{t(mode === 'template' ? 'mapping.use_template' : 'mapping.confirm')}</button></div></footer>
                 </div>
             </div>;
         };
@@ -6514,21 +6732,24 @@
                 }
             }, [isPolling, runningSkus, isCancelling]);
 
-            const t = (key) => {
-                const keys = key.split('.');
-                let val = TRANSLATIONS[lang] || TRANSLATIONS.en;
-                for (const k of keys) {
-                    val = val ? val[k] : null;
-                }
-                if (val != null) return val;
-                let fallback = TRANSLATIONS.en;
-                for (const k of keys) {
-                    fallback = fallback ? fallback[k] : null;
-                }
-                return fallback || key;
-            };
+            const t = useMemo(() => {
+                const translate = (key) => {
+                    const keys = key.split('.');
+                    let val = TRANSLATIONS[lang] || TRANSLATIONS.en;
+                    for (const k of keys) {
+                        val = val ? val[k] : null;
+                    }
+                    if (val != null) return val;
+                    let fallback = TRANSLATIONS.en;
+                    for (const k of keys) {
+                        fallback = fallback ? fallback[k] : null;
+                    }
+                    return fallback || key;
+                };
 
-            t.numberLocale = numberLocaleForLanguage(lang);
+                translate.numberLocale = numberLocaleForLanguage(lang);
+                return translate;
+            }, [lang]);
 
             const isForecastModelAvailable = (candidate) => forecastModelAvailable(candidate, forecastCapabilities);
             const hasAvailableAdvancedModels = SELECTABLE_FORECAST_MODELS.some(
@@ -7297,9 +7518,8 @@
                 return skuData.forecast_data.map(fd => {
                     const vd = valMap.get(fd.date);
                     return {
+                        ...vd, // Preserve preparation metadata and each point's train/test role.
                         date: fd.date, // Use forecast date as master axis
-                        actual_train: vd ? vd.actual_train : null,
-                        actual_test: vd ? vd.actual_test : null,
                         fitted: vd ? vd.fitted : null,
                         val_forecast: vd ? vd.val_forecast : null
                     };

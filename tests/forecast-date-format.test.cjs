@@ -22,3 +22,45 @@ test('missing labels and non-ISO values are not guessed or reinterpreted', () =>
     assert.equal(format('01/02/2026', 'en-US'), '01/02/2026');
     assert.equal(format('2026', 'vi-VN'), '2026');
 });
+const {parseCalendarDateInput:parse,formatSourcePreviewCell:cell,formatCalendarMessage:message}=new Function(helper+';return {parseCalendarDateInput,formatSourcePreviewCell,formatCalendarMessage};')();
+test('calendar entry converts language-specific dates into canonical ISO without rollover',()=>{
+ assert.equal(parse('03/02/2026','vi-VN'),'2026-02-03');
+ assert.equal(parse('03.02.2026','de-DE'),'2026-02-03');
+ for(const locale of ['en-US','vi-VN','de-DE']){
+  assert.equal(parse('2024-02-29',locale),'2024-02-29');
+  assert.equal(parse('2026-02-29',locale),null);
+  assert.equal(parse('2026-04-31',locale),null);
+  assert.equal(parse('',locale),'');
+ }
+ assert.equal(parse('02/03/2026','en-US'),null);
+ assert.equal(parse('31.12.2026','vi-VN'),null);
+ assert.equal(parse('29/02/1900','vi-VN'),null);
+ assert.equal(parse('29/02/2000','vi-VN'),'2000-02-29');
+});
+test('preview date cells and conflict dates localize without changing IDs or quantities',()=>{
+ const source={format:'vertical',headers:['Item ID','Date','Quantity'],mapping:{date:'Date'}};
+ assert.equal(cell('2026-02-03',1,source,'de-DE'),'03.02.2026');
+ assert.equal(cell('2026-02-03',0,source,'de-DE'),'2026-02-03');
+ assert.equal(cell(123,2,source,'vi-VN'),'123');
+ assert.equal(message('Closed dates: 2026-02-03, 2026-02-04','vi-VN'),'Closed dates: 03/02/2026, 04/02/2026');
+});
+
+const headerParser = source.slice(source.indexOf('const FORECAST_MONTH_NAMES ='), source.indexOf('const inferFrequencyFromHeaders ='));
+const formatHeader = new Function(headerParser + helper + ';return formatForecastHeader;')();
+test('horizontal named and ISO month headers use localized month precision', () => {
+    for (const [locale, expected] of [['vi-VN','01/2021'], ['de-DE','01.2021'], ['en-US','2021-01']]) {
+        for (const header of ['Jan-21','January 2021','jan/2021','2021-01']) {
+            assert.equal(formatHeader(header,locale),expected);
+        }
+    }
+    assert.equal(formatHeader('Dec-23','vi-VN'),'12/2023');
+    assert.equal(formatHeader('Dec-69','en-US'),'2069-12');
+    assert.equal(formatHeader('Jan-70','en-US'),'1970-01');
+});
+test('horizontal daily/hourly dates retain precision while non-date headers remain unchanged', () => {
+    assert.equal(formatHeader('2024-02-29','de-DE'),'29.02.2024');
+    assert.equal(formatHeader('2026-01-01T00:15:30+07:00','vi-VN'),'01/01/2026 00:15:30+07:00');
+    for (const header of ['Item ID','2021','2021-13','Custom-21','Product Jan-21']) {
+        assert.equal(formatHeader(header,'vi-VN'),header);
+    }
+});

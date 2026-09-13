@@ -85,3 +85,17 @@ test('prepared replay preserves missing dates and excludes them from fold metric
     assert.equal(replay.folds[0].metrics.mae,2);
     assert.equal(replay.folds[1].metrics.mae,0);
 });
+
+test('prepared display metadata cannot become simulation scoring targets',()=>{
+ const data=result();data.preparation={method:'interpolation'};
+ Object.assign(data.forecast_data[4],{actual_history:null,prepared_actual:100,preparation_method:'interpolation'});
+ data.validation_summary.all_forecasts=data.validation_forecasts.map(p=>({...p,actual:p.date.startsWith(dates[4])?null:p.actual}));
+ const replay=build(data);
+ assert.equal(replay.history[4].value,null);
+ assert.equal(replay.history[4].prepared_actual,100);
+ assert.equal(replay.history[4].preparation_method,'interpolation');
+ assert.ok(replay.domain[1]>100);
+ assert.equal(replay.folds[0].scoredCount,1);
+ assert.equal(replay.folds[0].metrics.mae,2);
+ assert.equal(replay.folds[1].metrics.mae,0);
+});
